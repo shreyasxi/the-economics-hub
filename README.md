@@ -2,6 +2,13 @@
 
 An automated Python pipeline that generates key macroeconomic charts and tables; tracking Global Equities, Forex, Sovereign Bonds, Commodities, and Indian Market nuances for [The Economics Hub](https://economicshub.substack.com/) Substack newsletter.
 
+<p align="center">
+  <img src="assets/macro/2026-02/05_macro_table.png" alt="Market Dashboard" width="48%">
+  <img src="assets/weekly/2026-02-10/00_summary_table.png" alt="India FPI Flows" width="48%">
+  <img src="assets/weekly/2026-02-10/10_sector_rotation.png" alt="India FPI Flows" width="48%">
+</p>
+
+
 
 ## 📁 Project Structure
 
@@ -110,78 +117,6 @@ python make_chart.py
 
 ---
 
-## Visual Style
-
-All charts follow a consistent institutional theme defined in `style/economics_hub_style.py`:
-
-**Layout:** White background, black title (18pt bold, top-left), thin horizontal rule below title, source citation bottom-left, "The Economics Hub" watermark bottom-right in bold serif (Cambria → Georgia → Palatino → Times New Roman).
-
-**Colour Palette:**
-
-| Key | Hex | Usage |
-|-----|-----|-------|
-| US | `#003366` | S&P 500, DXY, US yields, navy series |
-| EU | `#008080` | Euro Stoxx, EUR/USD, teal series |
-| UK | `#2ca02c` | FTSE, GBP, green series |
-| India | `#FF9933` | Nifty, INR, saffron series |
-| Japan | `#CC0066` | Nikkei, JPY, magenta series |
-| Gold | `#B8860B` | Gold price |
-| Silver | `#708090` | Silver price |
-| Copper | `#B87333` | Copper price |
-| Energy | `#CC0000` | Brent crude |
-| Positive | `#065F46` | Green (gains, inflows) |
-| Negative | `#991B1B` | Red (losses, outflows) |
-
-**Chart features:** Anti-aliased lines with subtle shadow for depth, end-labels on trend lines with white stroke background, reference lines (e.g., VIX at 20, Fed target at 2%, PMI at 50).
-
----
-
-## Chart Templates
-
-All templates inherit from `EconStyle` and share the same visual language. They can be used independently for custom charts.
-
-### TrendLineChart
-
-```python
-from charts.templates.trend_line import TrendLineChart
-
-trend = TrendLineChart()
-trend.add_series("S&P 500", dates, values, color_key="us")
-trend.add_series("FTSE 100", dates, values, color_key="uk")
-trend.add_reference_line(4500, label="2023 High", color="#999")
-trend.render(title="Equity Markets", subtitle="12-Month Trend",
-             source="Yahoo Finance", ylabel="Index", normalize=True)
-trend.save("output/my_chart.png")
-```
-
-### WeeklyBarChart
-
-```python
-from charts.templates.weekly_bar import WeeklyBarChart
-
-chart = WeeklyBarChart(
-    names=["S&P 500", "FTSE", "Nifty"],
-    values=[1.5, -0.8, 2.1],
-    change_type="pct"
-)
-chart.render(title="Equities", subtitle="Weekly Change", source="Yahoo Finance")
-chart.save("output/equities_bar.png")
-```
-
-### YieldCurveChart
-
-```python
-from charts.templates.yield_curve import YieldCurveChart
-
-yc = YieldCurveChart()
-yc.add_curve("Current", tenors, yields, style="current")
-yc.add_curve("4 Weeks Ago", tenors, yields_4w, style="4w_ago")
-yc.add_curve("52 Weeks Ago", tenors, yields_52w, style="52w_ago")
-yc.render(title="US Treasury Yield Curve", subtitle="...", source="FRED")
-yc.save("output/yield_curve.png")
-```
-
----
 
 ## Data Sources
 
@@ -208,7 +143,5 @@ This project is licensed for **personal and research use only**.
 * **Attribution:** You must give appropriate credit to **The Economics Hub**.
 * **NonCommercial:** You may **not** use this material for commercial purposes (e.g., selling these charts, using the pipeline for a paid client deliverable).
 ---
-
-**The Economics Hub** — Data-driven macro analysis for finance professionals.
 
 
