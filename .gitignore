@@ -1,0 +1,39 @@
+# ═══════════════════════════════════════
+# Economics Hub — .gitignore
+# ═══════════════════════════════════════
+
+# ── API KEYS & SECRETS ──
+.env
+.streamlit/secrets.toml
+**/secrets*
+**/*api_key*
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# ── Virtual Environment ──
+.venv/
+venv/
+env/
+
+# ── Output (generated charts — don't bloat the repo) ──
+output/
+
+# ── OS Files ──
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Jupyter (if you ever use it) ──
+.ipynb_checkpoints/
