@@ -3,7 +3,7 @@
 Economics Hub — Weekly Dashboard Generator
 ============================================
 Run this script every Friday/Saturday to generate the full
-weekly dashboard. Produces all charts and a newsletter template.
+weekly dashboard. Produces all charts.
 
 Usage:
     python generate_weekly.py              # Live data (requires API keys)
@@ -15,7 +15,6 @@ The script:
 2. Calculates weekly changes
 3. Generates all dashboard charts
 4. Saves everything to output/weekly/YYYY-MM-DD/
-5. Generates a newsletter markdown template
 """
 
 import sys
@@ -238,98 +237,7 @@ def generate_with_mock_data(output_dir):
         source="Yahoo Finance, FRED",
     )
     table.save(output_dir / "00_summary_table.png")
-    
-    # ─────────────────────────────────────────
-    # NEWSLETTER TEMPLATE
-    # ─────────────────────────────────────────
-    generate_newsletter_template(output_dir)
-    
-    print(f"\n✅ Dashboard complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
-    print(f"   {output_dir}")
-    print(f"\n📝 Newsletter template: {output_dir / 'newsletter.md'}")
-
-
-def generate_newsletter_template(output_dir):
-    """Generate a Markdown template for the Substack newsletter."""
-    date_str = datetime.now().strftime("%d %B %Y")
-    week_num = datetime.now().isocalendar()[1]
-    
-    template = f"""# The Weekly Pulse — Week {week_num}
-*{date_str}*
-
----
-
-Happy Saturday! Here's your weekly macro dashboard.
-
----
-
-## Global Equities
-
-![Equities Weekly](01_equities_weekly.png)
-
-![Equities Trend](02_equities_trend.png)
-
-> **One-liner:** [Your one-sentence summary of equity markets this week]
-
----
-
-## Foreign Exchange
-
-![FX Weekly](03_fx_weekly.png)
-
-![FX Trend](04_fx_trend.png)
-
-> **One-liner:** [Your one-sentence summary of FX moves]
-
----
-
-## Government Bond Yields
-
-![Yields Weekly](05_yields_weekly.png)
-
-![Yield Curve](06_yield_curve.png)
-
-![Yields Trend](06b_yields_trend.png)
-
-> **One-liner:** [Your one-sentence summary of yield movements]
-
----
-
-## Commodities
-
-![Commodities Weekly](07_commodities_weekly.png)
-
-![Commodities Trend](08_commodities_trend.png)
-
-> **One-liner:** [Your one-sentence summary of commodity moves]
-
----
-
-## The Signal
-
-*[This is where you write 300-500 words of original analysis. Pick one thing from the dashboard that caught your attention and explain WHY it matters.]*
-
-**[Title of your insight]**
-
-[Your analysis here...]
-
----
-
-## Market Snapshot
-
-![Summary Table](00_summary_table.png)
-
----
-
-*The Economics Hub — Global finance through multiple lenses.*
-
-*If you found this useful, please share it with someone who'd appreciate rigorous macro analysis.*
-
-[Subscribe](https://yoursubstack.substack.com)
-"""
-    
-    (output_dir / "newsletter.md").write_text(template)
-
+        
 
 def generate_with_live_data(output_dir):
     """Generate dashboard with live API data from yfinance + FRED."""
@@ -801,11 +709,8 @@ def generate_with_live_data(output_dir):
                  source="Yahoo Finance, FRED")
     table.save(output_dir / "00_summary_table.png")
 
-    generate_newsletter_template(output_dir)
-
     print(f"\n✅ Dashboard complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")
-    print(f"\n📝 Newsletter template: {output_dir / 'newsletter.md'}")
 
 
 def main():

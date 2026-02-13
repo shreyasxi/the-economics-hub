@@ -21,7 +21,7 @@ from datetime import datetime
 class EconStyle:
 
     # ─── BACKGROUND & BORDER ─────────────────
-    BACKGROUND       = "#FFFFFF"
+    BACKGROUND       = "#FFFFFF" 
     CHART_BG         = "#FFFFFF"
     ROW_ALT          = "#F4F4F4"
 

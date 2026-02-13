@@ -3,7 +3,7 @@
 Economics Hub — Monthly Macro Pulse Generator
 ===============================================
 Run on the 2nd Saturday of each month (after NFP + CPI release).
-Generates 5 macro charts + summary table + newsletter section.
+Generates 6 macro charts + summary table + newsletter section.
 
 Usage:
     python generate_macro.py                # Live FRED data
@@ -11,7 +11,7 @@ Usage:
 
 Before running:
     1. Update MANUAL_DATA in config/macro_settings.py
-       (India unemployment from CMIE, etc.)
+       (EM PMI Composite, etc.)
     2. Ensure fredapi is installed: pip install fredapi
 
 Output: output/macro/YYYY-MM/
@@ -179,7 +179,7 @@ def chart_inflation(engine, output_dir):
             continue
         dates = series.index.to_pydatetime().tolist()
         vals = series.values
-        ax1.plot(dates, vals, color=ind["color"], linewidth=1.8,
+        ax1.plot(dates, vals, color=ind["color"], linewidth=2.2,
                  solid_capstyle="round", zorder=3)
         _add_end_label(ax1, dates, vals, ind["name"], ind["color"])
 
@@ -203,20 +203,20 @@ def chart_inflation(engine, output_dir):
     xmin, xmax = ax1.get_xlim()
     ax1.set_xlim(xmin, xmax + (xmax - xmin) * 0.22)
 
-    # ── Right Panel: International ──
-    for ind_id in ["ez_cpi_yoy", "uk_cpi_yoy", "india_cpi_yoy"]:
+    # ── Right Panel: International (Eurozone, UK) ──
+    for ind_id in ["ez_cpi_yoy", "uk_cpi_yoy"]:
         ind = MACRO_INDICATORS[ind_id]
         series = engine.get_transformed(ind_id)
         if series.empty:
             continue
         dates = series.index.to_pydatetime().tolist()
         vals = series.values
-        ax2.plot(dates, vals, color=ind["color"], linewidth=1.8,
+        ax2.plot(dates, vals, color=ind["color"], linewidth=2.2,
                  solid_capstyle="round", zorder=3)
         _add_end_label(ax2, dates, vals, ind["name"], ind["color"])
 
     _style_axis(ax2, ylabel="CPI YoY (%)")
-    ax2.set_title("Eurozone · UK · India", fontsize=12, fontweight="bold",
+    ax2.set_title("Eurozone · UK", fontsize=12, fontweight="bold",
                   color=EconStyle.TEXT_TITLE, loc="left", pad=8)
 
     for spine in ["top", "right", "left"]:
@@ -394,8 +394,72 @@ def chart_financial_conditions(engine, output_dir):
     return filepath
 
 
+def chart_emerging_markets(engine, output_dir):
+    """Chart 4: Emerging Markets Stress Monitor — EM HY + Corp Spread + USD Index."""
+    EconStyle.apply_global_style()
+
+    fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    # ── Primary: EM Credit Spreads ──
+    for ind_id in ["em_hy_spread", "em_corp_spread"]:
+        if ind_id not in MACRO_INDICATORS:
+            continue
+        ind = MACRO_INDICATORS[ind_id]
+        series = engine.get_transformed(ind_id)
+        if series.empty:
+            continue
+        dates = series.index.to_pydatetime().tolist()
+        # Convert to bps (* 100)
+        vals = series.values * 100
+        ax1.plot(dates, vals, color=ind["color"], linewidth=2.2,
+                 solid_capstyle="round", zorder=3)
+        _add_end_label(ax1, dates, vals, ind["name"], ind["color"])
+
+    ax1.set_ylabel("Credit Spread (bps)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                   color="#000000", labelpad=6)
+
+    # ── Secondary: USD Index vs EM ──
+    ax2 = ax1.twinx()
+    if "em_usd_index" in MACRO_INDICATORS:
+        usd = engine.get_transformed("em_usd_index")
+        if not usd.empty:
+            dates_u = usd.index.to_pydatetime().tolist()
+            vals_u = usd.values
+            ax2.plot(dates_u, vals_u, color="#003366", linewidth=1.5,
+                     linestyle="--", alpha=0.85, zorder=2, solid_capstyle="round")
+            _add_end_label(ax2, dates_u, vals_u, "USD vs EM", "#003366")
+
+    ax2.set_ylabel("USD Index (vs EM)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                   color="#003366", labelpad=6)
+    ax2.tick_params(axis="y", colors="#003366")
+    ax2.spines["right"].set_visible(True)
+    ax2.spines["right"].set_color("#003366")
+    ax2.spines["right"].set_linewidth(0.5)
+
+    _style_axis(ax1)
+    for spine in ["top", "left"]:
+        ax1.spines[spine].set_visible(False)
+    ax2.spines["top"].set_visible(False)
+
+    xmin, xmax = ax1.get_xlim()
+    ax1.set_xlim(xmin, xmax + (xmax - xmin) * 0.18)
+
+    EconStyle.set_title(ax1, "Emerging Markets Stress Monitor",
+                        "EM High Yield & Corporate Spreads vs. USD Strength")
+    EconStyle.add_top_rule(ax1)
+    EconStyle.add_source(fig, "FRED (ICE BofA, Federal Reserve)")
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "04_macro_em.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Emerging Markets Stress Monitor")
+    return filepath
+
+
 def chart_money_rates(engine, output_dir):
-    """Chart 4: Money & Rates — M2 YoY, 2s10s, Real Yield (triple line)."""
+    """Chart 5: Money & Rates — M2 YoY, 2s10s, Real Yield (triple line)."""
     EconStyle.apply_global_style()
 
     fig, ax = plt.subplots(figsize=EconStyle.SIZE_WIDE)
@@ -409,7 +473,7 @@ def chart_money_rates(engine, output_dir):
             continue
         dates = series.index.to_pydatetime().tolist()
         vals = series.values
-        ax.plot(dates, vals, color=ind["color"], linewidth=1.8,
+        ax.plot(dates, vals, color=ind["color"], linewidth=2.2,
                 solid_capstyle="round", zorder=3)
         _add_end_label(ax, dates, vals, ind["name"], ind["color"])
 
@@ -437,14 +501,14 @@ def chart_money_rates(engine, output_dir):
     EconStyle.add_source(fig, "FRED")
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
 
-    filepath = output_dir / "04_macro_money.png"
+    filepath = output_dir / "05_macro_money.png"
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Money & Rates")
     return filepath
 
 
 def chart_macro_table(engine, output_dir):
-    """Chart 5: Macro Summary Table — matching Market Snapshot style."""
+    """Chart 6: Macro Summary Table — matching Market Snapshot style."""
     EconStyle.apply_global_style()
 
     # ── Build row data ──
@@ -464,6 +528,11 @@ def chart_macro_table(engine, output_dir):
                 latest_str = f"{latest:+,.0f}K"
             elif "claims" in ind_id:
                 latest_str = f"{latest/1000:,.0f}K"
+            elif "spread" in ind_id or "hy" in ind_id:
+                # Credit spreads: multiply by 100 for bps display
+                latest_str = f"{latest*100:.0f} bps"
+            elif "usd_index" in ind_id:
+                latest_str = f"{latest:.1f}"
             elif abs(latest) > 100:
                 latest_str = f"{latest:,.0f}"
             elif abs(latest) >= 1:
@@ -480,6 +549,10 @@ def chart_macro_table(engine, output_dir):
                         change_str = "0.0"
                     else:
                         change_str = f"{change_k:+.1f}"
+                elif "spread" in ind_id or "hy" in ind_id:
+                    # Credit spreads change in bps
+                    change_bps = change * 100
+                    change_str = f"{change_bps:+.0f}"
                 elif abs(change) < 0.005:
                     change_str = "0.00"
                 else:
@@ -496,7 +569,7 @@ def chart_macro_table(engine, output_dir):
                 "unit": ind.get("unit", ""),
             })
 
-        # Manual rows (India unemployment etc.)
+        # Manual rows (EM PMI etc.)
         for manual_key in section.get("manual_rows", []):
             if manual_key in MANUAL_DATA:
                 m = MANUAL_DATA[manual_key]
@@ -508,11 +581,19 @@ def chart_macro_table(engine, output_dir):
                 else:
                     change_str = "-"
 
+                # Format value based on unit
+                if m["unit"] == "index":
+                    val_str = f"{m['value']:.1f}"
+                elif m["unit"] == "%":
+                    val_str = f"{m['value']:.1f}%"
+                else:
+                    val_str = f"{m['value']}"
+
                 rows.append({
                     "section": section["section"],
                     "section_color": section["color"],
                     "name": m["name"],
-                    "latest": f"{m['value']:.1f}%",
+                    "latest": val_str,
                     "change": change_str,
                     "unit": m["unit"],
                     "manual_source": m["source"],
@@ -608,7 +689,7 @@ def chart_macro_table(engine, output_dir):
 
     # ── Footer ──
     footer_y = y - row_h/2 - 0.40
-    ax.text(0.5, footer_y, f"Source: FRED, OECD, CMIE  |  {datetime.now().strftime('%d %b %Y')}",
+    ax.text(0.5, footer_y, f"Source: FRED, OECD, ICE BofA, S&P Global  |  {datetime.now().strftime('%d %b %Y')}",
             fontsize=8, color="#666666", ha="left", va="bottom")
     ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT,
             fontproperties=EconStyle._get_masthead_font(),
@@ -616,77 +697,10 @@ def chart_macro_table(engine, output_dir):
 
     EconStyle.finalize(fig, ax, source=None, tight=False)
 
-    filepath = output_dir / "05_macro_table.png"
+    filepath = output_dir / "06_macro_table.png"
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Macro Summary Table")
     return filepath
-
-
-# ═══════════════════════════════════════════════
-# NEWSLETTER TEMPLATE
-# ═══════════════════════════════════════════════
-
-def generate_macro_newsletter(output_dir):
-    """Generate the Macro Pulse newsletter section."""
-    month_str = datetime.now().strftime("%B %Y")
-
-    template = f"""# Macro Pulse — {month_str}
-
----
-
-## Inflation Dashboard
-
-![Inflation](01_macro_inflation.png)
-
-> **Key takeaway:** [One sentence on the inflation picture — is it cooling, sticky, or diverging across regions?]
-
----
-
-## Labour Market
-
-![Labour](02_macro_labour.png)
-
-> **Key takeaway:** [One sentence — is the labour market tightening, loosening, or stable?]
-
----
-
-## Financial Conditions & Credit
-
-![Financial Conditions](03_macro_financial.png)
-
-> **Key takeaway:** [One sentence — are conditions easing or tightening? Any credit stress signals?]
-
----
-
-## Money, Rates & the Yield Curve
-
-![Money & Rates](04_macro_money.png)
-
-> **Key takeaway:** [One sentence — what is money supply doing? Is the yield curve signalling anything?]
-
----
-
-## Macro Summary
-
-![Macro Table](05_macro_table.png)
-
----
-
-## The Deep Dive
-
-*[This is your 400-600 word original analysis. Pick ONE theme from the macro dashboard and explain why it matters for markets in the next 1-3 months. Connect the dots between two or more indicators.]*
-
-**[Title of your insight]**
-
-[Your analysis here...]
-
----
-
-*The Economics Hub — Global finance through multiple lenses.*
-"""
-
-    (output_dir / "macro_newsletter.md").write_text(template)
-    return output_dir / "macro_newsletter.md"
 
 
 # ═══════════════════════════════════════════════
@@ -732,15 +746,14 @@ def generate_macro_dashboard():
     chart_inflation(engine, output_dir)
     chart_labour(engine, output_dir)
     chart_financial_conditions(engine, output_dir)
+    chart_emerging_markets(engine, output_dir)
     chart_money_rates(engine, output_dir)
     chart_macro_table(engine, output_dir)
 
-    # ── Newsletter template ──
-    nl_path = generate_macro_newsletter(output_dir)
-
+    
     print(f"\n✅ Macro Pulse complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")
-    print(f"\n📝 Newsletter template: {nl_path}")
+    
 
 
 def main():

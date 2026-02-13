@@ -24,22 +24,18 @@ from datetime import datetime
 #   4. Run generate_macro.py
 
 MANUAL_DATA = {
-    "india_unemployment": {
-        "value": 8.0,               # ← UPDATE THIS each month (%)
-        "previous_value": 7.8,      # ← Previous month's value (for MoM change)
-        "as_of": "2026-01-31",      # ← UPDATE THIS (date of the figure)
-        "source": "CMIE",
-        "name": "India Unemployment Rate",
-        "unit": "%",
+    # ═══════════════════════════════════════════
+    # EMERGING MARKETS (Manual - no FRED source)
+    # ═══════════════════════════════════════════
+    "em_lc_bonds": {                # <--- CHANGED from em_pmi_composite
+        "value": 26.47,             # <--- Price of EMLC ETF
+        "previous_value": 25.91,    
+        "as_of": "2026-02-11",
+        "source": "",               
+        "name": "EM Local Currency Bonds",
+        "unit": "USD",
     },
     # Add more manual entries here as needed
-    # "india_repo_rate": {
-    #     "value": 6.50,
-    #     "as_of": "2026-02-01",
-    #     "source": "RBI",
-    #     "name": "RBI Repo Rate",
-    #     "unit": "%",
-    # },
 }
 
 
@@ -110,16 +106,6 @@ MACRO_INDICATORS = {
         "unit": "% YoY",
         "group": "inflation_intl",
         "color": "#2ca02c",      # Green
-        "history_years": 3,
-    },
-    "india_cpi_yoy": {
-        "series": "INDCPIALLMINMEI",
-        "name": "India CPI",
-        "frequency": "monthly",
-        "transform": "yoy_pct",
-        "unit": "% YoY",
-        "group": "inflation_intl",
-        "color": "#FF9933",      # Saffron (India)
         "history_years": 3,
     },
 
@@ -202,6 +188,40 @@ MACRO_INDICATORS = {
     },
 
     # ═══════════════════════════════════════════
+    # EMERGING MARKETS (NEW SECTION)
+    # ═══════════════════════════════════════════
+    "em_hy_spread": {
+        "series": "BAMLEMHBHYCRPIOAS",
+        "name": "EM HY Credit Spread",
+        "frequency": "daily",
+        "transform": "level",
+        "unit": "bps",
+        "group": "emerging_markets",
+        "color": "#FF9933",      # Saffron/EM color
+        "history_years": 3,
+    },
+    "em_corp_spread": {
+        "series": "BAMLEMCBPIOAS",
+        "name": "EM Corporate Spread",
+        "frequency": "daily",
+        "transform": "level",
+        "unit": "bps",
+        "group": "emerging_markets",
+        "color": "#CC0066",      # Magenta
+        "history_years": 3,
+    },
+    "em_usd_index": {
+        "series": "DTWEXEMEGS",
+        "name": "USD Index (vs EM)",
+        "frequency": "daily",
+        "transform": "level",
+        "unit": "index",
+        "group": "emerging_markets",
+        "color": "#003366",
+        "history_years": 3,
+    },
+
+    # ═══════════════════════════════════════════
     # MONEY & RATES
     # ═══════════════════════════════════════════
     "m2_yoy": {
@@ -252,8 +272,8 @@ MACRO_CHARTS = {
                 "ylabel": "Rate (%)",
             },
             {
-                "subtitle": "Eurozone · UK · India",
-                "indicators": ["ez_cpi_yoy", "uk_cpi_yoy", "india_cpi_yoy"],
+                "subtitle": "Eurozone · UK",
+                "indicators": ["ez_cpi_yoy", "uk_cpi_yoy"],
                 "ylabel": "CPI YoY (%)",
             },
         ],
@@ -280,6 +300,17 @@ MACRO_CHARTS = {
             "ylabel": "HY OAS (bps)",
         },
     },
+    "emerging_markets": {
+        "title": "Emerging Markets Stress Monitor",
+        "primary": {
+            "indicators": ["em_hy_spread", "em_corp_spread"],
+            "ylabel": "Credit Spread (bps)",
+        },
+        "secondary": {
+            "indicators": ["em_usd_index"],
+            "ylabel": "USD Index",
+        },
+    },
     "money": {
         "title": "Money, Rates & the Yield Curve Signal",
         "indicators": ["m2_yoy", "spread_2s10s", "real_yield_10y"],
@@ -296,19 +327,24 @@ MACRO_TABLE_SECTIONS = [
         "section": "INFLATION",
         "color": "#B91C1C",
         "rows": ["us_cpi_yoy", "us_core_pce", "us_inflation_exp",
-                 "ez_cpi_yoy", "uk_cpi_yoy", "india_cpi_yoy"],
+                 "ez_cpi_yoy", "uk_cpi_yoy"],
     },
     {
         "section": "LABOUR MARKET",
         "color": "#0F172A",
         "rows": ["us_unemployment", "us_payrolls", "us_claims",
                  "ez_unemployment", "uk_unemployment"],
-        "manual_rows": ["india_unemployment"],
     },
     {
         "section": "FINANCIAL CONDITIONS",
         "color": "#059669",
         "rows": ["nfci", "hy_spread"],
+    },
+    {
+        "section": "EMERGING MARKETS",
+        "color": "#FF9933",
+        "rows": ["em_hy_spread", "em_corp_spread", "em_usd_index"],
+        "manual_rows": ["em_lc_bonds"],
     },
     {
         "section": "MONEY & RATES",

@@ -10,6 +10,8 @@ Data sources (all manual — no API available):
   - Bank Credit Growth:  RBI monthly bulletin (YoY %)
   - Unemployment:        CMIE (monthly)
   - FPI Flows:           fpi.nsdl.co.in (net monthly, $B)
+  - CPI (Headline):      mospi.gov.in (12th of month, YoY %)
+  - Core CPI:            RBI / mospi.gov.in (YoY %)
 
 Usage:
   python generate_india.py                    # Generate all charts
@@ -33,6 +35,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
 
 # ── Project imports ──
 sys.path.insert(0, str(Path(__file__).parent))
@@ -56,6 +59,17 @@ C_UNEMPLOYMENT  = "#CC0000"     # Red — unemployment
 C_FPI_POS       = "#065F46"     # Dark green — inflows
 C_FPI_NEG       = "#991B1B"     # Dark red — outflows
 C_PMI_50        = "#999999"     # Grey — expansion/contraction line
+
+# Section colors for table (matching macro_table style)
+SECTION_COLORS = {
+    "INFLATION":       "#B91C1C",
+    "PMI":             "#FF9933",
+    "FISCAL":          "#059669",
+    "CREDIT & FLOWS":  "#7C3AED",
+    "LABOUR":          "#0F172A",
+}
+
+SECTION_BG = "#F1F5F9"  # Slate 100
 
 
 # ═══════════════════════════════════════════
@@ -317,152 +331,196 @@ def chart_fpi(df, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 5: INDIA MACRO SUMMARY TABLE
+# CHART 5: INDIA MACRO PULSE TABLE (Bloomberg Style)
 # ═══════════════════════════════════════════
 
 def chart_table(df, output_dir):
-    """India macro pulse table — latest values + MoM change."""
+    """
+    India Macro Pulse Table — Bloomberg/FT style matching macro_table.py
+    Now includes CPI section at top for complete picture.
+    """
+    EconStyle.apply_global_style()
+    
     latest = df.iloc[-1]
     prev = df.iloc[-2] if len(df) >= 2 else None
 
-    # Define rows
-    indicators = [
+    # ═══════════════════════════════════════════
+    # DEFINE TABLE STRUCTURE
+    # ═══════════════════════════════════════════
+    # Each section: (section_name, [(display_name, csv_column, unit, format_fn)])
+    
+    TABLE_SECTIONS = [
+        ("INFLATION", [
+            ("CPI (Headline)", "india_cpi_yoy", "% YoY", lambda v: f"{v:.2f}%"),
+            ("Core CPI", "india_core_cpi_yoy", "% YoY", lambda v: f"{v:.2f}%"),
+        ]),
         ("PMI", [
-            ("Mfg PMI", "india_mfg_pmi", "index"),
-            ("Services PMI", "india_svc_pmi", "index"),
+            ("Manufacturing PMI", "india_mfg_pmi", "index", lambda v: f"{v:.1f}"),
+            ("Services PMI", "india_svc_pmi", "index", lambda v: f"{v:.1f}"),
+            ("Composite PMI", "india_composite_pmi", "index", lambda v: f"{v:.1f}"),
         ]),
         ("FISCAL", [
-            ("GST Revenue", "india_gst_revenue", "₹L Cr"),
+            ("GST Revenue", "india_gst_revenue", "₹L Cr", lambda v: f"₹{v:.2f}L Cr"),
         ]),
         ("CREDIT & FLOWS", [
-            ("Bank Credit Growth", "india_bank_credit_yoy", "% YoY"),
-            ("FPI Net Flows", "india_fpi_flows", "$B"),
+            ("Bank Credit Growth", "india_bank_credit_yoy", "% YoY", lambda v: f"{v:.1f}%"),
+            ("FPI Net Flows", "india_fpi_flows", "$B", lambda v: f"${v:+.1f}B"),
         ]),
         ("LABOUR", [
-            ("Unemployment (CMIE)", "india_unemployment", "%"),
+            ("Unemployment (CMIE)", "india_unemployment", "%", lambda v: f"{v:.1f}%"),
         ]),
     ]
 
-    # Build rows
+    # ═══════════════════════════════════════════
+    # BUILD ROW DATA
+    # ═══════════════════════════════════════════
     rows = []
-    for section_name, items in indicators:
-        for name, col, unit in items:
+    for section_name, items in TABLE_SECTIONS:
+        for display_name, col, unit, fmt_fn in items:
             if col in df.columns and pd.notna(latest.get(col)):
                 val = latest[col]
+                
+                # Calculate MoM change
                 if prev is not None and col in df.columns and pd.notna(prev.get(col)):
                     chg = val - prev[col]
-                    chg_str = f"{chg:+.2f}"
                 else:
                     chg = None
-                    chg_str = "-"
+                
                 rows.append({
                     "section": section_name,
-                    "name": name,
+                    "name": display_name,
                     "value": val,
+                    "value_str": fmt_fn(val),
                     "change": chg,
-                    "change_str": chg_str,
                     "unit": unit,
                 })
 
-    # ── Render ──
-    row_h = 0.28
-    sections = list(dict.fromkeys(r["section"] for r in rows))
-    sec_gap = 0.50
-    header_h = 1.4
-    content_h = (sec_gap * len(sections)) + (row_h * len(rows))
-    footer_h = 0.95
-    fig_h = header_h + content_h + footer_h
+    # ═══════════════════════════════════════════
+    # CALCULATE FIGURE DIMENSIONS
+    # ═══════════════════════════════════════════
+    n = len(rows)
+    sections_seen = []
+    for r in rows:
+        if r["section"] not in sections_seen:
+            sections_seen.append(r["section"])
+
+    row_h = 0.25
+    cat_gap = 0.45
+    header_block = 1.4
+    content_h = (0.65 * len(sections_seen)) + (row_h * n)
+    footer_space = 0.95
+    fig_h = header_block + content_h + footer_space
 
     fig, ax = EconStyle.create_figure(size=(7.0, fig_h))
     ax.set_xlim(0, 10)
     ax.set_ylim(0, fig_h)
     ax.axis("off")
 
-    # Title block
-    ax.text(0.3, fig_h - 0.25, "INDIA MACRO PULSE",
-            fontsize=18, fontweight="bold", color="#000000",
-            fontfamily=EconStyle.FONT_FAMILY, va="top")
-    ax.text(0.3, fig_h - 0.60, latest["date"].strftime("%B %Y"),
-            fontsize=11, color="#666666",
-            fontfamily=EconStyle.FONT_FAMILY, va="top")
+    # Column positions (matching macro_table)
+    cx = {"name": 0.5, "latest": 5.5, "change": 7.5, "unit": 9.5}
 
-    # Header rule
-    hdr_y = fig_h - 0.80
-    ax.plot([0.3, 9.7], [hdr_y, hdr_y], color="#000000", linewidth=2,
-            clip_on=False, zorder=10)
+    # ═══════════════════════════════════════════
+    # TITLE BLOCK
+    # ═══════════════════════════════════════════
+    y = fig_h - 0.4
+    ax.text(0.5, y, "INDIA MACRO PULSE", fontsize=20, fontweight="bold",
+            color="#000000", fontfamily="sans-serif", ha="left")
 
-    # Column headers
-    hy = hdr_y - 0.28
-    ax.text(0.5, hy, "INDICATOR", fontsize=8, fontweight="bold", color="#666666",
-            fontfamily=EconStyle.FONT_FAMILY)
-    ax.text(5.0, hy, "LATEST", fontsize=8, fontweight="bold", color="#666666",
-            ha="center", fontfamily=EconStyle.FONT_FAMILY)
-    ax.text(7.0, hy, "MoM CHG", fontsize=8, fontweight="bold", color="#666666",
-            ha="center", fontfamily=EconStyle.FONT_FAMILY)
-    ax.text(9.0, hy, "UNIT", fontsize=8, fontweight="bold", color="#666666",
-            ha="center", fontfamily=EconStyle.FONT_FAMILY)
+    y -= 0.25
+    month_str = latest["date"].strftime("%B %Y")
+    ax.text(0.5, y, month_str, fontsize=10, color="#000000", ha="left")
 
-    ax.plot([0.3, 9.7], [hy - 0.10, hy - 0.10], color="#CCCCCC",
-            linewidth=0.5, clip_on=False)
+    # ═══════════════════════════════════════════
+    # COLUMN HEADERS
+    # ═══════════════════════════════════════════
+    y -= 0.5
+    headers = [("name", "INDICATOR"), ("latest", "LATEST"), 
+               ("change", "MoM CHG"), ("unit", "UNIT")]
+    for key, label in headers:
+        ha = "left" if key == "name" else "right"
+        ax.text(cx[key], y, label, fontsize=9, fontweight="bold",
+                color="#000000", ha=ha, fontfamily="sans-serif")
 
-    y = hy - 0.35
-    current_section = None
+    y -= 0.15
+    ax.plot([0.5, 9.5], [y, y], color="#000000", linewidth=1.2)
 
-    for i, r in enumerate(rows):
+    # ═══════════════════════════════════════════
+    # DATA ROWS
+    # ═══════════════════════════════════════════
+    cur_section = None
+
+    def _draw_section_bar(ax, y, height):
+        rect = plt.Rectangle(
+            (0, y - height/2), 10, height,
+            facecolor=SECTION_BG, edgecolor="none", zorder=0
+        )
+        ax.add_patch(rect)
+
+    for i, row in enumerate(rows):
         # Section header
-        if r["section"] != current_section:
-            current_section = r["section"]
-            ax.text(0.5, y, current_section, fontsize=9, fontweight="bold",
-                    color="#FF9933", fontfamily=EconStyle.FONT_FAMILY)
-            y -= sec_gap * 0.6
-
-        # Alternating row background
-        if i % 2 == 0:
-            ax.fill_between([0.3, 9.7], y - 0.05, y + 0.20,
-                           color="#F8F8F8", zorder=0)
-
-        # Name
-        ax.text(0.5, y, r["name"], fontsize=10, color="#000000",
-                fontfamily=EconStyle.FONT_FAMILY, va="center")
-
-        # Value
-        if r["unit"] == "₹L Cr":
-            val_str = f"₹{r['value']:.2f}L Cr"
-        elif r["unit"] == "$B":
-            val_str = f"${r['value']:+.1f}B"
-        elif r["unit"] == "% YoY":
-            val_str = f"{r['value']:.1f}%"
-        elif r["unit"] == "%":
-            val_str = f"{r['value']:.1f}%"
-        else:
-            val_str = f"{r['value']:.1f}"
-        ax.text(5.0, y, val_str, fontsize=10, fontweight="bold",
-                color="#000000", ha="center", va="center",
-                fontfamily=EconStyle.FONT_FAMILY)
-
-        # Change
-        chg_color = "#000000"
-        if r["change"] is not None:
-            # For unemployment: down is good. For everything else: up is good.
-            if "unemployment" in r["name"].lower():
-                chg_color = EconStyle.POSITIVE if r["change"] <= 0 else EconStyle.NEGATIVE
-            else:
-                chg_color = EconStyle.POSITIVE if r["change"] >= 0 else EconStyle.NEGATIVE
-        ax.text(7.0, y, r["change_str"], fontsize=10, fontweight="bold",
-                color=chg_color, ha="center", va="center",
-                fontfamily=EconStyle.FONT_FAMILY)
-
-        # Unit
-        ax.text(9.0, y, r["unit"], fontsize=9, color="#999999",
-                ha="center", va="center", fontfamily=EconStyle.FONT_FAMILY)
+        if row["section"] != cur_section:
+            cur_section = row["section"]
+            y -= cat_gap
+            _draw_section_bar(ax, y, 0.25)
+            sec_color = SECTION_COLORS.get(cur_section, "#000000")
+            ax.text(cx["name"], y, cur_section, fontsize=9, fontweight="bold",
+                    color=sec_color, ha="left", va="center")
+            y -= 0.20
 
         y -= row_h
 
-    # Footer
-    footer_y = y - row_h
+        # Name
+        ax.text(cx["name"], y, row["name"], fontsize=10, fontweight="medium",
+                color="#000000", ha="left", va="center")
+
+        # Latest value
+        ax.text(cx["latest"], y, row["value_str"], fontsize=10,
+                color="#334155", ha="right", va="center")
+
+        # MoM Change
+        if row["change"] is not None:
+            chg = row["change"]
+            
+            # Determine color based on indicator type
+            # For unemployment: down is good. For everything else: up is good.
+            if "unemployment" in row["name"].lower():
+                chg_color = "#065f46" if chg <= 0 else "#991b1b"
+            elif "fpi" in row["name"].lower():
+                # FPI: positive flows are good
+                chg_color = "#065f46" if chg >= 0 else "#991b1b"
+            else:
+                # PMI, GST, Credit: higher is generally better
+                # CPI: context-dependent, but show neutral
+                if row["section"] == "INFLATION":
+                    chg_color = "#991b1b" if chg > 0 else "#065f46"
+                else:
+                    chg_color = "#065f46" if chg >= 0 else "#991b1b"
+            
+            chg_str = f"{chg:+.2f}"
+        else:
+            chg_str = "-"
+            chg_color = "#64748b"
+
+        ax.text(cx["change"], y, chg_str, fontsize=10, fontweight="bold",
+                color=chg_color, ha="right", va="center")
+
+        # Unit
+        ax.text(cx["unit"], y, row["unit"], fontsize=9,
+                color="#64748b", ha="right", va="center")
+
+        # Dotted separator
+        ax.plot([0.5, 9.5], [y - row_h/2, y - row_h/2],
+                color="#e2e8f0", linewidth=0.8, linestyle=":")
+
+    # ═══════════════════════════════════════════
+    # FOOTER
+    # ═══════════════════════════════════════════
+    footer_y = y - row_h/2 - 0.40
+
     ax.text(0.5, footer_y,
-            f"Source: S&P Global, RBI, PIB, CMIE, NSDL  |  {datetime.now().strftime('%d %b %Y')}",
+            f"Source: S&P Global, RBI, MoSPI, PIB, CMIE, NSDL  |  {datetime.now().strftime('%d %b %Y')}",
             fontsize=8, color="#666666", ha="left", va="bottom")
+    
     ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT,
             fontproperties=EconStyle._get_masthead_font(),
             fontsize=13, color="#1A1A1A", ha="right", va="bottom")
@@ -471,7 +529,7 @@ def chart_table(df, output_dir):
 
     fp = output_dir / "05_india_table.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ India Macro Table")
+    print(f"   ✓ India Macro Pulse Table")
     return fp
 
 
