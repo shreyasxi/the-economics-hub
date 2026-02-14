@@ -54,7 +54,7 @@ Python 3.9+ and a free FRED API key from [fred.stlouisfed.org](https://fred.stlo
 ### Installation
 
 ```bash
-git clone https://github.com/shreyasxi/economics-hub.git
+git clone https://github.com/shreyasxi/the-economics-hub.git
 cd the-economics-hub
 pip install -r requirements.txt
 ```
