@@ -2,7 +2,7 @@
 
 An automated Python pipeline that generates key macroeconomic charts and tables; tracking Global Equities, Forex, Sovereign Bonds, Commodities, and Indian Market nuances for [The Economics Hub](https://economicshub.substack.com/) Substack newsletter.
 
-Here is the sample snapshot of the macro indicators that feature in my newsletters. 
+Here is the sample snapshot of the macro indicators that feature in my newsletters:
 
 | **🌍 Market Snapshot** | **🧿 Macro Pulse** |
 |:---:|:---:|
@@ -46,6 +46,8 @@ Verify it works:
 ```bash
 python -c "import os; print(os.environ.get('FRED_API_KEY', 'NOT SET'))"
 ```
+---
+
 ## 📁 Project Structure
 
 ```
