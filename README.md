@@ -1,14 +1,14 @@
-# The Economics Hub — Weekly Dashboard System
+# The Economics Hub — Weekly Macro Dashboard
 
 An automated Python pipeline that generates key macroeconomic charts and tables; tracking Global Equities, Forex, Sovereign Bonds, Commodities, and Indian Market nuances for [The Economics Hub](https://economicshub.substack.com/) Substack newsletter.
 
-<p align="center">
-  <img src="assets/macro/2026-02/05_macro_table.png" alt="Market Dashboard" width="48%">
-  <img src="assets/weekly/2026-02-10/00_summary_table.png" alt="India FPI Flows" width="48%">
-  <img src="assets/weekly/2026-02-10/10_sector_rotation.png" alt="India FPI Flows" width="48%">
-</p>
+Here is the sample snapshot of the macro indicators that feature in my newsletters. 
 
-
+| **🌍 Market Snapshot** | **🧿 Macro Pulse** |
+|:---:|:---:|
+| <img src="assets/weekly/2026-02-10/00_summary_table.png" width="100%"> | <img src="assets/macro/2026-02/05_macro_table.png" width="100%"> |
+| **🔄 Sectoral Rotations** | **🔴 EM Stress Monitor** |
+| <img src="assets/weekly/2026-02-10/10_sector_rotation.png" width="100%"> | <img src="assets/weekly/2026-02-10/09_vix_trend.png" width="100%"> |
 
 ## 📁 Project Structure
 
