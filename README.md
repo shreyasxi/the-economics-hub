@@ -6,9 +6,9 @@ Here is the sample snapshot of the macro indicators that feature in my newslette
 
 | **🌍 Market Snapshot** | **🧿 Macro Pulse** |
 |:---:|:---:|
-| <img src="assets/weekly/2026-02-10/00_summary_table.png" width="100%"> | <img src="assets/macro/2026-02/05_macro_table.png" width="100%"> |
+| <img src="assets/weekly/2026-02-14/00_summary_table.png" width="100%"> | <img src="assets/macro/2026-02/06_macro_table.png" width="100%"> |
 | **🔄 Sectoral Rotations** | **🔴 EM Stress Monitor** |
-| <img src="assets/weekly/2026-02-10/10_sector_rotation.png" width="100%"> | <img src="assets/weekly/2026-02-10/09_vix_trend.png" width="100%"> |
+| <img src="assets/weekly/2026-02-14/10_sector_rotation.png" width="100%"> | <img src="assets/macro/2026-02/04_macro_em.png" width="100%"> |
 
 ## 📁 Project Structure
 
