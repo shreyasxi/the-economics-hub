@@ -10,39 +10,6 @@ Here is the sample snapshot of the macro indicators that feature in my newslette
 | **🔄 Sectoral Rotations** | **🔴 EM Stress Monitor** |
 | <img src="assets/weekly/2026-02-14/10_sector_rotation.png" width="100%"> | <img src="assets/macro/2026-02/04_macro_em.png" width="100%"> |
 
-## 📁 Project Structure
-
-```
-economics_hub/
-├── config/
-│   ├── settings.py              # Weekly indicators (Yahoo Finance + FRED tickers)
-│   └── macro_settings.py        # Monthly macro indicators (FRED + manual data)
-├── data/
-│   ├── fetchers/
-│   │   ├── yf_fetcher.py        # Yahoo Finance data fetcher
-│   │   └── fred_fetcher.py      # FRED API data fetcher
-│   └── india_manual.csv         # India metrics (manual monthly CSV)
-├── charts/templates/
-│   ├── trend_line.py            # TrendLineChart — line charts with end labels
-│   ├── weekly_bar.py            # WeeklyBarChart — horizontal green/red bars
-│   ├── yield_curve.py           # YieldCurveChart — multi-date yield curves
-│   └── summary_table.py         # SummaryTable — market snapshot table
-├── style/
-│   └── economics_hub_style.py   # EconStyle — visual theme (fonts, colours, layout)
-├── output/                      # Generated charts (not tracked by git)
-│   ├── weekly/YYYY-MM-DD/
-│   ├── macro/YYYY-MM/
-│   └── india/YYYY-MM/
-│   └── custom
-├── generate_weekly.py           # Weekly dashboard
-├── generate_macro.py            # Monthly macro dashboard
-├── generate_india.py            # India macro dashboard
-├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
 ---
 
 ## 🔧 Reproducibility Guide
@@ -79,6 +46,40 @@ Verify it works:
 ```bash
 python -c "import os; print(os.environ.get('FRED_API_KEY', 'NOT SET'))"
 ```
+## 📁 Project Structure
+
+```
+economics_hub/
+├── config/
+│   ├── settings.py              # Weekly indicators (Yahoo Finance + FRED tickers)
+│   └── macro_settings.py        # Monthly macro indicators (FRED + manual data)
+├── data/
+│   ├── fetchers/
+│   │   ├── yf_fetcher.py        # Yahoo Finance data fetcher
+│   │   └── fred_fetcher.py      # FRED API data fetcher
+│   └── india_manual.csv         # India metrics (manual monthly CSV)
+├── charts/templates/
+│   ├── trend_line.py            # TrendLineChart — line charts with end labels
+│   ├── weekly_bar.py            # WeeklyBarChart — horizontal green/red bars
+│   ├── yield_curve.py           # YieldCurveChart — multi-date yield curves
+│   └── summary_table.py         # SummaryTable — market snapshot table
+├── style/
+│   └── economics_hub_style.py   # EconStyle — visual theme (fonts, colours, layout)
+├── output/                      # Generated charts (not tracked by git)
+│   ├── weekly/YYYY-MM-DD/
+│   ├── macro/YYYY-MM/
+│   └── india/YYYY-MM/
+│   └── custom
+├── generate_weekly.py           # Weekly dashboard
+├── generate_macro.py            # Monthly macro dashboard
+├── generate_india.py            # India macro dashboard
+├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+---
 
 ## 📊 Usage
 
@@ -131,17 +132,12 @@ python make_chart.py
 
 ## 📄 License
 
-**Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**
+This project is licensed under the **CC BY-NC 4.0** License.
 
-This project is licensed for **personal and research use only**.
+This project is licensed for **personal and research use only**. You are free to use this code, but you must give appropriate credit to **The Economics Hub**. 
 
-**You are free to:**
-* **Share:** Copy and redistribute the material.
-* **Adapt:** Remix, transform, and build upon the material.
+See the [LICENSE](LICENSE) file for details.
 
-**Under the following terms:**
-* **Attribution:** You must give appropriate credit to **The Economics Hub**.
-* **NonCommercial:** You may **not** use this material for commercial purposes (e.g., selling these charts, using the pipeline for a paid client deliverable).
 ---
 
 
