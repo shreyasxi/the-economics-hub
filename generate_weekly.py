@@ -418,15 +418,15 @@ def generate_with_live_data(output_dir):
 
     print("   [4/8] FX — 12-Month Trends")
     trend = TrendLineChart()
-    for ind_id in ["dxy", "eurusd", "gbpusd", "usdinr"]:
+    for ind_id in ["dxy", "eurusd", "gbpusd", "usdinr", "usdjpy"]:
         dates, vals = get_trend(ind_id)
         if dates:
             ind = INDICATORS[ind_id]
             trend.add_series(ind["name"], dates, vals, color_key=ind["color_key"])
     trend.render(title="Key FX Rates — Trailing 12 Months",
-                 subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, GBP/USD, USD/INR",
+                 subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, GBP/USD, USD/INR, USD/JPY",
                  source="Yahoo Finance", normalize=True, ylabel="Indexed (start = 100)")
-    trend.save(output_dir / "04_fx_trend.png")
+    trend.save(output_dir / "04_fx_trend.png")                                      # <--- Add this
 
     # ── 3. YIELDS ──
     print("   [5/8] Yields — Weekly Bar Chart")
