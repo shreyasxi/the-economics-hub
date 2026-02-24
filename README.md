@@ -7,10 +7,12 @@ Here is the sample snapshot of the macro indicators that feature in my newslette
 | **🌍 Market Snapshot** | **🧿 Macro Pulse** |
 |:---:|:---:|
 | <img src="assets/weekly/2026-02-14/00_summary_table.png" width="100%"> | <img src="assets/macro/2026-02/06_macro_table.png" width="100%"> |
-| **🔄 Sectoral Rotations** | **🔴 EM Stress Monitor** |
-| <img src="assets/weekly/2026-02-14/10_sector_rotation.png" width="100%"> | <img src="assets/macro/2026-02/04_macro_em.png" width="100%"> |
+| **🔄 Sectoral Rotations** | **🛢️ Monthly Capex** |
+| <img src="assets/weekly/2026-02-14/10_sector_rotation.png" width="100%"> | <img src="assets/india/2026-02/10_india_monthly_capex.png" width="100%"> |
+| **💡Expenditure Quality** | **🔴 EM Stress Monitor** |
+| <img src="assets/india/2026-02/07_india_expenditure_quality.png" width="100%"> | <img src="assets/macro/2026-02/04_macro_em.png"> |
 
----
+---  
 
 ## 🔧 Reproducibility Guide
 
