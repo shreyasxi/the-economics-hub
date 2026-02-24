@@ -110,7 +110,7 @@ class SummaryTable:
         # Each category: cat_gap (0.45) + post-header gap (0.20)
         # Each row: row_h (0.25)
         content_below_header = (0.65 * len(cats)) + (row_h * n)
-        footer_space = 0.95  # separator + text + bottom pad
+        footer_space = 0.5  # separator + text + bottom pad
         
         fig_h = header_block + content_below_header + footer_space
 
@@ -199,6 +199,8 @@ class SummaryTable:
         ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT, 
                 fontproperties=EconStyle._get_masthead_font(),
                 fontsize=13, color="#1A1A1A", ha="right", va="bottom")
+
+        ax.set_ylim(footer_y - 0.15, fig_h)
 
         EconStyle.finalize(self.fig, ax, source=None, tight=False)
         return self.fig

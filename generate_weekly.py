@@ -659,7 +659,7 @@ def generate_with_live_data(output_dir):
         "btc", "eth",                                              # Crypto
         "dxy", "eurusd", "gbpusd", "usdinr", "usdjpy",             # FX
         "us_2y", "us_10y", "us_30y", "de_10y",                     # Yields
-        "brent", "gold", "copper", "natgas",                        # Commodities
+        "brent", "gold", "silver", "copper", "natgas",                        # Commodities
         "vix",                                                      # Volatility (AFTER commodities)
     ]
     
