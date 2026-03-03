@@ -152,23 +152,6 @@ def generate_with_mock_data(output_dir):
     )
     yc.save(output_dir / "06_yield_curve.png")
     
-    # Yield trend chart (10Y comparison across countries)
-    print("   [6b/8] Yields — 10Y Trend Comparison")
-    yield_trend = get_mock_yield_trend()
-    trend = TrendLineChart()
-    # FIX: removed in_10y (delisted)
-    for key in ["us_10y", "uk_10y", "de_10y"]:
-        if key in yield_trend:
-            d = yield_trend[key]
-            trend.add_series(d["name"], d["dates"], d["values"], color_key=d["color_key"])
-    trend.render(
-        title="10-Year Government Bond Yields — Trailing 12 Months",
-        subtitle="US, UK, Germany",
-        source="FRED, Yahoo Finance",
-        ylabel="Yield (%)",
-    )
-    trend.save(output_dir / "06b_yields_trend.png")
-    
     # ─────────────────────────────────────────
     # 4. COMMODITIES
     # ─────────────────────────────────────────
@@ -476,28 +459,75 @@ def generate_with_live_data(output_dir):
     except Exception as e:
         print(f"   ⚠ Yield curve failed: {e}")
 
-    print("   [6b/8] Yields — 10Y Trend Comparison")
-    trend = TrendLineChart()
-    # FIX: removed in_10y (delisted). Bund & Gilt are monthly but work for 12m trends.
-    for ind_id in ["us_10y", "uk_10y", "de_10y"]:
-        dates, vals = get_trend(ind_id)
-        if dates:
-            ind = INDICATORS[ind_id]
-            trend.add_series(ind["name"], dates, vals, color_key=ind["color_key"])
-    trend.render(title="10-Year Government Bond Yields — Trailing 12 Months",
-                 subtitle="US, UK, Germany",
-                 source="FRED", ylabel="Yield (%)")
-    trend.save(output_dir / "06b_yields_trend.png")
-
     # ── 4. COMMODITIES ──
-    print("   [7/8] Commodities — Weekly Bar Chart")
-    cm_ids = ["brent", "wti", "gold", "silver", "copper", "natgas"]
+    print("   [7/8] Commodities — Aesthetic Vertical Bar Chart (Weekly)")
+    cm_ids = ["brent", "wti", "gold", "silver", "copper", "natgas", "uranium"]
     names, values, cks = build_bar_data(cm_ids)
-    chart = WeeklyBarChart(names=names, values=values, color_keys=cks)
-    chart.render(title="Commodities",
-                 subtitle=f"Weekly percentage change  ·  {date_label}",
-                 source="Yahoo Finance")
-    chart.save(output_dir / "07_commodities_weekly.png")
+    
+    # Create the custom figure using your wide template
+    fig, ax = EconStyle.create_figure(size="wide")
+    
+    # 1. Premium Institutional Colors
+    color_pos = "#2A4DBE" # Deep, authoritative Slate Blue
+    color_neg = "#820E0E" # Deep, striking red for negatives
+    colors = [color_pos if v >= 0 else color_neg for v in values]
+    
+    # Plot the vertical bars
+    bars = ax.bar(names, values, color=colors, width=0.4, zorder=3)
+    
+    # 2. Restore the Y-Axis and Gridlines
+    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+    ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
+    
+    # Clean up the outer box spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    
+    # Heavy Zero-Line anchor
+    ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+    
+    # Clean up the X-axis labels
+    ax.xaxis.set_tick_params(length=0) 
+    ax.set_xticklabels(names, fontweight='bold', fontsize=11, color="#1C1C1E")
+    
+    # 3. Dynamic Y-Axis Logic (Fixing the gap)
+    min_v = min(values) if values else 0
+    max_v = max(values) if values else 0
+    y_range = max_v - min_v if max_v != min_v else (max_v if max_v != 0 else 1)
+    
+    # Only pad the bottom if there are actual negative numbers. 
+    y_bottom = (min_v - y_range * 0.15) if min_v < 0 else 0
+    y_top = (max_v + y_range * 0.15) if max_v > 0 else 0
+    
+    ax.set_ylim(y_bottom, y_top)
+    
+    for bar, v in zip(bars, values):
+        yval = bar.get_height()
+        offset = y_range * 0.02 
+        
+        if v >= 0:
+            y_pos = yval + offset
+            va = 'bottom'
+        else:
+            y_pos = yval - offset
+            va = 'top'
+            
+        ax.text(
+            bar.get_x() + bar.get_width()/2, 
+            y_pos, 
+            f"{v:+.1f}%", 
+            ha='center', va=va, 
+            fontweight='bold', fontsize=12, color=bar.get_facecolor()
+        )
+
+    # 4. Apply Full EconStyle Branding
+    EconStyle.set_title(ax, "Commodities: Weekly Performance", f"Physical market momentum  ·  {date_label}")
+    EconStyle.add_top_rule(ax) 
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "Yahoo Finance")
+    
+    EconStyle.save_chart(fig, output_dir / "07_commodities_weekly.png")
 
     print("   [8/8] Commodities — 12-Month Trends")
     trend = TrendLineChart()
@@ -606,6 +636,69 @@ def generate_with_live_data(output_dir):
             chart.save(output_dir / "10b_india_sector_rotation.png")
     except Exception as e:
         print(f"   ⚠ Sector rotation failed: {e}")
+        
+    # ── CUSTOM NARRATIVE CHART: NIFTY IT INDEX 1-YEAR TREND (ECONSTYLE BRANDED) ──
+    print("   [Custom] Generating NIFTY IT 1-Year Trend...")
+    try:
+        import matplotlib.pyplot as plt
+        import matplotlib.dates as mdates
+        
+        custom_series = yf_fetcher.get_close_series("^CNXIT", period="1y")
+        
+        if not custom_series.empty:
+            dates = custom_series.index.to_pydatetime()
+            vals = custom_series.values
+            
+            # Use YOUR custom styling framework for the figure
+            fig, ax = EconStyle.create_figure(size="wide")
+            
+            # Plot the line (using your official India color if defined, otherwise a deep red)
+            ax.plot(dates, vals, color="#B91C1C", linewidth=2.5, solid_capstyle="round")
+            # Add a subtle shadow for depth (standard in your other charts)
+            ax.plot(dates, vals, color="#B91C1C", linewidth=3.7, alpha=0.07, solid_capstyle="round")
+            
+            # THE Y-AXIS FIX: Force it to crop tightly around the data
+            min_val = min(vals)
+            max_val = max(vals)
+            padding = (max_val - min_val) * 0.1
+            ax.set_ylim(min_val - padding, max_val + padding)
+            
+            # Date formatting
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.set_ylabel("Index Level", fontsize=EconStyle.FONT_SIZE_AXIS)
+            
+            # Highlight the selloff at the very end
+            if len(dates) > 5:
+                ax.axvspan(dates[-6], dates[-1], color='#DC2626', alpha=0.1)
+                # Add an end label for maximum impact
+                ax.annotate(
+                    f"{vals[-1]:,.0f}",
+                    xy=(dates[-1], vals[-1]),
+                    xytext=(8, 0), textcoords="offset points",
+                    fontsize=9, fontweight="bold", color="#B91C1C",
+                    fontfamily=EconStyle.FONT_FAMILY,
+                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.85),
+                    zorder=10
+                )
+
+            # Apply YOUR custom titles, rules, and sources
+            EconStyle.set_title(ax, "India's IT Sector Feels the AI Threat", f"Sector benchmark hits 12-month lows as investors confront AI's threat to India's IT export model")
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (NSE)")
+            
+            # Save using your custom saver
+            chart_path = output_dir / "10c_nifty_it_trend_custom.png"
+            EconStyle.save_chart(fig, chart_path)
+            
+            print(f"      ✓ Saved Custom NIFTY IT chart (Perfectly branded)")
+        else:
+            print("   ⚠ Custom chart data returned empty.")
+            
+    except Exception as e:
+        print(f"   ⚠ Custom chart generation failed: {e}")
 
     # ── 8. REAL WAGE GROWTH ──
     print("   [12/12] US Real Wage Growth")
@@ -738,3 +831,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -326,7 +326,17 @@ INDICATORS = {
         "change_type": "pct",
         "color_key": "commodity_energy",
     },
+    
+    "uranium": {
+        "name": "Uranium", 
+        "ticker": "SRUUF", 
+        "source": "yfinance", 
+        "color_key": "us",
+        "category": "commodities"
+    },
 }
+
+
 
 # ─────────────────────────────────────────────
 # YIELD CURVE CONFIGURATION

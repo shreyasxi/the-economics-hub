@@ -53,6 +53,7 @@ class TrendLineChart:
         ax = self.ax
 
         num_series = len(self.series)
+        label_positions = [] # <--- NEW: List to hold label data to prevent collisions
 
         for i, s in enumerate(self.series):
             color = (EconStyle.get_color(s["color_key"]) if s["color_key"]
@@ -65,8 +66,6 @@ class TrendLineChart:
             lw = s["linewidth"]
 
             # ── v5: SUBTLE SHADOW for visual depth ──
-            # Light shadow slightly offset below the main line.
-            # This gives the FT "printed on quality paper" feel.
             if num_series <= 3:
                 ax.plot(s["dates"], values, color=color, linewidth=lw + 1.2,
                         linestyle=s["linestyle"], alpha=0.07, zorder=2 + i,
@@ -82,7 +81,7 @@ class TrendLineChart:
             if s["show_area"] and num_series == 1:
                 ax.fill_between(s["dates"], values, alpha=0.04, color=color, zorder=1)
 
-            # ── End-label with background pill ──
+            # ── NEW: Collect End-label Data (Do not draw yet) ──
             if show_endpoints and len(values) > 0:
                 last_val, last_date = values[-1], s["dates"][-1]
 
@@ -98,13 +97,39 @@ class TrendLineChart:
                 else:
                     vs = f"{last_val:.4f}"
 
-                label = f" {s['name']}  {vs}" if num_series > 1 else f" {vs}"
+                label_text = f" {s['name']}  {vs}" if num_series > 1 else f" {vs}"
+                label_positions.append({
+                    "text": label_text,
+                    "x": last_date,
+                    "y": last_val, 
+                    "color": color
+                })
+
+        # ── NEW: Spacing Logic & Drawing the Labels ──
+        if label_positions:
+            # 1. Sort labels from highest Y value to lowest Y value
+            label_positions.sort(key=lambda item: item['y'], reverse=True)
+            
+            # 2. Enforce a minimum vertical distance (4% of total chart height)
+            y_min, y_max = ax.get_ylim()
+            min_spacing = (y_max - y_min) * 0.04 
+            
+            for i in range(1, len(label_positions)):
+                prev_y = label_positions[i-1]['y']
+                curr_y = label_positions[i]['y']
+                
+                # If current label is too close to the one above it, push it down
+                if (prev_y - curr_y) < min_spacing:
+                    label_positions[i]['y'] = prev_y - min_spacing
+
+            # 3. Draw the spaced-out labels
+            for pos in label_positions:
                 ax.annotate(
-                    label, xy=(last_date, last_val),
+                    pos["text"], xy=(pos["x"], pos["y"]),
                     xytext=(5, 0), textcoords="offset points",
                     fontproperties=EconStyle._get_font("bold"),
                     fontsize=EconStyle.FONT_SIZE_ANNOTATION - 0.5,
-                    color=color, va="center", ha="left",
+                    color=pos["color"], va="center", ha="left",
                     path_effects=[
                         pe.withStroke(linewidth=3.0, foreground=EconStyle.BACKGROUND),
                     ],

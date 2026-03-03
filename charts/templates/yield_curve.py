@@ -66,13 +66,27 @@ class YieldCurveChart:
         except AttributeError:
             yc_colors = {"current": "#000000", "4w_ago": "#1f77b4", "52w_ago": "#B0B0B0"}
 
+        # ── BULLETPROOF Y-AXIS SCALING (The "Zoom" Fix) ──
+        # Find the absolute min and max yields across ALL curves
+        all_yields = [y for curve in self.curves for y in curve["yields"]]
+        if all_yields:
+            y_min, y_max = min(all_yields), max(all_yields)
+            y_range = y_max - y_min if y_max != y_min else 1.0
+            
+            # Pad the top and bottom by 15% so it breathes perfectly
+            y_bottom = y_min - (y_range * 0.15)
+            y_top = y_max + (y_range * 0.15)
+        else:
+            y_bottom, y_top = 0, 5
+
+        # ── Upgraded Institutional Styling ──
         cfg = {
-            "current": {"color": yc_colors.get("current", "#000000"),
-                        "lw": 2.2, "ls": "-", "marker": "o", "ms": 5, "z": 5, "a": 1.0},
-            "4w_ago":  {"color": yc_colors.get("4w_ago", "#1f77b4"),
-                        "lw": 1.2, "ls": "--", "marker": None, "ms": 0, "z": 4, "a": 0.7},
-            "52w_ago": {"color": yc_colors.get("52w_ago", "#B0B0B0"),
-                        "lw": 1.0, "ls": "-", "marker": None, "ms": 0, "z": 3, "a": 0.5},
+            "current": {"color": "#1C1C1E", 
+                        "lw": 3.5, "ls": "-", "marker": "o", "ms": 7, "z": 10, "a": 1.0},
+            "4w_ago":  {"color": "#2563EB", 
+                        "lw": 2.5, "ls": "--", "marker": None, "ms": 0, "z": 8, "a": 1.0},
+            "52w_ago": {"color": "#DC2626", 
+                        "lw": 2.0, "ls": "-", "marker": None, "ms": 0, "z": 7, "a": 0.85},
         }
 
         for curve in self.curves:
@@ -83,12 +97,20 @@ class YieldCurveChart:
             x = list(range(len(curve["tenors"])))
             y = curve["yields"]  # Already plain Python floats from add_curve()
 
+            # ── Draw the lines ──
             ax.plot(x, y, color=c["color"], linewidth=c["lw"],
                     linestyle=c["ls"], marker=c["marker"], markersize=c["ms"],
                     markerfacecolor="white", markeredgecolor=c["color"],
-                    markeredgewidth=1.2, label=curve["name"],
+                    markeredgewidth=1.8, label=curve["name"],
                     alpha=c["a"], zorder=c["z"],
                     solid_capstyle="round", antialiased=True)
+
+            # ── NEW: Shaded fill now anchors to y_bottom, NOT zero ──
+            if curve["style"] == "current":
+                ax.fill_between(x, y, y2=y_bottom, color=c["color"], alpha=0.06, zorder=1)
+
+            # ── LOCK THE Y-AXIS ZOOM ──
+            ax.set_ylim(y_bottom, y_top)
 
             # Annotate key tenors on current curve
             if curve["style"] == "current":
