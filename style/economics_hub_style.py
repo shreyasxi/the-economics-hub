@@ -66,6 +66,7 @@ class EconStyle:
         "commodity_silver": "#708090",  # Slate Grey
         "commodity_copper": "#B87333",  # Copper
         "special_black":    "#000000",  # For DXY
+        "pink":             "#BE185D"
     }
 
     # ─── YIELD CURVE COLOURS ────────────────
