@@ -110,6 +110,47 @@ INDICATORS = {
         "change_type": "pct",
         "color_key": "asia",
     },
+    
+    "dow": {
+        "name": "Dow Jones",
+        "source": "yfinance",
+        "ticker": "^DJI",
+        "category": "equities",
+        "region": "US",
+        "unit": "index",
+        "change_type": "pct",
+        "color_key": "us",
+    },
+    "nasdaq": {
+        "name": "NASDAQ",
+        "source": "yfinance",
+        "ticker": "^IXIC",  # Use ^NDX instead if you prefer the NASDAQ-100
+        "category": "equities",
+        "region": "US",
+        "unit": "index",
+        "change_type": "pct",
+        "color_key": "us",
+    },
+    "shanghai": {
+        "name": "Shanghai Comp",
+        "source": "yfinance",
+        "ticker": "000001.SS",
+        "category": "equities",
+        "region": "Asia",
+        "unit": "index",
+        "change_type": "pct",
+        "color_key": "asia",
+    },
+    "hangseng": {
+        "name": "Hang Seng",
+        "source": "yfinance",
+        "ticker": "^HSI",
+        "category": "equities",
+        "region": "Asia",
+        "unit": "index",
+        "change_type": "pct",
+        "color_key": "asia",
+    },
 
     # ═══════════════════════════════════════════
     # FOREIGN EXCHANGE
@@ -267,6 +308,16 @@ INDICATORS = {
         "unit": "index",
         "change_type": "abs",
         "color_key": "special_black",
+    },
+    
+    "vix3m": {
+        "name": "VIX 3-Month",
+        "ticker": "^VIX3M",
+        "source": "yfinance",
+        "change_type": "abs",
+        "unit": "index",
+        "category": "volatility",
+        "color_key": "pink",
     },
 
     # ═══════════════════════════════════════════

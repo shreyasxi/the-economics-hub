@@ -91,10 +91,10 @@ OPTIONS:
 | `navy`, `blue` | #003366 |
 | `orange`, `gold` | #D97706 |
 | `green`, `positive` | #059669 |
-| `red`, `negative` | #B91C1C |
+| `red`, `negative` | #B91C1C | #820E0E (Deep, striking red)
 | `purple` | #7C3AED |
 | `teal`, `cyan` | #0891B2 |
-| `pink`, `magenta` | #BE185D |
+| `pink`, `magenta` | #BE185D | 
 
 CSV FORMAT:
   - First column: dates (any parseable format) OR category labels

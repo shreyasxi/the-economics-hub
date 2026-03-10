@@ -25,6 +25,8 @@ import matplotlib.dates as mdates
 import matplotlib.patheffects as pe
 import numpy as np
 import pandas as pd
+import yfinance as yf
+import matplotlib.image as mpimg
 
 from style.economics_hub_style import EconStyle
 from data.fetchers.fred_fetcher import FredFetcher
@@ -80,7 +82,16 @@ class MacroDataEngine:
         ind = MACRO_INDICATORS[ind_id]
         years = ind.get("history_years", 3)
         try:
-            data = self.fred.fetch_series(ind["series"], period_years=years + 1)
+            # --- NEW: Yahoo Finance Interceptor ---
+            if "ticker" in ind:
+                start_date = datetime.now() - timedelta(days=int((years + 1) * 365.25))
+                df = yf.download(ind["ticker"], start=start_date, progress=False)
+                data = df["Close"]
+                if isinstance(data, pd.DataFrame): data = data.iloc[:, 0]
+            # --- ORIGINAL: FRED Fetcher ---
+            else:
+                data = self.fred.fetch_series(ind["series"], period_years=years + 1)
+                
             data = data.astype(float)
             self.cache[ind_id] = data
             return data
@@ -232,7 +243,8 @@ def _add_end_label(ax, dates, values, name, color):
 
 def chart_inflation(engine, output_dir):
     EconStyle.apply_global_style()
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.8))
+    # Use the standard wide template instead of the cramped 1x2 subplot
+    fig, ax1 = EconStyle.create_figure(size="wide")
     fig.patch.set_linewidth(2)
     fig.patch.set_edgecolor('#000000')
 
@@ -241,41 +253,35 @@ def chart_inflation(engine, output_dir):
         series = engine.get_transformed(ind_id)
         if series.empty: continue
         dates, vals = series.index.to_pydatetime().tolist(), series.values
-        ax1.plot(dates, vals, color=ind["color"], linewidth=2.2, solid_capstyle="round", zorder=3)
+        # Increased linewidth to 2.8 for better quality/visibility
+        ax1.plot(dates, vals, color=ind["color"], linewidth=2.8, solid_capstyle="round", zorder=3)
         _add_end_label(ax1, dates, vals, ind["name"], ind["color"])
 
-    ax1.axhline(y=2.0, color=EconStyle.NEGATIVE, linewidth=0.8, linestyle="--", alpha=0.6, zorder=1)
-    ax1.text(ax1.get_xlim()[0], 2.05, " Fed 2% target", fontsize=7, color=EconStyle.NEGATIVE, alpha=0.7, va="bottom")
-    _style_axis(ax1, ylabel="Rate (%)")
-    ax1.set_title("United States", fontsize=12, fontweight="bold", color=EconStyle.TEXT_TITLE, loc="left", pad=8)
-    for spine in ["top", "right", "left"]: ax1.spines[spine].set_visible(False)
+    # Target line styling
+    ax1.axhline(y=2.0, color=EconStyle.NEGATIVE, linewidth=1.2, linestyle="--", alpha=0.6, zorder=1)
+    ax1.text(ax1.get_xlim()[0], 2.05, " Fed 2% target", fontsize=9, fontweight="bold", color=EconStyle.NEGATIVE, alpha=0.8, va="bottom")
+    
+    _style_axis(ax1, ylabel="YoY Rate (%)")
+    
+    # Clean up spines
+    for spine in ["top", "right", "left"]: 
+        ax1.spines[spine].set_visible(False)
     ax1.spines["bottom"].set_visible(True)
     ax1.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.22)
+    
+    # Add padding to the right for labels
+    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.15)
 
-    for ind_id in ["ez_cpi_yoy", "uk_cpi_yoy"]:
-        ind = MACRO_INDICATORS[ind_id]
-        series = engine.get_transformed(ind_id)
-        if series.empty: continue
-        dates, vals = series.index.to_pydatetime().tolist(), series.values
-        ax2.plot(dates, vals, color=ind["color"], linewidth=2.2, solid_capstyle="round", zorder=3)
-        _add_end_label(ax2, dates, vals, ind["name"], ind["color"])
-
-    _style_axis(ax2, ylabel="CPI YoY (%)")
-    ax2.set_title("Eurozone · UK", fontsize=12, fontweight="bold", color=EconStyle.TEXT_TITLE, loc="left", pad=8)
-    for spine in ["top", "right", "left"]: ax2.spines[spine].set_visible(False)
-    ax2.spines["bottom"].set_visible(True)
-    ax2.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
-    ax2.set_xlim(ax2.get_xlim()[0], ax2.get_xlim()[1] + (ax2.get_xlim()[1] - ax2.get_xlim()[0]) * 0.22)
-
-    fig.subplots_adjust(left=0.06, right=0.96, top=0.85, bottom=0.12, wspace=0.25)
-    fig.text(0.06, 0.94, "Inflation Dashboard", fontsize=EconStyle.FONT_SIZE_TITLE, fontweight="bold", color=EconStyle.TEXT_TITLE, ha="left", va="bottom", fontfamily="sans-serif")
-    fig.add_artist(plt.Line2D([0.06, 0.96], [0.92, 0.92], color=EconStyle.RULE_HEAVY, linewidth=1.5, transform=fig.transFigure, clip_on=False))
-    EconStyle.add_source(fig, "FRED, OECD")
+    # Elite Narrative Titles
+    EconStyle.set_title(ax1, "US Inflation Metrics", "Headline CPI vs. Core PCE vs. 5-Year Inflation Expectations")
+    EconStyle.add_top_rule(ax1)
+    
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "FRED")
 
     filepath = output_dir / "01_macro_inflation.png"
     EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Inflation Dashboard")
+    print(f"   ✓ US Inflation Dashboard")
 
 def chart_labour(engine, output_dir):
     EconStyle.apply_global_style()
@@ -416,37 +422,6 @@ def chart_emerging_markets(engine, output_dir):
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Emerging Markets Stress Monitor")
 
-def chart_money_rates(engine, output_dir):
-    EconStyle.apply_global_style()
-    fig, ax = plt.subplots(figsize=EconStyle.SIZE_WIDE)
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    for ind_id in ["m2_yoy", "spread_2s10s", "real_yield_10y"]:
-        ind = MACRO_INDICATORS[ind_id]
-        series = engine.get_transformed(ind_id)
-        if series.empty: continue
-        dates, vals = series.index.to_pydatetime().tolist(), series.values
-        ax.plot(dates, vals, color=ind["color"], linewidth=2.2, solid_capstyle="round", zorder=3)
-        _add_end_label(ax, dates, vals, ind["name"], ind["color"])
-
-    ax.axhline(y=0, color="#A0A0A0", linewidth=0.8, linestyle="-", zorder=1)
-    _style_axis(ax, ylabel="Rate / Spread (%)")
-    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
-    ax.spines["bottom"].set_visible(True)
-    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.22)
-    ymin, ymax = ax.get_ylim()
-    pad = (ymax - ymin) * 0.06
-    ax.set_ylim(ymin - pad, ymax + pad)
-
-    EconStyle.set_title(ax, "Money, Rates & the Yield Curve Signal", "M2 Money Supply YoY · 2s10s Spread · 10Y Real Yield (TIPS)")
-    EconStyle.add_top_rule(ax)
-    EconStyle.add_source(fig, "FRED")
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "05_macro_money.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Money & Rates")
 
 def chart_macro_table(engine, output_dir):
     EconStyle.apply_global_style()
@@ -463,6 +438,7 @@ def chart_macro_table(engine, output_dir):
             elif "claims" in ind_id: latest_str = f"{latest/1000:,.0f}K"
             elif "spread" in ind_id or "hy" in ind_id: latest_str = f"{latest*100:.0f} bps"
             elif "usd_index" in ind_id: latest_str = f"{latest:.1f}"
+            elif ind.get("unit") == "USD": latest_str = f"{latest:.2f}"  # <--- ADD THIS LINE
             elif abs(latest) > 100: latest_str = f"{latest:,.0f}"
             elif abs(latest) >= 1: latest_str = f"{latest:.2f}%"
             else: latest_str = f"{latest:.2f}"
@@ -548,7 +524,7 @@ def chart_macro_table(engine, output_dir):
     ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT, fontproperties=EconStyle._get_masthead_font(), fontsize=13, color="#1A1A1A", ha="right", va="bottom")
 
     EconStyle.finalize(fig, ax, source=None, tight=False)
-    filepath = output_dir / "06_macro_table.png"
+    filepath = output_dir / "00_macro_table.png"
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Macro Summary Table")
 
@@ -645,6 +621,291 @@ def chart_macro_em_vulnerability(output_dir):
     EconStyle.save_chart(fig, output_dir / "08_macro_em_vulnerability.png")
     print(f"   ✓ EM Vulnerability Scorecard")
 
+
+def chart_agflation_pipeline(output_dir):
+    """Deep Dive Chart: Energy to Food Pipeline (Smoothed, Base-100)."""
+    EconStyle.apply_global_style()
+    
+    # 1. Load Manual Urea Data
+    urea_path = PROJECT_ROOT / "data" / "urea_middle_east.csv"
+    if not urea_path.exists():
+        print("   ⚠ Missing Urea CSV. Please place urea_middle_east.csv in the data folder.")
+        return
+
+    # Parse Investing.com CSV (using our bulletproof date fix)
+    urea_df = pd.read_csv(urea_path)
+    urea_df['Date'] = pd.to_datetime(urea_df['Date'], dayfirst=True, format='mixed')
+    urea_df = urea_df.sort_values('Date').set_index('Date')
+    
+    if urea_df['Price'].dtype == object:
+        urea_df['Price'] = urea_df['Price'].str.replace(',', '').astype(float)
+
+    # 2. Force start date to January 1, 2026 to show the pure "Hockey Stick"
+    start_date = pd.to_datetime("2026-01-01")
+    urea_df = urea_df[urea_df.index >= start_date]
+    
+    if urea_df.empty:
+        print("   ⚠ Urea data doesn't contain 2026 dates. Please download a longer timeframe.")
+        return
+        
+    end_date = urea_df.index[-1]
+
+    # 3. Fetch Yahoo Finance Data
+    tickers = {"Natural Gas (TTF)": "TTE=F", "Wheat Futures": "ZW=F"}
+    yf_data = yf.download(list(tickers.values()), start=start_date, end=end_date + pd.Timedelta(days=1), progress=False)
+    
+    if yf_data.empty:
+        print("   ⚠ Yahoo Finance data fetch failed.")
+        return
+        
+    prices = yf_data['Close']
+    
+    # 4. Merge, Forward-Fill, and SMOOTH the data
+    merged = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date, freq='B'))
+    merged["Urea Futures"] = urea_df["Price"]
+    
+    for name, ticker in tickers.items():
+        if ticker in prices.columns:
+            merged[name] = prices[ticker]
+            
+    # Forward-fill gaps (weekends/holidays), then backward fill the very first day if needed
+    merged = merged.ffill().bfill()
+    
+    # Apply a 5-day Exponential Moving Average to kill the "staircase" look
+    smoothed = merged.ewm(span=5, adjust=False).mean()
+    
+    # Normalize to 100 based on Jan 1st levels
+    normalized = (smoothed / smoothed.iloc[0]) * 100
+
+    # 5. Draw the Chart
+    fig, ax = EconStyle.create_figure(size=(11, 6.5))
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    colors = {
+        "Natural Gas (TTF)": "#BE185D",  # Energy Pink
+        "Urea Futures": "#D97706", # Chemical Orange
+        "Wheat Futures": "#003366"       # Agricultural Navy
+    }
+    
+    dates = normalized.index.to_pydatetime()
+    
+    # Draw the main lines much thicker (3.8) for premium visibility
+    for col in normalized.columns:
+        vals = normalized[col].values
+        ax.plot(dates, vals, label=col, color=colors[col], linewidth=3.8, solid_capstyle="round", zorder=3)
+        
+        # End Labels
+        last_val = vals[-1]
+        pct_change = last_val - 100
+        sign = "+" if pct_change > 0 else ""
+        ax.annotate(
+            f"{col} ({sign}{pct_change:.1f}%)", xy=(dates[-1], last_val),
+            xytext=(6, 0), textcoords="offset points",
+            fontproperties=EconStyle._get_font("bold"),
+            fontsize=10, color=colors[col], va="center", ha="left",
+            path_effects=[pe.withStroke(linewidth=3, foreground=EconStyle.BACKGROUND)]
+        )
+
+    # NEW: Refined Vertical Event Marker
+    event_date = pd.to_datetime("2026-02-27")
+    if event_date >= dates[0] and event_date <= dates[-1]:
+        # Thinner, dark red line that doesn't dominate the chart
+        ax.axvline(x=event_date, color="#120000", linewidth=1.4, linestyle="--", alpha=0.6, zorder=2)
+        
+        y_max = normalized.max().max()
+        
+        # Shifted label to the left of the event line to preserve readability of the spike
+        ax.text(event_date - pd.Timedelta(days=1), y_max * 0.98, "US-Israel Strike\non Iran", 
+                fontsize=9.5, fontweight="bold", color="#CC0000", alpha=0.8, va="top", ha="right",
+                fontfamily=EconStyle.FONT_FAMILY,
+                bbox=dict(facecolor='white', edgecolor='none', alpha=0.7, pad=1))
+
+    # Styling
+    ax.axhline(100, color="#A0A0A0", linewidth=1.2, linestyle="--", zorder=2)
+    
+    # (Removed the redundant "Base = 100" text box here as requested)
+
+    ax.set_ylabel("Indexed Price (Base = 100)", fontsize=10, color=EconStyle.TEXT_SECONDARY, labelpad=8)
+    ax.grid(axis="y", visible=True, color=EconStyle.GRID_COLOR, linewidth=0.5, zorder=0)
+    ax.grid(axis="x", visible=False)
+    
+    # Format X-axis for short timeframe
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator(minticks=5, maxticks=10))
+    plt.setp(ax.get_xticklabels(), fontsize=10)
+
+    for spine in ["top", "right", "left"]: 
+        ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
+
+    # NEW: Tighten up the blank space on the right (leaves exactly 5 days of room for labels)
+    ax.set_xlim(dates[0], dates[-1] + pd.Timedelta(days=5))
+
+    # Elite Narrative Titles
+    EconStyle.set_title(ax, 
+                        "Futures Markets are Pricing the Agricultural Shock", 
+                        "Rising European gas and fertilizer input futures are signaling a severe, lagged spike in global food costs")
+    EconStyle.add_top_rule(ax)
+    
+    # Source Line
+    EconStyle.add_source(fig, "Investing.com, Yahoo Finance. Note: Urea data is for Middle East region, not global")
+    
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "11_agflation_pipeline.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Agflation Pipeline Chart (Smoothed & Refined)")
+    return filepath
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+def chart_bdti_branded_screenshot(output_dir):
+    """Wraps a paywalled chart screenshot in the Economics Hub branding."""
+    EconStyle.apply_global_style()
+    
+    # 1. Load the raw screenshot
+    img_path = PROJECT_ROOT / "data" / "bdti_raw_chart.png"
+    if not img_path.exists():
+        print("   ⚠ Missing bdti_screenshot.png in the data folder.")
+        return
+        
+    img = mpimg.imread(img_path)
+    
+    # 2. Create the standard EconStyle figure
+    fig, ax = EconStyle.create_figure(size=(11, 7.5)) 
+    
+    # 3. Plot the image directly onto the matplotlib axis
+    ax.imshow(img, aspect='auto', interpolation='lanczos')
+    ax.axis('off')
+    
+    # ─── 100% ABSOLUTE MANUAL OVERRIDE ───────────────────────────────────────
+    # Bypassing all EconStyle title functions to guarantee perfect spacing
+    
+    # 4. Main Title (Anchored at the very top)
+    fig.text(0.02, 0.97, "Tanker Freight Rates Rise to Multi-Year Highs", 
+             fontsize=20, fontweight="bold", ha="left", va="top", color="#000000")
+             
+    # 5. Subtitle (Anchored perfectly below the main title)
+    fig.text(0.02, 0.92, "Baltic Dirty Tanker Index breaks above 3,000 for the first time since the 2022 energy crisis as Gulf shipping costs spike", 
+             fontsize=12, color=EconStyle.TEXT_SECONDARY, ha="left", va="top")
+             
+    # 6. Top Rule (Draws the thick black line directly below the subtitle)
+    fig.add_artist(plt.Line2D([0.02, 0.98], [0.88, 0.88], color='black', linewidth=2.5, zorder=10, transform=fig.transFigure))
+             
+    # 7. Split Custom Footer
+    fig.text(0.02, 0.02, "Source: Baltic Exchange and StockQ", 
+             fontsize=12, color=EconStyle.TEXT_SECONDARY, ha="left", va="bottom", fontweight="bold")
+    fig.text(0.98, 0.02, "The Economics Hub", 
+             fontsize=14, color="#1C1C1E", ha="right", va="bottom", fontweight="bold")
+    
+    # 8. Lock the chart image exactly between the header line (0.88) and footer (0.02)
+    fig.tight_layout(rect=[0.02, 0.06, 0.98, 0.86])
+    # ─────────────────────────────────────────────────────────────────────────
+    
+    filepath = output_dir / "13_bdti_branded_screenshot.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ BDTI Branded Screenshot Wrapper Complete")
+    return filepath
+
+def chart_hormuz_exposure(output_dir):
+    """Generates a horizontal bar chart showing Strait of Hormuz export exposure."""
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+
+    EconStyle.apply_global_style()
+
+    # 1. Extracted Data (Exports only, excluding Softs and Grains/Oilseeds)
+    # Grouped into three distinct categories for specific color targeting
+    data = [
+        ("Methanol", 31.6, "Petrochemicals & Refined"),
+        ("Crude Oil &\nCondensates", 30.9, "Crude & LNG"),
+        ("Natural Gas \nLiquids (NGLs)", 23.3, "Petrochemicals & Refined"),
+        ("Liquefied Natural \nGas (LNG)", 18.6, "Crude & LNG"),  
+        ("Dirty Petroleum \nProducts (DPP)", 13.0, "Petrochemicals & Refined"),
+        ("Clean Petroleum \nProducts (CPP)", 12.6, "Petrochemicals & Refined"),
+        ("Petcoke", 6.1, "Petrochemicals & Refined")
+    ]
+
+    # Sort by value (ascending, so the largest bar renders at the very top of the chart)
+    data.sort(key=lambda x: x[1])
+
+    labels = [item[0] for item in data]
+    values = [item[1] for item in data]
+    categories = [item[2] for item in data]
+
+    # 2. Institutional Color Mapping
+    color_ag = "#1E3A8A"      # Deep Blue
+    color_energy = "#D97706"  # Burnt Orange
+    color_petro = "#C2185B"   # Deep Magenta/Pink for Petrochemicals
+
+    colors = []
+    for cat in categories:
+        if cat == "Agriculture & Minerals":
+            colors.append(color_ag)
+        elif cat == "Petrochemicals & Refined":
+            colors.append(color_petro)
+        else:
+            colors.append(color_energy)
+
+    # 3. Create Figure
+    fig, ax = EconStyle.create_figure(size=(10, 7))
+
+    # 4. Plot Horizontal Bars
+    bars = ax.barh(labels, values, color=colors, height=0.6, zorder=3)
+
+    # 5. Add Data Labels directly to the end of the bars
+    for bar, val in zip(bars, values):
+        ax.text(
+            val + 0.5,  # Offset slightly to the right of the bar
+            bar.get_y() + bar.get_height() / 2,
+            f"{val:.1f}%",
+            va='center', ha='left',
+            fontsize=11, fontweight='bold', color="#1C1C1E"
+        )
+
+    # 6. Clean and Style Axes
+    ax.set_xlim(0, 40)
+    ax.set_xlabel("Share of Global Exports (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
+    
+    # Remove the bounding box
+    for spine in ['top', 'right', 'left']:
+        ax.spines[spine].set_visible(False)
+    ax.spines['bottom'].set_color(EconStyle.AXIS_COLOR)
+
+    # 7. Gridlines (Force behind bars with correct transparency)
+    ax.set_axisbelow(True)
+    ax.xaxis.grid(True, linestyle='-', alpha=0.3, color='#9CA3AF', zorder=0)
+    ax.yaxis.grid(False) 
+
+    # 8. Custom 3-Part Categorical Legend
+    energy_patch = mpatches.Patch(color=color_energy, label='Crude & LNG')
+    petro_patch = mpatches.Patch(color=color_petro, label='Petrochemicals and Refined Products')
+    
+    ax.legend(handles=[petro_patch, energy_patch], loc='lower right', frameon=False, fontsize=11)
+
+    # 9. Titles and Proprietary Branding
+    EconStyle.set_title(
+        ax,
+        "The Gulf Is the World's Petrochemical Supplier",
+        "Mideast Gulf exports as a share of global seaborne trade across commodity categories"
+    )
+    EconStyle.add_top_rule(ax)
+
+    # Tight layout to prevent clipping
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    # Footer with source
+    EconStyle.add_source(fig, "Kpler, S&P Global, U.S. EIA")
+
+    # 10. Save
+    filepath = output_dir / "15_hormuz_exposure.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Hormuz Petrochemical Exposure Chart Complete")
+    
+    return filepath
+
 # ═══════════════════════════════════════════════
 # MAIN PIPELINE
 # ═══════════════════════════════════════════════
@@ -676,19 +937,27 @@ def generate_macro_dashboard():
 
     print(f"\n   Fetched {success}/{len(MACRO_INDICATORS)} FRED indicators\n")
 
-    print("   Fetching International Data via DBnomics...")
-    fetch_macro_oecd_cli(output_dir)
-    fetch_macro_em_vulnerability(output_dir)
+    #print("   Fetching International Data via DBnomics...")
+    #fetch_macro_oecd_cli(output_dir)
+    #fetch_macro_em_vulnerability(output_dir)
 
     print("\n   Generating charts...")
+    
+    # 1. Generate Table First
+    chart_macro_table(engine, output_dir)
+    
     chart_inflation(engine, output_dir)
     chart_labour(engine, output_dir)
     chart_financial_conditions(engine, output_dir)
     chart_emerging_markets(engine, output_dir)
-    chart_money_rates(engine, output_dir)
-    chart_macro_table(engine, output_dir)
-    chart_macro_cli(output_dir)
-    chart_macro_em_vulnerability(output_dir)
+  
+    
+    #chart_macro_cli(output_dir)
+    #chart_macro_em_vulnerability(output_dir)
+    
+    chart_agflation_pipeline(output_dir)
+    chart_bdti_branded_screenshot(output_dir)
+    chart_hormuz_exposure(output_dir)
 
     print(f"\n✅ Macro Pulse complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")

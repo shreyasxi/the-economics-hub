@@ -92,19 +92,6 @@ def generate_with_mock_data(output_dir):
     # ─────────────────────────────────────────
     # 2. FOREIGN EXCHANGE
     # ─────────────────────────────────────────
-    print("   [3/8] FX — Weekly Bar Chart")
-    fx = weekly["fx"]
-    chart = WeeklyBarChart(
-        names=fx["names"],
-        values=fx["values"],
-        color_keys=fx["color_keys"],
-    )
-    chart.render(
-        title="Foreign Exchange",
-        subtitle="Weekly percentage change  ·  " + datetime.now().strftime("%d %b %Y"),
-        source="Yahoo Finance",
-    )
-    chart.save(output_dir / "03_fx_weekly.png")
     
     print("   [4/8] FX — 12-Month Trends")
     fx_data = get_mock_fx_data()
@@ -124,20 +111,6 @@ def generate_with_mock_data(output_dir):
     # ─────────────────────────────────────────
     # 3. GOVERNMENT BOND YIELDS
     # ─────────────────────────────────────────
-    print("   [5/8] Yields — Weekly Bar Chart")
-    yd = weekly["yields"]
-    chart = WeeklyBarChart(
-        names=yd["names"],
-        values=yd["values"],
-        change_type=yd.get("change_type", "abs"),
-        color_keys=yd["color_keys"],
-    )
-    chart.render(
-        title="Government Bond Yields",
-        subtitle="Weekly change (percentage points)  ·  " + datetime.now().strftime("%d %b %Y"),
-        source="FRED, Yahoo Finance",
-    )
-    chart.save(output_dir / "05_yields_weekly.png")
     
     print("   [6/8] Yields — US Treasury Yield Curve")
     yc_data = get_mock_yield_data()
@@ -147,7 +120,7 @@ def generate_with_mock_data(output_dir):
     yc.add_curve("7 Feb 2025", yc_data["tenors"], yc_data["52w_ago"], style="52w_ago")
     yc.render(
         title="US Treasury Yield Curve",
-        subtitle="Current vs. 4 weeks ago vs. 52 weeks ago",
+        subtitle="Current US Treasury yield curve movements relative to 4 and 52 weeks ago",
         source="FRED",
     )
     yc.save(output_dir / "06_yield_curve.png")
@@ -367,14 +340,74 @@ def generate_with_live_data(output_dir):
         return names, values, color_keys
 
     # ── 1. EQUITIES ──
-    print("\n   [1/8] Equities — Weekly Bar Chart")
-    eq_ids = ["sp500", "ftse100", "eurostoxx50", "nifty50", "nikkei225"]
+    # ── 1. EQUITIES ──
+    print("\n   [1/8] Equities — Aesthetic Vertical Bar Chart (Weekly)")
+    eq_ids = ["sp500", "dow", "nasdaq", "ftse100", "eurostoxx50", "nifty50", "shanghai", "hangseng", "nikkei225"]
     names, values, cks = build_bar_data(eq_ids)
-    chart = WeeklyBarChart(names=names, values=values, color_keys=cks)
-    chart.render(title="Global Equities",
-                 subtitle=f"Weekly percentage change  ·  {date_label}",
-                 source="Yahoo Finance")
-    chart.save(output_dir / "01_equities_weekly.png")
+    
+    # Create the custom figure using your wide template
+    fig, ax = EconStyle.create_figure(size="wide")
+    
+    # Premium Institutional Colors
+    color_pos = "#03AF53" # Deep, authoritative Slate Blue
+    color_neg = "#820E0E" # Deep, striking red for negatives
+    colors = [color_pos if v >= 0 else color_neg for v in values]
+    
+    # Plot the vertical bars
+    bars = ax.bar(names, values, color=colors, width=0.25, zorder=3)
+    
+    # Restore the Y-Axis and Gridlines
+    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+    ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
+    
+    # Clean up the outer box spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    
+    # Heavy Zero-Line anchor
+    ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+    
+    # Clean up the X-axis labels
+    ax.xaxis.set_tick_params(length=0) 
+    ax.set_xticklabels(names, fontweight='bold', fontsize=8.5, color="#1C1C1E")
+    
+    # Dynamic Y-Axis Logic (Fixing the gap)
+    min_v = min(values) if values else 0
+    max_v = max(values) if values else 0
+    y_range = max_v - min_v if max_v != min_v else (max_v if max_v != 0 else 1)
+    
+    y_bottom = (min_v - y_range * 0.15) if min_v < 0 else 0
+    y_top = (max_v + y_range * 0.15) if max_v > 0 else 0
+    
+    ax.set_ylim(y_bottom, y_top)
+    
+    for bar, v in zip(bars, values):
+        yval = bar.get_height()
+        offset = y_range * 0.02 
+        
+        if v >= 0:
+            y_pos = yval + offset
+            va = 'bottom'
+        else:
+            y_pos = yval - offset
+            va = 'top'
+            
+        ax.text(
+            bar.get_x() + bar.get_width()/2, 
+            y_pos, 
+            f"{v:+.1f}%", 
+            ha='center', va=va, 
+            fontweight='bold', fontsize=12, color=bar.get_facecolor()
+        )
+
+    # Apply Full EconStyle Branding
+    EconStyle.set_title(ax, "Global Equities Performance", f"Weekly percentage change across major indices  ·  {date_label}")
+    EconStyle.add_top_rule(ax) 
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "Yahoo Finance")
+    
+    EconStyle.save_chart(fig, output_dir / "01_equities_weekly.png")
 
     print("   [2/8] Equities — 12-Month Trends")
     trend = TrendLineChart()
@@ -389,15 +422,6 @@ def generate_with_live_data(output_dir):
     trend.save(output_dir / "02_equities_trend.png")
 
     # ── 2. FX ──
-    print("   [3/8] FX — Weekly Bar Chart")
-    # FIX: removed usdchf (not in INDICATORS)
-    fx_ids = ["dxy", "eurusd", "gbpusd", "usdinr", "usdjpy"]
-    names, values, cks = build_bar_data(fx_ids)
-    chart = WeeklyBarChart(names=names, values=values, color_keys=cks)
-    chart.render(title="Foreign Exchange",
-                 subtitle=f"Weekly percentage change  ·  {date_label}",
-                 source="Yahoo Finance")
-    chart.save(output_dir / "03_fx_weekly.png")
 
     print("   [4/8] FX — 12-Month Trends")
     trend = TrendLineChart()
@@ -412,15 +436,6 @@ def generate_with_live_data(output_dir):
     trend.save(output_dir / "04_fx_trend.png")                                      # <--- Add this
 
     # ── 3. YIELDS ──
-    print("   [5/8] Yields — Weekly Bar Chart")
-    # FIX: Only US daily yields for weekly bar (Bund/Gilt are monthly, will be auto-skipped)
-    yd_ids = ["us_2y", "us_10y", "us_30y"]
-    names, values, cks = build_bar_data(yd_ids, change_type="abs")
-    chart = WeeklyBarChart(names=names, values=values, change_type="abs", color_keys=cks)
-    chart.render(title="Government Bond Yields",
-                 subtitle=f"Weekly change (basis points)  ·  {date_label}",
-                 source="FRED")
-    chart.save(output_dir / "05_yields_weekly.png")
 
     print("   [6/8] Yields — US Treasury Yield Curve")
     try:
@@ -453,8 +468,8 @@ def generate_with_live_data(output_dir):
                          style="52w_ago")
         except Exception: pass
         
-        yc.render(title="US Treasury Yield Curve",
-                  subtitle="Current vs. 4 weeks ago vs. 52 weeks ago", source="FRED")
+        yc.render(title="The Bond Market Is Pricing an Immediate Shock",
+                  subtitle="Current vs. 4 weeks ago vs. 52 weeks ago US Treasury yield curve movements", source="FRED")
         yc.save(output_dir / "06_yield_curve.png")
     except Exception as e:
         print(f"   ⚠ Yield curve failed: {e}")
@@ -468,7 +483,7 @@ def generate_with_live_data(output_dir):
     fig, ax = EconStyle.create_figure(size="wide")
     
     # 1. Premium Institutional Colors
-    color_pos = "#2A4DBE" # Deep, authoritative Slate Blue
+    color_pos = "#03AF53" # Deep, authoritative Slate Blue
     color_neg = "#820E0E" # Deep, striking red for negatives
     colors = [color_pos if v >= 0 else color_neg for v in values]
     
@@ -522,7 +537,7 @@ def generate_with_live_data(output_dir):
         )
 
     # 4. Apply Full EconStyle Branding
-    EconStyle.set_title(ax, "Commodities: Weekly Performance", f"Physical market momentum  ·  {date_label}")
+    EconStyle.set_title(ax, "The Iran Risk Is Keeping Oil Prices Elevated", f"The Iran shock continues to impact broader commodity markets")
     EconStyle.add_top_rule(ax) 
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
     EconStyle.add_source(fig, "Yahoo Finance")
@@ -545,14 +560,15 @@ def generate_with_live_data(output_dir):
     print("   [9/11] VIX — 12-Month Trend")
     try:
         vix_dates, vix_vals = get_trend("vix")
+        vix3m_dates, vix3m_vals = get_trend("vix3m")
+        
         if vix_dates:
             trend = TrendLineChart()
             trend.add_series("VIX", vix_dates, vix_vals, color_key="special_black")
-            # Add reference lines for fear zones
-            trend.add_reference_line(20, label="Long-term avg", color="#999999")
-            trend.add_reference_line(30, label="Fear zone", color="#CC0000")
-            trend.render(title="VIX — Market Fear Gauge",
-                         subtitle=f"CBOE Volatility Index  ·  {date_label}",
+            trend.add_series("VIX 3-Month", vix3m_dates, vix3m_vals, color_key="pink")
+            
+            trend.render(title="The VIX Term Structure Signals a Contained Shock",
+                         subtitle=f"The 30-day VIX rising above the 3-month VIX suggests markets view the War Shock as a short-term event",
                          source="Yahoo Finance (CBOE)", ylabel="VIX Level")
             trend.save(output_dir / "09_vix_trend.png")
     except Exception as e:
@@ -701,7 +717,7 @@ def generate_with_live_data(output_dir):
         print(f"   ⚠ Custom chart generation failed: {e}")
 
     # ── 8. REAL WAGE GROWTH ──
-    print("   [12/12] US Real Wage Growth")
+    print("   [12/12] US Real Wage Growth (Data only for Summary Table)")
     real_wage_latest = None
     real_wage_change = None
     try:
@@ -716,31 +732,106 @@ def generate_with_live_data(output_dir):
             cpi_yoy = cpi.pct_change(periods=12) * 100
 
             # Align dates (both are monthly)
-            combined = pd.DataFrame({"earnings_yoy": earn_yoy, "cpi_yoy": cpi_yoy}).dropna()
+            combined = __import__('pandas').DataFrame({"earnings_yoy": earn_yoy, "cpi_yoy": cpi_yoy}).dropna()
             combined["real_wage"] = combined["earnings_yoy"] - combined["cpi_yoy"]
 
             if len(combined) > 3:
-                dates_rw = combined.index.to_pydatetime().tolist()
-                vals_rw = combined["real_wage"].values.tolist()
-
-                trend = TrendLineChart()
-                trend.add_series("Real Wage Growth", dates_rw, vals_rw,
-                                 color_key="us", linewidth=2.2)
-                trend.add_reference_line(0, label="Break-even", color="#CC0000")
-                trend.render(
-                    title="US Real Wage Growth",
-                    subtitle="Average Hourly Earnings YoY minus CPI YoY  ·  Positive = purchasing power gains",
-                    source="FRED (BLS)",
-                    ylabel="Real Wage Growth (%)",
-                )
-                trend.save(output_dir / "11_real_wage_growth.png")
-
-                # Store latest for summary table
+                # Store latest for summary table ONLY (no chart rendering)
                 real_wage_latest = float(combined["real_wage"].iloc[-1])
                 if len(combined) >= 2:
                     real_wage_change = real_wage_latest - float(combined["real_wage"].iloc[-2])
     except Exception as e:
         print(f"   ⚠ Real wage growth failed: {e}")
+        
+   # -- 10. BRAZIL MACRO NARRATIVE (FX) --
+    print("   [13/13] Brazil Macro - USD/BRL Exchange Rate")
+    try:
+        import pandas as pd
+        import matplotlib.dates as mdates
+        
+        # 1. Fetch daily FX data (Pulling a safe buffer from 2010 onwards)
+        brl_raw = fred_fetcher.fetch_series("DEXBZUS", period_years=17)
+        
+        if len(brl_raw) > 0:
+            df = pd.DataFrame({"BRL": brl_raw}).dropna()
+            
+            # Filter to start exactly at 2010-01-01
+            df = df.loc["2010-01-01":]
+            
+            # 2. Resample to monthly average to smooth out daily volatility
+            monthly_avg = df["BRL"].resample("ME").mean()
+            
+            dates = monthly_avg.index.to_pydatetime()
+            vals = monthly_avg.values
+            
+            # 3. Calculate the 2015-2019 pre-COVID baseline average
+            pre_covid_avg = monthly_avg.loc["2015-01-01":"2019-12-31"].mean()
+
+            # 4. Create the Aesthetic Chart
+            fig, ax = EconStyle.create_figure(size="wide")
+            
+            # Background Shading (Neutral Grey for Pre-COVID, Light Pink for Post-COVID)
+            PANDEMIC_START = pd.to_datetime("2020-01-01")
+            ax.axvspan(dates[0], PANDEMIC_START, color="#F3F4F6", alpha=0.6, zorder=0) 
+            ax.axvspan(PANDEMIC_START, dates[-1], color="#FDF2F8", alpha=0.6, zorder=0) 
+            
+            # Label inside the shaded region (using axes coordinates to keep it near the bottom visually)
+            ax.text(pd.to_datetime("2020-08-01"), 0.05, "Post-COVID Era", 
+                    color="#BE185D", fontsize=10, alpha=0.7, zorder=1, 
+                    transform=ax.get_xaxis_transform())
+
+            # Reference Line (2015-2019 Average) - Made much more visible
+            ax.axhline(pre_covid_avg, color="#6B7280", linestyle="--", linewidth=1.8, zorder=1)
+            
+            # Adjusted text position for inverted axis (subtracting moves it UP visually)
+            ax.text(pd.to_datetime("2010-06-01"), pre_covid_avg - 0.1, 
+                    f"Pre-COVID avg (2015-19): {pre_covid_avg:.2f}", 
+                    color="#4B5563", fontsize=10, fontweight="bold", va="bottom", zorder=2)
+
+            # Plot the Line (Bold Pink/Magenta)
+            line_color = "#BE185D"
+            
+            # Add a subtle shadow for depth
+            ax.plot(dates, vals, color=line_color, linewidth=4.0, alpha=0.15, solid_capstyle="round", zorder=2)
+            ax.plot(dates, vals, color=line_color, linewidth=2.5, solid_capstyle="round", zorder=3)
+            
+            # End Value Label
+            last_date = dates[-1]
+            last_val = vals[-1]
+            ax.text(last_date + pd.DateOffset(days=45), last_val, 
+                    f"BRL/USD\n{last_val:.2f}", 
+                    color=line_color, fontweight="bold", fontsize=10, va="center", zorder=5)
+
+            # 5. Formatting the Axes
+            # INVERT Y-AXIS: Higher number (weaker Real) points DOWN visually
+            ax.invert_yaxis()
+            ax.set_ylabel("BRL per 1 USD (Lower line = Weaker Real)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
+            
+            ax.xaxis.set_major_locator(mdates.YearLocator(2))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+            
+            # Clean up grid and spines
+            # Horizontal grid
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            # Vertical grid (Added with 0.5 alpha)
+            ax.xaxis.grid(True, linestyle='-', alpha=0.5, color='#E5E7EB', zorder=0)
+            
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
+
+            # Apply Economics Hub Branding
+            EconStyle.set_title(ax, "The Brazilian Real Remains Deeply Discounted", "Despite record trade surpluses over the years, the currency has not recovered to its pre-COVID levels")
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "FRED")
+            
+            EconStyle.save_chart(fig, output_dir / "13_brazil_fx_trend.png")
+            print("      ✓ Saved Brazil FX Trend")
+            
+    except Exception as e:
+        print(f"   ⚠ Brazil FX chart failed: {e}")
 
     # ── SUMMARY TABLE ──
     print("   [+] Summary Table")
@@ -749,11 +840,11 @@ def generate_with_live_data(output_dir):
     # Define the rows we want (Ordered list)
     row_ids = [
         "sp500", "ftse100", "eurostoxx50", "nifty50", "nikkei225", # Equities
-        "btc", "eth",                                              # Crypto
+        "brent", "gold", "silver", "copper", "natgas",             # Commodities
         "dxy", "eurusd", "gbpusd", "usdinr", "usdjpy",             # FX
         "us_2y", "us_10y", "us_30y", "de_10y",                     # Yields
-        "brent", "gold", "silver", "copper", "natgas",                        # Commodities
-        "vix",                                                      # Volatility (AFTER commodities)
+        "btc", "eth",                                              # Crypto
+        "vix",                                                     # Volatility (AFTER commodities)
     ]
     
     for ind_id in row_ids:
@@ -786,7 +877,7 @@ def generate_with_live_data(output_dir):
             else:
                 weekly_str = EconStyle.format_change_label(w["change"], "abs")
 
-            table.add_row(ind["name"], w["level"],
+            table.add_row(ind["name"], f"{w['level']:,.2f}",
                           weekly_str,
                           ytd_change=ytd_str,
                           category=ind.get("category", "misc"))
@@ -794,7 +885,7 @@ def generate_with_live_data(output_dir):
     # ── Special row: Real Wage Growth (computed, not in INDICATORS) ──
     if real_wage_latest is not None:
         rw_weekly_str = f"{real_wage_change:+.2f} pp" if real_wage_change is not None else "-"
-        table.add_row("Real Wage Growth", f"{real_wage_latest:.2f}%",
+        table.add_row("US Real Wage Growth", f"{real_wage_latest:.2f}%",
                       rw_weekly_str, ytd_change="-", category="volatility")
 
     table.render(title="Market Snapshot",

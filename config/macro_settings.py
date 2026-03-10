@@ -14,45 +14,14 @@ from datetime import datetime
 # MANUAL DATA OVERRIDES
 # ─────────────────────────────────────────────
 # Update these each month with latest figures.
-# Format: value (float), date string, source note.
-#
-# HOW TO UPDATE:
-#   1. Go to https://unemploymentinindia.cmie.com/ (CMIE)
-#      or check RBI monthly bulletin
-#   2. Update the "value" field below
-#   3. Update the "as_of" date
-#   4. Run generate_macro.py
-
 MANUAL_DATA = {
-    # ═══════════════════════════════════════════
-    # EMERGING MARKETS (Manual - no FRED source)
-    # ═══════════════════════════════════════════
-    "em_lc_bonds": {                # <--- CHANGED from em_pmi_composite
-        "value": 26.47,             # <--- Price of EMLC ETF
-        "previous_value": 25.91,    
-        "as_of": "2026-02-11",
-        "source": "",               
-        "name": "EM Local Currency Bonds",
-        "unit": "USD",
-    },
-    # Add more manual entries here as needed
+    # Empty for now since EMLC is automated!
 }
 
 
 # ─────────────────────────────────────────────
-# MACRO INDICATORS (FRED)
+# MACRO INDICATORS (FRED & YFINANCE)
 # ─────────────────────────────────────────────
-# Each indicator:
-#   - series: FRED series ID
-#   - name: Display name
-#   - frequency: "daily", "weekly", "monthly"
-#   - transform: how to compute the display value
-#       "level"   → latest raw value
-#       "yoy_pct" → year-over-year % change (for CPI, M2 etc.)
-#       "mom_pct" → month-over-month % change
-#   - unit: display unit
-#   - group: which chart/table section
-
 MACRO_INDICATORS = {
 
     # ═══════════════════════════════════════════
@@ -188,7 +157,7 @@ MACRO_INDICATORS = {
     },
 
     # ═══════════════════════════════════════════
-    # EMERGING MARKETS (NEW SECTION)
+    # EMERGING MARKETS
     # ═══════════════════════════════════════════
     "em_hy_spread": {
         "series": "BAMLEMHBHYCRPIOAS",
@@ -216,6 +185,16 @@ MACRO_INDICATORS = {
         "frequency": "daily",
         "transform": "level",
         "unit": "index",
+        "group": "emerging_markets",
+        "color": "#003366",
+        "history_years": 3,
+    },
+    "em_lc_bonds": {
+        "ticker": "EMLC",         # Automates via yfinance
+        "name": "EM Local Currency Bonds",
+        "frequency": "daily",
+        "transform": "level",
+        "unit": "USD",
         "group": "emerging_markets",
         "color": "#003366",
         "history_years": 3,
@@ -260,8 +239,6 @@ MACRO_INDICATORS = {
 # ─────────────────────────────────────────────
 # CHART DEFINITIONS
 # ─────────────────────────────────────────────
-# Which indicators go into which chart
-
 MACRO_CHARTS = {
     "inflation": {
         "title": "Inflation Dashboard",
@@ -343,8 +320,7 @@ MACRO_TABLE_SECTIONS = [
     {
         "section": "EMERGING MARKETS",
         "color": "#FF9933",
-        "rows": ["em_hy_spread", "em_corp_spread", "em_usd_index"],
-        "manual_rows": ["em_lc_bonds"],
+        "rows": ["em_hy_spread", "em_corp_spread", "em_usd_index", "em_lc_bonds"],
     },
     {
         "section": "MONEY & RATES",
