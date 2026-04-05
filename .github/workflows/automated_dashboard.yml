@@ -29,15 +29,26 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }} 
           PYTHONPATH: "."
         run: |
-          # 1. Create the hosting folder and wipe last week's data
+          # 1. Create the storefront folder and wipe last week's display
           mkdir -p hosted_charts
           rm -f hosted_charts/*.png
           
-          # 2. Run your generators (which secretly dump files into output/)
+          # 2. Run your generators (wherever they decide to save the files locally)
           echo "Starting Macro Generation..."
           python generate_macro.py 
           echo "Starting Weekly Generation..."
           python generate_weekly.py 
           
-          # 3. THE FIX: Dig into the output/ folder, find every PNG, and move it to hosted_charts/
-          find output -type f -name "*.png" -exec mv {} hosted_charts/ \;
+          # 3. THE CATCH-ALL: Search every single folder in the repository for PNGs 
+          # and copy them directly into the Streamlit storefront.
+          find . -type f -name "*.png" -not -path "*/hosted_charts/*" -exec cp {} hosted_charts/ \;
+
+      - name: Commit and Push Assets
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Economics Hub Bot"
+          
+          # 4. Track the storefront and push
+          git add hosted_charts/
+          git commit -m "Automated data refresh: Storefront Catch-All [skip ci]" || echo "No changes to commit"
+          git push
