@@ -27,6 +27,7 @@ jobs:
       - name: Execute Data Pipelines
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }} 
+          PYTHONPATH: "."
         run: |
           echo "Starting Macro Generation..."
           python generate_macro.py 
