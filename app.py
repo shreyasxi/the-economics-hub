@@ -3,7 +3,7 @@ import os
 import glob
 from datetime import datetime
 
-# 1. Page Configuration (Must be the first Streamlit command)
+# 1. Page Configuration
 st.set_page_config(
     page_title="The Economics Hub | Global Dashboard",
     page_icon="🌍",
@@ -14,18 +14,15 @@ st.set_page_config(
 # 2. Inject Custom CSS for Premium UI styling
 st.markdown("""
     <style>
-    /* Clean up the main UI */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
-    /* Style headers */
     h1 {
         font-weight: 700;
         letter-spacing: -0.02em;
         margin-bottom: 0.5rem;
     }
-    /* Chart container hover effects */
     .stImage > img {
         border-radius: 8px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -35,7 +32,6 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
-    /* Style the sidebar */
     [data-testid="stSidebar"] {
         background-color: #f8f9fa;
         border-right: 1px solid #e5e7eb;
@@ -44,24 +40,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 3. Helper Functions
-def get_latest_folder(base_path):
-    """Finds the most recent date-stamped folder in a directory."""
-    if not os.path.exists(base_path):
-        return None
-    folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
-    if not folders:
-        return None
-    # Sort descending to get the newest folder first
-    folders.sort(reverse=True) 
-    return folders[0]
-
 def render_image_grid(image_paths, cols=2):
     """Renders a list of images in a clean, responsive grid."""
     if not image_paths:
-        st.warning("No charts available for this period.")
+        st.warning("No charts available for this category.")
         return
     
-    # Create columns dynamically
     columns = st.columns(cols)
     for i, img_path in enumerate(image_paths):
         # Extract a clean title from the filename (e.g., '01_macro_inflation.png' -> 'Macro Inflation')
@@ -70,9 +54,15 @@ def render_image_grid(image_paths, cols=2):
         
         with columns[i % cols]:
             st.image(img_path, caption=clean_title, use_container_width=True)
-            st.markdown("<br>", unsafe_allow_html=True) # Spacing between rows
+            st.markdown("<br>", unsafe_allow_html=True)
 
-# 4. Sidebar Layout
+# 4. Fetch All Active Charts
+# We now ONLY look inside the ephemeral hosted_charts folder
+all_images = []
+if os.path.exists("hosted_charts"):
+    all_images = sorted(glob.glob("hosted_charts/*.png"))
+
+# 5. Sidebar Layout
 with st.sidebar:
     st.title("📊 Economics Hub")
     st.markdown("Automated macroeconomic & financial tracking.")
@@ -84,44 +74,36 @@ with st.sidebar:
     st.caption(f"App Last Refreshed: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}")
     st.caption("Data sources: FRED, Yahoo Finance")
 
-# 5. Main Dashboard Routing
-if view_mode == "Global Macro":
-    st.title("Global Macroeconomic Environment")
-    latest_macro = get_latest_folder("assets/macro")
-    
-    if latest_macro:
-        st.markdown(f"**Latest Data Cut:** `{latest_macro}`")
-        images = sorted(glob.glob(f"assets/macro/{latest_macro}/*.png"))
-        render_image_grid(images, cols=2)
-    else:
-        st.info("Macro data directory is empty or currently updating.")
+# 6. Main Dashboard Routing
+if not all_images:
+    st.warning("The dashboard is currently updating or awaiting its first data run. Please check back shortly.")
+else:
+    if view_mode == "Global Macro":
+        st.title("Global Macroeconomic Environment")
+        # Filter for filenames containing 'macro'
+        macro_images = [img for img in all_images if "macro" in os.path.basename(img).lower()]
+        render_image_grid(macro_images, cols=2)
 
-elif view_mode == "Weekly Markets":
-    st.title("Weekly Cross-Asset Performance")
-    latest_weekly = get_latest_folder("assets/weekly")
-    
-    if latest_weekly:
-        st.markdown(f"**Latest Data Cut:** `{latest_weekly}`")
+    elif view_mode == "Weekly Markets":
+        st.title("Weekly Cross-Asset Performance")
+        # Filter out macro and india to get the general weekly charts
+        weekly_images = [img for img in all_images if "macro" not in os.path.basename(img).lower() and "india" not in os.path.basename(img).lower()]
         
         # Pull out the summary table specifically to feature it at the top
-        summary_img = f"assets/weekly/{latest_weekly}/00_summary_table.png"
-        if os.path.exists(summary_img):
+        summary_img = next((img for img in weekly_images if "summary" in os.path.basename(img).lower()), None)
+        
+        if summary_img:
             st.subheader("Market Summary")
             st.image(summary_img, use_container_width=True)
             st.markdown("<br>", unsafe_allow_html=True)
-        
+            weekly_images.remove(summary_img) # Remove so it doesn't render twice
+            
         st.subheader("Asset Class Deep Dives")
-        # Get all other images except the summary
-        other_images = sorted([img for img in glob.glob(f"assets/weekly/{latest_weekly}/*.png") if "00_summary_table" not in img])
-        render_image_grid(other_images, cols=2)
-    else:
-        st.info("Weekly data directory is empty or currently updating.")
+        render_image_grid(weekly_images, cols=2)
 
-elif view_mode == "India Setup (WIP)":
-    st.title("India Domestic Indicators")
-    st.info("India data pipeline relies on manual CSV uploads. Automated parsing framework is under construction.")
-    # Placeholder for when you bring generate_india.py online
-    latest_india = get_latest_folder("assets/india")
-    if latest_india:
-        images = sorted(glob.glob(f"assets/india/{latest_india}/*.png"))
-        render_image_grid(images, cols=2)
+    elif view_mode == "India Setup (WIP)":
+        st.title("India Domestic Indicators")
+        st.info("India data pipeline relies on manual CSV uploads. Automated parsing framework is under construction.")
+        # Filter for filenames containing 'india'
+        india_images = [img for img in all_images if "india" in os.path.basename(img).lower()]
+        render_image_grid(india_images, cols=2)
