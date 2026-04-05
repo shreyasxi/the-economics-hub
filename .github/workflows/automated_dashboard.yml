@@ -24,20 +24,31 @@ jobs:
           python -m pip install --no-cache-dir --upgrade pip
           pip install --no-cache-dir -r requirements.txt
 
-      - name: Execute Data Pipelines
+      - name: Execute and Organize Data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }} 
           PYTHONPATH: "."
         run: |
+          # 1. Create a dedicated hosting folder and wipe last week's data
+          mkdir -p hosted_charts
+          rm -f hosted_charts/*.png
+          
+          # 2. Run your generators (which output to the root)
           echo "Starting Macro Generation..."
           python generate_macro.py 
           echo "Starting Weekly Generation..."
           python generate_weekly.py 
+          
+          # 3. Move ONLY the newly generated charts into the hosting folder
+          # (This keeps your root folder completely clean!)
+          mv *.png hosted_charts/
 
       - name: Commit and Push Assets
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Economics Hub Bot"
-          git add assets/
-          git commit -m "Automated data refresh: Macro & Weekly charts [skip ci]" || echo "No changes to commit"
+          
+          # 4. Track the changes to the hosting folder (which registers the deletions and additions)
+          git add hosted_charts/
+          git commit -m "Automated data refresh: Wipe and replace charts [skip ci]" || echo "No changes to commit"
           git push
