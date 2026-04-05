@@ -29,26 +29,15 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }} 
           PYTHONPATH: "."
         run: |
-          # 1. Create a dedicated hosting folder and wipe last week's data
+          # 1. Create the hosting folder and wipe last week's data
           mkdir -p hosted_charts
           rm -f hosted_charts/*.png
           
-          # 2. Run your generators (which output to the root)
+          # 2. Run your generators (which secretly dump files into output/)
           echo "Starting Macro Generation..."
           python generate_macro.py 
           echo "Starting Weekly Generation..."
           python generate_weekly.py 
           
-          # 3. Move ONLY the newly generated charts into the hosting folder
-          # (This keeps your root folder completely clean!)
-          mv *.png hosted_charts/
-
-      - name: Commit and Push Assets
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "Economics Hub Bot"
-          
-          # 4. Track the changes to the hosting folder (which registers the deletions and additions)
-          git add hosted_charts/
-          git commit -m "Automated data refresh: Wipe and replace charts [skip ci]" || echo "No changes to commit"
-          git push
+          # 3. THE FIX: Dig into the output/ folder, find every PNG, and move it to hosted_charts/
+          find output -type f -name "*.png" -exec mv {} hosted_charts/ \;
