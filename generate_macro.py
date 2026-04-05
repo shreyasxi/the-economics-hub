@@ -421,6 +421,62 @@ def chart_emerging_markets(engine, output_dir):
     filepath = output_dir / "04_macro_em.png"
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Emerging Markets Stress Monitor")
+    
+import matplotlib.pyplot as plt
+
+# 1. Chart Data
+regions = [
+    'Latin America', 
+    'Sub-Saharan Africa', 
+    'Oceania', 
+    'North America', 
+    'Europe', 
+    'Asia', 
+    'Middle East & North Africa'
+]
+# Using 0.5 for <1% so it renders a tiny bar
+percentages = [0.5, 1, 3, 3, 17, 37, 39] 
+display_labels = ['<1%', '1%', '3%', '3%', '17%', '37%', '39%']
+
+# 2. Canvas Setup (The Economics Hub standard)
+fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
+fig.patch.set_facecolor('#ffffff')
+ax.set_facecolor('#ffffff')
+
+# 3. Color Palette: Hub Red for MENA, muted greys for the rest
+colors = ['#e0e0e0', '#cccccc', '#b3b3b3', '#999999', '#666666', '#333333', '#d62728']
+
+# 4. Render Horizontal Bars
+bars = ax.barh(regions, percentages, color=colors, height=0.65)
+
+# 5. Clean Aesthetics (Remove all spines and axis ticks)
+for spine in ax.spines.values():
+    spine.set_visible(False)
+ax.xaxis.set_ticks([]) 
+ax.tick_params(axis='y', length=0, labelsize=12, colors='#333333') 
+
+# 6. Direct Data Labels (Bolding the MENA data point)
+for bar, label in zip(bars, display_labels):
+    width = bar.get_width()
+    font_weight = 'bold' if label == '39%' else 'normal'
+    color = '#d62728' if label == '39%' else '#333333'
+    
+    ax.text(width + 0.5, bar.get_y() + bar.get_height()/2, 
+            label, 
+            va='center', ha='left', fontsize=12, fontweight=font_weight, color=color)
+
+# 7. Typography: Title & Subtitle
+plt.text(-0.5, 7.4, "MENA's Absolute Dominance in Sovereign Wealth Funds", fontsize=18, fontweight='bold', color='#111111')
+plt.text(-0.5, 6.9, "Proportion of global sovereign wealth fund assets by region (Total: $15.2 Trillion)", fontsize=12, color='#555555')
+
+# 8. Footer / Source
+plt.text(-0.5, -1.5, "Source: Global SWF (Dec 2025) | The Economics Hub", fontsize=10, color='#888888')
+
+plt.tight_layout()
+
+# Save output for the uploader
+plt.savefig('TEH_SWF_Dominance.png', bbox_inches='tight', dpi=300)
+plt.close()
 
 
 def chart_macro_table(engine, output_dir):

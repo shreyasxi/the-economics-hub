@@ -319,6 +319,16 @@ INDICATORS = {
         "category": "volatility",
         "color_key": "pink",
     },
+    
+    "india_vix": {
+        "name": "India VIX",
+        "source": "yfinance",
+        "ticker": "^INDIAVIX",
+        "category": "volatility",
+        "unit": "index",
+        "change_type": "abs",
+        "color_key": "special_black",
+    },
 
     # ═══════════════════════════════════════════
     # COMMODITIES

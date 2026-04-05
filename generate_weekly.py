@@ -700,7 +700,7 @@ def generate_with_live_data(output_dir):
                 )
 
             # Apply YOUR custom titles, rules, and sources
-            EconStyle.set_title(ax, "India's IT Sector Feels the AI Threat", f"Sector benchmark hits 12-month lows as investors confront AI's threat to India's IT export model")
+            EconStyle.set_title(ax, "India's IT Sector Feels the AI Threat", f"Sector benchmark continues to hit 12 month lows as investors confront AI's threat to India's IT export model")
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
             EconStyle.add_source(fig, "Yahoo Finance (NSE)")
@@ -844,7 +844,7 @@ def generate_with_live_data(output_dir):
         "dxy", "eurusd", "gbpusd", "usdinr", "usdjpy",             # FX
         "us_2y", "us_10y", "us_30y", "de_10y",                     # Yields
         "btc", "eth",                                              # Crypto
-        "vix",                                                     # Volatility (AFTER commodities)
+        "vix", "india_vix",                                        # Volatility (AFTER commodities)
     ]
     
     for ind_id in row_ids:
@@ -858,18 +858,20 @@ def generate_with_live_data(output_dir):
             # Format YTD based on type
             if ytd_val is None:
                 ytd_str = "-"
-            elif ind["change_type"] == "abs": # Yields + VIX
+            elif ind_id in ["vix", "india_vix"]:
+                ytd_str = f"{ytd_val:+.1f} pts"
+            elif ind["change_type"] == "abs":
                 ytd_str = EconStyle.format_change_label(ytd_val, "abs")
             else: # Everything else (%)
                 ytd_str = EconStyle.format_change_label(ytd_val * 100, "pct") # *100 for display
 
             # VIX: weekly change is absolute points, not percentage
-            if ind_id == "vix":
+            if ind_id in ["vix", "india_vix"]:
                 # Back-calculate absolute change from level and change_pct
                 if "change_pct" in w and w["change_pct"] != 0:
-                    prev_vix = w["level"] / (1 + w["change_pct"] / 100)
-                    vix_abs = w["level"] - prev_vix
-                    weekly_str = f"{vix_abs:+.1f} pts"
+                    prev_level = w["level"] / (1 + w["change_pct"] / 100)
+                    points_abs = w["level"] - prev_level
+                    weekly_str = f"{points_abs:+.1f} pts"
                 else:
                     weekly_str = "0.0 pts"
             elif "change_pct" in w:
