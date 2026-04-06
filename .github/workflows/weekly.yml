@@ -1,0 +1,55 @@
+name: Weekly Markets Generator
+
+on:
+  schedule:
+    # 06:00 UTC every Saturday — ~10 hours after US Friday market close
+    - cron: '0 6 * * 6'
+  workflow_dispatch:  # Manual trigger from GitHub Actions UI
+
+jobs:
+  generate-weekly:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate weekly charts
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          PYTHONPATH: "."
+        run: python generate_weekly.py
+
+      - name: Copy charts to assets/
+        run: |
+          DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
+          if [ -z "$DATE_FOLDER" ]; then
+            echo "ERROR: No weekly output folder found after generation."
+            exit 1
+          fi
+          echo "Copying output/weekly/$DATE_FOLDER/ → assets/weekly/$DATE_FOLDER/"
+          mkdir -p "assets/weekly/$DATE_FOLDER"
+          cp output/weekly/"$DATE_FOLDER"/*.png "assets/weekly/$DATE_FOLDER/"
+          echo "Charts in assets/weekly/$DATE_FOLDER/:"
+          ls "assets/weekly/$DATE_FOLDER/"
+
+      - name: Commit and push charts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/weekly/
+          git diff --staged --quiet && echo "No changes to commit." && exit 0
+          git commit -m "chore: weekly charts $(date -u +%Y-%m-%d)"
+          git push

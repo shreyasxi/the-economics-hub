@@ -1,0 +1,72 @@
+name: India Dashboard Generator
+
+on:
+  # No schedule — India data is manually maintained by Shreyas.
+  # Trigger this workflow ONLY after updating:
+  #   data/india_manual.csv
+  #   data/cag_monthly_accounts.xlsx
+  # Commit and push those files first, then run this workflow.
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: >
+          Type "run" to confirm you have updated india_manual.csv
+          and cag_monthly_accounts.xlsx and pushed the changes.
+        required: true
+        default: ''
+
+jobs:
+  generate-india:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate confirmation input
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "run" ]; then
+            echo "ERROR: Confirmation input must be exactly 'run'."
+            echo "Update your data files, push, then trigger this workflow."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate India charts
+        env:
+          # No FRED_API_KEY needed — India pipeline reads local CSV/XLSX only.
+          PYTHONPATH: "."
+        run: python generate_india.py
+
+      - name: Copy charts to assets/
+        run: |
+          MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
+          if [ -z "$MONTH_FOLDER" ]; then
+            echo "ERROR: No India output folder found after generation."
+            exit 1
+          fi
+          echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
+          mkdir -p "assets/india/$MONTH_FOLDER"
+          cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
+          echo "Charts in assets/india/$MONTH_FOLDER/:"
+          ls "assets/india/$MONTH_FOLDER/"
+
+      - name: Commit and push charts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/india/
+          git diff --staged --quiet && echo "No changes to commit." && exit 0
+          git commit -m "chore: india charts $(date -u +%Y-%m)"
+          git push
