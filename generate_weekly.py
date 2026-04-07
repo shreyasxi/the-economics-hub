@@ -101,18 +101,44 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Sector benchmark continues to hit 12-month lows as investors confront AI's threat to India's IT export model",
         ),
     },
-    "brazil_fx": {
+    "fx_weekly": {
         "dashboard": (
-            "USD/BRL Exchange Rate — Historical Trend",
-            "Monthly average BRL per 1 USD since 2010",
+            "Foreign Exchange — Weekly Performance",
+            "Weekly percentage change across major currency pairs  ·  {date}",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "The Brazilian Real Remains Deeply Discounted",
-            "Despite record trade surpluses over the years, the currency has not recovered to its pre-COVID levels",
+            "Foreign Exchange — Weekly Performance",
+            "Weekly percentage change across major currency pairs  ·  {date}",
+        ),
+    },
+    "crypto_weekly": {
+        "dashboard": (
+            "Cryptocurrency Weekly Performance",
+            "Bitcoin and Ethereum weekly percentage change  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Cryptocurrency Weekly Performance",
+            "Bitcoin and Ethereum weekly percentage change  ·  {date}",
+        ),
+    },
+    "crypto_trend": {
+        "dashboard": (
+            "Crypto vs. Equities — Trailing 12 Months",
+            "Bitcoin, Ethereum and S&P 500 indexed to 100 at start  ·  Risk-on vs. risk-off",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Crypto vs. Equities — Trailing 12 Months",
+            "Bitcoin, Ethereum and S&P 500 indexed to 100 at start  ·  Risk-on vs. risk-off",
         ),
     },
 }
+
+# NOTE: USD/BRL and Hormuz exposure are ad-hoc narrative charts.
+# Run them independently: python custom/brazil_fx.py
+#                         python custom/hormuz_exposure.py
 
 
 def get_output_dir():
@@ -824,96 +850,111 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ Real wage growth failed: {e}")
         
-   # -- 10. BRAZIL MACRO NARRATIVE (FX) --
-    print("   [13/13] Brazil Macro - USD/BRL Exchange Rate")
+    # ── 8. FX WEEKLY BAR ──
+    print("   [FX-bar] FX — Weekly Performance Bar Chart")
     try:
-        import pandas as pd
-        import matplotlib.dates as mdates
-        
-        # 1. Fetch daily FX data (Pulling a safe buffer from 2010 onwards)
-        brl_raw = fred_fetcher.fetch_series("DEXBZUS", period_years=17)
-        
-        if len(brl_raw) > 0:
-            df = pd.DataFrame({"BRL": brl_raw}).dropna()
-            
-            # Filter to start exactly at 2010-01-01
-            df = df.loc["2010-01-01":]
-            
-            # 2. Resample to monthly average to smooth out daily volatility
-            monthly_avg = df["BRL"].resample("ME").mean()
-            
-            dates = monthly_avg.index.to_pydatetime()
-            vals = monthly_avg.values
-            
-            # 3. Calculate the 2015-2019 pre-COVID baseline average
-            pre_covid_avg = monthly_avg.loc["2015-01-01":"2019-12-31"].mean()
+        fx_ids = ["dxy", "eurusd", "gbpusd", "usdinr", "usdjpy", "usdcny"]
+        names_fx, values_fx, cks_fx = build_bar_data(fx_ids)
 
-            # 4. Create the Aesthetic Chart
+        if names_fx:
             fig, ax = EconStyle.create_figure(size="wide")
-            
-            # Background Shading (Neutral Grey for Pre-COVID, Light Pink for Post-COVID)
-            PANDEMIC_START = pd.to_datetime("2020-01-01")
-            ax.axvspan(dates[0], PANDEMIC_START, color="#F3F4F6", alpha=0.6, zorder=0) 
-            ax.axvspan(PANDEMIC_START, dates[-1], color="#FDF2F8", alpha=0.6, zorder=0) 
-            
-            # Label inside the shaded region (using axes coordinates to keep it near the bottom visually)
-            ax.text(pd.to_datetime("2020-08-01"), 0.05, "Post-COVID Era", 
-                    color="#BE185D", fontsize=10, alpha=0.7, zorder=1, 
-                    transform=ax.get_xaxis_transform())
+            color_pos = "#03AF53"
+            color_neg = "#820E0E"
+            colors_fx = [color_pos if v >= 0 else color_neg for v in values_fx]
+            bars = ax.bar(names_fx, values_fx, color=colors_fx, width=0.25, zorder=3)
 
-            # Reference Line (2015-2019 Average) - Made much more visible
-            ax.axhline(pre_covid_avg, color="#6B7280", linestyle="--", linewidth=1.8, zorder=1)
-            
-            # Adjusted text position for inverted axis (subtracting moves it UP visually)
-            ax.text(pd.to_datetime("2010-06-01"), pre_covid_avg - 0.1, 
-                    f"Pre-COVID avg (2015-19): {pre_covid_avg:.2f}", 
-                    color="#4B5563", fontsize=10, fontweight="bold", va="bottom", zorder=2)
-
-            # Plot the Line (Bold Pink/Magenta)
-            line_color = "#BE185D"
-            
-            # Add a subtle shadow for depth
-            ax.plot(dates, vals, color=line_color, linewidth=4.0, alpha=0.15, solid_capstyle="round", zorder=2)
-            ax.plot(dates, vals, color=line_color, linewidth=2.5, solid_capstyle="round", zorder=3)
-            
-            # End Value Label
-            last_date = dates[-1]
-            last_val = vals[-1]
-            ax.text(last_date + pd.DateOffset(days=45), last_val, 
-                    f"BRL/USD\n{last_val:.2f}", 
-                    color=line_color, fontweight="bold", fontsize=10, va="center", zorder=5)
-
-            # 5. Formatting the Axes
-            # INVERT Y-AXIS: Higher number (weaker Real) points DOWN visually
-            ax.invert_yaxis()
-            ax.set_ylabel("BRL per 1 USD (Lower line = Weaker Real)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
-            
-            ax.xaxis.set_major_locator(mdates.YearLocator(2))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-            
-            # Clean up grid and spines
-            # Horizontal grid
             ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            # Vertical grid (Added with 0.5 alpha)
-            ax.xaxis.grid(True, linestyle='-', alpha=0.5, color='#E5E7EB', zorder=0)
-            
+            ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
             ax.spines['top'].set_visible(False)
             ax.spines['right'].set_visible(False)
             ax.spines['left'].set_visible(False)
-            ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
+            ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+            ax.xaxis.set_tick_params(length=0)
+            ax.set_xticklabels(names_fx, fontweight='bold', fontsize=8.5, color="#1C1C1E")
 
-            # Apply Economics Hub Branding
-            _t, _s = WEEKLY_TITLES["brazil_fx"][mode]
-            EconStyle.set_title(ax, _t, _s)
+            min_v = min(values_fx) if values_fx else 0
+            max_v = max(values_fx) if values_fx else 0
+            y_range = max_v - min_v if max_v != min_v else 1
+            ax.set_ylim(
+                (min_v - y_range * 0.15) if min_v < 0 else 0,
+                (max_v + y_range * 0.15) if max_v > 0 else 0,
+            )
+            for bar, v in zip(bars, values_fx):
+                offset = y_range * 0.02
+                va = 'bottom' if v >= 0 else 'top'
+                y_pos = bar.get_height() + offset if v >= 0 else bar.get_height() - offset
+                ax.text(bar.get_x() + bar.get_width() / 2, y_pos, f"{v:+.1f}%",
+                        ha='center', va=va, fontweight='bold', fontsize=11, color=bar.get_facecolor())
+
+            _t, _s = WEEKLY_TITLES["fx_weekly"][mode]
+            EconStyle.set_title(ax, _t, _s.format(date=date_label))
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "FRED")
-            
-            EconStyle.save_chart(fig, output_dir / "13_brazil_fx_trend.png")
-            print("      ✓ Saved Brazil FX Trend")
-            
+            EconStyle.add_source(fig, "Yahoo Finance")
+            EconStyle.save_chart(fig, output_dir / "03_fx_weekly.png")
     except Exception as e:
-        print(f"   ⚠ Brazil FX chart failed: {e}")
+        print(f"   ⚠ FX weekly bar failed: {e}")
+
+    # ── 9. CRYPTO ──
+    print("   [crypto] Crypto — Weekly Performance & 12-Month Trend")
+    try:
+        crypto_ids = ["btc", "eth"]
+        names_c, values_c, cks_c = build_bar_data(crypto_ids)
+
+        if names_c:
+            # 9a. Weekly bar
+            fig, ax = EconStyle.create_figure(size="wide")
+            color_pos = "#F7931A"   # Bitcoin orange
+            color_neg = "#820E0E"
+            colors_c = [color_pos if v >= 0 else color_neg for v in values_c]
+            bars = ax.bar(names_c, values_c, color=colors_c, width=0.2, zorder=3)
+
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
+            for s in ['top', 'right', 'left']: ax.spines[s].set_visible(False)
+            ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+            ax.xaxis.set_tick_params(length=0)
+            ax.set_xticklabels(names_c, fontweight='bold', fontsize=11, color="#1C1C1E")
+
+            min_v = min(values_c) if values_c else 0
+            max_v = max(values_c) if values_c else 0
+            y_range = max_v - min_v if max_v != min_v else 1
+            ax.set_ylim(
+                (min_v - y_range * 0.15) if min_v < 0 else 0,
+                (max_v + y_range * 0.15) if max_v > 0 else 0,
+            )
+            for bar, v in zip(bars, values_c):
+                offset = y_range * 0.02
+                va = 'bottom' if v >= 0 else 'top'
+                y_pos = bar.get_height() + offset if v >= 0 else bar.get_height() - offset
+                ax.text(bar.get_x() + bar.get_width() / 2, y_pos, f"{v:+.1f}%",
+                        ha='center', va=va, fontweight='bold', fontsize=14, color=bar.get_facecolor())
+
+            _t, _s = WEEKLY_TITLES["crypto_weekly"][mode]
+            EconStyle.set_title(ax, _t, _s.format(date=date_label))
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance")
+            EconStyle.save_chart(fig, output_dir / "11_crypto_weekly.png")
+
+            # 9b. Crypto vs S&P 500 indexed trend
+            crypto_trend = TrendLineChart()
+            crypto_colors = {"btc": "special_black", "eth": "blue", "sp500": "us"}
+            for ind_id in ["btc", "eth", "sp500"]:
+                dates_t, vals_t = get_trend(ind_id)
+                if dates_t:
+                    ind = INDICATORS[ind_id]
+                    crypto_trend.add_series(ind["name"], dates_t, vals_t,
+                                            color_key=crypto_colors[ind_id])
+            _t, _s = WEEKLY_TITLES["crypto_trend"][mode]
+            crypto_trend.render(title=_t, subtitle=_s, source="Yahoo Finance",
+                                normalize=True, ylabel="Indexed (start = 100)")
+            crypto_trend.save(output_dir / "12_crypto_vs_spx_trend.png")
+
+    except Exception as e:
+        print(f"   ⚠ Crypto charts failed: {e}")
+
+    # NOTE: USD/BRL is an ad-hoc narrative chart. Run: python custom/brazil_fx.py
 
     # ── SUMMARY TABLE ──
     print("   [+] Summary Table")

@@ -111,26 +111,59 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Rising European gas and fertilizer input futures are signaling a severe, lagged spike in global food costs",
         ),
     },
-    "bdti": {
+    "money_rates": {
         "dashboard": (
-            "Baltic Dirty Tanker Index",
-            "Tanker freight rates — current trend",
+            "Money Supply, Yield Spreads & Real Rates",
+            "M2 YoY growth · 2s10s & 10y–3m spreads · 10Y TIPS real yield",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Tanker Freight Rates Rise to Multi-Year Highs",
-            "Baltic Dirty Tanker Index breaks above 3,000 for the first time since the 2022 energy crisis as Gulf shipping costs spike",
+            "Money Supply, Yield Spreads & Real Rates",
+            "M2 YoY growth · 2s10s & 10y–3m spreads · 10Y TIPS real yield",
         ),
     },
-    "hormuz": {
+    "sahm_rule": {
         "dashboard": (
-            "Strait of Hormuz — Global Export Exposure",
-            "Mideast Gulf exports as a share of global seaborne trade across commodity categories",
+            "Sahm Rule Recession Indicator",
+            "3-month average unemployment rate rise from prior 12-month low  ·  Threshold: 0.50 pp",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "The Gulf Is the World's Petrochemical Supplier",
-            "Mideast Gulf exports as a share of global seaborne trade across commodity categories",
+            "Sahm Rule Recession Indicator",
+            "3-month average unemployment rate rise from prior 12-month low  ·  Threshold: 0.50 pp",
+        ),
+    },
+    "fed_balance_sheet": {
+        "dashboard": (
+            "Federal Reserve Balance Sheet",
+            "Total assets held by the Fed (WALCL)  ·  QE expansion and QT drawdown",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Federal Reserve Balance Sheet",
+            "Total assets held by the Fed (WALCL)  ·  QE expansion and QT drawdown",
+        ),
+    },
+    "housing": {
+        "dashboard": (
+            "US Housing Market",
+            "30-Year Fixed Mortgage Rate vs. Housing Starts",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "US Housing Market",
+            "30-Year Fixed Mortgage Rate vs. Housing Starts",
+        ),
+    },
+    "consumer_sentiment": {
+        "dashboard": (
+            "US Consumer Sentiment",
+            "University of Michigan Consumer Sentiment Index",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "US Consumer Sentiment",
+            "University of Michigan Consumer Sentiment Index",
         ),
     },
 }
@@ -1059,6 +1092,253 @@ def chart_hormuz_exposure(output_dir, mode="dashboard"):
 # MAIN PIPELINE
 # ═══════════════════════════════════════════════
 
+def chart_money_rates(engine, output_dir, mode="dashboard"):
+    """M2 YoY (bar) + 2s10s spread + 10y–3m spread + 10Y real yield."""
+    EconStyle.apply_global_style()
+    fig, ax1 = EconStyle.create_figure(size="wide")
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    # M2 YoY as bars on primary axis
+    m2 = engine.get_transformed("m2_yoy")
+    if not m2.empty:
+        dates_m2 = m2.index.to_pydatetime().tolist()
+        vals_m2 = m2.values
+        colors_m2 = [EconStyle.POSITIVE if v >= 0 else EconStyle.NEGATIVE for v in vals_m2]
+        ax1.bar(dates_m2, vals_m2, color=colors_m2, alpha=0.35, width=25, zorder=2, label="M2 YoY %")
+        ax1.axhline(0, color="#AAAAAA", linewidth=0.8, zorder=1)
+        _add_end_label(ax1, dates_m2, vals_m2, "M2 YoY", "#003366")
+
+    ax1.set_ylabel("M2 Growth (% YoY)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#003366", labelpad=6)
+    ax1.tick_params(axis="y", colors="#003366")
+
+    ax2 = ax1.twinx()
+    # 2s10s spread
+    s2s10 = engine.get_transformed("spread_2s10s")
+    if not s2s10.empty:
+        dates_s, vals_s = s2s10.index.to_pydatetime().tolist(), s2s10.values
+        ax2.plot(dates_s, vals_s, color="#d62728", linewidth=2, solid_capstyle="round", zorder=3)
+        ax2.fill_between(dates_s, vals_s, 0, where=[v < 0 for v in vals_s],
+                         alpha=0.08, color="#d62728", zorder=1)
+        _add_end_label(ax2, dates_s, vals_s, "2s10s", "#d62728")
+
+    # 10y–3m spread
+    s10y3m = engine.get_transformed("spread_10y3m")
+    if not s10y3m.empty:
+        dates_3m, vals_3m = s10y3m.index.to_pydatetime().tolist(), s10y3m.values
+        ax2.plot(dates_3m, vals_3m, color="#9467bd", linewidth=1.5, linestyle="--",
+                 alpha=0.85, solid_capstyle="round", zorder=3)
+        _add_end_label(ax2, dates_3m, vals_3m, "10y–3m", "#9467bd")
+
+    ax2.axhline(0, color="#CCCCCC", linewidth=0.8, linestyle="--", zorder=1)
+    ax2.set_ylabel("Yield Spread (pp)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#d62728", labelpad=6)
+    ax2.tick_params(axis="y", colors="#d62728")
+    ax2.spines["right"].set_visible(True)
+    ax2.spines["right"].set_color("#d62728")
+
+    _style_axis(ax1)
+    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
+    ax2.spines["top"].set_visible(False)
+    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
+
+    _t, _s = MACRO_TITLES["money_rates"][mode]
+    EconStyle.set_title(ax1, _t, _s)
+    EconStyle.add_top_rule(ax1)
+    EconStyle.add_source(fig, "FRED (Federal Reserve)")
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "05_macro_money.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Money, Rates & Yield Spreads")
+
+
+def chart_sahm_rule(engine, output_dir, mode="dashboard"):
+    """Sahm Rule recession indicator with 0.50 pp trigger threshold."""
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    sahm = engine.get_transformed("sahm_rule")
+    if sahm.empty:
+        print("   ⚠ Sahm Rule data unavailable — skipping.")
+        return
+
+    dates, vals = sahm.index.to_pydatetime().tolist(), sahm.values
+
+    # Fill above 0.5 threshold (danger zone)
+    ax.fill_between(dates, vals, 0.5,
+                    where=[v >= 0.5 for v in vals],
+                    alpha=0.18, color="#B91C1C", zorder=1, label="Recession zone (≥ 0.50)")
+    ax.fill_between(dates, vals, 0,
+                    where=[v < 0.5 for v in vals],
+                    alpha=0.07, color="#059669", zorder=1)
+
+    ax.plot(dates, vals, color="#B91C1C", linewidth=2.5, solid_capstyle="round", zorder=3)
+    ax.axhline(0.5, color="#B91C1C", linewidth=1.5, linestyle="--", alpha=0.7, zorder=2)
+    ax.text(dates[1], 0.53, " Recession threshold (0.50 pp)",
+            fontsize=9, fontweight="bold", color="#B91C1C", alpha=0.85, va="bottom")
+    ax.axhline(0, color="#AAAAAA", linewidth=0.6, zorder=1)
+
+    _add_end_label(ax, dates, vals, "Sahm Rule", "#B91C1C")
+    _style_axis(ax, ylabel="Unemployment Rise from 12-Month Low (pp)")
+
+    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_visible(True)
+    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.14)
+
+    _t, _s = MACRO_TITLES["sahm_rule"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    EconStyle.add_source(fig, "FRED (Claudia Sahm / BLS)")
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "06_macro_sahm.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Sahm Rule Recession Indicator")
+
+
+def chart_fed_balance_sheet(engine, output_dir, mode="dashboard"):
+    """Federal Reserve total assets (WALCL) with QE/QT era shading."""
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    bs = engine.get_transformed("fed_balance_sheet")
+    if bs.empty:
+        print("   ⚠ Fed balance sheet data unavailable — skipping.")
+        return
+
+    # Convert from millions to trillions for readability
+    bs_t = bs / 1_000_000
+    dates, vals = bs_t.index.to_pydatetime().tolist(), bs_t.values
+
+    # Era shading
+    qe_start  = pd.to_datetime("2020-03-01")
+    qt_start  = pd.to_datetime("2022-06-01")
+    ax.axvspan(qe_start, qt_start, alpha=0.06, color="#003366", zorder=0)
+    ax.axvspan(qt_start, dates[-1], alpha=0.06, color="#B91C1C", zorder=0)
+    ax.text(pd.to_datetime("2021-01-01"), 0.03, "QE Era",
+            color="#003366", fontsize=9, alpha=0.7, transform=ax.get_xaxis_transform())
+    ax.text(pd.to_datetime("2022-09-01"), 0.03, "QT Era",
+            color="#B91C1C", fontsize=9, alpha=0.7, transform=ax.get_xaxis_transform())
+
+    ax.plot(dates, vals, color="#003366", linewidth=2.5, solid_capstyle="round", zorder=3)
+    ax.fill_between(dates, vals, min(vals), alpha=0.06, color="#003366", zorder=0)
+
+    _add_end_label(ax, dates, vals, f"${vals[-1]:.1f}T", "#003366")
+    _style_axis(ax, ylabel="Total Assets (USD Trillions)")
+
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"${x:.1f}T"))
+    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_visible(True)
+    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.12)
+
+    _t, _s = MACRO_TITLES["fed_balance_sheet"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    EconStyle.add_source(fig, "FRED (Federal Reserve H.4.1)")
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "07_macro_balance_sheet.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Fed Balance Sheet")
+
+
+def chart_housing(engine, output_dir, mode="dashboard"):
+    """30Y mortgage rate (primary) vs housing starts (secondary, dual axis)."""
+    EconStyle.apply_global_style()
+    fig, ax1 = EconStyle.create_figure(size="wide")
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    mort = engine.get_transformed("mortgage_30y")
+    if not mort.empty:
+        dates_m, vals_m = mort.index.to_pydatetime().tolist(), mort.values
+        ax1.plot(dates_m, vals_m, color="#B91C1C", linewidth=2.5, solid_capstyle="round", zorder=3)
+        _add_end_label(ax1, dates_m, vals_m, "Mortgage 30Y", "#B91C1C")
+
+    ax1.set_ylabel("30Y Mortgage Rate (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#B91C1C", labelpad=6)
+    ax1.tick_params(axis="y", colors="#B91C1C")
+
+    ax2 = ax1.twinx()
+    starts = engine.get_transformed("housing_starts")
+    if not starts.empty:
+        # Convert from thousands units to display
+        starts_k = starts / 1000
+        dates_s, vals_s = starts_k.index.to_pydatetime().tolist(), starts_k.values
+        ax2.bar(dates_s, vals_s, color="#003366", alpha=0.3, width=25, zorder=2)
+        ax2.plot(dates_s, vals_s, color="#003366", linewidth=1.5, solid_capstyle="round", zorder=3)
+        _add_end_label(ax2, dates_s, vals_s, "Starts", "#003366")
+
+    ax2.set_ylabel("Housing Starts (M units, SAAR)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#003366", labelpad=6)
+    ax2.tick_params(axis="y", colors="#003366")
+    ax2.spines["right"].set_visible(True)
+    ax2.spines["right"].set_color("#003366")
+
+    _style_axis(ax1)
+    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
+    ax2.spines["top"].set_visible(False)
+    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
+
+    _t, _s = MACRO_TITLES["housing"][mode]
+    EconStyle.set_title(ax1, _t, _s)
+    EconStyle.add_top_rule(ax1)
+    EconStyle.add_source(fig, "FRED (Freddie Mac PMMS, Census Bureau)")
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "08_macro_housing.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Housing Market")
+
+
+def chart_consumer_sentiment(engine, output_dir, mode="dashboard"):
+    """University of Michigan Consumer Sentiment index — level with long-run trend."""
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    fig.patch.set_linewidth(2)
+    fig.patch.set_edgecolor('#000000')
+
+    sent = engine.get_transformed("consumer_sentiment")
+    if sent.empty:
+        print("   ⚠ Consumer sentiment data unavailable — skipping.")
+        return
+
+    dates, vals = sent.index.to_pydatetime().tolist(), sent.values
+
+    # Long-run average reference line
+    long_run_avg = float(sent.mean())
+    ax.axhline(long_run_avg, color="#AAAAAA", linewidth=1.0, linestyle="--", alpha=0.7, zorder=1)
+    ax.text(dates[2], long_run_avg + 1.5,
+            f" Avg ({long_run_avg:.0f})", fontsize=9, color="#888888", va="bottom")
+
+    ax.fill_between(dates, vals, long_run_avg,
+                    where=[v < long_run_avg for v in vals],
+                    alpha=0.10, color="#B91C1C", zorder=1)
+    ax.fill_between(dates, vals, long_run_avg,
+                    where=[v >= long_run_avg for v in vals],
+                    alpha=0.06, color="#059669", zorder=1)
+
+    ax.plot(dates, vals, color="#003366", linewidth=2.5, solid_capstyle="round", zorder=3)
+    _add_end_label(ax, dates, vals, "Sentiment", "#003366")
+    _style_axis(ax, ylabel="Index Level")
+
+    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_visible(True)
+    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.12)
+
+    _t, _s = MACRO_TITLES["consumer_sentiment"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    EconStyle.add_source(fig, "FRED (University of Michigan)")
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+
+    filepath = output_dir / "09_macro_consumer.png"
+    EconStyle.save_chart(fig, filepath)
+    print(f"   ✓ Consumer Sentiment")
+
+
 def generate_macro_dashboard(mode="dashboard"):
     month_str = datetime.now().strftime("%Y-%m")
     output_dir = PROJECT_ROOT / "output" / "macro" / month_str
@@ -1093,18 +1373,26 @@ def generate_macro_dashboard(mode="dashboard"):
 
     print("\n   Generating charts...")
 
+    # ── Core macro charts ──
     chart_macro_table(engine, output_dir)
     chart_inflation(engine, output_dir, mode=mode)
     chart_labour(engine, output_dir, mode=mode)
     chart_financial_conditions(engine, output_dir, mode=mode)
     chart_emerging_markets(engine, output_dir, mode=mode)
 
-    #chart_macro_cli(output_dir)
-    #chart_macro_em_vulnerability(output_dir)
+    # ── Extended macro charts ──
+    chart_money_rates(engine, output_dir, mode=mode)
+    chart_sahm_rule(engine, output_dir, mode=mode)
+    chart_fed_balance_sheet(engine, output_dir, mode=mode)
+    chart_housing(engine, output_dir, mode=mode)
+    chart_consumer_sentiment(engine, output_dir, mode=mode)
 
+    # ── Narrative / deep-dive charts (optional, data-dependent) ──
     chart_agflation_pipeline(output_dir, mode=mode)
-    chart_bdti_branded_screenshot(output_dir, mode=mode)
-    chart_hormuz_exposure(output_dir, mode=mode)
+
+    # NOTE: BDTI screenshot and Hormuz exposure are ad-hoc narrative charts.
+    # Run them independently via: python custom/bdti_branded.py
+    #                              python custom/hormuz_exposure.py
 
     print(f"\n✅ Macro Pulse complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")

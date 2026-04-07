@@ -94,18 +94,28 @@ def get_folder_mtime(subdir: str) -> datetime | None:
     return datetime.fromtimestamp(max(p.stat().st_mtime for p in pngs))
 
 
-def is_streamlit_cloud() -> bool:
+def is_pipeline_admin() -> bool:
     """
-    Detect the Streamlit Cloud environment.
+    Returns True only when the PIPELINE_KEY secret/env-var is set and non-empty.
 
-    On Streamlit Cloud, STREAMLIT_SHARING_MODE is set to "1".
-    The IS_STREAMLIT_CLOUD flag can also be set manually in Streamlit
-    Cloud secrets as a safety override.
+    How it works:
+    - Locally: set PIPELINE_KEY in .streamlit/secrets.toml (never committed)
+    - Streamlit Cloud: do NOT add PIPELINE_KEY to app secrets → always False
+    - Any random visitor to the deployed app: never sees pipeline controls
+
+    This is safer than checking for env vars that Streamlit Cloud may set
+    unpredictably across versions.
     """
-    return (
-        os.environ.get("STREAMLIT_SHARING_MODE") == "1"
-        or os.environ.get("IS_STREAMLIT_CLOUD", "").lower() == "true"
-    )
+    # Check Streamlit secrets first (works both locally and on Cloud)
+    try:
+        import streamlit as st
+        key = st.secrets.get("PIPELINE_KEY", "")
+        if key:
+            return True
+    except Exception:
+        pass
+    # Fallback: plain env var (for local runs outside Streamlit)
+    return bool(os.environ.get("PIPELINE_KEY", "").strip())
 
 
 # ---------------------------------------------------------------------------

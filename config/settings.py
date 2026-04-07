@@ -205,6 +205,16 @@ INDICATORS = {
         "change_type": "pct",
         "color_key": "asia",
     },
+    "usdcny": {
+        "name": "USD/CNY",
+        "source": "yfinance",
+        "ticker": "CNY=X",
+        "category": "fx",
+        "region": "Asia",
+        "unit": "",
+        "change_type": "pct",
+        "color_key": "asia",
+    },
 
     # ═══════════════════════════════════════════
     # TREASURY / GOVERNMENT BOND YIELDS

@@ -1,13 +1,13 @@
 """
 The Economics Hub — Streamlit Dashboard
-Author: Shreyas
+Author: Shreyas Urgunde  |  shreyasxi.github.io
 
 Three-tab publication dashboard:
   Weekly Markets  · Macro Pulse  · India Dashboard
 
 Charts are served from assets/ (git-tracked, deployed) with a local
-fallback to output/ for development. The sidebar exposes pipeline
-control buttons when running locally (hidden on Streamlit Cloud).
+fallback to output/ for development. Pipeline controls are gated
+behind PIPELINE_KEY — only visible to the publisher.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from utils.chart_loader import (
     clean_title,
     get_charts,
     get_folder_mtime,
-    is_streamlit_cloud,
+    is_pipeline_admin,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -39,14 +39,14 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------------------------
-# Custom CSS — FT/Bloomberg-grade institutional typography
+# Custom CSS
 # ---------------------------------------------------------------------------
 
 st.markdown(
     """
     <style>
-    /* ── Google Fonts ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,700;0,900;1,400&display=swap');
+    /* ── Google Fonts: Inter (UI) + Merriweather (editorial) ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,700;0,900;1,400&display=swap');
 
     /* ── Global base ── */
     html, body, [class*="css"] {
@@ -55,14 +55,14 @@ st.markdown(
 
     /* ── Reduce Streamlit's default top padding ── */
     .main .block-container {
-        padding-top: 1.2rem;
+        padding-top: 1.0rem;
         padding-bottom: 2rem;
     }
 
     /* ── Masthead — Merriweather, editorial weight ── */
     .hub-masthead {
         font-family: 'Merriweather', Georgia, "Times New Roman", serif;
-        font-size: 2.1rem;
+        font-size: 2.05rem;
         font-weight: 900;
         letter-spacing: -0.01em;
         color: #000000;
@@ -71,14 +71,25 @@ st.markdown(
     }
     .hub-tagline {
         font-family: 'Inter', sans-serif;
-        font-size: 0.82rem;
+        font-size: 0.76rem;
         font-weight: 400;
-        color: #666666;
+        color: #777777;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-top: 0.25rem;
-        margin-bottom: 0.35rem;
+        letter-spacing: 0.11em;
+        margin-top: 0.22rem;
+        margin-bottom: 0.2rem;
     }
+    .hub-substack {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.76rem;
+        font-weight: 500;
+        color: #FF6719;
+        text-decoration: none;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.35rem;
+        display: inline-block;
+    }
+    .hub-substack:hover { text-decoration: underline; }
     .hub-rule {
         border: none;
         border-top: 2px solid #000000;
@@ -86,16 +97,16 @@ st.markdown(
         margin-bottom: 0.5rem;
     }
 
-    /* ── Section headers — Inter, all-caps, navy, tight tracking ── */
+    /* ── Section headers — Inter 800, all-caps, navy, generous spacing ── */
     .section-header {
         font-family: 'Inter', sans-serif;
-        font-size: 0.70rem;
-        font-weight: 700;
-        letter-spacing: 0.13em;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
         color: #003366;
-        margin-top: 1.4rem;
-        margin-bottom: 0.5rem;
+        margin-top: 3.5rem;
+        margin-bottom: 0.6rem;
     }
 
     /* ── Status bar ── */
@@ -114,37 +125,52 @@ st.markdown(
         text-align: right;
     }
 
-    /* ── Tab bar — Inter, lighter weight than masthead ── */
+    /* ── Tab bar ── */
     button[data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 0.82rem !important;
-        letter-spacing: 0.04em !important;
+        font-weight: 700 !important;
+        font-size: 0.80rem !important;
+        letter-spacing: 0.06em !important;
         text-transform: uppercase !important;
     }
 
     /* ── Sidebar ── */
     [data-testid="stSidebar"] {
-        background-color: #F7F7F7;
+        background-color: #ECEEF1;
     }
     .sidebar-masthead {
         font-family: 'Merriweather', Georgia, serif;
         font-size: 0.95rem;
         font-weight: 700;
         color: #000000;
-        letter-spacing: 0.01em;
     }
     .sidebar-byline {
         font-family: 'Inter', sans-serif;
-        font-size: 0.75rem;
+        font-size: 0.73rem;
         font-weight: 400;
         color: #888888;
         margin-top: 0.1rem;
     }
+    .sidebar-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.73rem;
+        font-weight: 500;
+        color: #003366;
+        text-decoration: none;
+    }
+    .sidebar-link:hover { text-decoration: underline; }
+
+    /* ── Chart cards: white cards elevated over the grey background ── */
+    .main [data-testid="stImage"] img,
+    .main img {
+        background: #FFFFFF;
+        border-radius: 3px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
 
     /* ── India notice ── */
     .india-notice {
-        background-color: #FAFAFA;
+        background-color: #FFF8F0;
         border-left: 2px solid #CC6600;
         padding: 0.45rem 0.80rem;
         font-family: 'Inter', sans-serif;
@@ -158,11 +184,11 @@ st.markdown(
     /* ── Image captions ── */
     [data-testid="caption"] {
         font-family: 'Inter', sans-serif;
-        font-size: 0.70rem;
-        font-weight: 400;
+        font-size: 0.68rem;
+        font-weight: 500;
         color: #999999;
         text-align: center;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
     }
     </style>
@@ -177,7 +203,7 @@ st.markdown(
 with st.sidebar:
     st.markdown(
         '<p class="sidebar-masthead">The Economics Hub</p>'
-        '<p class="sidebar-byline">by Shreyas</p>',
+        '<p class="sidebar-byline">Shreyas Urgunde</p>',
         unsafe_allow_html=True,
     )
     st.markdown("---")
@@ -185,28 +211,41 @@ with st.sidebar:
     with st.expander("About", expanded=False):
         st.markdown(
             """
+            **Author**
+            Shreyas Urgunde
+
+            **Links**
+            """
+        )
+        st.markdown(
+            '<a class="sidebar-link" href="https://shreyasxi.github.io/" target="_blank">🌐 shreyasxi.github.io</a><br>'
+            '<a class="sidebar-link" href="https://economicshub.substack.com/" target="_blank">📬 The Economics Hub — Substack</a>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            """
+            ---
             **Data sources**
             - Market data: Yahoo Finance
             - Macro series: FRED (St. Louis Fed)
             - International: DBnomics · IMF · OECD
             - India: RBI · MoSPI · NSDL · CAG
 
-            **Publication**
-            The Economics Hub · CC BY-NC 4.0
+            **License**
+            CC BY-NC 4.0
             """
         )
 
-    st.markdown("---")
-
-    # Pipeline control — local only, hidden on Streamlit Cloud
-    if not is_streamlit_cloud():
+    # Pipeline control — only visible when PIPELINE_KEY secret is set
+    if is_pipeline_admin():
+        st.markdown("---")
         st.markdown(
-            '<p style="font-family:\'Inter\',sans-serif;font-size:0.75rem;'
-            'font-weight:700;letter-spacing:0.08em;text-transform:uppercase;'
+            '<p style="font-family:\'Inter\',sans-serif;font-size:0.72rem;'
+            'font-weight:700;letter-spacing:0.09em;text-transform:uppercase;'
             'color:#003366;margin-bottom:0.2rem;">Pipeline Control</p>',
             unsafe_allow_html=True,
         )
-        st.caption("Local use only — not available on Streamlit Cloud.")
+        st.caption("Publisher access only.")
 
         with st.expander("Run Generators", expanded=False):
             _GENERATORS = {
@@ -241,7 +280,9 @@ with st.sidebar:
 
 st.markdown(
     '<h1 class="hub-masthead">THE ECONOMICS HUB</h1>'
-    '<p class="hub-tagline">Global finance through multiple lenses</p>',
+    '<p class="hub-tagline">A visual dashboard tracking global macroeconomics and financial markets.</p>'
+    '<a class="hub-substack" href="https://economicshub.substack.com/" target="_blank">'
+    'Subscribe on Substack →</a>',
     unsafe_allow_html=True,
 )
 st.markdown('<hr class="hub-rule">', unsafe_allow_html=True)
@@ -258,7 +299,6 @@ tab_weekly, tab_macro, tab_india = st.tabs(
 # ── Helpers ────────────────────────────────────────────────────────────────
 
 def _render_status_bar(date_label: str | None, subdir: str) -> None:
-    """Render the date label and last-updated timestamp row."""
     mtime = get_folder_mtime(subdir)
     col_label, col_mtime = st.columns([3, 1])
     with col_label:
@@ -276,7 +316,6 @@ def _render_status_bar(date_label: str | None, subdir: str) -> None:
 
 
 def _render_grid(charts: list[Path], cols: int = 2) -> None:
-    """Render a list of PNG paths in an evenly-spaced column grid."""
     columns = st.columns(cols)
     for i, chart_path in enumerate(charts):
         with columns[i % cols]:
@@ -295,17 +334,13 @@ def _section(title: str) -> None:
 
 
 def _render_summary(chart_path: Path) -> None:
-    """Render the snapshot/summary table constrained to 80% of page width."""
+    """Summary table constrained to 80% of page width."""
     _, col_img, _ = st.columns([1, 4, 1])
     with col_img:
         st.image(str(chart_path), use_container_width=True)
 
 
 def _pop_summary(charts: list[Path], keywords: list[str]) -> tuple[Path | None, list[Path]]:
-    """
-    Extract the first chart whose name matches any of the given keywords.
-    Returns (summary_chart_or_None, remaining_charts).
-    """
     for kw in keywords:
         for c in charts:
             if kw in c.name:
@@ -315,7 +350,6 @@ def _pop_summary(charts: list[Path], keywords: list[str]) -> tuple[Path | None, 
 
 
 def _group(charts: list[Path], keyword: str) -> tuple[list[Path], list[Path]]:
-    """Partition charts into (matching, non_matching) by filename keyword."""
     matched = [c for c in charts if keyword in c.name]
     rest = [c for c in charts if keyword not in c.name]
     return matched, rest
@@ -334,7 +368,6 @@ with tab_weekly:
     else:
         _render_status_bar(f"Week of {date_label}", "weekly")
 
-        # Summary table — constrained width, no caption
         summary, charts = _pop_summary(charts, ["summary_table", "00_"])
         if summary:
             _render_summary(summary)
@@ -363,6 +396,14 @@ with tab_weekly:
         if commodities:
             _section("Commodities")
             _render_grid(commodities)
+
+        # Cryptocurrency
+        crypto_kws = ["crypto", "bitcoin", "btc", "eth"]
+        crypto = [c for c in charts if any(k in c.name for k in crypto_kws)]
+        charts = [c for c in charts if not any(k in c.name for k in crypto_kws)]
+        if crypto:
+            _section("Cryptocurrency")
+            _render_grid(crypto)
 
         # Volatility & Sentiment
         vol_kws = ["vix", "sector_rotation"]
@@ -398,14 +439,47 @@ with tab_macro:
     else:
         _render_status_bar(date_label, "macro")
 
-        # Summary table — constrained width
         summary, charts = _pop_summary(charts, ["macro_table", "00_"])
         if summary:
             _render_summary(summary)
 
-        # All remaining charts in 2-column grid
+        # Inflation
+        inflation_charts, charts = _group(charts, "inflation")
+        if inflation_charts:
+            _section("Inflation")
+            _render_grid(inflation_charts)
+
+        # Labour Market
+        labour_charts = [c for c in charts if any(k in c.name for k in ["labour", "labor", "sahm", "payroll"])]
+        charts = [c for c in charts if not any(k in c.name for k in ["labour", "labor", "sahm", "payroll"])]
+        if labour_charts:
+            _section("Labour Market")
+            _render_grid(labour_charts)
+
+        # Financial Conditions
+        financial_charts = [c for c in charts if any(k in c.name for k in ["financial", "credit", "money", "balance_sheet", "yield_spread"])]
+        charts = [c for c in charts if not any(k in c.name for k in ["financial", "credit", "money", "balance_sheet", "yield_spread"])]
+        if financial_charts:
+            _section("Financial Conditions & Credit")
+            _render_grid(financial_charts)
+
+        # Emerging Markets
+        em_charts, charts = _group(charts, "em")
+        if em_charts:
+            _section("Emerging Markets")
+            _render_grid(em_charts)
+
+        # Housing & Consumer
+        housing_charts = [c for c in charts if any(k in c.name for k in ["housing", "mortgage", "consumer", "sentiment"])]
+        charts = [c for c in charts if not any(k in c.name for k in ["housing", "mortgage", "consumer", "sentiment"])]
+        if housing_charts:
+            _section("Housing & Consumer")
+            _render_grid(housing_charts)
+
+        # Catch-all
         if charts:
-            _render_grid(charts, cols=2)
+            _section("Other")
+            _render_grid(charts)
 
 
 # ── India Dashboard tab ────────────────────────────────────────────────────
@@ -425,16 +499,14 @@ with tab_india:
         st.markdown(
             '<div class="india-notice">'
             "India data is manually curated. Charts reflect the latest data "
-            "update committed to the repository by Shreyas."
+            "update committed to the repository by Shreyas Urgunde."
             "</div>",
             unsafe_allow_html=True,
         )
 
-        # India summary table — constrained width
         summary, charts = _pop_summary(charts, ["india_table", "05_india"])
         if summary:
             _render_summary(summary)
 
-        # All remaining charts in 2-column grid
         if charts:
             _render_grid(charts, cols=2)

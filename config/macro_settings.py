@@ -233,6 +233,92 @@ MACRO_INDICATORS = {
         "color": "#ff7f0e",
         "history_years": 3,
     },
+    "spread_10y3m": {
+        "series": "T10Y3M",
+        "name": "10Y–3M Spread",
+        "frequency": "daily",
+        "transform": "level",
+        "unit": "pp",
+        "group": "money",
+        "color": "#9467bd",
+        "history_years": 3,
+    },
+
+    # ═══════════════════════════════════════════
+    # RECESSION INDICATORS
+    # ═══════════════════════════════════════════
+    "sahm_rule": {
+        "series": "SAHMREALTIME",
+        "name": "Sahm Rule Indicator",
+        "frequency": "monthly",
+        "transform": "level",
+        "unit": "pp",
+        "group": "recession",
+        "color": "#B91C1C",
+        "history_years": 5,
+    },
+
+    # ═══════════════════════════════════════════
+    # FED BALANCE SHEET
+    # ═══════════════════════════════════════════
+    "fed_balance_sheet": {
+        "series": "WALCL",
+        "name": "Fed Balance Sheet (Total Assets)",
+        "frequency": "weekly",
+        "transform": "level",
+        "unit": "$B",
+        "group": "balance_sheet",
+        "color": "#003366",
+        "history_years": 6,
+    },
+
+    # ═══════════════════════════════════════════
+    # HOUSING MARKET
+    # ═══════════════════════════════════════════
+    "mortgage_30y": {
+        "series": "MORTGAGE30US",
+        "name": "30Y Fixed Mortgage Rate",
+        "frequency": "weekly",
+        "transform": "level",
+        "unit": "%",
+        "group": "housing",
+        "color": "#B91C1C",
+        "history_years": 5,
+    },
+    "housing_starts": {
+        "series": "HOUST",
+        "name": "Housing Starts",
+        "frequency": "monthly",
+        "transform": "level",
+        "unit": "K units",
+        "group": "housing",
+        "color": "#003366",
+        "history_years": 5,
+    },
+
+    # ═══════════════════════════════════════════
+    # CONSUMER SENTIMENT
+    # ═══════════════════════════════════════════
+    "consumer_sentiment": {
+        "series": "UMCSENT",
+        "name": "Michigan Consumer Sentiment",
+        "frequency": "monthly",
+        "transform": "level",
+        "unit": "index",
+        "group": "consumer",
+        "color": "#003366",
+        "history_years": 5,
+    },
+    "consumer_expectations": {
+        "series": "UMCSENT1",
+        "name": "Consumer Expectations Index",
+        "frequency": "monthly",
+        "transform": "level",
+        "unit": "index",
+        "group": "consumer",
+        "color": "#FF9933",
+        "history_years": 5,
+    },
 }
 
 
@@ -325,6 +411,26 @@ MACRO_TABLE_SECTIONS = [
     {
         "section": "MONEY & RATES",
         "color": "#7C3AED",
-        "rows": ["m2_yoy", "spread_2s10s", "real_yield_10y"],
+        "rows": ["m2_yoy", "spread_2s10s", "spread_10y3m", "real_yield_10y"],
+    },
+    {
+        "section": "RECESSION WATCH",
+        "color": "#B91C1C",
+        "rows": ["sahm_rule"],
+    },
+    {
+        "section": "FED POLICY",
+        "color": "#003366",
+        "rows": ["fed_balance_sheet"],
+    },
+    {
+        "section": "HOUSING MARKET",
+        "color": "#059669",
+        "rows": ["mortgage_30y", "housing_starts"],
+    },
+    {
+        "section": "CONSUMER",
+        "color": "#0F172A",
+        "rows": ["consumer_sentiment"],
     },
 ]

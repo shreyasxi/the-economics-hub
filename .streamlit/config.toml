@@ -1,11 +1,11 @@
 [theme]
 # Institutional light theme — mirrors EconStyle color system
-base                   = "light"
-primaryColor           = "#003366"    # EconStyle navy (US region color)
-backgroundColor        = "#FFFFFF"    # EconStyle.BACKGROUND
-secondaryBackgroundColor = "#F4F4F4"  # EconStyle row-alt / sidebar
-textColor              = "#000000"    # EconStyle.TEXT_TITLE
-font                   = "serif"      # Closest to Cambria; refined further via CSS
+base                     = "light"
+primaryColor             = "#003366"      # EconStyle navy
+backgroundColor          = "#F4F5F7"      # Subtle off-white — eliminates "sea of white"
+secondaryBackgroundColor = "#ECEEF1"      # Sidebar / input backgrounds
+textColor                = "#0A0A0A"      # Near-black for maximum legibility
+font                     = "serif"        # Closest to Cambria; refined further via CSS
 
 [server]
 headless    = true    # Required for Streamlit Cloud
