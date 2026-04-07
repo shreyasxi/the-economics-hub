@@ -30,7 +30,7 @@ jobs:
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           PYTHONPATH: "."
-        run: python generate_weekly.py
+        run: python generate_weekly.py --mode dashboard
 
       - name: Copy charts to assets/
         run: |

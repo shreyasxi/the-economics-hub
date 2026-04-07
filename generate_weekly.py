@@ -33,6 +33,88 @@ from charts.templates.yield_curve import YieldCurveChart
 from charts.templates.summary_table import SummaryTable
 
 
+# ---------------------------------------------------------------------------
+# Title registry
+# ---------------------------------------------------------------------------
+# Each key maps to a (title, subtitle) pair for each mode.
+#
+#   mode = 'dashboard'  → Standard, descriptive titles for the Streamlit dashboard.
+#   mode = 'newsletter' → Narrative, story-driven titles for Substack issues.
+#
+# Before each Substack publication, edit the 'newsletter' strings below to
+# reflect the specific narrative you are writing about in that issue.
+# ---------------------------------------------------------------------------
+
+WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
+    "equities_weekly": {
+        "dashboard": (
+            "Global Equities",
+            "Weekly percentage change across major indices  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Global Equities Performance",
+            "Weekly percentage change across major indices  ·  {date}",
+        ),
+    },
+    "yield_curve": {
+        "dashboard": (
+            "US Treasury Yield Curve",
+            "Current vs. 4 weeks ago vs. 52 weeks ago",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Bond Market Is Pricing an Immediate Shock",
+            "Current US Treasury yield curve movements relative to 4 and 52 weeks ago",
+        ),
+    },
+    "commodities_weekly": {
+        "dashboard": (
+            "Global Commodities",
+            "Weekly percentage change  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Iran Risk Is Keeping Oil Prices Elevated",
+            "The Iran shock continues to impact broader commodity markets",
+        ),
+    },
+    "vix_trend": {
+        "dashboard": (
+            "VIX Volatility Index — Trailing 12 Months",
+            "CBOE VIX (30-day) vs. VIX 3-Month Term Structure",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The VIX Term Structure Signals a Contained Shock",
+            "The 30-day VIX rising above the 3-month VIX suggests markets view the shock as a short-term event",
+        ),
+    },
+    "nifty_it_trend": {
+        "dashboard": (
+            "NIFTY IT Index — Trailing 12 Months",
+            "NSE IT sector benchmark index level",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "India's IT Sector Feels the AI Threat",
+            "Sector benchmark continues to hit 12-month lows as investors confront AI's threat to India's IT export model",
+        ),
+    },
+    "brazil_fx": {
+        "dashboard": (
+            "USD/BRL Exchange Rate — Historical Trend",
+            "Monthly average BRL per 1 USD since 2010",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Brazilian Real Remains Deeply Discounted",
+            "Despite record trade surpluses over the years, the currency has not recovered to its pre-COVID levels",
+        ),
+    },
+}
+
+
 def get_output_dir():
     """Create and return the output directory for this week."""
     date_str = datetime.now().strftime("%Y-%m-%d")
@@ -41,7 +123,7 @@ def get_output_dir():
     return out_dir
 
 
-def generate_with_mock_data(output_dir):
+def generate_with_mock_data(output_dir, mode="dashboard"):
     """Generate full dashboard using mock data."""
     from data.mock_data import (
         get_mock_weekly_changes,
@@ -118,13 +200,10 @@ def generate_with_mock_data(output_dir):
     yc.add_curve("7 Feb 2026", yc_data["tenors"], yc_data["current"], style="current")
     yc.add_curve("10 Jan 2026", yc_data["tenors"], yc_data["4w_ago"], style="4w_ago")
     yc.add_curve("7 Feb 2025", yc_data["tenors"], yc_data["52w_ago"], style="52w_ago")
-    yc.render(
-        title="US Treasury Yield Curve",
-        subtitle="Current US Treasury yield curve movements relative to 4 and 52 weeks ago",
-        source="FRED",
-    )
+    _t, _s = WEEKLY_TITLES["yield_curve"][mode]
+    yc.render(title=_t, subtitle=_s, source="FRED")
     yc.save(output_dir / "06_yield_curve.png")
-    
+
     # ─────────────────────────────────────────
     # 4. COMMODITIES
     # ─────────────────────────────────────────
@@ -195,7 +274,7 @@ def generate_with_mock_data(output_dir):
     table.save(output_dir / "00_summary_table.png")
         
 
-def generate_with_live_data(output_dir):
+def generate_with_live_data(output_dir, mode="dashboard"):
     """Generate dashboard with live API data from yfinance + FRED."""
     import pandas as pd
     from data.fetchers.yfinance_fetcher import YFinanceFetcher
@@ -402,7 +481,8 @@ def generate_with_live_data(output_dir):
         )
 
     # Apply Full EconStyle Branding
-    EconStyle.set_title(ax, "Global Equities Performance", f"Weekly percentage change across major indices  ·  {date_label}")
+    _t, _s = WEEKLY_TITLES["equities_weekly"][mode]
+    EconStyle.set_title(ax, _t, _s.format(date=date_label))
     EconStyle.add_top_rule(ax) 
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
     EconStyle.add_source(fig, "Yahoo Finance")
@@ -468,8 +548,8 @@ def generate_with_live_data(output_dir):
                          style="52w_ago")
         except Exception: pass
         
-        yc.render(title="The Bond Market Is Pricing an Immediate Shock",
-                  subtitle="Current vs. 4 weeks ago vs. 52 weeks ago US Treasury yield curve movements", source="FRED")
+        _t, _s = WEEKLY_TITLES["yield_curve"][mode]
+        yc.render(title=_t, subtitle=_s, source="FRED")
         yc.save(output_dir / "06_yield_curve.png")
     except Exception as e:
         print(f"   ⚠ Yield curve failed: {e}")
@@ -537,7 +617,8 @@ def generate_with_live_data(output_dir):
         )
 
     # 4. Apply Full EconStyle Branding
-    EconStyle.set_title(ax, "The Iran Risk Is Keeping Oil Prices Elevated", f"The Iran shock continues to impact broader commodity markets")
+    _t, _s = WEEKLY_TITLES["commodities_weekly"][mode]
+    EconStyle.set_title(ax, _t, _s.format(date=date_label))
     EconStyle.add_top_rule(ax) 
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
     EconStyle.add_source(fig, "Yahoo Finance")
@@ -567,9 +648,8 @@ def generate_with_live_data(output_dir):
             trend.add_series("VIX", vix_dates, vix_vals, color_key="special_black")
             trend.add_series("VIX 3-Month", vix3m_dates, vix3m_vals, color_key="pink")
             
-            trend.render(title="The VIX Term Structure Signals a Contained Shock",
-                         subtitle=f"The 30-day VIX rising above the 3-month VIX suggests markets view the War Shock as a short-term event",
-                         source="Yahoo Finance (CBOE)", ylabel="VIX Level")
+            _t, _s = WEEKLY_TITLES["vix_trend"][mode]
+            trend.render(title=_t, subtitle=_s, source="Yahoo Finance (CBOE)", ylabel="VIX Level")
             trend.save(output_dir / "09_vix_trend.png")
     except Exception as e:
         print(f"   ⚠ VIX chart failed: {e}")
@@ -700,7 +780,8 @@ def generate_with_live_data(output_dir):
                 )
 
             # Apply YOUR custom titles, rules, and sources
-            EconStyle.set_title(ax, "India's IT Sector Feels the AI Threat", f"Sector benchmark continues to hit 12 month lows as investors confront AI's threat to India's IT export model")
+            _t, _s = WEEKLY_TITLES["nifty_it_trend"][mode]
+            EconStyle.set_title(ax, _t, _s)
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
             EconStyle.add_source(fig, "Yahoo Finance (NSE)")
@@ -822,7 +903,8 @@ def generate_with_live_data(output_dir):
             ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
 
             # Apply Economics Hub Branding
-            EconStyle.set_title(ax, "The Brazilian Real Remains Deeply Discounted", "Despite record trade surpluses over the years, the currency has not recovered to its pre-COVID levels")
+            _t, _s = WEEKLY_TITLES["brazil_fx"][mode]
+            EconStyle.set_title(ax, _t, _s)
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
             EconStyle.add_source(fig, "FRED")
@@ -903,23 +985,29 @@ def main():
     parser = argparse.ArgumentParser(description="Generate Economics Hub Weekly Dashboard")
     parser.add_argument("--mock", action="store_true", help="Use mock data for testing")
     parser.add_argument("--preview", action="store_true", help="Generate at lower DPI")
+    parser.add_argument(
+        "--mode",
+        choices=["dashboard", "newsletter"],
+        default="dashboard",
+        help="Title mode: 'dashboard' for standard titles, 'newsletter' for narrative Substack titles",
+    )
     args = parser.parse_args()
-    
+
     if args.preview:
         EconStyle.DPI = EconStyle.DPI_PREVIEW
-    
+
     output_dir = get_output_dir()
-    
+
     if args.mock:
-        generate_with_mock_data(output_dir)
+        generate_with_mock_data(output_dir, mode=args.mode)
     else:
         try:
-            generate_with_live_data(output_dir)
+            generate_with_live_data(output_dir, mode=args.mode)
         except ImportError as e:
             print(f"⚠ {e}")
             print("   Falling back to mock data. Install dependencies:")
             print("   pip install yfinance fredapi")
-            generate_with_mock_data(output_dir)
+            generate_with_mock_data(output_dir, mode=args.mode)
 
 
 if __name__ == "__main__":

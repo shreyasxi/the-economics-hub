@@ -43,6 +43,98 @@ COLOR_NEGATIVE = "#991B1B"
 COLOR_NEUTRAL = "#666666"
 COLOR_TARGET = "#CC0000"
 
+# ---------------------------------------------------------------------------
+# Title registry
+# ---------------------------------------------------------------------------
+# Each key maps to a (title, subtitle) pair for each mode.
+#
+#   mode = 'dashboard'  → Standard, descriptive titles for the Streamlit dashboard.
+#   mode = 'newsletter' → Narrative, story-driven titles for Substack issues.
+#
+# Before each Substack publication, edit the 'newsletter' strings below to
+# reflect the specific narrative you are writing about in that issue.
+# ---------------------------------------------------------------------------
+
+MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
+    "inflation": {
+        "dashboard": (
+            "US Inflation Metrics",
+            "Headline CPI vs. Core PCE vs. 5-Year Inflation Expectations",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "US Inflation Metrics",
+            "Headline CPI vs. Core PCE vs. 5-Year Inflation Expectations",
+        ),
+    },
+    "labour": {
+        "dashboard": (
+            "Labour Market Pulse",
+            "US Unemployment Rate vs. Initial Jobless Claims (4wk MA)",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Labour Market Pulse",
+            "US Unemployment Rate vs. Initial Jobless Claims (4wk MA)",
+        ),
+    },
+    "financial_conditions": {
+        "dashboard": (
+            "Financial Conditions & Credit Stress",
+            "Chicago Fed NFCI vs. US High Yield Credit Spread",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Financial Conditions & Credit Stress",
+            "Chicago Fed NFCI vs. US High Yield Credit Spread",
+        ),
+    },
+    "emerging_markets": {
+        "dashboard": (
+            "Emerging Markets Stress Monitor",
+            "EM High Yield & Corporate Spreads vs. USD Strength",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Emerging Markets Stress Monitor",
+            "EM High Yield & Corporate Spreads vs. USD Strength",
+        ),
+    },
+    "agflation": {
+        "dashboard": (
+            "Agricultural & Energy Input Pipeline",
+            "Natural gas, fertilizer (urea) and wheat futures indexed to 100",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Futures Markets are Pricing the Agricultural Shock",
+            "Rising European gas and fertilizer input futures are signaling a severe, lagged spike in global food costs",
+        ),
+    },
+    "bdti": {
+        "dashboard": (
+            "Baltic Dirty Tanker Index",
+            "Tanker freight rates — current trend",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Tanker Freight Rates Rise to Multi-Year Highs",
+            "Baltic Dirty Tanker Index breaks above 3,000 for the first time since the 2022 energy crisis as Gulf shipping costs spike",
+        ),
+    },
+    "hormuz": {
+        "dashboard": (
+            "Strait of Hormuz — Global Export Exposure",
+            "Mideast Gulf exports as a share of global seaborne trade across commodity categories",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Gulf Is the World's Petrochemical Supplier",
+            "Mideast Gulf exports as a share of global seaborne trade across commodity categories",
+        ),
+    },
+}
+
 G7 = {
     "US": "United States", "GB": "United Kingdom", "DE": "Germany",
     "FR": "France", "IT": "Italy", "JP": "Japan", "CA": "Canada",
@@ -241,7 +333,7 @@ def _add_end_label(ax, dates, values, name, color):
         path_effects=[pe.withStroke(linewidth=2.5, foreground=EconStyle.BACKGROUND)],
     )
 
-def chart_inflation(engine, output_dir):
+def chart_inflation(engine, output_dir, mode="dashboard"):
     EconStyle.apply_global_style()
     # Use the standard wide template instead of the cramped 1x2 subplot
     fig, ax1 = EconStyle.create_figure(size="wide")
@@ -273,7 +365,8 @@ def chart_inflation(engine, output_dir):
     ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.15)
 
     # Elite Narrative Titles
-    EconStyle.set_title(ax1, "US Inflation Metrics", "Headline CPI vs. Core PCE vs. 5-Year Inflation Expectations")
+    _t, _s = MACRO_TITLES["inflation"][mode]
+    EconStyle.set_title(ax1, _t, _s)
     EconStyle.add_top_rule(ax1)
     
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
@@ -283,7 +376,7 @@ def chart_inflation(engine, output_dir):
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ US Inflation Dashboard")
 
-def chart_labour(engine, output_dir):
+def chart_labour(engine, output_dir, mode="dashboard"):
     EconStyle.apply_global_style()
     fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
     fig.patch.set_linewidth(2)
@@ -321,7 +414,8 @@ def chart_labour(engine, output_dir):
     ax2.spines["top"].set_visible(False)
     ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
 
-    EconStyle.set_title(ax1, "Labour Market Pulse", "US Unemployment Rate vs. Initial Jobless Claims (4wk MA)")
+    _t, _s = MACRO_TITLES["labour"][mode]
+    EconStyle.set_title(ax1, _t, _s)
     EconStyle.add_top_rule(ax1)
     EconStyle.add_source(fig, "FRED (BLS)")
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
@@ -330,7 +424,7 @@ def chart_labour(engine, output_dir):
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Labour Market Pulse")
 
-def chart_financial_conditions(engine, output_dir):
+def chart_financial_conditions(engine, output_dir, mode="dashboard"):
     EconStyle.apply_global_style()
     fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
     fig.patch.set_linewidth(2)
@@ -369,7 +463,8 @@ def chart_financial_conditions(engine, output_dir):
     ax2.spines["top"].set_visible(False)
     ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
 
-    EconStyle.set_title(ax1, "Financial Conditions & Credit Stress", "Chicago Fed NFCI vs. US High Yield Credit Spread")
+    _t, _s = MACRO_TITLES["financial_conditions"][mode]
+    EconStyle.set_title(ax1, _t, _s)
     EconStyle.add_top_rule(ax1)
     EconStyle.add_source(fig, "FRED (Chicago Fed, ICE BofA)")
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
@@ -378,7 +473,7 @@ def chart_financial_conditions(engine, output_dir):
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Financial Conditions")
 
-def chart_emerging_markets(engine, output_dir):
+def chart_emerging_markets(engine, output_dir, mode="dashboard"):
     EconStyle.apply_global_style()
     fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
     fig.patch.set_linewidth(2)
@@ -413,7 +508,8 @@ def chart_emerging_markets(engine, output_dir):
     ax2.spines["top"].set_visible(False)
     ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.18)
 
-    EconStyle.set_title(ax1, "Emerging Markets Stress Monitor", "EM High Yield & Corporate Spreads vs. USD Strength")
+    _t, _s = MACRO_TITLES["emerging_markets"][mode]
+    EconStyle.set_title(ax1, _t, _s)
     EconStyle.add_top_rule(ax1)
     EconStyle.add_source(fig, "FRED (ICE BofA, Federal Reserve)")
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
@@ -678,7 +774,7 @@ def chart_macro_em_vulnerability(output_dir):
     print(f"   ✓ EM Vulnerability Scorecard")
 
 
-def chart_agflation_pipeline(output_dir):
+def chart_agflation_pipeline(output_dir, mode="dashboard"):
     """Deep Dive Chart: Energy to Food Pipeline (Smoothed, Base-100)."""
     EconStyle.apply_global_style()
     
@@ -799,9 +895,8 @@ def chart_agflation_pipeline(output_dir):
     ax.set_xlim(dates[0], dates[-1] + pd.Timedelta(days=5))
 
     # Elite Narrative Titles
-    EconStyle.set_title(ax, 
-                        "Futures Markets are Pricing the Agricultural Shock", 
-                        "Rising European gas and fertilizer input futures are signaling a severe, lagged spike in global food costs")
+    _t, _s = MACRO_TITLES["agflation"][mode]
+    EconStyle.set_title(ax, _t, _s)
     EconStyle.add_top_rule(ax)
     
     # Source Line
@@ -817,7 +912,7 @@ def chart_agflation_pipeline(output_dir):
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-def chart_bdti_branded_screenshot(output_dir):
+def chart_bdti_branded_screenshot(output_dir, mode="dashboard"):
     """Wraps a paywalled chart screenshot in the Economics Hub branding."""
     EconStyle.apply_global_style()
     
@@ -840,11 +935,12 @@ def chart_bdti_branded_screenshot(output_dir):
     # Bypassing all EconStyle title functions to guarantee perfect spacing
     
     # 4. Main Title (Anchored at the very top)
-    fig.text(0.02, 0.97, "Tanker Freight Rates Rise to Multi-Year Highs", 
+    _t, _s = MACRO_TITLES["bdti"][mode]
+    fig.text(0.02, 0.97, _t,
              fontsize=20, fontweight="bold", ha="left", va="top", color="#000000")
-             
+
     # 5. Subtitle (Anchored perfectly below the main title)
-    fig.text(0.02, 0.92, "Baltic Dirty Tanker Index breaks above 3,000 for the first time since the 2022 energy crisis as Gulf shipping costs spike", 
+    fig.text(0.02, 0.92, _s,
              fontsize=12, color=EconStyle.TEXT_SECONDARY, ha="left", va="top")
              
     # 6. Top Rule (Draws the thick black line directly below the subtitle)
@@ -865,7 +961,7 @@ def chart_bdti_branded_screenshot(output_dir):
     print(f"   ✓ BDTI Branded Screenshot Wrapper Complete")
     return filepath
 
-def chart_hormuz_exposure(output_dir):
+def chart_hormuz_exposure(output_dir, mode="dashboard"):
     """Generates a horizontal bar chart showing Strait of Hormuz export exposure."""
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
@@ -942,11 +1038,8 @@ def chart_hormuz_exposure(output_dir):
     ax.legend(handles=[petro_patch, energy_patch], loc='lower right', frameon=False, fontsize=11)
 
     # 9. Titles and Proprietary Branding
-    EconStyle.set_title(
-        ax,
-        "The Gulf Is the World's Petrochemical Supplier",
-        "Mideast Gulf exports as a share of global seaborne trade across commodity categories"
-    )
+    _t, _s = MACRO_TITLES["hormuz"][mode]
+    EconStyle.set_title(ax, _t, _s)
     EconStyle.add_top_rule(ax)
 
     # Tight layout to prevent clipping
@@ -966,13 +1059,14 @@ def chart_hormuz_exposure(output_dir):
 # MAIN PIPELINE
 # ═══════════════════════════════════════════════
 
-def generate_macro_dashboard():
+def generate_macro_dashboard(mode="dashboard"):
     month_str = datetime.now().strftime("%Y-%m")
     output_dir = PROJECT_ROOT / "output" / "macro" / month_str
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print("📊 Generating Economics Hub — Macro Pulse Dashboard")
-    print(f"   Output: {output_dir}\n")
+    print(f"   Output: {output_dir}")
+    print(f"   Mode:   {mode}\n")
 
     if FRED_API_KEY == "YOUR_FRED_API_KEY":
         print("⚠  FRED API key not set! Open config/settings.py")
@@ -998,22 +1092,19 @@ def generate_macro_dashboard():
     #fetch_macro_em_vulnerability(output_dir)
 
     print("\n   Generating charts...")
-    
-    # 1. Generate Table First
+
     chart_macro_table(engine, output_dir)
-    
-    chart_inflation(engine, output_dir)
-    chart_labour(engine, output_dir)
-    chart_financial_conditions(engine, output_dir)
-    chart_emerging_markets(engine, output_dir)
-  
-    
+    chart_inflation(engine, output_dir, mode=mode)
+    chart_labour(engine, output_dir, mode=mode)
+    chart_financial_conditions(engine, output_dir, mode=mode)
+    chart_emerging_markets(engine, output_dir, mode=mode)
+
     #chart_macro_cli(output_dir)
     #chart_macro_em_vulnerability(output_dir)
-    
-    chart_agflation_pipeline(output_dir)
-    chart_bdti_branded_screenshot(output_dir)
-    chart_hormuz_exposure(output_dir)
+
+    chart_agflation_pipeline(output_dir, mode=mode)
+    chart_bdti_branded_screenshot(output_dir, mode=mode)
+    chart_hormuz_exposure(output_dir, mode=mode)
 
     print(f"\n✅ Macro Pulse complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")
@@ -1021,12 +1112,18 @@ def generate_macro_dashboard():
 def main():
     parser = argparse.ArgumentParser(description="Generate Economics Hub Macro Pulse Dashboard")
     parser.add_argument("--preview", action="store_true", help="Lower DPI for quick test")
+    parser.add_argument(
+        "--mode",
+        choices=["dashboard", "newsletter"],
+        default="dashboard",
+        help="Title mode: 'dashboard' for standard titles, 'newsletter' for narrative Substack titles",
+    )
     args = parser.parse_args()
 
     if args.preview:
         EconStyle.DPI = 120
 
-    generate_macro_dashboard()
+    generate_macro_dashboard(mode=args.mode)
 
 if __name__ == "__main__":
     main()

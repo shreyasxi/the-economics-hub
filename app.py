@@ -35,119 +35,135 @@ st.set_page_config(
     page_title="The Economics Hub",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ---------------------------------------------------------------------------
-# Custom CSS — institutional serif aesthetic matching EconStyle
+# Custom CSS — FT/Bloomberg-grade institutional typography
 # ---------------------------------------------------------------------------
 
 st.markdown(
     """
     <style>
-    /* ── Global font ── */
+    /* ── Google Fonts ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,700;0,900;1,400&display=swap');
+
+    /* ── Global base ── */
     html, body, [class*="css"] {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* ── Masthead ── */
+    /* ── Reduce Streamlit's default top padding ── */
+    .main .block-container {
+        padding-top: 1.2rem;
+        padding-bottom: 2rem;
+    }
+
+    /* ── Masthead — Merriweather, editorial weight ── */
     .hub-masthead {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 2.4rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        color: #003366;
+        font-family: 'Merriweather', Georgia, "Times New Roman", serif;
+        font-size: 2.1rem;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        color: #000000;
         margin-bottom: 0;
         line-height: 1.1;
     }
     .hub-tagline {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 1.0rem;
-        font-style: italic;
-        color: #444444;
-        margin-top: 0.2rem;
-        margin-bottom: 0.6rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 400;
+        color: #666666;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-top: 0.25rem;
+        margin-bottom: 0.35rem;
     }
     .hub-rule {
         border: none;
-        border-top: 2.5px solid #000000;
-        margin-top: 0.5rem;
-        margin-bottom: 1.2rem;
+        border-top: 2px solid #000000;
+        margin-top: 0.4rem;
+        margin-bottom: 0.5rem;
     }
 
-    /* ── Section headers ── */
+    /* ── Section headers — Inter, all-caps, navy, tight tracking ── */
     .section-header {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 1.05rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.70rem;
         font-weight: 700;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.13em;
         text-transform: uppercase;
         color: #003366;
-        border-bottom: 1px solid #CCCCCC;
-        padding-bottom: 0.3rem;
-        margin-top: 1.2rem;
-        margin-bottom: 0.6rem;
+        margin-top: 1.4rem;
+        margin-bottom: 0.5rem;
     }
 
     /* ── Status bar ── */
     .status-label {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.80rem;
         font-weight: 600;
         color: #003366;
+        letter-spacing: 0.01em;
     }
     .status-mtime {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 0.78rem;
-        color: #666666;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.73rem;
+        font-weight: 400;
+        color: #888888;
         text-align: right;
     }
 
-    /* ── Tab styling ── */
+    /* ── Tab bar — Inter, lighter weight than masthead ── */
     button[data-baseweb="tab"] {
-        font-family: "Cambria", Georgia, "Times New Roman", serif !important;
+        font-family: 'Inter', sans-serif !important;
         font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 0.02em;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.04em !important;
+        text-transform: uppercase !important;
     }
 
     /* ── Sidebar ── */
     [data-testid="stSidebar"] {
-        background-color: #F4F4F4;
+        background-color: #F7F7F7;
     }
     .sidebar-masthead {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 1.1rem;
+        font-family: 'Merriweather', Georgia, serif;
+        font-size: 0.95rem;
         font-weight: 700;
-        color: #003366;
-        letter-spacing: 0.04em;
+        color: #000000;
+        letter-spacing: 0.01em;
     }
     .sidebar-byline {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 0.82rem;
-        color: #555555;
-        font-style: italic;
-        margin-top: -0.3rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #888888;
+        margin-top: 0.1rem;
     }
 
     /* ── India notice ── */
     .india-notice {
-        background-color: #FFF8E6;
-        border-left: 3px solid #CC6600;
-        padding: 0.55rem 0.85rem;
-        font-size: 0.82rem;
+        background-color: #FAFAFA;
+        border-left: 2px solid #CC6600;
+        padding: 0.45rem 0.80rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.76rem;
+        font-weight: 400;
         font-style: italic;
-        color: #555555;
+        color: #666666;
         margin-bottom: 1rem;
     }
 
     /* ── Image captions ── */
     [data-testid="caption"] {
-        font-family: "Cambria", Georgia, "Times New Roman", serif;
-        font-size: 0.75rem;
-        color: #777777;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.70rem;
+        font-weight: 400;
+        color: #999999;
         text-align: center;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
     }
     </style>
     """,
@@ -160,7 +176,7 @@ st.markdown(
 
 with st.sidebar:
     st.markdown(
-        '<p class="sidebar-masthead">THE ECONOMICS HUB</p>'
+        '<p class="sidebar-masthead">The Economics Hub</p>'
         '<p class="sidebar-byline">by Shreyas</p>',
         unsafe_allow_html=True,
     )
@@ -175,29 +191,37 @@ with st.sidebar:
             - International: DBnomics · IMF · OECD
             - India: RBI · MoSPI · NSDL · CAG
 
-            **Charts**
+            **Publication**
             The Economics Hub · CC BY-NC 4.0
             """
         )
 
     st.markdown("---")
 
-    # Pipeline control — local only
+    # Pipeline control — local only, hidden on Streamlit Cloud
     if not is_streamlit_cloud():
-        st.markdown("**Pipeline Control**")
+        st.markdown(
+            '<p style="font-family:\'Inter\',sans-serif;font-size:0.75rem;'
+            'font-weight:700;letter-spacing:0.08em;text-transform:uppercase;'
+            'color:#003366;margin-bottom:0.2rem;">Pipeline Control</p>',
+            unsafe_allow_html=True,
+        )
         st.caption("Local use only — not available on Streamlit Cloud.")
 
         with st.expander("Run Generators", expanded=False):
             _GENERATORS = {
-                "Weekly Markets": "generate_weekly.py",
-                "Macro Pulse": "generate_macro.py",
-                "India Dashboard": "generate_india.py",
+                "Weekly Markets":  ("generate_weekly.py",  True),
+                "Macro Pulse":     ("generate_macro.py",   True),
+                "India Dashboard": ("generate_india.py",   False),
             }
-            for label, script in _GENERATORS.items():
+            for label, (script, has_mode) in _GENERATORS.items():
                 if st.button(f"▶  {label}", key=f"btn_{script}", use_container_width=True):
+                    cmd = [sys.executable, script]
+                    if has_mode:
+                        cmd += ["--mode", "dashboard"]
                     with st.spinner(f"Running {label} generator…"):
                         result = subprocess.run(
-                            [sys.executable, script],
+                            cmd,
                             capture_output=True,
                             text=True,
                             cwd=str(PROJECT_ROOT),
@@ -270,6 +294,13 @@ def _section(title: str) -> None:
     )
 
 
+def _render_summary(chart_path: Path) -> None:
+    """Render the snapshot/summary table constrained to 80% of page width."""
+    _, col_img, _ = st.columns([1, 4, 1])
+    with col_img:
+        st.image(str(chart_path), use_container_width=True)
+
+
 def _pop_summary(charts: list[Path], keywords: list[str]) -> tuple[Path | None, list[Path]]:
     """
     Extract the first chart whose name matches any of the given keywords.
@@ -302,13 +333,11 @@ with tab_weekly:
         )
     else:
         _render_status_bar(f"Week of {date_label}", "weekly")
-        st.markdown('<hr style="border-top:1px solid #DDDDDD; margin:0.4rem 0 1rem 0">', unsafe_allow_html=True)
 
-        # Summary table — full width, no caption
+        # Summary table — constrained width, no caption
         summary, charts = _pop_summary(charts, ["summary_table", "00_"])
         if summary:
-            st.image(str(summary), use_container_width=True)
-            st.markdown("---")
+            _render_summary(summary)
 
         # Equities
         equities, charts = _group(charts, "equities")
@@ -368,13 +397,11 @@ with tab_macro:
         )
     else:
         _render_status_bar(date_label, "macro")
-        st.markdown('<hr style="border-top:1px solid #DDDDDD; margin:0.4rem 0 1rem 0">', unsafe_allow_html=True)
 
-        # Summary table — full width
+        # Summary table — constrained width
         summary, charts = _pop_summary(charts, ["macro_table", "00_"])
         if summary:
-            st.image(str(summary), use_container_width=True)
-            st.markdown("---")
+            _render_summary(summary)
 
         # All remaining charts in 2-column grid
         if charts:
@@ -394,7 +421,6 @@ with tab_india:
         )
     else:
         _render_status_bar(date_label, "india")
-        st.markdown('<hr style="border-top:1px solid #DDDDDD; margin:0.4rem 0 1rem 0">', unsafe_allow_html=True)
 
         st.markdown(
             '<div class="india-notice">'
@@ -404,11 +430,10 @@ with tab_india:
             unsafe_allow_html=True,
         )
 
-        # India summary table — full width
+        # India summary table — constrained width
         summary, charts = _pop_summary(charts, ["india_table", "05_india"])
         if summary:
-            st.image(str(summary), use_container_width=True)
-            st.markdown("---")
+            _render_summary(summary)
 
         # All remaining charts in 2-column grid
         if charts:
