@@ -112,26 +112,169 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Weekly percentage change across major currency pairs  ·  {date}",
         ),
     },
-    "crypto_weekly": {
+    "credit_spreads": {
         "dashboard": (
-            "Cryptocurrency Weekly Performance",
-            "Bitcoin and Ethereum weekly percentage change  ·  {date}",
+            "IG & HY Credit Spreads — 2-Year Trend",
+            "ICE BofA Investment Grade OAS (right) vs. High Yield OAS (left)  ·  basis points",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Cryptocurrency Weekly Performance",
-            "Bitcoin and Ethereum weekly percentage change  ·  {date}",
+            "The Credit Market Is Flashing a Warning",
+            "High yield spreads widening above 400bps has historically preceded equity drawdowns",
         ),
     },
-    "crypto_trend": {
+    "breakeven_inflation": {
         "dashboard": (
-            "Crypto vs. Equities — Trailing 12 Months",
-            "Bitcoin, Ethereum and S&P 500 indexed to 100 at start  ·  Risk-on vs. risk-off",
+            "Breakeven Inflation — 5Y & 10Y (2-Year Trend)",
+            "Market-implied inflation expectations vs. Fed 2% target  ·  TIPS-derived",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Crypto vs. Equities — Trailing 12 Months",
-            "Bitcoin, Ethereum and S&P 500 indexed to 100 at start  ·  Risk-on vs. risk-off",
+            "The Bond Market Doesn't Believe Inflation Is Over",
+            "5Y and 10Y breakeven rates remain above the Fed's 2% target",
+        ),
+    },
+    "real_yields": {
+        "dashboard": (
+            "Real Yields — 5Y & 10Y TIPS (2-Year Trend)",
+            "Inflation-adjusted Treasury yields  ·  positive = restrictive monetary conditions",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Real Rates at Multi-Decade Highs Are Squeezing Valuations",
+            "Positive real yields compress equity multiples and strengthen the dollar",
+        ),
+    },
+    "copper_gold_ratio": {
+        "dashboard": (
+            "Copper/Gold Ratio & 10Y Treasury Yield",
+            "Growth expectations proxy vs. sovereign yield direction  ·  2-year window",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Copper Is Signalling a Global Growth Slowdown",
+            "The Gundlach indicator: falling Copper/Gold ratio has historically led lower bond yields",
+        ),
+    },
+    "spy_tlt_ratio": {
+        "dashboard": (
+            "SPY/TLT Risk Appetite Ratio — 2-Year Trend",
+            "Equities vs. long-duration Treasuries  ·  rising = risk-on, falling = flight to safety",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Risk-On / Risk-Off Switch Just Flipped",
+            "SPY/TLT ratio breaking below its 52-week range signals institutional rotation to safety",
+        ),
+    },
+    "risk_appetite_ratio": {
+        "dashboard": (
+            "SPHB/SPLV — High Beta vs. Low Volatility (2-Year Trend)",
+            "Equity-only risk appetite signal  ·  rising = investors chasing risk within equities",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "High-Beta Stocks Are Being Abandoned",
+            "SPHB/SPLV ratio below its 26-week mean signals investors rotating to defensive equities",
+        ),
+    },
+    "market_breadth": {
+        "dashboard": (
+            "Market Breadth — RSP/SPY Equal vs. Cap-Weight (2-Year Trend)",
+            "Equal-weight S&P 500 vs. cap-weight  ·  falling ratio = rally narrowing to mega-caps",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Only the Magnificent Seven Are Holding Up the Market",
+            "RSP/SPY below its 20-week average confirms the rally is concentrated, not broad-based",
+        ),
+    },
+    "bond_etf_returns": {
+        "dashboard": (
+            "Bond ETF Total Returns — TLT, LQD, HYG (Trailing 12 Months)",
+            "Duration, investment grade credit, and high yield indexed to 100  ·  total return",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Fixed Income Hierarchy Is Breaking Down",
+            "HYG outperforming TLT despite rising rates is a paradox worth watching",
+        ),
+    },
+    "gold_spx_ratio": {
+        "dashboard": (
+            "Gold/SPX Safe Haven Ratio — 2-Year Trend",
+            "Rotation between safe assets and growth  ·  rising = defensive positioning",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Gold Is Reclaiming Its Role as the Macro Hedge",
+            "Gold/SPX ratio rising above its 52-week mean signals institutional flight from equities",
+        ),
+    },
+    "em_fx_weekly": {
+        "dashboard": (
+            "EM Currency Performance vs. USD — Weekly",
+            "Weekly % change vs. the dollar  ·  positive = EM currency appreciated  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Dollar Strength Is Crushing EM Currencies",
+            "The dollar index surge is transmitting directly into EM balance-of-payments stress",
+        ),
+    },
+    "em_equity_weekly": {
+        "dashboard": (
+            "Emerging Market Equities — Weekly Performance",
+            "Country ETF weekly % change  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "India Decouples as EM Peers Sell Off",
+            "India's equity outperformance vs. China and Korea widening on a weekly basis",
+        ),
+    },
+    "india_vs_em": {
+        "dashboard": (
+            "India vs. EM Peers — Trailing 12 Months",
+            "INDA, EEM, MCHI, EWY indexed to 100 at start  ·  total return comparison",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "India Is the Only EM Story Worth Telling Right Now",
+            "INDA's 12-month outperformance vs. EEM, China, and Korea is widening structurally",
+        ),
+    },
+    "brent_wti_spread": {
+        "dashboard": (
+            "Brent–WTI Crude Spread — 2-Year Trend",
+            "International vs. US crude oil price differential  ·  $/barrel  ·  5-day smooth",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Geopolitical Risk Premium in Oil Is Back",
+            "Brent-WTI spread widening signals Middle East supply disruption fears re-entering the market",
+        ),
+    },
+    "agri_weekly": {
+        "dashboard": (
+            "Agricultural Commodities — Weekly Performance",
+            "Soft commodities weekly % change  ·  CBOT & ICE futures  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Food Inflation Is Making a Comeback",
+            "Wheat, corn, and coffee futures surging on supply shock signals",
+        ),
+    },
+    "india_vix_vs_us": {
+        "dashboard": (
+            "India VIX vs. US VIX — Trailing 12 Months",
+            "NSE India VIX (left) vs. CBOE US VIX (right)  ·  India-specific vs. global risk",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "India's Fear Gauge Is Spiking Independently of Global Volatility",
+            "India VIX diverging from US VIX signals domestic political or RBI event risk",
         ),
     },
 }
@@ -303,6 +446,8 @@ def generate_with_mock_data(output_dir, mode="dashboard"):
 def generate_with_live_data(output_dir, mode="dashboard"):
     """Generate dashboard with live API data from yfinance + FRED."""
     import pandas as pd
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
     from data.fetchers.yfinance_fetcher import YFinanceFetcher
     from data.fetchers.fred_fetcher import FredFetcher
     from config.settings import INDICATORS, FRED_API_KEY
@@ -895,66 +1040,618 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ FX weekly bar failed: {e}")
 
-    # ── 9. CRYPTO ──
-    print("   [crypto] Crypto — Weekly Performance & 12-Month Trend")
+    # NOTE: USD/BRL is an ad-hoc narrative chart. Run: python custom/brazil_fx.py
+
+    # ── 11. CREDIT SPREADS ──
+    print("   [11] Credit Markets — IG & HY Spreads (2-Year Trend)")
     try:
-        crypto_ids = ["btc", "eth"]
-        names_c, values_c, cks_c = build_bar_data(crypto_ids)
+        ig_s = fred_fetcher.fetch_series("BAMLC0A0CM", period_years=2)
+        hy_s = fred_fetcher.fetch_series("BAMLH0A0HYM2", period_years=2)
 
-        if names_c:
-            # 9a. Weekly bar
+        if len(ig_s) > 10 and len(hy_s) > 10:
+            fig, ax1 = EconStyle.create_figure(size="wide")
+            ax2 = ax1.twinx()
+
+            color_hy = "#DC2626"
+            color_ig = "#1D4ED8"
+
+            hy_dates = hy_s.index.to_pydatetime()
+            ig_dates = ig_s.index.to_pydatetime()
+
+            l1, = ax1.plot(hy_dates, hy_s.values, color=color_hy, linewidth=2.5, label="HY OAS")
+            l2, = ax2.plot(ig_dates, ig_s.values, color=color_ig, linewidth=2.5, linestyle="--", label="IG OAS")
+
+            ax1.axhline(400, color=color_hy, linestyle=":", linewidth=1.2, alpha=0.6)
+            ax2.axhline(150, color=color_ig, linestyle=":", linewidth=1.2, alpha=0.6)
+
+            ax1.set_ylabel("HY OAS (bps)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color=color_hy)
+            ax2.set_ylabel("IG OAS (bps)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color=color_ig)
+
+            ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax1.spines['top'].set_visible(False)
+            ax2.spines['top'].set_visible(False)
+
+            ax1.legend(handles=[l1, l2], loc="upper right", frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["credit_spreads"][mode]
+            EconStyle.set_title(ax1, _t, _s)
+            EconStyle.add_top_rule(ax1)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "FRED (ICE BofA)")
+            EconStyle.save_chart(fig, output_dir / "11_credit_spreads.png")
+    except Exception as e:
+        print(f"   ⚠ Credit spreads failed: {e}")
+
+    # ── 12. BREAKEVEN INFLATION ──
+    print("   [12] Breakeven Inflation — 5Y & 10Y (2-Year Trend)")
+    try:
+        be5_s = fred_fetcher.fetch_series("T5YIE", period_years=2)
+        be10_s = fred_fetcher.fetch_series("T10YIE", period_years=2)
+
+        if len(be5_s) > 10 and len(be10_s) > 10:
             fig, ax = EconStyle.create_figure(size="wide")
-            color_pos = "#F7931A"   # Bitcoin orange
-            color_neg = "#820E0E"
-            colors_c = [color_pos if v >= 0 else color_neg for v in values_c]
-            bars = ax.bar(names_c, values_c, color=colors_c, width=0.2, zorder=3)
 
+            color_5y  = "#7C3AED"
+            color_10y = "#2563EB"
+
+            ax.plot(be5_s.index.to_pydatetime(), be5_s.values, color=color_5y, linewidth=2.5, label="5Y Breakeven")
+            ax.plot(be10_s.index.to_pydatetime(), be10_s.values, color=color_10y, linewidth=2.5, linestyle="--", label="10Y Breakeven")
+            ax.axhline(2.0, color="#6B7280", linestyle="--", linewidth=1.5, label="Fed 2% Target")
+
+            ax.set_ylabel("Breakeven Rate (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
             ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
-            for s in ['top', 'right', 'left']: ax.spines[s].set_visible(False)
-            ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-            ax.xaxis.set_tick_params(length=0)
-            ax.set_xticklabels(names_c, fontweight='bold', fontsize=11, color="#1C1C1E")
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
 
-            min_v = min(values_c) if values_c else 0
-            max_v = max(values_c) if values_c else 0
-            y_range = max_v - min_v if max_v != min_v else 1
-            ax.set_ylim(
-                (min_v - y_range * 0.15) if min_v < 0 else 0,
-                (max_v + y_range * 0.15) if max_v > 0 else 0,
-            )
-            for bar, v in zip(bars, values_c):
-                offset = y_range * 0.02
-                va = 'bottom' if v >= 0 else 'top'
-                y_pos = bar.get_height() + offset if v >= 0 else bar.get_height() - offset
-                ax.text(bar.get_x() + bar.get_width() / 2, y_pos, f"{v:+.1f}%",
-                        ha='center', va=va, fontweight='bold', fontsize=14, color=bar.get_facecolor())
+            _t, _s = WEEKLY_TITLES["breakeven_inflation"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "FRED (Federal Reserve Bank of St. Louis)")
+            EconStyle.save_chart(fig, output_dir / "12_breakeven_inflation.png")
+    except Exception as e:
+        print(f"   ⚠ Breakeven inflation failed: {e}")
 
-            _t, _s = WEEKLY_TITLES["crypto_weekly"][mode]
+    # ── 13. REAL YIELDS ──
+    print("   [13] Real Yields — 5Y & 10Y TIPS (2-Year Trend)")
+    try:
+        ry5_s  = fred_fetcher.fetch_series("DFII5",  period_years=2)
+        ry10_s = fred_fetcher.fetch_series("DFII10", period_years=2)
+
+        if len(ry5_s) > 10 and len(ry10_s) > 10:
+            fig, ax = EconStyle.create_figure(size="wide")
+
+            color_5y  = "#D97706"
+            color_10y = "#DC2626"
+
+            ax.plot(ry5_s.index.to_pydatetime(), ry5_s.values, color=color_5y, linewidth=2.5, label="5Y Real Yield (TIPS)")
+            ax.plot(ry10_s.index.to_pydatetime(), ry10_s.values, color=color_10y, linewidth=2.5, linestyle="--", label="10Y Real Yield (TIPS)")
+            ax.axhline(0.0, color="#1C1C1E", linestyle="-", linewidth=1.5, alpha=0.7)
+
+            ry10_vals = ry10_s.values
+            ry10_dts  = ry10_s.index.to_pydatetime()
+            ax.fill_between(ry10_dts, ry10_vals, 0,
+                            where=[v < 0 for v in ry10_vals],
+                            color=color_10y, alpha=0.08)
+
+            ax.set_ylabel("Real Yield (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["real_yields"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "FRED (US Treasury — TIPS)")
+            EconStyle.save_chart(fig, output_dir / "13_real_yields.png")
+    except Exception as e:
+        print(f"   ⚠ Real yields failed: {e}")
+
+    # ── 14. COPPER/GOLD RATIO ──
+    print("   [14] Copper/Gold Ratio + 10Y Yield (2-Year Trend)")
+    try:
+        cu_s    = yf_fetcher.get_close_series("HG=F", period="2y")
+        au_s    = yf_fetcher.get_close_series("GC=F", period="2y")
+        dgs10_s = fred_fetcher.fetch_series("DGS10", period_years=2)
+
+        if len(cu_s) > 50 and len(au_s) > 50:
+            ratio_s = (cu_s / au_s).dropna().rolling(5).mean().dropna()
+
+            # Align FRED 10Y to ratio's trading-day index
+            dgs10_aligned = dgs10_s.reindex(ratio_s.index, method="ffill").dropna()
+
+            fig, ax1 = EconStyle.create_figure(size="wide")
+            ax2 = ax1.twinx()
+
+            color_ratio = "#B45309"
+            color_10y   = "#1D4ED8"
+
+            l1, = ax1.plot(ratio_s.index.to_pydatetime(), ratio_s.values,
+                           color=color_ratio, linewidth=2.5, label="Copper/Gold Ratio")
+            l2, = ax2.plot(dgs10_aligned.index.to_pydatetime(), dgs10_aligned.values,
+                           color=color_10y, linewidth=2.0, linestyle="--", alpha=0.8, label="10Y Yield (%)")
+
+            ax1.set_ylabel("Copper/Gold Ratio (5-day smooth)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                           fontweight="bold", color=color_ratio)
+            ax2.set_ylabel("10Y Treasury Yield (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                           fontweight="bold", color=color_10y)
+
+            ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax1.spines['top'].set_visible(False)
+            ax2.spines['top'].set_visible(False)
+
+            ax1.legend(handles=[l1, l2], loc="upper left", frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["copper_gold_ratio"][mode]
+            EconStyle.set_title(ax1, _t, _s)
+            EconStyle.add_top_rule(ax1)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance · FRED")
+            EconStyle.save_chart(fig, output_dir / "14_copper_gold_ratio.png")
+    except Exception as e:
+        print(f"   ⚠ Copper/Gold ratio failed: {e}")
+
+    # ── 15. SPY/TLT RATIO ──
+    print("   [15] SPY/TLT Risk Appetite Ratio (2-Year Trend)")
+    try:
+        spy_s = yf_fetcher.get_close_series("SPY", period="2y")
+        tlt_s = yf_fetcher.get_close_series("TLT", period="2y")
+
+        if len(spy_s) > 50 and len(tlt_s) > 50:
+            ratio_s = (spy_s / tlt_s).dropna()
+            r52_high = ratio_s.rolling(252).max()
+            r52_low  = ratio_s.rolling(252).min()
+
+            fig, ax = EconStyle.create_figure(size="wide")
+            color_line = "#003366"
+            r_dates = ratio_s.index.to_pydatetime()
+
+            ax.fill_between(r_dates, r52_high.values, r52_low.values,
+                            color="#003366", alpha=0.08, label="52-Week Range")
+            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="SPY/TLT Ratio")
+
+            ax.set_ylabel("SPY / TLT Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["spy_tlt_ratio"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (SPDR ETFs)")
+            EconStyle.save_chart(fig, output_dir / "15_spy_tlt_ratio.png")
+    except Exception as e:
+        print(f"   ⚠ SPY/TLT ratio failed: {e}")
+
+    # ── 16. SPHB/SPLV RISK APPETITE ──
+    print("   [16] SPHB/SPLV — High Beta vs Low Vol (2-Year Trend)")
+    try:
+        sphb_s = yf_fetcher.get_close_series("SPHB", period="2y")
+        splv_s = yf_fetcher.get_close_series("SPLV", period="2y")
+
+        if len(sphb_s) > 50 and len(splv_s) > 50:
+            ratio_s  = (sphb_s / splv_s).dropna()
+            mean_26w = ratio_s.rolling(130).mean()   # ~26 weeks (130 trading days)
+
+            fig, ax = EconStyle.create_figure(size="wide")
+            color_line = "#7C3AED"
+            r_dates = ratio_s.index.to_pydatetime()
+
+            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="SPHB/SPLV Ratio")
+            ax.plot(mean_26w.index.to_pydatetime(), mean_26w.values, color="#6B7280",
+                    linewidth=1.5, linestyle="--", label="26-Week Mean")
+
+            ax.set_ylabel("SPHB / SPLV Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["risk_appetite_ratio"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (Invesco ETFs)")
+            EconStyle.save_chart(fig, output_dir / "16_risk_appetite_ratio.png")
+    except Exception as e:
+        print(f"   ⚠ SPHB/SPLV ratio failed: {e}")
+
+    # ── 17. MARKET BREADTH (RSP/SPY) ──
+    print("   [17] Market Breadth — RSP/SPY Equal vs Cap-Weight (2-Year Trend)")
+    try:
+        rsp_s  = yf_fetcher.get_close_series("RSP", period="2y")
+        spy2_s = yf_fetcher.get_close_series("SPY", period="2y")
+
+        if len(rsp_s) > 50 and len(spy2_s) > 50:
+            ratio_s = (rsp_s / spy2_s).dropna()
+            ma20w   = ratio_s.rolling(100).mean()   # ~20 weeks (100 trading days)
+
+            fig, ax = EconStyle.create_figure(size="wide")
+            color_line = "#0F766E"
+            r_dates = ratio_s.index.to_pydatetime()
+
+            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="RSP/SPY Ratio")
+            ax.plot(ma20w.index.to_pydatetime(), ma20w.values, color="#6B7280",
+                    linewidth=1.5, linestyle="--", label="20-Week Moving Average")
+
+            ax.set_ylabel("RSP / SPY Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["market_breadth"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (Invesco · SPDR ETFs)")
+            EconStyle.save_chart(fig, output_dir / "17_market_breadth.png")
+    except Exception as e:
+        print(f"   ⚠ Market breadth failed: {e}")
+
+    # ── 18. BOND ETF TOTAL RETURNS ──
+    print("   [18] Bond ETF Total Returns — TLT, LQD, HYG (1-Year Indexed)")
+    try:
+        BOND_ETFS = {
+            "TLT": ("#1D4ED8", "TLT — Long Duration"),
+            "LQD": ("#059669", "LQD — IG Credit"),
+            "HYG": ("#DC2626", "HYG — High Yield"),
+        }
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        any_plotted = False
+
+        for ticker, (color, label) in BOND_ETFS.items():
+            sr = yf_fetcher.get_close_series(ticker, period="1y")
+            if len(sr) > 20:
+                indexed = (sr / sr.iloc[0]) * 100
+                ax.plot(indexed.index.to_pydatetime(), indexed.values,
+                        color=color, linewidth=2.5, label=label)
+                any_plotted = True
+
+        if any_plotted:
+            ax.axhline(100, color="#6B7280", linestyle="--", linewidth=1.2, alpha=0.7)
+            ax.set_ylabel("Total Return (Indexed to 100)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                          fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["bond_etf_returns"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (iShares ETFs)")
+            EconStyle.save_chart(fig, output_dir / "18_bond_etf_returns.png")
+        else:
+            plt.close(fig)
+    except Exception as e:
+        print(f"   ⚠ Bond ETF returns failed: {e}")
+
+    # ── 19. GOLD/SPX SAFE HAVEN RATIO ──
+    print("   [19] Gold/SPX Safe Haven Ratio (2-Year Trend)")
+    try:
+        gold_s = yf_fetcher.get_close_series("GC=F",  period="2y")
+        spx_s  = yf_fetcher.get_close_series("^GSPC", period="2y")
+
+        if len(gold_s) > 50 and len(spx_s) > 50:
+            ratio_s  = (gold_s / spx_s).dropna()
+            mean_52w = ratio_s.rolling(252).mean()
+
+            fig, ax = EconStyle.create_figure(size="wide")
+            color_line = "#D97706"
+            r_dates = ratio_s.index.to_pydatetime()
+
+            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="Gold/SPX Ratio")
+            ax.plot(mean_52w.index.to_pydatetime(), mean_52w.values, color="#6B7280",
+                    linewidth=1.5, linestyle="--", label="52-Week Mean")
+
+            ax.set_ylabel("Gold / SPX Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["gold_spx_ratio"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance")
+            EconStyle.save_chart(fig, output_dir / "19_gold_spx_ratio.png")
+    except Exception as e:
+        print(f"   ⚠ Gold/SPX ratio failed: {e}")
+
+    # ── 20. EM FX WEEKLY BAR ──
+    print("   [20] EM FX — Weekly Performance Bar Chart")
+    try:
+        EM_FX_TICKERS = {
+            "BRL=X": "Brazilian Real (BRL)",
+            "MXN=X": "Mexican Peso (MXN)",
+            "ZAR=X": "South African Rand (ZAR)",
+            "TRY=X": "Turkish Lira (TRY)",
+            "IDR=X": "Indonesian Rupiah (IDR)",
+            "KRW=X": "Korean Won (KRW)",
+        }
+        em_fx_data = []
+        for ticker, name in EM_FX_TICKERS.items():
+            try:
+                result = yf_fetcher.weekly_change(ticker)
+                if result:
+                    # Tickers are USD/EM rates — negate to show EM currency vs USD
+                    em_fx_data.append((name, -result["change_pct"]))
+            except Exception:
+                pass
+
+        if em_fx_data:
+            em_fx_data.sort(key=lambda x: x[1])
+            names_emfx  = [d[0] for d in em_fx_data]
+            values_emfx = [d[1] for d in em_fx_data]
+            colors_emfx = ["#03AF53" if v >= 0 else "#820E0E" for v in values_emfx]
+
+            fig, ax = EconStyle.create_figure(size=(10, 6))
+            bars = ax.barh(names_emfx, values_emfx, color=colors_emfx, height=0.5, zorder=3)
+
+            for bar, v in zip(bars, values_emfx):
+                x_pos = v + 0.05 if v >= 0 else v - 0.05
+                ha = 'left' if v >= 0 else 'right'
+                ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
+                        f"{v:+.1f}%", va='center', ha=ha,
+                        fontsize=11, fontweight='bold', color=bar.get_facecolor())
+
+            ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+            ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.set_xlabel("Weekly Change vs USD (%)  ·  positive = EM currency appreciated",
+                          fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
+            for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
+            ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+
+            _t, _s = WEEKLY_TITLES["em_fx_weekly"][mode]
             EconStyle.set_title(ax, _t, _s.format(date=date_label))
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
             EconStyle.add_source(fig, "Yahoo Finance")
-            EconStyle.save_chart(fig, output_dir / "11_crypto_weekly.png")
-
-            # 9b. Crypto vs S&P 500 indexed trend
-            crypto_trend = TrendLineChart()
-            crypto_colors = {"btc": "special_black", "eth": "blue", "sp500": "us"}
-            for ind_id in ["btc", "eth", "sp500"]:
-                dates_t, vals_t = get_trend(ind_id)
-                if dates_t:
-                    ind = INDICATORS[ind_id]
-                    crypto_trend.add_series(ind["name"], dates_t, vals_t,
-                                            color_key=crypto_colors[ind_id])
-            _t, _s = WEEKLY_TITLES["crypto_trend"][mode]
-            crypto_trend.render(title=_t, subtitle=_s, source="Yahoo Finance",
-                                normalize=True, ylabel="Indexed (start = 100)")
-            crypto_trend.save(output_dir / "12_crypto_vs_spx_trend.png")
-
+            EconStyle.save_chart(fig, output_dir / "20_em_fx_weekly.png")
     except Exception as e:
-        print(f"   ⚠ Crypto charts failed: {e}")
+        print(f"   ⚠ EM FX weekly failed: {e}")
 
-    # NOTE: USD/BRL is an ad-hoc narrative chart. Run: python custom/brazil_fx.py
+    # ── 21. EM EQUITY ETF WEEKLY BAR ──
+    print("   [21] EM Equity ETFs — Weekly Performance Bar Chart")
+    try:
+        EM_EQUITY_TICKERS = {
+            "EWZ":  "Brazil (EWZ)",
+            "EWW":  "Mexico (EWW)",
+            "EZA":  "South Africa (EZA)",
+            "EWT":  "Taiwan (EWT)",
+            "EWY":  "South Korea (EWY)",
+            "INDA": "India (INDA)",
+            "MCHI": "China (MCHI)",
+        }
+        em_eq_data = []
+        for ticker, name in EM_EQUITY_TICKERS.items():
+            try:
+                result = yf_fetcher.weekly_change(ticker)
+                if result:
+                    em_eq_data.append((name, result["change_pct"]))
+            except Exception:
+                pass
+
+        if em_eq_data:
+            em_eq_data.sort(key=lambda x: x[1])
+            names_emeq  = [d[0] for d in em_eq_data]
+            values_emeq = [d[1] for d in em_eq_data]
+            colors_emeq = ["#03AF53" if v >= 0 else "#820E0E" for v in values_emeq]
+
+            fig, ax = EconStyle.create_figure(size=(10, 6))
+            bars = ax.barh(names_emeq, values_emeq, color=colors_emeq, height=0.5, zorder=3)
+
+            for bar, v in zip(bars, values_emeq):
+                x_pos = v + 0.05 if v >= 0 else v - 0.05
+                ha = 'left' if v >= 0 else 'right'
+                ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
+                        f"{v:+.1f}%", va='center', ha=ha,
+                        fontsize=11, fontweight='bold', color=bar.get_facecolor())
+
+            ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+            ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.set_xlabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
+            for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
+            ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+
+            _t, _s = WEEKLY_TITLES["em_equity_weekly"][mode]
+            EconStyle.set_title(ax, _t, _s.format(date=date_label))
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (iShares ETFs)")
+            EconStyle.save_chart(fig, output_dir / "21_em_equity_weekly.png")
+    except Exception as e:
+        print(f"   ⚠ EM equity weekly failed: {e}")
+
+    # ── 22. INDIA VS EM PEERS (INDEXED) ──
+    print("   [22] India vs EM Peers — Indexed 1-Year Trend")
+    try:
+        EM_PEERS = {
+            "INDA": ("India (INDA)",         "#FF6B00", 3.0),
+            "EEM":  ("EM Benchmark (EEM)",   "#6B7280", 2.0),
+            "MCHI": ("China (MCHI)",         "#DC2626", 2.0),
+            "EWY":  ("South Korea (EWY)",    "#2563EB", 2.0),
+        }
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        any_plotted = False
+
+        for ticker, (label, color, lw) in EM_PEERS.items():
+            sr = yf_fetcher.get_close_series(ticker, period="1y")
+            if len(sr) > 20:
+                indexed = (sr / sr.iloc[0]) * 100
+                ax.plot(indexed.index.to_pydatetime(), indexed.values,
+                        color=color, linewidth=lw, label=label)
+                any_plotted = True
+
+        if any_plotted:
+            ax.axhline(100, color="#6B7280", linestyle="--", linewidth=1.2, alpha=0.7)
+            ax.set_ylabel("Total Return (Indexed to 100)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                          fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["india_vs_em"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (iShares ETFs)")
+            EconStyle.save_chart(fig, output_dir / "22_india_vs_em_peers.png")
+        else:
+            plt.close(fig)
+    except Exception as e:
+        print(f"   ⚠ India vs EM peers failed: {e}")
+
+    # ── 23. BRENT–WTI SPREAD ──
+    print("   [23] Brent–WTI Spread (2-Year Trend)")
+    try:
+        brent_s = yf_fetcher.get_close_series("BZ=F", period="2y")
+        wti2_s  = yf_fetcher.get_close_series("CL=F", period="2y")
+
+        if len(brent_s) > 50 and len(wti2_s) > 50:
+            spread_s = (brent_s - wti2_s).dropna().rolling(5).mean().dropna()
+
+            fig, ax = EconStyle.create_figure(size="wide")
+            color_pos = "#D97706"
+            color_neg = "#1D4ED8"
+            sp_dates = spread_s.index.to_pydatetime()
+            sp_vals  = spread_s.values
+
+            ax.fill_between(sp_dates, sp_vals, 0,
+                            where=[v >= 0 for v in sp_vals], color=color_pos, alpha=0.3, label="Brent Premium")
+            ax.fill_between(sp_dates, sp_vals, 0,
+                            where=[v < 0  for v in sp_vals], color=color_neg, alpha=0.3, label="WTI Premium")
+            ax.plot(sp_dates, sp_vals, color="#1C1C1E", linewidth=1.8)
+            ax.axhline(0, color="#1C1C1E", linewidth=1.5)
+
+            ax.set_ylabel("Brent minus WTI ($/bbl)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                          fontweight="bold", color="#1C1C1E")
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.legend(frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["brent_wti_spread"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (NYMEX · ICE)")
+            EconStyle.save_chart(fig, output_dir / "23_brent_wti_spread.png")
+    except Exception as e:
+        print(f"   ⚠ Brent-WTI spread failed: {e}")
+
+    # ── 24. AGRICULTURAL COMMODITIES ──
+    print("   [24] Agricultural Commodities — Weekly Bar Chart")
+    try:
+        AGRI_TICKERS = {
+            "ZW=F": "Wheat",
+            "ZC=F": "Corn",
+            "ZS=F": "Soybeans",
+            "KC=F": "Coffee",
+            "SB=F": "Sugar",
+            "CC=F": "Cocoa",
+        }
+        agri_data = []
+        for ticker, name in AGRI_TICKERS.items():
+            try:
+                result = yf_fetcher.weekly_change(ticker)
+                if result:
+                    agri_data.append((name, result["change_pct"]))
+            except Exception:
+                pass
+
+        if agri_data:
+            agri_data.sort(key=lambda x: x[1])
+            names_ag  = [d[0] for d in agri_data]
+            values_ag = [d[1] for d in agri_data]
+            colors_ag = ["#03AF53" if v >= 0 else "#820E0E" for v in values_ag]
+
+            fig, ax = EconStyle.create_figure(size=(10, 6))
+            bars = ax.barh(names_ag, values_ag, color=colors_ag, height=0.5, zorder=3)
+
+            for bar, v in zip(bars, values_ag):
+                x_pos = v + 0.05 if v >= 0 else v - 0.05
+                ha = 'left' if v >= 0 else 'right'
+                ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
+                        f"{v:+.1f}%", va='center', ha=ha,
+                        fontsize=11, fontweight='bold', color=bar.get_facecolor())
+
+            ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+            ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax.set_xlabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
+            for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
+            ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+
+            _t, _s = WEEKLY_TITLES["agri_weekly"][mode]
+            EconStyle.set_title(ax, _t, _s.format(date=date_label))
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (CBOT · ICE Futures)")
+            EconStyle.save_chart(fig, output_dir / "24_agri_weekly.png")
+    except Exception as e:
+        print(f"   ⚠ Agricultural commodities failed: {e}")
+
+    # ── 25. INDIA VIX VS US VIX ──
+    print("   [25] India VIX vs US VIX (1-Year Trend)")
+    try:
+        india_vix_dates, india_vix_vals = get_trend("india_vix")
+        us_vix_dates, us_vix_vals       = get_trend("vix")
+
+        if india_vix_dates and us_vix_dates:
+            fig, ax1 = EconStyle.create_figure(size="wide")
+            ax2 = ax1.twinx()
+
+            color_india = "#FF6B00"
+            color_us    = "#1C1C1E"
+
+            l1, = ax1.plot(india_vix_dates, india_vix_vals, color=color_india,
+                           linewidth=2.5, label="India VIX")
+            l2, = ax2.plot(us_vix_dates, us_vix_vals, color=color_us,
+                           linewidth=2.0, linestyle="--", alpha=0.8, label="US VIX")
+
+            ax1.set_ylabel("India VIX", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color=color_india)
+            ax2.set_ylabel("US VIX",   fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color=color_us)
+
+            ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax1.spines['top'].set_visible(False)
+            ax2.spines['top'].set_visible(False)
+
+            ax1.legend(handles=[l1, l2], loc="upper right", frameon=False, fontsize=10)
+
+            _t, _s = WEEKLY_TITLES["india_vix_vs_us"][mode]
+            EconStyle.set_title(ax1, _t, _s)
+            EconStyle.add_top_rule(ax1)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "Yahoo Finance (NSE · CBOE)")
+            EconStyle.save_chart(fig, output_dir / "25_india_vix_vs_us.png")
+    except Exception as e:
+        print(f"   ⚠ India VIX vs US VIX failed: {e}")
 
     # ── SUMMARY TABLE ──
     print("   [+] Summary Table")
@@ -966,8 +1663,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         "brent", "gold", "silver", "copper", "natgas",             # Commodities
         "dxy", "eurusd", "gbpusd", "usdinr", "usdjpy",             # FX
         "us_2y", "us_10y", "us_30y", "de_10y",                     # Yields
-        "btc", "eth",                                              # Crypto
-        "vix", "india_vix",                                        # Volatility (AFTER commodities)
+        "vix", "india_vix",                                        # Volatility
     ]
     
     for ind_id in row_ids:

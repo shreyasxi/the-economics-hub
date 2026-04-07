@@ -378,15 +378,16 @@ with tab_weekly:
             _section("Equities")
             _render_grid(equities)
 
-        # Foreign Exchange
-        fx, charts = _group(charts, "fx")
+        # Foreign Exchange (major pairs only — EM FX handled separately below)
+        fx = [c for c in charts if "fx" in c.name and "em_fx" not in c.name]
+        charts = [c for c in charts if not ("fx" in c.name and "em_fx" not in c.name)]
         if fx:
             _section("Foreign Exchange")
             _render_grid(fx)
 
-        # Government Bond Yields
-        yields = [c for c in charts if "yield" in c.name]
-        charts = [c for c in charts if "yield" not in c.name]
+        # Government Bond Yields (excludes real_yields which goes to Inflation Signals)
+        yields = [c for c in charts if "yield" in c.name and "real_yield" not in c.name]
+        charts = [c for c in charts if not ("yield" in c.name and "real_yield" not in c.name)]
         if yields:
             _section("Government Bond Yields")
             _render_grid(yields)
@@ -397,18 +398,10 @@ with tab_weekly:
             _section("Commodities")
             _render_grid(commodities)
 
-        # Cryptocurrency
-        crypto_kws = ["crypto", "bitcoin", "btc", "eth"]
-        crypto = [c for c in charts if any(k in c.name for k in crypto_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in crypto_kws)]
-        if crypto:
-            _section("Cryptocurrency")
-            _render_grid(crypto)
-
         # Volatility & Sentiment
         vol_kws = ["vix", "sector_rotation"]
-        vol = [c for c in charts if any(k in c.name for k in vol_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in vol_kws)]
+        vol = [c for c in charts if any(k in c.name for k in vol_kws) and "india_vix" not in c.name]
+        charts = [c for c in charts if not (any(k in c.name for k in vol_kws) and "india_vix" not in c.name)]
         if vol:
             _section("Volatility & Sentiment")
             _render_grid(vol)
@@ -419,6 +412,53 @@ with tab_weekly:
         if labour:
             _section("Labour & Wages")
             _render_grid(labour)
+
+        # Credit Markets
+        credit_kws = ["credit_spreads", "bond_etf"]
+        credit = [c for c in charts if any(k in c.name for k in credit_kws)]
+        charts = [c for c in charts if not any(k in c.name for k in credit_kws)]
+        if credit:
+            _section("Credit Markets")
+            _render_grid(credit)
+
+        # Inflation Signals
+        inflation_kws = ["breakeven", "real_yield"]
+        inflation_sig = [c for c in charts if any(k in c.name for k in inflation_kws)]
+        charts = [c for c in charts if not any(k in c.name for k in inflation_kws)]
+        if inflation_sig:
+            _section("Inflation Signals")
+            _render_grid(inflation_sig)
+
+        # Cross-Asset Risk
+        cross_kws = ["spy_tlt", "risk_appetite", "breadth", "gold_spx", "copper_gold"]
+        cross = [c for c in charts if any(k in c.name for k in cross_kws)]
+        charts = [c for c in charts if not any(k in c.name for k in cross_kws)]
+        if cross:
+            _section("Cross-Asset Risk")
+            _render_grid(cross)
+
+        # Emerging Markets
+        em_kws = ["em_fx", "em_equity", "india_vs_em"]
+        em = [c for c in charts if any(k in c.name for k in em_kws)]
+        charts = [c for c in charts if not any(k in c.name for k in em_kws)]
+        if em:
+            _section("Emerging Markets")
+            _render_grid(em)
+
+        # Energy & Agriculture
+        energy_kws = ["brent_wti", "agri"]
+        energy_ag = [c for c in charts if any(k in c.name for k in energy_kws)]
+        charts = [c for c in charts if not any(k in c.name for k in energy_kws)]
+        if energy_ag:
+            _section("Energy & Agriculture")
+            _render_grid(energy_ag)
+
+        # India Volatility
+        india_vix = [c for c in charts if "india_vix" in c.name]
+        charts = [c for c in charts if "india_vix" not in c.name]
+        if india_vix:
+            _section("India Volatility")
+            _render_grid(india_vix)
 
         # Catch-all
         if charts:

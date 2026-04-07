@@ -286,28 +286,6 @@ INDICATORS = {
     # ── REMOVED: India 10Y — ^IRTYIELD is permanently delisted on Yahoo Finance ──
 
     # ═══════════════════════════════════════════
-    # CRYPTO (New Section)
-    # ═══════════════════════════════════════════
-    "btc": {
-        "name": "Bitcoin",
-        "source": "yfinance",
-        "ticker": "BTC-USD",
-        "category": "crypto",
-        "unit": "USD",
-        "change_type": "pct",
-        "color_key": "special_black",
-    },
-    "eth": {
-        "name": "Ethereum",
-        "source": "yfinance",
-        "ticker": "ETH-USD",
-        "category": "crypto",
-        "unit": "USD",
-        "change_type": "pct",
-        "color_key": "special_black",
-    },
-
-    # ═══════════════════════════════════════════
     # VOLATILITY & SENTIMENT
     # ═══════════════════════════════════════════
     "vix": {
@@ -442,13 +420,6 @@ DASHBOARD_SECTIONS = [
         "subtitle": "Key currency moves",
         "indicators": ["dxy", "eurusd", "gbpusd", "usdinr", "usdjpy"], 
         "chart_types": ["weekly_bar", "trend_line"],
-    },
-    {
-        "id": "crypto",
-        "title": "Crypto Assets",
-        "subtitle": "Digital assets performance",
-        "indicators": ["btc", "eth"], 
-        "chart_types": ["weekly_bar"],
     },
     {
         "id": "yields",
