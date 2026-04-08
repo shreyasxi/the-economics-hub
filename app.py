@@ -40,6 +40,17 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------------------------
+# Page configuration — must be the first Streamlit call
+# ---------------------------------------------------------------------------
+
+st.set_page_config(
+    page_title="The Economics Hub",
+    page_icon="charts/Econhub Logo.jpg",  # <-- Replaced the emoji with your file path
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+# ---------------------------------------------------------------------------
 # Custom CSS
 # ---------------------------------------------------------------------------
 
@@ -59,6 +70,15 @@ st.markdown(
         padding-top: 1.0rem;
         padding-bottom: 2rem;
     }
+    
+    /* ── Centered Section Divider ── */
+    .section-divider {
+        height: 2px; /* This controls the thickness */
+        background-color: #003366; /* Your signature navy blue */
+        width: 60%; /* 60% of the page width */
+        margin: 2.0rem auto 2.0rem auto; /* The 'auto' on left/right perfectly centers it */
+        border-radius: 2px; /* Gives the ends a slightly polished, rounded look */
+    }
 
     /* ── Masthead — Merriweather, editorial weight ── */
     .hub-masthead {
@@ -72,19 +92,18 @@ st.markdown(
     }
     .hub-tagline {
         font-family: 'Inter', sans-serif;
-        font-size: 0.76rem;
-        font-weight: 400;
-        color: #777777;
-        text-transform: uppercase;
-        letter-spacing: 0.11em;
+        font-size: 0.90rem; 
+        font-weight: 500; 
+        color: #444444; 
+        letter-spacing: 0.02em; 
         margin-top: 0.22rem;
         margin-bottom: 0.2rem;
     }
     .hub-substack {
         font-family: 'Inter', sans-serif;
         font-size: 0.76rem;
-        font-weight: 500;
-        color: #FF6719;
+        font-weight: 600;
+        color: #FF6719; !important
         text-decoration: none;
         letter-spacing: 0.02em;
         margin-bottom: 0.35rem;
@@ -126,8 +145,12 @@ st.markdown(
         text-align: right;
     }
 
+    
+    
     /* ── Tab bar ── */
-    button[data-baseweb="tab"] {
+    button[data-baseweb="tab"], 
+    button[data-baseweb="tab"] p, 
+    button[data-baseweb="tab"] span {
         font-family: 'Inter', sans-serif !important;
         font-weight: 700 !important;
         font-size: 0.80rem !important;
@@ -329,14 +352,13 @@ def _render_grid(charts: list[Path], cols: int = 2) -> None:
             if insight:
                 with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
                     st.markdown(insight)
-
-
+    
 def _section(title: str) -> None:
     st.markdown(
+        f'<div class="section-divider"></div>'
         f'<p class="section-header">{title}</p>',
         unsafe_allow_html=True,
     )
-
 
 def _render_summary(chart_path: Path) -> None:
     """Summary table constrained to 80% of page width."""
