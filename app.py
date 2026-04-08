@@ -24,6 +24,7 @@ from utils.chart_loader import (
     get_folder_mtime,
     is_pipeline_admin,
 )
+from config.insights import get_insight
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
@@ -324,6 +325,10 @@ def _render_grid(charts: list[Path], cols: int = 2) -> None:
                 caption=clean_title(chart_path.name),
                 use_container_width=True,
             )
+            insight = get_insight(chart_path.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    st.markdown(insight)
 
 
 def _section(title: str) -> None:
