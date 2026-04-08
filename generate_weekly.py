@@ -883,13 +883,14 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # ── MOVE INDEX ──
     print("   [09b] ICE BofA MOVE Index — Bond Volatility")
     try:
-        move_s = fred_fetcher.fetch_series("BAMLMOVE", period_years=1)
+        # Pull from yfinance instead of FRED
+        move_s = yf_fetcher.get_close_series("^MOVE", period="1y")
 
         if len(move_s) > 20:
-            # FRED BAMLMOVE is already in basis points — no scaling needed
+            move_s.index = move_s.index.tz_localize(None) # Strip timezone
             fig, ax = EconStyle.create_figure(size="wide")
 
-            color_move = "#7C3AED"  # Purple — distinct from VIX orange
+            color_move = "#7C3AED"  # Purple
 
             move_dates = move_s.index.to_pydatetime()
             move_vals  = move_s.values
@@ -898,11 +899,9 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             ax.fill_between(move_dates, move_vals, move_vals.min(),
                             alpha=0.06, color=color_move)
 
-            # Alert threshold at 100 (elevated bond vol regime)
             ax.axhline(100, color="#6B7280", linestyle="--", linewidth=1.2, alpha=0.7,
                        label="100 — Elevated vol threshold")
 
-            # Annotate the latest value
             ax.annotate(
                 f"{move_vals[-1]:.0f}",
                 xy=(move_dates[-1], move_vals[-1]),
@@ -923,7 +922,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             EconStyle.set_title(ax, _t, _s)
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "FRED (ICE BofA)")
+            EconStyle.add_source(fig, "Yahoo Finance (ICE BofA)")
             EconStyle.save_chart(fig, output_dir / "09_move_index.png")
     except Exception as e:
         print(f"   ⚠ MOVE Index chart failed: {e}")
@@ -1261,13 +1260,18 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             EconStyle.save_chart(fig, output_dir / "13_real_yields.png")
     except Exception as e:
         print(f"   ⚠ Real yields failed: {e}")
-
+        
     # ── 14. COPPER/GOLD RATIO ──
     print("   [14] Copper/Gold Ratio + 10Y Yield (2-Year Trend)")
     try:
         cu_s    = yf_fetcher.get_close_series("HG=F", period="2y")
         au_s    = yf_fetcher.get_close_series("GC=F", period="2y")
         dgs10_s = fred_fetcher.fetch_series("DGS10", period_years=2)
+
+        # ── THE FIX: Strip timezones so Pandas can do math ──
+        cu_s.index = cu_s.index.tz_localize(None)
+        au_s.index = au_s.index.tz_localize(None)
+        dgs10_s.index = dgs10_s.index.tz_localize(None)
 
         if len(cu_s) > 50 and len(au_s) > 50:
             ratio_s = (cu_s / au_s).dropna().rolling(5).mean().dropna()
@@ -1821,8 +1825,16 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         btc_s  = yf_fetcher.get_close_series("BTC-USD", period="2y")
         gold_s = yf_fetcher.get_close_series("GC=F",    period="2y")
 
+        # ── THE FIX: Strip timezones (BTC is UTC, Gold is NY) ──
+        btc_s.index = btc_s.index.tz_localize(None)
+        gold_s.index = gold_s.index.tz_localize(None)
+
         if len(btc_s) > 50 and len(gold_s) > 50:
             import pandas as pd
+            # Force numeric to prevent the 'isfinite' error
+            btc_s = pd.to_numeric(btc_s, errors='coerce')
+            gold_s = pd.to_numeric(gold_s, errors='coerce')
+            
             combined = pd.DataFrame({"btc": btc_s, "gold": gold_s}).dropna()
             ratio_s  = combined["btc"] / combined["gold"]
             mean_52w = ratio_s.rolling(252).mean()
@@ -1911,7 +1923,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         print(f"   ⚠ BTC vs Global M2 failed: {e}")
 
     # ── 29. STABLECOIN MARKET CAP (USDT + USDC) ──
-    print("   [29] Stablecoin Market Cap — USDT + USDC (2-Year Trend)")
+    # print("   [29] Stablecoin Market Cap — USDT + USDC (2-Year Trend)")
     try:
         import json
         import urllib.request
@@ -1921,7 +1933,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
                 f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
                 f"?vs_currency=usd&days={days}&interval=daily"
             )
-            req = urllib.request.Request(url, headers={"User-Agent": "EconHub/1.0"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
             with urllib.request.urlopen(req, timeout=30) as resp:
                 data = json.loads(resp.read())
             raw = data["market_caps"]  # [[epoch_ms, value], ...]

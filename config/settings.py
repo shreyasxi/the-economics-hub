@@ -411,16 +411,14 @@ INDICATORS = {
     # ═══════════════════════════════════════════
     "move_index": {
         "name": "MOVE Index",
-        "source": "fred",
-        "series": "BAMLMOVE",
+        "source": "yfinance",
+        "ticker": "^MOVE",
         "category": "volatility",
         "unit": "bps",
         "change_type": "abs",
         "color_key": "us",
     },
 }
-
-
 
 # ─────────────────────────────────────────────
 # YIELD CURVE CONFIGURATION
