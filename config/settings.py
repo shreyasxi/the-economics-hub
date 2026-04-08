@@ -377,11 +377,46 @@ INDICATORS = {
     },
     
     "uranium": {
-        "name": "Uranium", 
-        "ticker": "SRUUF", 
-        "source": "yfinance", 
+        "name": "Uranium",
+        "ticker": "SRUUF",
+        "source": "yfinance",
         "color_key": "us",
         "category": "commodities"
+    },
+
+    # ═══════════════════════════════════════════
+    # CRYPTO ASSETS
+    # ═══════════════════════════════════════════
+    "btc": {
+        "name": "Bitcoin",
+        "source": "yfinance",
+        "ticker": "BTC-USD",
+        "category": "crypto",
+        "unit": "USD",
+        "change_type": "pct",
+        "color_key": "us",
+    },
+    "eth": {
+        "name": "Ethereum",
+        "source": "yfinance",
+        "ticker": "ETH-USD",
+        "category": "crypto",
+        "unit": "USD",
+        "change_type": "pct",
+        "color_key": "asia",
+    },
+
+    # ═══════════════════════════════════════════
+    # BOND VOLATILITY
+    # ═══════════════════════════════════════════
+    "move_index": {
+        "name": "MOVE Index",
+        "source": "fred",
+        "series": "BAMLMOVE",
+        "category": "volatility",
+        "unit": "bps",
+        "change_type": "abs",
+        "color_key": "us",
     },
 }
 

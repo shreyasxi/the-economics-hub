@@ -413,93 +413,77 @@ with tab_weekly:
         if summary:
             _render_summary(summary)
 
-        # Equities
-        equities, charts = _group(charts, "equities")
+        # 1. Equities
+        equities_kws = ["equities"]
+        equities = [c for c in charts if any(k in c.name for k in equities_kws)]
+        charts = [c for c in charts if c not in equities]
         if equities:
             _section("Equities")
             _render_grid(equities)
 
-        # Foreign Exchange (major pairs only — EM FX handled separately below)
-        fx = [c for c in charts if "fx" in c.name and "em_fx" not in c.name]
-        charts = [c for c in charts if not ("fx" in c.name and "em_fx" not in c.name)]
-        if fx:
-            _section("Foreign Exchange")
-            _render_grid(fx)
-
-        # Government Bond Yields (excludes real_yields which goes to Inflation Signals)
-        yields = [c for c in charts if "yield" in c.name and "real_yield" not in c.name]
-        charts = [c for c in charts if not ("yield" in c.name and "real_yield" not in c.name)]
-        if yields:
-            _section("Government Bond Yields")
-            _render_grid(yields)
-
-        # Commodities
-        commodities, charts = _group(charts, "commodities")
-        if commodities:
+        # 2. Fixed Income & Credit
+        rates_kws = ["yield", "credit_spreads", "bond_etf"]
+        rates = [c for c in charts if any(k in c.name for k in rates_kws)]
+        charts = [c for c in charts if c not in rates]
+        if rates:
+            _section("Fixed Income & Credit")
+            _render_grid(rates)
+            
+        # 3. Commodities
+        commo_kws = ["commodities", "brent", "wti", "agri", "oil", "gold", "copper"]
+        commo = [c for c in charts if any(k in c.name for k in commo_kws)]
+        charts = [c for c in charts if c not in commo]
+        if commo:
             _section("Commodities")
-            _render_grid(commodities)
+            _render_grid(commo)
 
-        # Volatility & Sentiment
-        vol_kws = ["vix", "sector_rotation"]
-        vol = [c for c in charts if any(k in c.name for k in vol_kws) and "india_vix" not in c.name]
-        charts = [c for c in charts if not (any(k in c.name for k in vol_kws) and "india_vix" not in c.name)]
-        if vol:
-            _section("Volatility & Sentiment")
-            _render_grid(vol)
-
-        # Labour & Wages
-        labour = [c for c in charts if any(k in c.name for k in ["wage", "labour", "labor"])]
-        charts = [c for c in charts if not any(k in c.name for k in ["wage", "labour", "labor"])]
-        if labour:
-            _section("Labour & Wages")
-            _render_grid(labour)
-
-        # Credit Markets
-        credit_kws = ["credit_spreads", "bond_etf"]
-        credit = [c for c in charts if any(k in c.name for k in credit_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in credit_kws)]
-        if credit:
-            _section("Credit Markets")
-            _render_grid(credit)
-
-        # Inflation Signals
+        # 4. Inflation Signals
         inflation_kws = ["breakeven", "real_yield"]
         inflation_sig = [c for c in charts if any(k in c.name for k in inflation_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in inflation_kws)]
+        charts = [c for c in charts if c not in inflation_sig]
         if inflation_sig:
             _section("Inflation Signals")
             _render_grid(inflation_sig)
 
-        # Cross-Asset Risk
-        cross_kws = ["spy_tlt", "risk_appetite", "breadth", "gold_spx", "copper_gold"]
-        cross = [c for c in charts if any(k in c.name for k in cross_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in cross_kws)]
-        if cross:
-            _section("Cross-Asset Risk")
-            _render_grid(cross)
+        # 5. Foreign Exchange (excluding EM FX)
+        fx = [c for c in charts if "fx" in c.name and "em_fx" not in c.name]
+        charts = [c for c in charts if c not in fx]
+        if fx:
+            _section("Foreign Exchange")
+            _render_grid(fx)
 
-        # Emerging Markets
-        em_kws = ["em_fx", "em_equity", "india_vs_em"]
+        # 6. Volatility & Sentiment
+        vol_kws = ["vix", "move", "sector_rotation", "india_vix"]
+        volatility = [c for c in charts if any(k in c.name for k in vol_kws)]
+        charts = [c for c in charts if c not in volatility]
+        if volatility:
+            _section("Volatility & Sentiment")
+            _render_grid(volatility)
+
+        # 7. Cross-Asset Risk & Breadth
+        risk_kws = ["spy_tlt", "risk_appetite", "breadth", "gold_spx", "copper_gold"]
+        risk = [c for c in charts if any(k in c.name for k in risk_kws)]
+        charts = [c for c in charts if c not in risk]
+        if risk:
+            _section("Cross-Asset Risk & Breadth")
+            _render_grid(risk)
+
+
+        # 8. Emerging Markets
+        em_kws = ["em_fx", "em_equity", "india_vs_em", "nifty"]
         em = [c for c in charts if any(k in c.name for k in em_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in em_kws)]
+        charts = [c for c in charts if c not in em]
         if em:
             _section("Emerging Markets")
             _render_grid(em)
 
-        # Energy & Agriculture
-        energy_kws = ["brent_wti", "agri"]
-        energy_ag = [c for c in charts if any(k in c.name for k in energy_kws)]
-        charts = [c for c in charts if not any(k in c.name for k in energy_kws)]
-        if energy_ag:
-            _section("Energy & Agriculture")
-            _render_grid(energy_ag)
-
-        # India Volatility
-        india_vix = [c for c in charts if "india_vix" in c.name]
-        charts = [c for c in charts if "india_vix" not in c.name]
-        if india_vix:
-            _section("India Volatility")
-            _render_grid(india_vix)
+        # 9. Crypto Assets
+        crypto_kws = ["eth_btc", "btc_gold", "btc_global", "stablecoin"]
+        crypto = [c for c in charts if any(k in c.name for k in crypto_kws)]
+        charts = [c for c in charts if c not in crypto]
+        if crypto:
+            _section("Crypto Assets")
+            _render_grid(crypto)
 
         # Catch-all
         if charts:
@@ -588,6 +572,43 @@ with tab_india:
         summary, charts = _pop_summary(charts, ["india_table", "05_india"])
         if summary:
             _render_summary(summary)
+
+        # 1. High-Frequency Growth Indicators
+        growth_kws = ["pmi", "credit"]
+        growth = [c for c in charts if any(k in c.name for k in growth_kws)]
+        charts = [c for c in charts if c not in growth]
+        if growth:
+            _section("Growth Indicators")
+            _render_grid(growth)
+
+        # 2. Inflation Dynamics
+        inflation_kws = ["inflation", "cpi", "wpi"]
+        inflation = [c for c in charts if any(k in c.name for k in inflation_kws)]
+        charts = [c for c in charts if c not in inflation]
+        if inflation:
+            _section("Inflation Dynamics")
+            _render_grid(inflation)
+
+        # 3. Fiscal Policy & Public Finances
+        fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
+        fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
+        charts = [c for c in charts if c not in fiscal]
+        if fiscal:
+            _section("Fiscal Policy & Public Finances")
+            _render_grid(fiscal)
+
+        # 4. Capital Flows
+        flows_kws = ["flows", "fii", "fpi", "portfolio"]
+        flows = [c for c in charts if any(k in c.name for k in flows_kws)]
+        charts = [c for c in charts if c not in flows]
+        if flows:
+            _section("Capital Flows")
+            _render_grid(flows)
+
+        # Catch-all
+        if charts:
+            _section("Other")
+            _render_grid(charts)
 
         if charts:
             _render_grid(charts, cols=2)
