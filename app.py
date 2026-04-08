@@ -34,17 +34,6 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 st.set_page_config(
     page_title="The Economics Hub",
-    page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
-
-# ---------------------------------------------------------------------------
-# Page configuration — must be the first Streamlit call
-# ---------------------------------------------------------------------------
-
-st.set_page_config(
-    page_title="The Economics Hub",
     page_icon="charts/Econhub_logo.jpg",  # <-- Replaced the emoji with your file path
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -177,9 +166,13 @@ st.markdown(
         text-transform: uppercase !important;
     }
 
-    /* ── Sidebar ── */
+    /* ── App & Sidebar Background Color ── */
+    .stApp, [data-testid="stHeader"] {
+        background-color: #FFFFF0; 
+    }
+    
     [data-testid="stSidebar"] {
-        background-color: #ECEEF1;
+        background-color: #E2E8F0;
     }
     .sidebar-masthead {
         font-family: 'Merriweather', Georgia, serif;
