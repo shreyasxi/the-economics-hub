@@ -45,7 +45,7 @@ st.set_page_config(
 
 st.set_page_config(
     page_title="The Economics Hub",
-    page_icon="charts/Econhub Logo.jpg",  # <-- Replaced the emoji with your file path
+    page_icon="charts/Econhub_logo.jpg",  # <-- Replaced the emoji with your file path
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -111,18 +111,36 @@ st.markdown(
     }
     .hub-substack:hover { text-decoration: underline; }
     .hub-rule {
-        border: none;
-        border-top: 2px solid #000000;
-        margin-top: 0.4rem;
-        margin-bottom: 0.5rem;
+        height: 2px; /* 2px thickness */
+        width: 100%; /* Full width */
+        background-color: #003366; /* Matching your navy blue, change to #000000 for black */
+        margin-top: 0.2rem; /* Shrinks the gap above the line */
+        margin-bottom: 1.5rem; /* Space below the line before the tabs */
     }
-
-    /* ── Section headers — Inter 800, all-caps, navy, generous spacing ── */
+    /* ── Substack Callout Box ── */
+    .substack-box {
+        background-color: #FFF8F0;
+        border-left: 3px solid #FF6719;
+        padding: 0.35rem 0.75rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.8rem; /* Pushes the horizontal line down slightly */
+        display: inline-block; 
+        border-radius: 0 3px 3px 0; 
+    }
+    
+    /* Force the link inside the box to be orange and underlined */
+    .substack-box a {
+        color: #FF6719 !important;
+        font-weight: 600 !important;
+        text-decoration: underline !important;
+    }
+    
+    /* ── Section headers — Inter 800, all-caps, navy ── */
     .section-header {
         font-family: 'Inter', sans-serif;
         font-size: 0.75rem;
         font-weight: 800;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.06em; /* Tighter letter spacing for better readability */
         text-transform: uppercase;
         color: #003366;
         margin-top: 3.5rem;
@@ -141,6 +159,7 @@ st.markdown(
         font-family: 'Inter', sans-serif;
         font-size: 0.73rem;
         font-weight: 400;
+        font-style: italic;
         color: #888888;
         text-align: right;
     }
@@ -305,11 +324,13 @@ with st.sidebar:
 st.markdown(
     '<h1 class="hub-masthead">THE ECONOMICS HUB</h1>'
     '<p class="hub-tagline">A visual dashboard tracking global macroeconomics and financial markets.</p>'
-    '<a class="hub-substack" href="https://economicshub.substack.com/" target="_blank">'
-    'Subscribe on Substack →</a>',
+    '<div class="substack-box">'
+    '<a href="https://economicshub.substack.com/" target="_blank">'
+    'Subscribe on Substack →</a>'
+    '</div>'
+    '<div class="hub-rule"></div>',
     unsafe_allow_html=True,
 )
-st.markdown('<hr class="hub-rule">', unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 # Tabs
