@@ -285,9 +285,10 @@ with st.sidebar:
 
         with st.expander("Run Generators", expanded=False):
             _GENERATORS = {
-                "Weekly Markets":  ("generate_weekly.py",  True),
-                "Macro Pulse":     ("generate_macro.py",   True),
-                "India Dashboard": ("generate_india.py",   False),
+                "Weekly Markets":  ("generate_weekly.py",       True),
+                "Macro Pulse":     ("generate_macro.py",        True),
+                "India Dashboard": ("generate_india.py",        False),
+                "RBI Sentinel":    ("generate_rbi_sentinel.py", False),
             }
             for label, (script, has_mode) in _GENERATORS.items():
                 if st.button(f"▶  {label}", key=f"btn_{script}", use_container_width=True):

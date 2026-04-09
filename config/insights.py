@@ -403,4 +403,63 @@ CHART_INSIGHTS: dict[str, str] = {
 **Practical takeaway:** The MOVE Index is the institutional bond manager's primary risk gauge and often leads equity volatility (VIX) during rate-driven market dislocations. When MOVE rises sharply while VIX remains contained, it signals the stress is originating in fixed income — typically driven by unexpected inflation data, Fed communication uncertainty, or Treasury supply/demand imbalance — rather than in corporate or equity risk. This is the pattern preceding the most dangerous equity corrections: the ones the VIX doesn't see coming until Treasury dysfunction forces risk-off across all asset classes. A MOVE above 130 while the 10-year yield is rising rapidly is historically associated with credit spread widening, mortgage market stress, and dollar strength — all simultaneously. Watch for MOVE and VIX rising together, as that combination signals a systemic risk-off event rather than an isolated rates concern.
 """,
 
+
+    # ── RBI SENTINEL ─────────────────────────────────────────────────────────
+
+    "rbi_stance_meter": """\
+**How to read this chart:** The dial displays the RBI MPC's current composite policy stance \
+on a continuous scale from −1.0 (Extremely Dovish) to +1.0 (Extremely Hawkish). The score is \
+derived from the most recent set of MPC documents using a hybrid model: a curated central-bank-specific \
+lexicon pre-scores the text for RBI-specific phrases (e.g. "withdrawal of accommodation" = +1.0), \
+then the Anthropic Claude API provides a contextual validation and sub-dimension breakdown. \
+The five sub-dimensions — Inflation Stance, Growth Stance, Liquidity Stance, Rate Guidance, and FX/External Stance — \
+are weighted and fused into the single composite displayed here. A score near zero does not mean "no view" — \
+it may mean the committee is actively balancing competing concerns, which is itself a meaningful signal.
+
+**Practical takeaway:** A composite score crossing −0.3 and continuing to fall has historically \
+preceded RBI rate cuts by 1–2 meetings. A score above +0.5 sustained over two consecutive meeting \
+cycles signals a committee prepared to act on inflation regardless of growth conditions — typically \
+negative for rate-sensitive sectors (real estate, NBFCs, capex-heavy industrials) and supportive \
+of the INR through carry dynamics. The most actionable signal is a large divergence between the \
+Resolution score and the Minutes score: when Minutes are significantly more hawkish than the \
+Resolution, the committee's official statement is understating internal pressure, and markets may \
+be underpricing the risk of a hawkish surprise at the next meeting.
+""",
+
+    "rbi_sentiment_trajectory": """\
+**How to read this chart:** Each point represents an MPC meeting's composite sentiment score, \
+derived separately from the official Policy Resolution (published on meeting day) and the MPC \
+Minutes (published ~14 days later). The horizontal zero line is the "Neutral" threshold. \
+Sustained above-zero readings indicate a hawkish regime; sustained negative readings indicate \
+a dovish or accommodative regime. Background shading identifies regime zones. Vertical hairlines \
+mark each MPC meeting date.
+
+**Practical takeaway:** The Minutes line is the more analytically valuable of the two series. \
+The official Resolution is often drafted for public communication clarity and may soften language \
+relative to the actual committee debate captured in the Minutes. A persistent gap between the two \
+lines — Minutes systematically more dovish than the Resolution — often signals that the \
+committee's internal consensus is less hawkish than its public posture, and rate-cut expectations \
+should be brought forward. Conversely, Minutes suddenly turning more hawkish than the Resolution \
+is the early warning signal for a regime shift: the committee is building a case for tightening \
+that has not yet been communicated publicly.
+""",
+
+    "rbi_resolution_vs_minutes": """\
+**How to read this chart:** For each of the last eight MPC meetings, two bars are shown \
+side-by-side — the sentiment score derived from the official Policy Resolution and the score from \
+the MPC Minutes. The delta (Δ) annotated above each pair is the "Minutes Premium": the difference \
+between Minutes and Resolution scores. A positive delta means the Minutes revealed a more hawkish \
+internal debate than the official statement suggested. RBI Minutes are structured differently from \
+Fed Minutes: each MPC member's individual assessment is published in full, enabling richer \
+sentiment extraction per member.
+
+**Practical takeaway:** When the Minutes Premium is consistently negative over 2–3 cycles — \
+Minutes more dovish than the Resolution — it signals the committee is more concerned about growth \
+than the press release language reveals. This pattern has preceded RBI rate pivot announcements in \
+previous cycles. A sudden reversal — Minutes becoming significantly more hawkish than the \
+Resolution — indicates a regime shift in progress, often driven by a minority view gaining \
+traction within the committee before it reaches the majority. This is the most reliable leading \
+indicator in the RBI Sentinel framework.
+""",
+
 }

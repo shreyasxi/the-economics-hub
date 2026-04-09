@@ -40,3 +40,8 @@ Desktop.ini
 
 # ── Jupyter (if you ever use it) ──
 .ipynb_checkpoints/
+
+# ── RBI Sentinel — local data, cache, logs ──
+data/rbi_sentinel.db
+data/rbi_sentinel_cache/
+logs/
