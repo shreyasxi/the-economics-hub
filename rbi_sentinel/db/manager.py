@@ -147,7 +147,10 @@ def get_document(meeting_id: int, doc_type: str) -> Optional[dict]:
 def get_documents_without_scores(
     model_version: str = SCORING_MODEL_VERSION,
 ) -> list[dict]:
-    """Return documents that have raw_text but no score for the given model version."""
+    """
+    Return documents that are ready to score but have no score yet.
+    Ready = fetch succeeded AND (raw_text stored OR cache_path exists on disk).
+    """
     with _connect() as conn:
         rows = conn.execute(
             """
@@ -156,8 +159,8 @@ def get_documents_without_scores(
             LEFT JOIN sentiment_scores s
                 ON s.doc_id = d.doc_id
                AND s.scoring_model_version = ?
-            WHERE d.raw_text IS NOT NULL
-              AND d.fetch_status IN ('success', 'cached')
+            WHERE d.fetch_status IN ('success', 'cached')
+              AND (d.raw_text IS NOT NULL OR d.cache_path IS NOT NULL)
               AND s.score_id IS NULL
             ORDER BY d.publication_date ASC
             """,

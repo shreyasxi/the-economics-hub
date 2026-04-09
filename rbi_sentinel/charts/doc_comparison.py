@@ -89,7 +89,7 @@ def generate(
             sign = "+" if divergence >= 0 else ""
             ax.text(
                 i, y_pos,
-                f"Δ{sign}{divergence:.2f}",
+                f"d{sign}{divergence:.2f}",
                 ha="center", va="bottom",
                 fontsize=7, color="#404040",
                 zorder=5,
@@ -138,13 +138,13 @@ def generate(
         title = "What the Minutes Reveal"
         subtitle = (
             "Resolution vs. MPC Minutes sentiment · "
-            "Δ = Minutes Premium (positive = Minutes more hawkish)"
+            "d = Minutes Premium (positive = Minutes more hawkish)"
         )
     else:
         title = "Policy Resolution vs. MPC Minutes — Sentiment Divergence"
         subtitle = (
             f"Last {n_meetings} MPC meetings · "
-            "Δ = Minutes score minus Resolution score"
+            "d = Minutes score minus Resolution score"
         )
 
     EconStyle.add_top_rule(ax)

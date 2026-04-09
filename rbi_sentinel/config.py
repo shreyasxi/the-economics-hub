@@ -59,12 +59,16 @@ USER_AGENT = (
 
 # ── Versioned CSS Selectors ───────────────────────────────────────────────────
 # Tried in order; first match wins. Logs which version succeeded.
+# Confirmed against live RBI press release pages (April 2026):
+#   Content lives in <td> inside <table class="tablebg">, inside div.grid_11
 HTML_CONTENT_SELECTORS = [
-    ("v2024", "div.contentBx"),
-    ("v2022", "div#outer table td.tabletext"),
-    ("v2020", "td.tabletext"),
-    ("v2019", "div.tabletext"),
-    ("fallback", "body"),
+    ("v2026", "table.tablebg td"),              # Current RBI layout (confirmed 2026)
+    ("v2024", "div.grid_11 td"),                # Grid layout fallback
+    ("v2023", "div.right_blue_border td"),      # Right column fallback
+    ("v2022", "div#doublescroll td"),            # Scroll wrapper fallback
+    ("v2020", "div.text1 td"),                  # Outer text div fallback
+    ("v2019", "td.tabletext"),                  # Legacy tabletext class
+    ("v2018", "div.contentBx"),                 # Older layout
 ]
 
 # Minimum word count for extracted text to be considered valid (not an error page)

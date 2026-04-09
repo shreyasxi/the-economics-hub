@@ -69,11 +69,29 @@ def extract_text(html_bytes: bytes, source_url: str = "") -> Optional[str]:
                 break
 
     if content_element is None:
-        log.warning(
-            "All selectors failed for %s — falling back to full body",
-            source_url or "unknown"
-        )
-        content_element = soup.find("body") or soup
+        # Smart fallback: find the largest <td> that contains MPC keywords.
+        # This avoids pulling in navigation/header noise from the full body.
+        best_td = None
+        best_wc = 0
+        for td in soup.find_all("td"):
+            txt = td.get_text()
+            wc = len(txt.split())
+            if wc > best_wc and any(kw in txt.lower() for kw in _VALIDITY_KEYWORDS):
+                best_td = td
+                best_wc = wc
+        if best_td and best_wc >= MIN_VALID_WORD_COUNT:
+            content_element = best_td
+            used_selector = "smart_td_fallback"
+            log.info(
+                "Smart TD fallback succeeded for %s (%d words)",
+                source_url or "unknown", best_wc,
+            )
+        else:
+            log.warning(
+                "All selectors including fallback failed for %s",
+                source_url or "unknown",
+            )
+            return None
 
     raw_text = content_element.get_text(separator="\n", strip=True)
     cleaned = _clean_text(raw_text)

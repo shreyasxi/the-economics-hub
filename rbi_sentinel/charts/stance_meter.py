@@ -168,7 +168,6 @@ def generate(
         ha="center", va="center",
         fontsize=9, fontweight="700",
         color="#404040", zorder=6,
-        letter_spacing=0.05,
     )
     ax.text(
         0, -0.49,
