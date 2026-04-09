@@ -69,42 +69,42 @@ st.markdown(
         border-radius: 2px; /* Gives the ends a slightly polished, rounded look */
     }
 
-    /* ── Masthead — Merriweather, editorial weight ── */
-    .hub-masthead {
-        font-family: 'Merriweather', Georgia, "Times New Roman", serif;
-        font-size: 2.05rem;
-        font-weight: 900;
-        letter-spacing: -0.01em;
-        color: #000000;
+    /* ── Institutional Masthead ── */
+    .insti-masthead {
+        font-family: 'Inter', sans-serif;
+        font-size: 2.6rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: #0A1128; 
+        text-align: center;
+        text-transform: uppercase;
         margin-bottom: 0;
         line-height: 1.1;
     }
-    .hub-tagline {
+    
+    .insti-tagline {
         font-family: 'Inter', sans-serif;
-        font-size: 0.90rem; 
-        font-weight: 500; 
-        color: #444444; 
-        letter-spacing: 0.02em; 
-        margin-top: 0.22rem;
-        margin-bottom: 0.2rem;
-    }
-    .hub-substack {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.76rem;
+        font-size: 0.85rem;
         font-weight: 600;
-        color: #FF6719; !important
-        text-decoration: none;
-        letter-spacing: 0.02em;
-        margin-bottom: 0.35rem;
-        display: inline-block;
+        color: #6B7280; 
+        text-align: center;
+        letter-spacing: 0.15em; 
+        text-transform: uppercase;
+        margin-top: 0.6rem;
+        margin-bottom: 1.2rem;
     }
-    .hub-substack:hover { text-decoration: underline; }
-    .hub-rule {
-        height: 2px; /* 2px thickness */
-        width: 100%; /* Full width */
-        background-color: #003366; /* Matching your navy blue, change to #000000 for black */
-        margin-top: 0.2rem; /* Shrinks the gap above the line */
-        margin-bottom: 1.5rem; /* Space below the line before the tabs */
+    
+    .substack-center-container {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .insti-rule {
+        height: 2px;
+        width: 100%;
+        background: linear-gradient(90deg, rgba(0,51,102,0) 0%, rgba(0,51,102,1) 15%, rgba(0,51,102,1) 85%, rgba(0,51,102,0) 100%);
+        margin-top: 0.5rem;
+        margin-bottom: 2.5rem;
     }
     /* ── Substack Callout Box ── */
     .substack-box {
@@ -315,13 +315,15 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 
 st.markdown(
-    '<h1 class="hub-masthead">THE ECONOMICS HUB</h1>'
-    '<p class="hub-tagline">A visual dashboard tracking global macroeconomics and financial markets.</p>'
-    '<div class="substack-box">'
-    '<a href="https://economicshub.substack.com/" target="_blank">'
-    'Subscribe on Substack →</a>'
+    '<h1 class="insti-masthead">Global Macro & Cross-Asset Monitor</h1>'
+    '<p class="insti-tagline">Maintained by Shreyas Urgunde</p>'
+    '<div class="substack-center-container">'
+        '<div class="substack-box">'
+            '<a href="https://economicshub.substack.com/" target="_blank">'
+            'Subscribe on Substack →</a>'
+        '</div>'
     '</div>'
-    '<div class="hub-rule"></div>',
+    '<div class="insti-rule"></div>',
     unsafe_allow_html=True,
 )
 
@@ -431,7 +433,7 @@ with tab_weekly:
             
         # 3. Commodities
         commo_kws = ["commodities", "brent", "wti", "agri", "oil", "gold", "copper"]
-        commo = [c for c in charts if any(k in c.name for k in commo_kws)]
+        commo = [c for c in charts if any(k in c.name for k in commo_kws) and "btc" not in c.name]
         charts = [c for c in charts if c not in commo]
         if commo:
             _section("Commodities")

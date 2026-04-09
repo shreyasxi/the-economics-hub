@@ -114,7 +114,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "credit_spreads": {
         "dashboard": (
-            "IG & HY Credit Spreads — 2-Year Trend",
+            "IG & HY Credit Spreads",
             "ICE BofA Investment Grade OAS (right) vs. High Yield OAS (left)  ·  basis points",
         ),
         "newsletter": (
@@ -125,7 +125,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "breakeven_inflation": {
         "dashboard": (
-            "Breakeven Inflation — 5Y & 10Y (2-Year Trend)",
+            "Breakeven Inflation — 5Y & 10Y",
             "Market-implied inflation expectations vs. Fed 2% target  ·  TIPS-derived",
         ),
         "newsletter": (
@@ -136,7 +136,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "real_yields": {
         "dashboard": (
-            "Real Yields — 5Y & 10Y TIPS (2-Year Trend)",
+            "Real Yields — 5Y & 10Y TIPS",
             "Inflation-adjusted Treasury yields  ·  positive = restrictive monetary conditions",
         ),
         "newsletter": (
@@ -158,7 +158,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "spy_tlt_ratio": {
         "dashboard": (
-            "SPY/TLT Risk Appetite Ratio — 2-Year Trend",
+            "SPY/TLT Risk Appetite Ratio",
             "Equities vs. long-duration Treasuries  ·  rising = risk-on, falling = flight to safety",
         ),
         "newsletter": (
@@ -169,7 +169,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "risk_appetite_ratio": {
         "dashboard": (
-            "SPHB/SPLV — High Beta vs. Low Volatility (2-Year Trend)",
+            "SPHB/SPLV — High Beta vs. Low Volatility",
             "Equity-only risk appetite signal  ·  rising = investors chasing risk within equities",
         ),
         "newsletter": (
@@ -180,7 +180,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "market_breadth": {
         "dashboard": (
-            "Market Breadth — RSP/SPY Equal vs. Cap-Weight (2-Year Trend)",
+            "Market Breadth — RSP/SPY Equal vs. Cap-Weight",
             "Equal-weight S&P 500 vs. cap-weight  ·  falling ratio = rally narrowing to mega-caps",
         ),
         "newsletter": (
@@ -191,7 +191,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "bond_etf_returns": {
         "dashboard": (
-            "Bond ETF Total Returns — TLT, LQD, HYG (Trailing 12 Months)",
+            "Bond ETF Total Returns — Trailing 12 Months",
             "Duration, investment grade credit, and high yield indexed to 100  ·  total return",
         ),
         "newsletter": (
@@ -202,7 +202,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "gold_spx_ratio": {
         "dashboard": (
-            "Gold/SPX Safe Haven Ratio — 2-Year Trend",
+            "Gold/SPX Safe Haven Ratio",
             "Rotation between safe assets and growth  ·  rising = defensive positioning",
         ),
         "newsletter": (
@@ -246,7 +246,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "brent_wti_spread": {
         "dashboard": (
-            "Brent–WTI Crude Spread — 2-Year Trend",
+            "Brent–WTI Crude Spread",
             "International vs. US crude oil price differential  ·  $/barrel  ·  5-day smooth",
         ),
         "newsletter": (
@@ -268,7 +268,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "eth_btc_ratio": {
         "dashboard": (
-            "ETH/BTC Ratio — Altcoin Appetite Signal (2-Year Trend)",
+            "ETH/BTC Ratio — Altcoin Appetite Signal",
             "Ethereum vs. Bitcoin relative strength  ·  rising = risk-on within crypto",
         ),
         "newsletter": (
@@ -290,24 +290,13 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "btc_global_m2": {
         "dashboard": (
-            "Bitcoin vs. Global Central Bank Liquidity",
-            "BTC price (left) vs. Fed + ECB blended balance sheet in USD (right)  ·  2-year trend",
+            "Bitcoin vs. US M2 Money Supply",
+            "BTC price (log scale, left) vs. US M2 Supply (right)  ·  Trend since 2013",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Bitcoin Tracks Global Liquidity — And Liquidity Is Tightening",
-            "The Fed + ECB balance sheet contraction is the single biggest macro headwind for crypto",
-        ),
-    },
-    "stablecoin_mcap": {
-        "dashboard": (
-            "Stablecoin Market Cap — Crypto Liquidity Proxy",
-            "USDT + USDC combined market cap  ·  USD billions  ·  2-year trend",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "Stablecoin Supply Is Contracting — A Crypto Liquidity Warning",
-            "Declining USDT + USDC combined supply signals capital is leaving crypto ecosystems",
+            "Bitcoin vs. US Liquidity: The M2 Correlation",
+            "The expansion of US M2 remains a structural driver for crypto prices",
         ),
     },
     "move_index": {
@@ -333,11 +322,6 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
         ),
     },
 }
-
-# NOTE: USD/BRL and Hormuz exposure are ad-hoc narrative charts.
-# Run them independently: python custom/brazil_fx.py
-#                         python custom/hormuz_exposure.py
-
 
 def get_output_dir():
     """Create and return the output directory for this week."""
@@ -407,7 +391,7 @@ def generate_with_mock_data(output_dir, mode="dashboard"):
         trend.add_series(d["name"], d["dates"], d["values"], color_key=d["color_key"])
     trend.render(
         title="Key FX Rates — Trailing 12 Months",
-        subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, GBP/USD, USD/INR",
+        subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, USD/INR",
         source="Yahoo Finance",
         normalize=True,
         ylabel="Indexed (start = 100)",
@@ -731,13 +715,13 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     print("   [4/8] FX — 12-Month Trends")
     trend = TrendLineChart()
-    for ind_id in ["dxy", "eurusd", "gbpusd", "usdinr", "usdjpy"]:
+    for ind_id in ["dxy", "eurusd","usdinr", "usdjpy"]:
         dates, vals = get_trend(ind_id)
         if dates:
             ind = INDICATORS[ind_id]
             trend.add_series(ind["name"], dates, vals, color_key=ind["color_key"])
     trend.render(title="Key FX Rates — Trailing 12 Months",
-                 subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, GBP/USD, USD/INR, USD/JPY",
+                 subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, USD/INR, USD/JPY",
                  source="Yahoo Finance", normalize=True, ylabel="Indexed (start = 100)")
     trend.save(output_dir / "04_fx_trend.png")                                      # <--- Add this
 
@@ -1286,7 +1270,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             color_10y   = "#1D4ED8"
 
             l1, = ax1.plot(ratio_s.index.to_pydatetime(), ratio_s.values,
-                           color=color_ratio, linewidth=2.5, label="Copper/Gold Ratio")
+                           color=color_ratio, linewidth=2.5, label="C/G Ratio")
             l2, = ax2.plot(dgs10_aligned.index.to_pydatetime(), dgs10_aligned.values,
                            color=color_10y, linewidth=2.0, linestyle="--", alpha=0.8, label="10Y Yield (%)")
 
@@ -1301,7 +1285,9 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             ax1.spines['top'].set_visible(False)
             ax2.spines['top'].set_visible(False)
 
-            ax1.legend(handles=[l1, l2], loc="upper left", frameon=False, fontsize=10)
+            # Perfectly aligned with the subcaption sitting on the top axis
+            ax1.legend(handles=[l1, l2], loc="lower right", bbox_to_anchor=(1.0, 1.00), 
+                       ncol=2, frameon=False, fontsize=10)
 
             _t, _s = WEEKLY_TITLES["copper_gold_ratio"][mode]
             EconStyle.set_title(ax1, _t, _s)
@@ -1497,6 +1483,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             "BRL=X": "Brazilian Real (BRL)",
             "MXN=X": "Mexican Peso (MXN)",
             "ZAR=X": "South African Rand (ZAR)",
+            "INR=X": "Indian Rupee (INR)",
             "TRY=X": "Turkish Lira (TRY)",
             "IDR=X": "Indonesian Rupiah (IDR)",
             "KRW=X": "Korean Won (KRW)",
@@ -1806,9 +1793,11 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
             ax1.spines['top'].set_visible(False)
             ax2.spines['top'].set_visible(False)
-
+            
+            # Floating in the empty bottom-left corner with a premium white background
             handles = [l1] + ax1.lines[1:2] + [l2, l3]
-            ax1.legend(handles=handles, loc="upper left", frameon=False, fontsize=9)
+            ax1.legend(handles=handles, loc="lower left", ncol=1, 
+                       frameon=True, facecolor="white", edgecolor="none", framealpha=0.85, fontsize=9.5)
 
             _t, _s = WEEKLY_TITLES["eth_btc_ratio"][mode]
             EconStyle.set_title(ax1, _t, _s)
@@ -1867,124 +1856,84 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ BTC/Gold ratio failed: {e}")
 
-    # ── 28. BTC VS GLOBAL CENTRAL BANK BALANCE SHEETS (FED + ECB) ──
-    print("   [28] Bitcoin vs. Global Liquidity (Fed + ECB Balance Sheets)")
+    # ── 28. BTC VS US LIQUIDITY (M2 MONEY SUPPLY - SINCE 2013) ──
+    print("   [28] Bitcoin vs. US Liquidity (M2 Money Supply - Since 2013)")
     try:
         import pandas as pd
-        btc_s  = yf_fetcher.get_close_series("BTC-USD", period="2y")
-        # Fed total assets: USD millions (WALCL)
-        walcl_s = fred_fetcher.fetch_series("WALCL", period_years=2)
-        # ECB total assets: EUR millions (ECBASSETS) → convert to USD
-        ecb_s   = fred_fetcher.fetch_series("ECBASSETS", period_years=2)
-        eurusd_s = yf_fetcher.get_close_series("EURUSD=X", period="2y")
+        import matplotlib.ticker as ticker
+        
+        # Fetch max history to go back to 2013
+        btc_s  = yf_fetcher.get_close_series("BTC-USD", period="max")
+        m2_s = fred_fetcher.fetch_series("M2SL", period_years=15)
 
-        if len(btc_s) > 50 and len(walcl_s) > 10 and len(ecb_s) > 10:
-            # ECB EUR millions → USD millions using EURUSD
-            ecb_usd = ecb_s * eurusd_s.reindex(ecb_s.index, method="ffill")
-            # Combined Fed + ECB in USD billions
-            fed_usd_b = walcl_s / 1e3
-            ecb_usd_b = ecb_usd / 1e3
-            combined_bs = (fed_usd_b + ecb_usd_b.reindex(fed_usd_b.index, method="ffill")).dropna()
-            # Align BTC to balance sheet dates
-            btc_aligned = btc_s.reindex(combined_bs.index, method="ffill").dropna()
-            combined_bs = combined_bs.reindex(btc_aligned.index).dropna()
+        if len(btc_s) > 50 and len(m2_s) > 5:
+            # ── Safe Timezone Stripping ──
+            btc_s.index = pd.to_datetime(btc_s.index)
+            if btc_s.index.tz is not None:
+                btc_s.index = btc_s.index.tz_localize(None)
+                
+            m2_s.index = pd.to_datetime(m2_s.index)
+            if m2_s.index.tz is not None:
+                m2_s.index = m2_s.index.tz_localize(None)
+
+            # Filter both to start from Jan 1, 2013
+            btc_s = btc_s[btc_s.index >= "2013-01-01"]
+            m2_s = m2_s[m2_s.index >= "2013-01-01"]
+
+            m2_usd_t = (m2_s / 1e3).dropna()
+
+            # ── THE FIX: Time-based Interpolation for Smoothing ──
+            # Combine indexes so we don't lose the exact monthly M2 dates
+            combined_idx = btc_s.index.union(m2_usd_t.index).sort_values()
+
+            # Reindex M2 to the combined timeline and interpolate the gaps mathematically
+            m2_smooth = m2_usd_t.reindex(combined_idx).interpolate(method="time")
+
+            # Now filter back down to only the days Bitcoin actually traded
+            m2_aligned = m2_smooth.reindex(btc_s.index).dropna()
+            btc_aligned = btc_s.reindex(m2_aligned.index).dropna()
 
             fig, ax1 = EconStyle.create_figure(size="wide")
             ax2 = ax1.twinx()
 
             color_btc = "#F59E0B"
-            color_bs  = "#1D4ED8"
+            color_m2  = "#1D4ED8"
 
             l1, = ax1.plot(btc_aligned.index.to_pydatetime(), btc_aligned.values,
-                           color=color_btc, linewidth=2.5, label="Bitcoin (USD)")
-            l2, = ax2.plot(combined_bs.index.to_pydatetime(), combined_bs.values,
-                           color=color_bs, linewidth=2.0, linestyle="--", alpha=0.8,
-                           label="Fed + ECB Assets (USD B)")
+                           color=color_btc, linewidth=2.0, label="Bitcoin (USD)")
+            l2, = ax2.plot(m2_aligned.index.to_pydatetime(), m2_aligned.values,
+                           color=color_m2, linewidth=2.5, linestyle="--", alpha=0.8,
+                           label="US M2 Supply (Trillions)")
 
-            ax1.set_ylabel("Bitcoin Price (USD)", fontsize=EconStyle.FONT_SIZE_AXIS,
+            # ── Mandatory Log Scale for 10+ Year Bitcoin Data ──
+            ax1.set_yscale("log")
+            # Format the log axis to show standard numbers (e.g., 10,000) instead of scientific notation (10^4)
+            ax1.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: f"{y:,.0f}"))
+
+            ax1.set_ylabel("Bitcoin Price (USD, Log Scale)", fontsize=EconStyle.FONT_SIZE_AXIS,
                            fontweight="bold", color=color_btc)
-            ax2.set_ylabel("Fed + ECB Balance Sheet (USD Billions)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                           fontweight="bold", color=color_bs)
+            ax2.set_ylabel("US M2 Supply ($ Trillions)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                           fontweight="bold", color=color_m2)
 
             ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            
+            # Format X-Axis for a decade-long view
+            ax1.xaxis.set_major_locator(mdates.YearLocator())
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+            
             ax1.spines['top'].set_visible(False)
             ax2.spines['top'].set_visible(False)
+            
             ax1.legend(handles=[l1, l2], loc="upper left", frameon=False, fontsize=10)
 
             _t, _s = WEEKLY_TITLES["btc_global_m2"][mode]
             EconStyle.set_title(ax1, _t, _s)
             EconStyle.add_top_rule(ax1)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance · FRED (Fed WALCL + ECB ECBASSETS)")
+            EconStyle.add_source(fig, "Yahoo Finance · FRED (M2SL)")
             EconStyle.save_chart(fig, output_dir / "28_btc_global_m2.png")
     except Exception as e:
-        print(f"   ⚠ BTC vs Global M2 failed: {e}")
-
-    # ── 29. STABLECOIN MARKET CAP (USDT + USDC) ──
-    # print("   [29] Stablecoin Market Cap — USDT + USDC (2-Year Trend)")
-    try:
-        import json
-        import urllib.request
-
-        def _fetch_cg_mcap(coin_id, days=730):
-            url = (
-                f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-                f"?vs_currency=usd&days={days}&interval=daily"
-            )
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                data = json.loads(resp.read())
-            raw = data["market_caps"]  # [[epoch_ms, value], ...]
-            import pandas as pd
-            s = pd.Series(
-                {pd.Timestamp(ts_ms, unit="ms"): val for ts_ms, val in raw}
-            )
-            return s / 1e9  # → USD billions
-
-        usdt_s = _fetch_cg_mcap("tether",   days=730)
-        usdc_s = _fetch_cg_mcap("usd-coin", days=730)
-
-        if len(usdt_s) > 30 and len(usdc_s) > 30:
-            import pandas as pd
-            combined_sc = (usdt_s + usdc_s.reindex(usdt_s.index, method="ffill")).dropna()
-
-            fig, ax = EconStyle.create_figure(size="wide")
-            color_usdt  = "#26A17B"  # Tether green
-            color_usdc  = "#2775CA"  # Circle blue
-            color_total = "#1C1C1E"
-
-            sc_dates = combined_sc.index.to_pydatetime()
-            ax.plot(sc_dates, combined_sc.values, color=color_total, linewidth=2.5,
-                    label="USDT + USDC (Combined)")
-            ax.fill_between(sc_dates, combined_sc.values, combined_sc.min(),
-                            alpha=0.07, color=color_total)
-
-            # Show individual components as faint fills
-            usdt_al = usdt_s.reindex(combined_sc.index, method="ffill")
-            usdc_al = usdc_s.reindex(combined_sc.index, method="ffill")
-            ax.fill_between(sc_dates, usdt_al.values, combined_sc.min(),
-                            alpha=0.12, color=color_usdt, label="USDT")
-            ax.fill_between(sc_dates, combined_sc.values, usdt_al.values,
-                            alpha=0.12, color=color_usdc, label="USDC (incremental)")
-
-            ax.set_ylabel("Market Cap (USD Billions)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                          fontweight="bold", color="#1C1C1E")
-            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-            ax.legend(frameon=False, fontsize=9)
-
-            _t, _s = WEEKLY_TITLES["stablecoin_mcap"][mode]
-            EconStyle.set_title(ax, _t, _s)
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "CoinGecko (USDT · USDC)")
-            EconStyle.save_chart(fig, output_dir / "29_stablecoin_mcap.png")
-    except Exception as e:
-        print(f"   ⚠ Stablecoin market cap failed: {e}")
+        print(f"   ⚠ BTC vs US M2 Liquidity failed: {e}")
 
     # ── SUMMARY TABLE ──
     print("   [+] Summary Table")
