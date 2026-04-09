@@ -125,26 +125,35 @@ def generate(
             edgecolors="#000000", linewidths=0.6,
         )
 
-    # Rate action labels — only cuts/hikes, alternate above/below
+    # Rate action labels — only cuts/hikes, with minimum 150-day spacing
+    # to avoid label pile-up in dense rate-cycle clusters.
     hike_cut_rows = grouped[grouped["rate_action"].isin([RATE_CUT, RATE_HIKE])].reset_index()
-    for idx, row in hike_cut_rows.iterrows():
+    _MIN_LABEL_GAP_DAYS = 150
+    last_labeled_date = pd.Timestamp("2000-01-01")
+    label_idx = 0  # alternating counter for above/below, only increments when label is drawn
+    for _, row in hike_cut_rows.iterrows():
+        dt = pd.Timestamp(row["meeting_date"])
+        gap = (dt - last_labeled_date).days
+        if gap < _MIN_LABEL_GAP_DAYS:
+            continue  # too close to previous label — skip
         action = row["rate_action"]
         color = _ACTION_COLORS[action]
         label_text = _ACTION_LABELS[action]
-        y_pos = 0.22 if idx % 2 == 0 else -0.28
+        y_pos = 0.25 if label_idx % 2 == 0 else -0.32
         va = "bottom" if y_pos > 0 else "top"
         ax_time.text(
-            row["meeting_date"], y_pos, label_text,
+            dt, y_pos, label_text,
             ha="center", va=va,
-            fontsize=6, color=color, fontweight="700",
+            fontsize=6.5, color=color, fontweight="700",
             zorder=5,
         )
-        # Stem line from dot to label
         ax_time.plot(
-            [row["meeting_date"], row["meeting_date"]],
-            [0.06 if y_pos > 0 else -0.06, y_pos * 0.8],
-            color=color, lw=0.5, alpha=0.5, zorder=3,
+            [dt, dt],
+            [0.07 if y_pos > 0 else -0.07, y_pos * 0.75],
+            color=color, lw=0.6, alpha=0.55, zorder=3,
         )
+        last_labeled_date = dt
+        label_idx += 1
 
     # ── Axes formatting ────────────────────────────────────────────────────────
     x_min = grouped["meeting_date"].min() - pd.Timedelta(days=60)
@@ -171,8 +180,9 @@ def generate(
         mpatches.Patch(color=_ACTION_COLORS[RATE_HOLD], label="Hold"),
     ]
     ax_time.legend(
-        handles=legend_handles, loc="upper left",
-        fontsize=7.5, frameon=False,
+        handles=legend_handles, loc="upper right",
+        fontsize=7.5, frameon=False, ncol=3,
+        bbox_to_anchor=(0.99, 0.98),
     )
 
     # ── Title & branding ───────────────────────────────────────────────────────

@@ -168,30 +168,124 @@ st.markdown(
 
     /* ── App & Sidebar Background Color ── */
     .stApp, [data-testid="stHeader"] {
-        background-color: #FFFFF0; 
+        background-color: #FFFFF0;
     }
-    
+
+    /* ── Institutional dark sidebar ── */
     [data-testid="stSidebar"] {
-        background-color: #E2E8F0;
+        background-color: #0D1B2E;
     }
-    .sidebar-masthead {
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        padding-top: 0.5rem;
+    }
+    /* Force all default Streamlit text inside sidebar to white */
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] .stMarkdown {
+        color: #C8D3E0 !important;
+    }
+    /* Sidebar logo container */
+    .sb-logo-wrap {
+        text-align: center;
+        padding: 1.0rem 0 0.4rem 0;
+    }
+    /* Publication title block */
+    .sb-pub-name {
         font-family: 'Merriweather', Georgia, serif;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 700;
-        color: #000000;
+        color: #FFFFFF;
+        text-align: center;
+        letter-spacing: 0.02em;
+        margin: 0;
+        line-height: 1.3;
     }
-    .sidebar-byline {
+    .sb-pub-tagline {
         font-family: 'Inter', sans-serif;
-        font-size: 0.73rem;
-        font-weight: 400;
-        color: #888888;
-        margin-top: 0.1rem;
+        font-size: 0.63rem;
+        font-weight: 500;
+        color: #7A9BB5;
+        text-align: center;
+        letter-spacing: 0.10em;
+        text-transform: uppercase;
+        margin: 0.15rem 0 0 0;
     }
+    /* Thin rule in sidebar */
+    .sb-rule {
+        border: none;
+        border-top: 1px solid #1E3352;
+        margin: 0.65rem 0;
+    }
+    /* Section label (e.g. "About", "Data Sources") */
+    .sb-section-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.60rem;
+        font-weight: 700;
+        color: #4A7FA5;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin: 0.55rem 0 0.25rem 0;
+    }
+    /* Body text inside sidebar */
+    .sb-body {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.71rem;
+        font-weight: 400;
+        color: #B0BEC5;
+        line-height: 1.5;
+        margin: 0;
+    }
+    /* Links */
+    .sb-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.71rem;
+        font-weight: 500;
+        color: #7EB6D9;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    .sb-link:hover { color: #FFFFFF; text-decoration: none; }
+    /* Pipeline admin label */
+    .sb-admin-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.60rem;
+        font-weight: 700;
+        letter-spacing: 0.10em;
+        text-transform: uppercase;
+        color: #E8A030;
+        margin-bottom: 0.15rem;
+    }
+    /* Pipeline run buttons */
+    [data-testid="stSidebar"] .stButton > button {
+        background-color: #1E3352;
+        color: #C8D3E0;
+        border: 1px solid #2A4A70;
+        border-radius: 3px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+    }
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background-color: #2A4A70;
+        color: #FFFFFF;
+        border-color: #4A7FA5;
+    }
+    /* Sidebar expander header color */
+    [data-testid="stSidebar"] .streamlit-expanderHeader {
+        background-color: transparent;
+        color: #C8D3E0 !important;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    /* Legacy sidebar link class — keep for backward compat */
     .sidebar-link {
         font-family: 'Inter', sans-serif;
         font-size: 0.73rem;
         font-weight: 500;
-        color: #003366;
+        color: #7EB6D9;
         text-decoration: none;
     }
     .sidebar-link:hover { text-decoration: underline; }
@@ -237,51 +331,66 @@ st.markdown(
 # ---------------------------------------------------------------------------
 
 with st.sidebar:
+    # ── Logo ────────────────────────────────────────────────────────────────────
+    logo_path = PROJECT_ROOT / "charts" / "Econhub_logo.jpg"
+    if logo_path.exists():
+        st.markdown('<div class="sb-logo-wrap">', unsafe_allow_html=True)
+        st.image(str(logo_path), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # ── Publication name ────────────────────────────────────────────────────────
     st.markdown(
-        '<p class="sidebar-masthead">The Economics Hub</p>'
-        '<p class="sidebar-byline">Shreyas Urgunde</p>',
+        '<p class="sb-pub-name">The Economics Hub</p>'
+        '<p class="sb-pub-tagline">Global Macro &amp; Cross-Asset</p>',
         unsafe_allow_html=True,
     )
-    st.markdown("---")
 
-    with st.expander("About", expanded=False):
-        st.markdown(
-            """
-            **Author**
-            Shreyas Urgunde
+    # ── Divider ─────────────────────────────────────────────────────────────────
+    st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
 
-            **Links**
-            """
-        )
-        st.markdown(
-            '<a class="sidebar-link" href="https://shreyasxi.github.io/" target="_blank">🌐 shreyasxi.github.io</a><br>'
-            '<a class="sidebar-link" href="https://economicshub.substack.com/" target="_blank">📬 The Economics Hub — Substack</a>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            """
-            ---
-            **Data sources**
-            - Market data: Yahoo Finance
-            - Macro series: FRED (St. Louis Fed)
-            - International: DBnomics · IMF · OECD
-            - India: RBI · MoSPI · NSDL · CAG
+    # ── About ───────────────────────────────────────────────────────────────────
+    st.markdown('<p class="sb-section-label">About</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="sb-body">Independent macro research by <strong style="color:#FFFFFF;">Shreyas Urgunde</strong>. '
+        'Charts published weekly — covering equities, rates, FX, commodities, and India.</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<a class="sb-link" href="https://economicshub.substack.com/" target="_blank">'
+        '&#x2709; Substack Newsletter</a>'
+        '<a class="sb-link" href="https://shreyasxi.github.io/" target="_blank">'
+        '&#x1F310; shreyasxi.github.io</a>',
+        unsafe_allow_html=True,
+    )
 
-            **License**
-            CC BY-NC 4.0
-            """
-        )
+    # ── Data sources ────────────────────────────────────────────────────────────
+    st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
+    st.markdown('<p class="sb-section-label">Data Sources</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="sb-body">'
+        'Markets: Yahoo Finance<br>'
+        'Macro: FRED · St. Louis Fed<br>'
+        'International: IMF · OECD · DBnomics<br>'
+        'India: RBI · MoSPI · NSDL · CAG<br>'
+        'RBI text: Anthropic Claude (LLM scoring)'
+        '</p>',
+        unsafe_allow_html=True,
+    )
 
-    # Pipeline control — only visible when PIPELINE_KEY secret is set
+    # ── License ─────────────────────────────────────────────────────────────────
+    st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="sb-body" style="color:#4A6680;">Licensed under CC BY-NC 4.0 &nbsp;·&nbsp; '
+        'Not investment advice</p>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Pipeline control — only visible when PIPELINE_KEY secret is set ─────────
     if is_pipeline_admin():
-        st.markdown("---")
-        st.markdown(
-            '<p style="font-family:\'Inter\',sans-serif;font-size:0.72rem;'
-            'font-weight:700;letter-spacing:0.09em;text-transform:uppercase;'
-            'color:#003366;margin-bottom:0.2rem;">Pipeline Control</p>',
-            unsafe_allow_html=True,
-        )
-        st.caption("Publisher access only.")
+        st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
+        st.markdown('<p class="sb-admin-label">Pipeline Control</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sb-body" style="color:#7A9BB5;margin-bottom:0.4rem;">Publisher access only.</p>',
+                    unsafe_allow_html=True)
 
         with st.expander("Run Generators", expanded=False):
             _GENERATORS = {
