@@ -233,6 +233,17 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "India's equity outperformance vs. China and Korea widening on a weekly basis",
         ),
     },
+    "em_stress_monitor": {
+        "dashboard": (
+            "Emerging Markets Stress Monitor",
+            "EM High Yield & Corporate Spreads vs. USD Strength",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Dollar Strength Tests Emerging Markets",
+            "EM credit spreads react to the soaring Trade-Weighted Dollar",
+        ),
+    },
     "india_vs_em": {
         "dashboard": (
             "India vs. EM Peers — Trailing 12 Months",
@@ -1623,6 +1634,109 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             plt.close(fig)
     except Exception as e:
         print(f"   ⚠ India vs EM peers failed: {e}")
+        
+    # ── 22b. EM STRESS MONITOR ──
+    print("   [22b] Emerging Markets Stress Monitor")
+    try:
+        import pandas as pd
+        
+        # Fetch the exact series from your macro_settings.py
+        em_hy_s = fred_fetcher.fetch_series("BAMLEMHBHYCRPIOAS", period_years=3)
+        em_corp_s = fred_fetcher.fetch_series("BAMLEMCBPIOAS", period_years=3)
+        usd_em_s = fred_fetcher.fetch_series("DTWEXEMEGS", period_years=3)
+
+        if len(em_hy_s) > 10 and len(usd_em_s) > 10:
+            # Strip timezones safely
+            for s in [em_hy_s, em_corp_s, usd_em_s]:
+                s.index = pd.to_datetime(s.index)
+                if s.index.tz is not None:
+                    s.index = s.index.tz_localize(None)
+
+            # Multiply spreads by 100 to convert to basis points (bps)
+            em_hy_bps = (em_hy_s * 100).dropna()
+            em_corp_bps = (em_corp_s * 100).dropna()
+            usd_em = usd_em_s.dropna()
+
+            fig, ax1 = EconStyle.create_figure(size="wide")
+            ax2 = ax1.twinx()
+
+            # Institutional Colors mapped directly from macro_settings.py
+            color_hy = "#FF9933"   # Saffron/EM
+            color_corp = "#CC0066" # Magenta
+            color_usd = "#003366"  # Navy
+
+            # Plot Spreads (Left Axis)
+            l1, = ax1.plot(em_hy_bps.index.to_pydatetime(), em_hy_bps.values,
+                           color=color_hy, linewidth=2.5, solid_capstyle="round", label="EM HY Credit Spread")
+            l2, = ax1.plot(em_corp_bps.index.to_pydatetime(), em_corp_bps.values,
+                           color=color_corp, linewidth=2.5, solid_capstyle="round", label="EM Corporate Spread")
+            
+            # Plot USD Index (Right Axis)
+            l3, = ax2.plot(usd_em.index.to_pydatetime(), usd_em.values,
+                           color=color_usd, linewidth=2.0, linestyle="--", alpha=0.8, solid_capstyle="round",
+                           label="USD Index (vs EM)")
+
+            ax1.set_ylabel("Credit Spread (bps)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                           fontweight="bold", color="#1C1C1E")
+            ax2.set_ylabel("USD Index (vs EM)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                           fontweight="bold", color=color_usd)
+
+            ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            
+            ax1.spines['top'].set_visible(False)
+            ax2.spines['top'].set_visible(False)
+            
+            # ── DYNAMIC END-OF-LINE LABELS WITH CROSS-AXIS COLLISION AVOIDANCE ──
+            last_date = em_hy_bps.index[-1].to_pydatetime()
+            val_hy = em_hy_bps.values[-1]
+            val_corp = em_corp_bps.values[-1]
+            val_usd = usd_em.values[-1]
+
+            # 1. Convert actual values to a 0-to-1 physical scale to detect cross-axis collisions
+            y1_min, y1_max = ax1.get_ylim()
+            y2_min, y2_max = ax2.get_ylim()
+            
+            norm_hy = (val_hy - y1_min) / (y1_max - y1_min)
+            norm_corp = (val_corp - y1_min) / (y1_max - y1_min)
+            norm_usd = (val_usd - y2_min) / (y2_max - y2_min)
+
+            offset_hy, offset_corp, offset_usd = 0, 0, 0
+            
+            # 2. The Repeller: If HY and USD lines are occupying the same physical space
+            if abs(norm_hy - norm_usd) < 0.05:
+                if norm_hy >= norm_usd:
+                    offset_hy, offset_usd = 10, -10
+                else:
+                    offset_hy, offset_usd = -10, 10
+
+            # 3. Draw the Labels using the computed offsets
+            ax1.annotate("EM HY Spread", xy=(last_date, val_hy), xytext=(8, offset_hy), 
+                         textcoords="offset points", va="center", ha="left", 
+                         fontsize=10, fontweight="bold", color=color_hy)
+                         
+            ax1.annotate("EM Corp Spread", xy=(last_date, val_corp), xytext=(8, offset_corp), 
+                         textcoords="offset points", va="center", ha="left", 
+                         fontsize=10, fontweight="bold", color=color_corp)
+
+            ax2.annotate("USD Index", xy=(last_date, val_usd), xytext=(8, offset_usd), 
+                         textcoords="offset points", va="center", ha="left", 
+                         fontsize=10, fontweight="bold", color=color_usd)
+
+            # Expand right side for text breathing room
+            ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.18)
+
+            _t, _s = WEEKLY_TITLES["em_stress_monitor"][mode]
+            EconStyle.set_title(ax1, _t, _s)
+            EconStyle.add_top_rule(ax1)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "FRED (ICE BofA, Federal Reserve)")
+            
+            # Save chart
+            EconStyle.save_chart(fig, output_dir / "22b_em_stress_monitor.png")
+    except Exception as e:
+        print(f"   ⚠ EM Stress Monitor failed: {e}")
 
     # ── 23. BRENT–WTI SPREAD ──
     print("   [23] Brent–WTI Spread (2-Year Trend)")

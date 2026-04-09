@@ -203,6 +203,12 @@ CHART_INSIGHTS: dict[str, str] = {
 **Practical takeaway:** India's outperformance vs. EEM on this chart is structurally driven by four factors: higher domestic GDP growth, lower export dependence on China's demand cycle, a resilient domestic consumption base, and ongoing foreign institutional investor (FII) inflows following the MSCI weight increase. However, INDA underperforming EEM in any given month is not necessarily bearish for India — it can simply reflect China (which has a ~30% EEM weight) bouncing. Always decompose EEM's performance by checking MCHI separately. When INDA, EEM, MCHI, and EWY all decline simultaneously for 8+ weeks, it is a dollar-squeeze event rather than any country-specific story.
 """,
 
+"em_stress_monitor": """\
+**How to read this chart:** Emerging market stress indicators — specifically combining EM High Yield sovereign credit spreads, EM Corporate spreads, and the Trade-Weighted US Dollar — provide a consolidated view of how international investors are pricing risk across the developing world. EM stress is heavily driven by external conditions (USD strength and US real yield levels) colliding with domestic vulnerabilities.
+
+**Practical takeaway:** The most important principle in EM macro: external conditions (USD, US yields) are the *tide*, and domestic policies are the *swimming ability*. When the tide goes out (USD strengthens), all EM credit spreads face widening pressure. However, countries with sound fiscal positions and high FX reserves weather the storm far better than those with external financing needs. EM stress periods also create opportunities — historically, EM credit widening during a USD tightening cycle followed by a Fed pivot has been one of the most reliable mean-reversion trades in institutional macro.
+""",
+
     # ── WEEKLY: ENERGY & AGRICULTURE ────────────────────────────────────────
 
     "brent_wti_spread": """\
@@ -243,12 +249,6 @@ CHART_INSIGHTS: dict[str, str] = {
 **How to read this chart:** Financial conditions indices aggregate the information in credit spreads, equity prices, currency moves, and funding rates into a single number. Tighter financial conditions (rising index) mean credit is becoming more expensive and less available across the economy — a direct transmission mechanism of Fed policy. This chart typically shows components like the Chicago Fed NFCI or the Bloomberg Financial Conditions Index.
 
 **Practical takeaway:** Financial conditions often tighten *before* the Fed raises rates (as markets pre-price hikes) and ease *before* the Fed cuts (as markets pre-price easing). The key asymmetry: conditions can tighten very rapidly (weeks) but ease slowly (months), particularly after credit events. For equity investors, a financial conditions tightening of more than 1 standard deviation from the 1-year mean has historically preceded equity drawdowns of 10–20% with a lag of 2–4 months. When financial conditions are easing but the Fed is still hiking, it signals the market is betting against the Fed — a high-conviction positioning that is periodically correct and periodically very wrong.
-""",
-
-    "macro_em": """\
-**How to read this chart:** Emerging market stress indicators — typically combining EM FX volatility, EM sovereign credit spreads, and capital flow proxies — provide a consolidated view of how international investors are positioning across the developing world. EM stress is heavily driven by three external factors: US dollar strength, US real yield levels, and commodity price cycles; and one internal factor: domestic political/policy credibility.
-
-**Practical takeaway:** The most important principle in EM macro: external conditions (USD, US yields) are the *tide*, and domestic policies are the *swimming ability*. When the tide goes out (USD strengthens, US real yields rise), all EM currencies face pressure, but those with sound fiscal positions, high FX reserves, and credible central banks (India, Indonesia) weather the storm far better than those with external financing needs and policy uncertainty (Turkey, Argentina, Pakistan). EM stress periods also create opportunities — historically, EM equity underperformance during a USD tightening cycle followed by a Fed pivot has been one of the most reliable mean-reversion trades in institutional macro.
 """,
 
     "macro_em_vulnerability": """\

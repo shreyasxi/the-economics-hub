@@ -550,62 +550,6 @@ def chart_emerging_markets(engine, output_dir, mode="dashboard"):
     filepath = output_dir / "04_macro_em.png"
     EconStyle.save_chart(fig, filepath)
     print(f"   ✓ Emerging Markets Stress Monitor")
-    
-import matplotlib.pyplot as plt
-
-# 1. Chart Data
-regions = [
-    'Latin America', 
-    'Sub-Saharan Africa', 
-    'Oceania', 
-    'North America', 
-    'Europe', 
-    'Asia', 
-    'Middle East & North Africa'
-]
-# Using 0.5 for <1% so it renders a tiny bar
-percentages = [0.5, 1, 3, 3, 17, 37, 39] 
-display_labels = ['<1%', '1%', '3%', '3%', '17%', '37%', '39%']
-
-# 2. Canvas Setup (The Economics Hub standard)
-fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
-fig.patch.set_facecolor('#ffffff')
-ax.set_facecolor('#ffffff')
-
-# 3. Color Palette: Hub Red for MENA, muted greys for the rest
-colors = ['#e0e0e0', '#cccccc', '#b3b3b3', '#999999', '#666666', '#333333', '#d62728']
-
-# 4. Render Horizontal Bars
-bars = ax.barh(regions, percentages, color=colors, height=0.65)
-
-# 5. Clean Aesthetics (Remove all spines and axis ticks)
-for spine in ax.spines.values():
-    spine.set_visible(False)
-ax.xaxis.set_ticks([]) 
-ax.tick_params(axis='y', length=0, labelsize=12, colors='#333333') 
-
-# 6. Direct Data Labels (Bolding the MENA data point)
-for bar, label in zip(bars, display_labels):
-    width = bar.get_width()
-    font_weight = 'bold' if label == '39%' else 'normal'
-    color = '#d62728' if label == '39%' else '#333333'
-    
-    ax.text(width + 0.5, bar.get_y() + bar.get_height()/2, 
-            label, 
-            va='center', ha='left', fontsize=12, fontweight=font_weight, color=color)
-
-# 7. Typography: Title & Subtitle
-plt.text(-0.5, 7.4, "MENA's Absolute Dominance in Sovereign Wealth Funds", fontsize=18, fontweight='bold', color='#111111')
-plt.text(-0.5, 6.9, "Proportion of global sovereign wealth fund assets by region (Total: $15.2 Trillion)", fontsize=12, color='#555555')
-
-# 8. Footer / Source
-plt.text(-0.5, -1.5, "Source: Global SWF (Dec 2025) | The Economics Hub", fontsize=10, color='#888888')
-
-plt.tight_layout()
-
-# Save output for the uploader
-plt.savefig('TEH_SWF_Dominance.png', bbox_inches='tight', dpi=300)
-plt.close()
 
 
 def chart_macro_table(engine, output_dir):
@@ -805,142 +749,6 @@ def chart_macro_em_vulnerability(output_dir):
     fig.tight_layout(rect=[0.01, 0.06, 0.99, 0.91])
     EconStyle.save_chart(fig, output_dir / "08_macro_em_vulnerability.png")
     print(f"   ✓ EM Vulnerability Scorecard")
-
-
-def chart_agflation_pipeline(output_dir, mode="dashboard"):
-    """Deep Dive Chart: Energy to Food Pipeline (Smoothed, Base-100)."""
-    EconStyle.apply_global_style()
-    
-    # 1. Load Manual Urea Data
-    urea_path = PROJECT_ROOT / "data" / "urea_middle_east.csv"
-    if not urea_path.exists():
-        print("   ⚠ Missing Urea CSV. Please place urea_middle_east.csv in the data folder.")
-        return
-
-    # Parse Investing.com CSV (using our bulletproof date fix)
-    urea_df = pd.read_csv(urea_path)
-    urea_df['Date'] = pd.to_datetime(urea_df['Date'], dayfirst=True, format='mixed')
-    urea_df = urea_df.sort_values('Date').set_index('Date')
-    
-    if urea_df['Price'].dtype == object:
-        urea_df['Price'] = urea_df['Price'].str.replace(',', '').astype(float)
-
-    # 2. Force start date to January 1, 2026 to show the pure "Hockey Stick"
-    start_date = pd.to_datetime("2026-01-01")
-    urea_df = urea_df[urea_df.index >= start_date]
-    
-    if urea_df.empty:
-        print("   ⚠ Urea data doesn't contain 2026 dates. Please download a longer timeframe.")
-        return
-        
-    end_date = urea_df.index[-1]
-
-    # 3. Fetch Yahoo Finance Data
-    tickers = {"Natural Gas (TTF)": "TTE=F", "Wheat Futures": "ZW=F"}
-    yf_data = yf.download(list(tickers.values()), start=start_date, end=end_date + pd.Timedelta(days=1), progress=False)
-    
-    if yf_data.empty:
-        print("   ⚠ Yahoo Finance data fetch failed.")
-        return
-        
-    prices = yf_data['Close']
-    
-    # 4. Merge, Forward-Fill, and SMOOTH the data
-    merged = pd.DataFrame(index=pd.date_range(start=start_date, end=end_date, freq='B'))
-    merged["Urea Futures"] = urea_df["Price"]
-    
-    for name, ticker in tickers.items():
-        if ticker in prices.columns:
-            merged[name] = prices[ticker]
-            
-    # Forward-fill gaps (weekends/holidays), then backward fill the very first day if needed
-    merged = merged.ffill().bfill()
-    
-    # Apply a 5-day Exponential Moving Average to kill the "staircase" look
-    smoothed = merged.ewm(span=5, adjust=False).mean()
-    
-    # Normalize to 100 based on Jan 1st levels
-    normalized = (smoothed / smoothed.iloc[0]) * 100
-
-    # 5. Draw the Chart
-    fig, ax = EconStyle.create_figure(size=(11, 6.5))
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    colors = {
-        "Natural Gas (TTF)": "#BE185D",  # Energy Pink
-        "Urea Futures": "#D97706", # Chemical Orange
-        "Wheat Futures": "#003366"       # Agricultural Navy
-    }
-    
-    dates = normalized.index.to_pydatetime()
-    
-    # Draw the main lines much thicker (3.8) for premium visibility
-    for col in normalized.columns:
-        vals = normalized[col].values
-        ax.plot(dates, vals, label=col, color=colors[col], linewidth=3.8, solid_capstyle="round", zorder=3)
-        
-        # End Labels
-        last_val = vals[-1]
-        pct_change = last_val - 100
-        sign = "+" if pct_change > 0 else ""
-        ax.annotate(
-            f"{col} ({sign}{pct_change:.1f}%)", xy=(dates[-1], last_val),
-            xytext=(6, 0), textcoords="offset points",
-            fontproperties=EconStyle._get_font("bold"),
-            fontsize=10, color=colors[col], va="center", ha="left",
-            path_effects=[pe.withStroke(linewidth=3, foreground=EconStyle.BACKGROUND)]
-        )
-
-    # NEW: Refined Vertical Event Marker
-    event_date = pd.to_datetime("2026-02-27")
-    if event_date >= dates[0] and event_date <= dates[-1]:
-        # Thinner, dark red line that doesn't dominate the chart
-        ax.axvline(x=event_date, color="#120000", linewidth=1.4, linestyle="--", alpha=0.6, zorder=2)
-        
-        y_max = normalized.max().max()
-        
-        # Shifted label to the left of the event line to preserve readability of the spike
-        ax.text(event_date - pd.Timedelta(days=1), y_max * 0.98, "US-Israel Strike\non Iran", 
-                fontsize=9.5, fontweight="bold", color="#CC0000", alpha=0.8, va="top", ha="right",
-                fontfamily=EconStyle.FONT_FAMILY,
-                bbox=dict(facecolor='white', edgecolor='none', alpha=0.7, pad=1))
-
-    # Styling
-    ax.axhline(100, color="#A0A0A0", linewidth=1.2, linestyle="--", zorder=2)
-    
-    # (Removed the redundant "Base = 100" text box here as requested)
-
-    ax.set_ylabel("Indexed Price (Base = 100)", fontsize=10, color=EconStyle.TEXT_SECONDARY, labelpad=8)
-    ax.grid(axis="y", visible=True, color=EconStyle.GRID_COLOR, linewidth=0.5, zorder=0)
-    ax.grid(axis="x", visible=False)
-    
-    # Format X-axis for short timeframe
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator(minticks=5, maxticks=10))
-    plt.setp(ax.get_xticklabels(), fontsize=10)
-
-    for spine in ["top", "right", "left"]: 
-        ax.spines[spine].set_visible(False)
-    ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
-
-    # NEW: Tighten up the blank space on the right (leaves exactly 5 days of room for labels)
-    ax.set_xlim(dates[0], dates[-1] + pd.Timedelta(days=5))
-
-    # Elite Narrative Titles
-    _t, _s = MACRO_TITLES["agflation"][mode]
-    EconStyle.set_title(ax, _t, _s)
-    EconStyle.add_top_rule(ax)
-    
-    # Source Line
-    EconStyle.add_source(fig, "Investing.com, Yahoo Finance. Note: Urea data is for Middle East region, not global")
-    
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "11_agflation_pipeline.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Agflation Pipeline Chart (Smoothed & Refined)")
-    return filepath
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -1378,7 +1186,6 @@ def generate_macro_dashboard(mode="dashboard"):
     chart_inflation(engine, output_dir, mode=mode)
     chart_labour(engine, output_dir, mode=mode)
     chart_financial_conditions(engine, output_dir, mode=mode)
-    chart_emerging_markets(engine, output_dir, mode=mode)
 
     # ── Extended macro charts ──
     chart_money_rates(engine, output_dir, mode=mode)
@@ -1386,13 +1193,6 @@ def generate_macro_dashboard(mode="dashboard"):
     chart_fed_balance_sheet(engine, output_dir, mode=mode)
     chart_housing(engine, output_dir, mode=mode)
     chart_consumer_sentiment(engine, output_dir, mode=mode)
-
-    # ── Narrative / deep-dive charts (optional, data-dependent) ──
-    chart_agflation_pipeline(output_dir, mode=mode)
-
-    # NOTE: BDTI screenshot and Hormuz exposure are ad-hoc narrative charts.
-    # Run them independently via: python custom/bdti_branded.py
-    #                              python custom/hormuz_exposure.py
 
     print(f"\n✅ Macro Pulse complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")

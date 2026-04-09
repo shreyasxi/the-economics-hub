@@ -472,7 +472,7 @@ with tab_weekly:
 
 
         # 8. Emerging Markets
-        em_kws = ["em_fx", "em_equity", "india_vs_em", "nifty"]
+        em_kws = ["em_fx", "em_equity", "india_vs_em", "nifty", "stress_monitor"]
         em = [c for c in charts if any(k in c.name for k in em_kws)]
         charts = [c for c in charts if c not in em]
         if em:
