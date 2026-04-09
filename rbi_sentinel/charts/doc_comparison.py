@@ -2,7 +2,7 @@
 rbi_sentinel/charts/doc_comparison.py
 
 Chart 03: Resolution vs. Minutes Comparison
-Side-by-side grouped bars for the last N meetings.
+Side-by-side grouped bars — one pair per MPC cycle (deduped by YYYY-MM).
 Annotates the divergence (Minutes Premium) above each pair.
 """
 
@@ -11,6 +11,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
 import numpy as np
 import pandas as pd
 
@@ -20,7 +21,35 @@ from style.economics_hub_style import EconStyle
 log = logging.getLogger("rbi_sentinel.charts.doc_comparison")
 
 _RESOLUTION_COLOR = EconStyle.get_color("us") if hasattr(EconStyle, "get_color") else "#003366"
-_MINUTES_COLOR = EconStyle.get_color("india") if hasattr(EconStyle, "get_color") else "#FF9933"
+_MINUTES_COLOR    = EconStyle.get_color("india") if hasattr(EconStyle, "get_color") else "#FF9933"
+
+
+def _merge_by_cycle(composites: list[dict], n_meetings: int) -> pd.DataFrame:
+    """
+    The composites table has one row per *document publication date*, not per
+    MPC cycle. This function groups by YYYY-MM, merges resolution_score and
+    minutes_score from their respective rows, and returns one row per cycle.
+    """
+    df = pd.DataFrame(composites)
+    if df.empty:
+        return df
+
+    df["meeting_date"] = pd.to_datetime(df["meeting_date"])
+    df = df.sort_values("meeting_date")
+    df["ym"] = df["meeting_date"].dt.to_period("M")
+
+    merged = (
+        df.groupby("ym", sort=True)
+        .agg(
+            meeting_date=("meeting_date", "min"),
+            resolution_score=("resolution_score", lambda s: next((v for v in s if pd.notna(v)), None)),
+            minutes_score=("minutes_score",    lambda s: next((v for v in s if pd.notna(v)), None)),
+        )
+        .reset_index(drop=True)
+    )
+
+    # Return the last n_meetings cycles
+    return merged.tail(n_meetings).reset_index(drop=True)
 
 
 def generate(
@@ -31,10 +60,10 @@ def generate(
 ) -> None:
     """
     Args:
-        composites: List of dicts from get_recent_composites(n) — oldest first
+        composites: List from get_recent_composites(n) or get_all_composites()
         output_path: Full path for output PNG
         mode: "dashboard" | "newsletter"
-        n_meetings: Number of meetings to display
+        n_meetings: Number of MPC cycles to display
     """
     if not composites:
         log.warning("No composites for resolution vs minutes comparison chart")
@@ -42,16 +71,15 @@ def generate(
 
     EconStyle.apply_global_style()
 
-    df = pd.DataFrame(composites).tail(n_meetings).reset_index(drop=True)
+    # Merge to one row per MPC cycle
+    df = _merge_by_cycle(composites, n_meetings)
 
-    # Format x-axis labels: "Oct\n2024"
-    labels = []
-    for date_str in df["meeting_date"]:
-        try:
-            dt = pd.to_datetime(date_str)
-            labels.append(dt.strftime("%b\n%Y"))
-        except Exception:
-            labels.append(str(date_str)[:7])
+    if df.empty:
+        log.warning("No merged cycles for doc comparison chart")
+        return
+
+    # Format x-axis labels
+    labels = [pd.to_datetime(d).strftime("%b\n%Y") for d in df["meeting_date"]]
 
     x = np.arange(len(df))
     bar_width = 0.35
@@ -61,39 +89,43 @@ def generate(
     ax.set_facecolor(EconStyle.BACKGROUND)
 
     # ── Bars ──────────────────────────────────────────────────────────────────
-    res_scores = df["resolution_score"].fillna(0).values
-    min_scores = df["minutes_score"].fillna(0).values
+    res_scores = pd.to_numeric(df["resolution_score"], errors="coerce").fillna(0).values
+    min_scores = pd.to_numeric(df["minutes_score"],    errors="coerce").fillna(0).values
+
+    # Track which cycles actually have each doc type
+    has_res = pd.to_numeric(df["resolution_score"], errors="coerce").notna().values
+    has_min = pd.to_numeric(df["minutes_score"],    errors="coerce").notna().values
 
     bars_res = ax.bar(
         x - bar_width / 2, res_scores,
         width=bar_width,
-        color=[_score_color(s) for s in res_scores],
+        color=[_score_color(s) if has_res[i] else "#E0E0E0" for i, s in enumerate(res_scores)],
         alpha=0.90, label="Resolution",
         zorder=3,
     )
     bars_min = ax.bar(
         x + bar_width / 2, min_scores,
         width=bar_width,
-        color=[_score_color(s) for s in min_scores],
+        color=[_score_color(s) if has_min[i] else "#E0E0E0" for i, s in enumerate(min_scores)],
         alpha=0.72, label="Minutes",
         zorder=3,
         edgecolor="#404040", linewidth=0.5,
     )
 
-    # ── Divergence annotation ─────────────────────────────────────────────────
-    for i, (rs, ms) in enumerate(zip(res_scores, min_scores)):
-        if df["resolution_score"].iloc[i] is not None and df["minutes_score"].iloc[i] is not None:
-            divergence = ms - rs  # Positive = Minutes more hawkish than Resolution
-            y_top = max(abs(rs), abs(ms)) + 0.05
-            y_pos = y_top if y_top > 0 else -y_top - 0.12
-            sign = "+" if divergence >= 0 else ""
-            ax.text(
-                i, y_pos,
-                f"d{sign}{divergence:.2f}",
-                ha="center", va="bottom",
-                fontsize=7, color="#404040",
-                zorder=5,
-            )
+    # ── Divergence annotation ──────────────────────────────────────────────────
+    for i, (rs, ms, hr, hm) in enumerate(zip(res_scores, min_scores, has_res, has_min)):
+        if not (hr and hm):
+            continue  # Only annotate when both scores are present
+        divergence = ms - rs
+        y_top = max(abs(rs), abs(ms)) + 0.07
+        sign = "+" if divergence >= 0 else ""
+        ax.text(
+            i, y_top,
+            f"d{sign}{divergence:.2f}",
+            ha="center", va="bottom",
+            fontsize=7, color="#404040",
+            zorder=5,
+        )
 
     # ── Zero line ─────────────────────────────────────────────────────────────
     ax.axhline(0, color="#000000", lw=0.8, ls="-", alpha=0.6, zorder=2)
@@ -101,7 +133,7 @@ def generate(
     # ── Axes ──────────────────────────────────────────────────────────────────
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=8)
-    ax.set_ylim(-1.15, 1.15)
+    ax.set_ylim(-1.15, 1.35)
     ax.yaxis.set_major_locator(mticker.MultipleLocator(0.25))
     ax.tick_params(axis="y", labelsize=8)
     ax.set_ylabel("Sentiment Score", fontsize=8, color="#404040")
@@ -115,21 +147,17 @@ def generate(
     ax.spines["bottom"].set_visible(True)
     ax.spines["bottom"].set_color("#000000")
 
-    # ── Hawkish / Dovish zone labels ──────────────────────────────────────────
-    ax.text(
-        -0.5, 0.90, "HAWKISH",
-        fontsize=7, color="#CC000055", fontweight="700", va="center"
-    )
-    ax.text(
-        -0.5, -0.90, "DOVISH",
-        fontsize=7, color="#00336655", fontweight="700", va="center"
-    )
+    # ── Zone labels ───────────────────────────────────────────────────────────
+    ax.text(-0.5, 0.90, "HAWKISH",
+            fontsize=7, color="#CC000055", fontweight="700", va="center")
+    ax.text(-0.5, -0.90, "DOVISH",
+            fontsize=7, color="#00336655", fontweight="700", va="center")
 
     # ── Legend ────────────────────────────────────────────────────────────────
-    import matplotlib.patches as mpatches
     legend_handles = [
-        mpatches.Patch(color="#808080", alpha=0.90, label="Resolution (solid fill)"),
-        mpatches.Patch(color="#808080", alpha=0.72, label="Minutes (hatched edge)"),
+        mpatches.Patch(color="#4472C4", alpha=0.90, label="Resolution"),
+        mpatches.Patch(color="#4472C4", alpha=0.72, label="Minutes", linewidth=0.5,
+                       edgecolor="#404040"),
     ]
     ax.legend(handles=legend_handles, loc="upper right", fontsize=7.5, frameon=False)
 
@@ -138,13 +166,13 @@ def generate(
         title = "What the Minutes Reveal"
         subtitle = (
             "Resolution vs. MPC Minutes sentiment · "
-            "d = Minutes Premium (positive = Minutes more hawkish)"
+            "d = Minutes Premium (positive = Minutes more hawkish than Resolution)"
         )
     else:
         title = "Policy Resolution vs. MPC Minutes — Sentiment Divergence"
         subtitle = (
-            f"Last {n_meetings} MPC meetings · "
-            "d = Minutes score minus Resolution score"
+            f"Last {len(df)} MPC cycles · "
+            "d = Minutes score minus Resolution score · Grey bars = data not yet available"
         )
 
     EconStyle.add_top_rule(ax)
@@ -157,7 +185,7 @@ def generate(
 
 
 def _score_color(score: float) -> str:
-    """Color bar based on sign: hawkish = red tones, dovish = navy tones."""
+    """Color bar based on score: hawkish = red tones, dovish = blue tones."""
     if score >= 0.40:
         return "#CC0000"
     elif score >= 0.10:

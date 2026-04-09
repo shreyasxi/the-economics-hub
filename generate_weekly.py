@@ -244,6 +244,17 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "EM credit spreads react to the soaring Trade-Weighted Dollar",
         ),
     },
+    "em_vix": {
+        "dashboard": (
+            "CBOE Emerging Markets ETF Volatility Index (VXEEM)",
+            "VXEEM — implied volatility of EEM options · Higher = more EM fear · FRED: VXEEMCLS",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "EM Fear Is Spiking",
+            "CBOE EM Volatility Index signals rising tail risk across emerging markets",
+        ),
+    },
     "india_vs_em": {
         "dashboard": (
             "India vs. EM Peers — Trailing 12 Months",
@@ -1737,6 +1748,46 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             EconStyle.save_chart(fig, output_dir / "22b_em_stress_monitor.png")
     except Exception as e:
         print(f"   ⚠ EM Stress Monitor failed: {e}")
+
+    # ── 22c. CBOE EM VOLATILITY INDEX (VXEEM) ──
+    print("   [22c] CBOE EM Volatility Index (VXEEM)")
+    try:
+        vxeem_s = fred_fetcher.fetch_series("VXEEMCLS", period_years=3)
+        if len(vxeem_s) > 20:
+            fig, ax = EconStyle.create_figure(size="wide")
+            dates = vxeem_s.index.to_pydatetime()
+            vals  = vxeem_s.values
+
+            color_vxeem = EconStyle.get_color("asia")   # Purple — EM fear
+            mean_52w = vxeem_s.rolling(252).mean()
+
+            ax.plot(dates, vals, color=color_vxeem, lw=2.0, zorder=4, label="VXEEM")
+            ax.plot(
+                mean_52w.index.to_pydatetime(), mean_52w.values,
+                color="#808080", lw=1.2, ls="--", alpha=0.7, zorder=3, label="52-Week Avg",
+            )
+            ax.fill_between(dates, vals, mean_52w.reindex(vxeem_s.index).values,
+                            where=(vals > mean_52w.reindex(vxeem_s.index).values),
+                            color=color_vxeem, alpha=0.12, zorder=2)
+
+            ax.yaxis.grid(True, color=EconStyle.GRID_COLOR, lw=0.5, alpha=0.6, zorder=0)
+            ax.xaxis.grid(False)
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax.set_ylabel("VXEEM Level", fontsize=EconStyle.FONT_SIZE_AXIS, color="#404040")
+            ax.tick_params(axis="x", rotation=30, labelsize=8)
+            for spine in ["top", "right", "left"]:
+                ax.spines[spine].set_visible(False)
+            ax.legend(loc="upper left", fontsize=8.5, frameon=False)
+
+            _t, _s = WEEKLY_TITLES["em_vix"][mode]
+            EconStyle.set_title(ax, _t, _s)
+            EconStyle.add_top_rule(ax)
+            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+            EconStyle.add_source(fig, "FRED (CBOE / ICE)")
+            EconStyle.save_chart(fig, output_dir / "22c_em_vix.png")
+    except Exception as e:
+        print(f"   ⚠ VXEEM chart failed: {e}")
 
     # ── 23. BRENT–WTI SPREAD ──
     print("   [23] Brent–WTI Spread (2-Year Trend)")

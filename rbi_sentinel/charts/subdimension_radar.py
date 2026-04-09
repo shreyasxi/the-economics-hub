@@ -3,8 +3,10 @@ rbi_sentinel/charts/subdimension_radar.py
 
 Chart 04: Sub-Dimension Radar (Spider Chart)
 Five axes: Inflation Stance, Growth Stance, Liquidity Stance, Rate Guidance, FX Stance.
-Current meeting: filled navy polygon.
-Previous meeting: dashed overlay for comparison.
+Current meeting: filled navy polygon. Previous meeting: dashed overlay.
+
+Layout fix: polar axes constrained to lower 70% of figure via subplots_adjust,
+leaving a clean header zone for title, subtitle, and top rule.
 """
 
 import logging
@@ -29,7 +31,7 @@ _DIMENSIONS = [
 
 _N = len(_DIMENSIONS)
 _ANGLES = [n / float(_N) * 2 * math.pi for n in range(_N)]
-_ANGLES += _ANGLES[:1]  # Close the polygon
+_ANGLES += _ANGLES[:1]   # Close the polygon
 
 
 def generate(
@@ -40,147 +42,148 @@ def generate(
     output_path: Path,
     mode: str = "dashboard",
 ) -> None:
-    """
-    Args:
-        current_scores: Dict with dimension keys (from sentiment_scores table)
-        previous_scores: Dict for previous meeting (optional overlay)
-        current_date: Meeting date string for current meeting
-        previous_date: Meeting date string for previous meeting
-        output_path: Full path for output PNG
-        mode: "dashboard" | "newsletter"
-    """
     EconStyle.apply_global_style()
 
-    fig, ax = plt.subplots(
-        figsize=(7.0, 5.5),
-        subplot_kw=dict(polar=True),
-    )
+    # Square figure — leaves room for header at top
+    fig = plt.figure(figsize=(7.5, 7.0))
     fig.patch.set_facecolor(EconStyle.BACKGROUND)
+
+    # Polar axes occupy the lower 68% of the figure
+    ax = fig.add_axes(
+        [0.10, 0.04, 0.80, 0.62],   # [left, bottom, width, height]
+        projection="polar",
+    )
     ax.set_facecolor(EconStyle.BACKGROUND)
 
-    # ── Radar rings (reference circles at -1, -0.5, 0, +0.5, +1) ─────────────
-    # Radar uses [0, 2] scale internally: 0 = center, 1 = neutral (score 0), 2 = max
-    ring_labels = ["-1.0", "-0.5", "0", "+0.5", "+1.0"]
-    ring_values = [0.0, 0.5, 1.0, 1.5, 2.0]  # Mapped from [-1, +1] → [0, 2]
+    # ── Reference rings ────────────────────────────────────────────────────────
+    ring_specs = [
+        (0.0,  "-1.0", False),
+        (0.5,  "-0.5", False),
+        (1.0,  "0",    True),   # Neutral ring — solid black
+        (1.5,  "+0.5", False),
+        (2.0,  "+1.0", False),
+    ]
+    ring_angles = np.linspace(0, 2 * math.pi, 100)
 
-    for rv, rl in zip(ring_values, ring_labels):
-        ring_angles = np.linspace(0, 2 * math.pi, 100)
+    for rv, rl, is_neutral in ring_specs:
         ax.plot(
             ring_angles, [rv] * 100,
-            color="#D6D6D6" if rv != 1.0 else "#000000",
-            lw=0.5 if rv != 1.0 else 0.8,
-            ls="-" if rv == 1.0 else "--",
-            alpha=0.5 if rv != 1.0 else 0.7,
+            color="#000000" if is_neutral else "#C0C0C0",
+            lw=0.8 if is_neutral else 0.4,
+            ls="-" if is_neutral else "--",
+            alpha=0.7 if is_neutral else 0.5,
             zorder=1,
         )
         if rv > 0:
             ax.text(
-                0, rv + 0.05, rl,
+                0, rv + 0.07, rl,
                 ha="center", va="bottom",
-                fontsize=6.5, color="#606060",
+                fontsize=6, color="#808080",
             )
 
-    # ── Axis lines ────────────────────────────────────────────────────────────
+    # ── Axis spokes ────────────────────────────────────────────────────────────
     for angle in _ANGLES[:-1]:
-        ax.plot([angle, angle], [0, 2.0], color="#D6D6D6", lw=0.5, zorder=1)
+        ax.plot([angle, angle], [0, 2.0], color="#C0C0C0", lw=0.4, zorder=1)
 
-    # ── Current meeting polygon ───────────────────────────────────────────────
-    current_vals = _extract_values(current_scores)
-    current_vals += current_vals[:1]
+    # ── Current meeting polygon ────────────────────────────────────────────────
+    curr_vals = _extract_values(current_scores) + [0]
+    curr_vals[-1] = curr_vals[0]   # Close
 
     ax.fill(
-        _ANGLES, current_vals,
-        color=EconStyle.get_color("us"),   # Navy
-        alpha=0.30, zorder=3,
+        _ANGLES, curr_vals,
+        color=EconStyle.get_color("us"),
+        alpha=0.25, zorder=3,
     )
     ax.plot(
-        _ANGLES, current_vals,
+        _ANGLES, curr_vals,
         color=EconStyle.get_color("us"),
-        lw=2.2, zorder=4, label=f"Current ({current_date})",
+        lw=2.5, zorder=4,
     )
     ax.scatter(
-        _ANGLES[:-1], current_vals[:-1],
-        color=EconStyle.get_color("us"),
-        s=35, zorder=5,
+        _ANGLES[:-1], curr_vals[:-1],
+        color=EconStyle.get_color("us"), s=45, zorder=5,
     )
 
-    # ── Previous meeting overlay ──────────────────────────────────────────────
+    # ── Previous meeting overlay ───────────────────────────────────────────────
     if previous_scores and previous_date:
-        prev_vals = _extract_values(previous_scores)
-        prev_vals += prev_vals[:1]
+        prev_vals = _extract_values(previous_scores) + [0]
+        prev_vals[-1] = prev_vals[0]
         ax.plot(
             _ANGLES, prev_vals,
-            color=EconStyle.get_color("india"),   # Saffron
-            lw=1.5, ls="--", zorder=3,
-            label=f"Previous ({previous_date})", alpha=0.75,
+            color=EconStyle.get_color("india"),
+            lw=1.8, ls="--", zorder=3, alpha=0.80,
         )
         ax.scatter(
             _ANGLES[:-1], prev_vals[:-1],
             color=EconStyle.get_color("india"),
-            s=20, zorder=4, alpha=0.75,
+            s=28, zorder=4, alpha=0.80,
         )
 
-    # ── Axis labels ───────────────────────────────────────────────────────────
+    # ── Axis labels — padded outward ───────────────────────────────────────────
     ax.set_xticks(_ANGLES[:-1])
     ax.set_xticklabels(
         [label for _, label in _DIMENSIONS],
-        fontsize=8, fontweight="600", color="#222222",
+        fontsize=8.5, fontweight="600", color="#1A1A1A",
     )
-    ax.tick_params(pad=10)
+    ax.tick_params(pad=16)   # Push labels further from polygon edge
 
     ax.set_yticks([])
-    ax.set_ylim(0, 2.05)
-
-    # ── Legend ────────────────────────────────────────────────────────────────
-    ax.legend(
-        loc="upper right",
-        bbox_to_anchor=(1.3, 1.1),
-        fontsize=7.5, frameon=False,
-    )
-
-    # ── Spine / grid cleanup ──────────────────────────────────────────────────
+    ax.set_ylim(0, 2.20)
     ax.spines["polar"].set_visible(False)
     ax.grid(False)
 
-    # ── Title & branding ──────────────────────────────────────────────────────
-    # For polar subplots, add_top_rule needs special handling — place as fig text
-    fig.text(
-        0.08, 0.93, "",
-        transform=fig.transFigure,
+    # ── Legend — bottom of figure, below polar axes ────────────────────────────
+    import matplotlib.lines as mlines
+    curr_handle = mlines.Line2D([], [], color=EconStyle.get_color("us"),
+                                lw=2.5, label=f"Current ({current_date})")
+    prev_handle = mlines.Line2D([], [], color=EconStyle.get_color("india"),
+                                lw=1.8, ls="--",
+                                label=f"Previous ({previous_date or 'n/a'})")
+    handles = [curr_handle] + ([prev_handle] if previous_scores else [])
+
+    fig.legend(
+        handles=handles,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.00),
+        ncol=2,
+        fontsize=8.5, frameon=False,
+    )
+
+    # ── Header zone: top rule + title + subtitle ───────────────────────────────
+    # Top rule at 97%
+    fig.add_artist(
+        plt.Line2D(
+            [0.06, 0.94], [0.965, 0.965],
+            transform=fig.transFigure,
+            color="#000000", lw=1.5, zorder=10,
+        )
     )
 
     if mode == "newsletter":
         title = "Breaking Down the RBI's Stance"
-        subtitle = "Five-dimension policy sentiment breakdown · current vs. previous meeting"
+        subtitle = f"5-dimension policy breakdown · Current ({current_date}) vs. Previous ({previous_date or 'n/a'})"
     else:
         title = "RBI Sentiment Sub-Dimensions — Policy Stance Breakdown"
         subtitle = (
-            "All dimensions: −1.0 = Extremely Dovish · +1.0 = Extremely Hawkish · "
-            f"Blue = {current_date} · Orange dashed = {previous_date or 'n/a'}"
+            f"\u22121.0 = Extremely Dovish · +1.0 = Extremely Hawkish "
+            f"· Navy = {current_date} · Orange = {previous_date or 'n/a'}"
         )
 
-    # Title via fig.text since polar ax doesn't support set_title() well
     fig.text(
-        0.08, 0.96, title,
+        0.06, 0.945, title,
         fontsize=EconStyle.FONT_SIZE_TITLE,
         fontweight="800",
         color=EconStyle.TEXT_TITLE,
         transform=fig.transFigure,
+        va="top",
     )
     fig.text(
-        0.08, 0.915, subtitle,
+        0.06, 0.910, subtitle,
         fontsize=EconStyle.FONT_SIZE_SUBTITLE,
         color=EconStyle.TEXT_BODY,
         transform=fig.transFigure,
-    )
-
-    # Top rule
-    fig.add_artist(
-        plt.Line2D(
-            [0.08, 0.92], [0.97, 0.97],
-            transform=fig.transFigure,
-            color="#000000", lw=1.5,
-        )
+        va="top",
+        wrap=True,
     )
 
     EconStyle.add_source(fig, "RBI MPC Documents  |  The Economics Hub RBI Sentinel")
@@ -191,16 +194,12 @@ def generate(
 
 
 def _extract_values(scores: dict) -> list[float]:
-    """
-    Extract sub-dimension values and convert from [-1, +1] to [0, 2] for radar display.
-    0 = center (score -1), 1.0 = neutral (score 0), 2.0 = outer (score +1).
-    """
+    """Map sub-dimension scores from [-1, +1] → [0, 2] for radar display."""
     values = []
     for key, _ in _DIMENSIONS:
         raw = scores.get(key)
         if raw is None:
-            raw = 0.0  # Default to neutral if missing
-        # Map [-1, +1] → [0, 2]
+            raw = 0.0
         mapped = float(raw) + 1.0
-        values.append(max(0.05, mapped))  # Minimum visible size
+        values.append(max(0.05, mapped))
     return values
