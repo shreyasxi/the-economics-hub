@@ -89,54 +89,72 @@ def generate(
     ax.set_facecolor(EconStyle.BACKGROUND)
 
     # ── Bars ──────────────────────────────────────────────────────────────────
-    res_scores = pd.to_numeric(df["resolution_score"], errors="coerce").fillna(0).values
-    min_scores = pd.to_numeric(df["minutes_score"],    errors="coerce").fillna(0).values
+    res_scores_raw = pd.to_numeric(df["resolution_score"], errors="coerce").values
+    min_scores_raw = pd.to_numeric(df["minutes_score"], errors="coerce").values
 
-    # Track which cycles actually have each doc type
-    has_res = pd.to_numeric(df["resolution_score"], errors="coerce").notna().values
-    has_min = pd.to_numeric(df["minutes_score"],    errors="coerce").notna().values
+    has_res = ~np.isnan(res_scores_raw)
+    has_min = ~np.isnan(min_scores_raw)
+
+    # Use 0.0 so missing data sits flat on the axis
+    res_scores = np.nan_to_num(res_scores_raw)
+    min_scores = np.nan_to_num(min_scores_raw)
+
+    # Fetch your strict brand colors
+    res_color = EconStyle.get_color("pink") if hasattr(EconStyle, "get_color") else "#900C3F"
+    min_color = EconStyle.get_color("us")   if hasattr(EconStyle, "get_color") else "#4472C4"
 
     bars_res = ax.bar(
         x - bar_width / 2, res_scores,
         width=bar_width,
-        color=[_score_color(s) if has_res[i] else "#E0E0E0" for i, s in enumerate(res_scores)],
-        alpha=0.90, label="Resolution",
-        zorder=3,
+        color=[res_color if has_res[i] else "#CCCCCC" for i in range(len(res_scores))],
+        alpha=0.90, zorder=3,
+        edgecolor=["none" if has_res[i] else "#999999" for i in range(len(res_scores))],
+        linewidth=1.0
     )
     bars_min = ax.bar(
         x + bar_width / 2, min_scores,
         width=bar_width,
-        color=[_score_color(s) if has_min[i] else "#E0E0E0" for i, s in enumerate(min_scores)],
-        alpha=0.72, label="Minutes",
-        zorder=3,
-        edgecolor="#404040", linewidth=0.5,
+        color=[min_color if has_min[i] else "#CCCCCC" for i in range(len(min_scores))],
+        alpha=0.90, zorder=3,
+        edgecolor=["none" if has_min[i] else "#999999" for i in range(len(min_scores))],
+        linewidth=1.0
     )
-
+    
     # ── Divergence annotation ──────────────────────────────────────────────────
-    for i, (rs, ms, hr, hm) in enumerate(zip(res_scores, min_scores, has_res, has_min)):
+    for i, (rs, ms, hr, hm) in enumerate(zip(res_scores_raw, min_scores_raw, has_res, has_min)):
         if not (hr and hm):
-            continue  # Only annotate when both scores are present
+            continue  
+            
         divergence = ms - rs
-        y_top = max(abs(rs), abs(ms)) + 0.07
-        sign = "+" if divergence >= 0 else ""
+        if abs(divergence) < 0.01:
+            continue
+            
+        # Position smartly above or below the bars
+        if rs < 0 and ms < 0:
+            y_pos = min(rs, ms) - 0.05
+            va = "top"
+        else:
+            y_pos = max(rs, ms) + 0.05
+            va = "bottom"
+            
+        sign = "+" if divergence > 0 else ""
         ax.text(
-            i, y_top,
-            f"d{sign}{divergence:.2f}",
-            ha="center", va="bottom",
-            fontsize=7, color="#404040",
+            i, y_pos,
+            f"d = {sign}{divergence:.2f}",  # ADDED 'd = ' BACK HERE
+            ha="center", va=va,
+            fontsize=8, color="#222222", fontweight="bold",
             zorder=5,
         )
 
     # ── Zero line ─────────────────────────────────────────────────────────────
     ax.axhline(0, color="#000000", lw=0.8, ls="-", alpha=0.6, zorder=2)
 
-    # ── Axes ──────────────────────────────────────────────────────────────────
+   # ── Axes ──────────────────────────────────────────────────────────────────
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=8)
-    ax.set_ylim(-1.15, 1.35)
-    ax.yaxis.set_major_locator(mticker.MultipleLocator(0.25))
+    ax.set_ylim(-1.05, 1.05)
+    ax.yaxis.set_major_locator(mticker.MultipleLocator(0.5))
     ax.tick_params(axis="y", labelsize=8)
-    ax.set_ylabel("Sentiment Score", fontsize=8, color="#404040")
 
     ax.set_axisbelow(True)
     ax.yaxis.grid(True, color=EconStyle.GRID_COLOR, lw=0.5, alpha=0.7)
@@ -147,37 +165,39 @@ def generate(
     ax.spines["bottom"].set_visible(True)
     ax.spines["bottom"].set_color("#000000")
 
-    # ── Zone labels ───────────────────────────────────────────────────────────
-    ax.text(-0.5, 0.90, "HAWKISH",
-            fontsize=7, color="#CC000055", fontweight="700", va="center")
-    ax.text(-0.5, -0.90, "DOVISH",
-            fontsize=7, color="#00336655", fontweight="700", va="center")
+    # ── Zone labels (Arrows) ──────────────────────────────────────────────────
+    ax.annotate("More Hawkish", xy=(-0.045, 0.95), xytext=(-0.045, 0.75),
+                xycoords="axes fraction", textcoords="axes fraction",
+                arrowprops=dict(arrowstyle="->", color="#CC0000", lw=1.5),
+                ha="center", va="center", rotation=90, fontsize=8, color="#CC0000", fontweight="bold")
 
-    # ── Legend ────────────────────────────────────────────────────────────────
+    ax.annotate("More Dovish", xy=(-0.045, 0.05), xytext=(-0.045, 0.25),
+                xycoords="axes fraction", textcoords="axes fraction",
+                arrowprops=dict(arrowstyle="->", color="#003366", lw=1.5),
+                ha="center", va="center", rotation=90, fontsize=8, color="#003366", fontweight="bold")
+   
+   # ── Legend ────────────────────────────────────────────────────────────────
+    # Removed the redundant 'Unavailable' patch. Empty space speaks for itself.
     legend_handles = [
-        mpatches.Patch(color="#4472C4", alpha=0.90, label="Resolution"),
-        mpatches.Patch(color="#4472C4", alpha=0.72, label="Minutes", linewidth=0.5,
-                       edgecolor="#404040"),
+        mpatches.Patch(facecolor=res_color, alpha=0.90, label="Policy Statement"),
+        mpatches.Patch(facecolor=min_color, alpha=0.90, label="Minutes"),
     ]
-    ax.legend(handles=legend_handles, loc="upper right", fontsize=7.5, frameon=False)
+    ax.legend(handles=legend_handles, loc="upper right", fontsize=8.5, frameon=False)
 
     # ── Title & branding ──────────────────────────────────────────────────────
     if mode == "newsletter":
         title = "What the Minutes Reveal"
-        subtitle = (
-            "Resolution vs. MPC Minutes sentiment · "
-            "d = Minutes Premium (positive = Minutes more hawkish than Resolution)"
-        )
+        subtitle = "Resolution vs. MPC Minutes sentiment divergence"
     else:
-        title = "Policy Resolution vs. MPC Minutes — Sentiment Divergence"
-        subtitle = (
-            f"Last {len(df)} MPC cycles · "
-            "d = Minutes score minus Resolution score · Grey bars = data not yet available"
-        )
+        title = "Policy Statement vs. Minutes — Sentiment Divergence"
+        subtitle = f"Last {len(df)} MPC cycles | d = Minutes minus Policy Statement score"
 
     EconStyle.add_top_rule(ax)
     EconStyle.set_title(ax, title, subtitle)
-    EconStyle.add_source(fig, "RBI MPC Documents  |  The Economics Hub RBI Sentinel")
+    EconStyle.add_source(fig, "RBI MPC Documents")
+
+    # CRITICAL FIX: left=0.10 gives the arrows physical space to exist outside the chart
+    fig.subplots_adjust(top=0.85, bottom=0.15, left=0.08, right=0.95)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     EconStyle.save_chart(fig, output_path)

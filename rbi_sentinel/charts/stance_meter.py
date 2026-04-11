@@ -50,25 +50,26 @@ def generate(
 ) -> None:
     """
     Generate the stance meter chart.
-
-    Args:
-        composite_score: [-1.0, +1.0]
-        meeting_date: "YYYY-MM-DD"
-        output_path: Full path for the output PNG
-        mode: "dashboard" or "newsletter"
     """
     EconStyle.apply_global_style()
 
-    fig, ax = plt.subplots(figsize=EconStyle.SIZE_STANDARD)
+    # --- FINAL FIX: PERFECT 1.4 ASPECT RATIO MATCH ---
+    # Width 7.0 / Height 5.0 = 1.4 Ratio
+    fig, ax = plt.subplots(figsize=(7.0, 5.0))
     fig.patch.set_facecolor(EconStyle.BACKGROUND)
     fig.patch.set_edgecolor("#000000")
     fig.patch.set_linewidth(1.5)
 
     ax.set_facecolor(EconStyle.BACKGROUND)
+    
+    # X-Span: -1.4 to 1.4 = 2.8
+    # Y-Span: -0.65 to 1.35 = 2.0
+    # Data Ratio: 2.8 / 2.0 = 1.4 Ratio (Perfectly matches the figure!)
     ax.set_xlim(-1.4, 1.4)
-    ax.set_ylim(-0.55, 1.3)
+    ax.set_ylim(-0.65, 1.35)
     ax.set_aspect("equal")
     ax.axis("off")
+
 
     # ── Draw colour arc zones ─────────────────────────────────────────────────
     outer_r = 1.0
@@ -100,7 +101,7 @@ def generate(
         ax.text(
             lx, ly, label,
             ha="center", va="center",
-            fontsize=6.5, fontweight="600",
+            fontsize=9.5, fontweight="800",
             color="#222222",
             linespacing=1.2,
             zorder=5,
@@ -118,12 +119,12 @@ def generate(
         ax.plot([tx_in, tx_out], [ty_in, ty_out], color="#000000", lw=1.0, zorder=4)
 
         # Label below the arc
-        tx_label = 1.35 * math.cos(angle)
-        ty_label = 1.35 * math.sin(angle)
+        tx_label = 1.08 * math.cos(angle)
+        ty_label = 1.08 * math.sin(angle)
         ax.text(
             tx_label, ty_label, tl,
             ha="center", va="center",
-            fontsize=6.5, color="#404040", zorder=5,
+            fontsize=8.5, fontweight="bold", color="#404040", zorder=5,
         )
 
     # ── Needle ────────────────────────────────────────────────────────────────
@@ -181,15 +182,19 @@ def generate(
         title = "Where Does the RBI Stand?"
         subtitle = f"Composite policy stance score · {meeting_date}"
     else:
-        title = "RBI MPC Policy Stance — Composite Sentiment Score"
+        title = "Current RBI MPC Policy Stance"
+        # Added the meeting_date back to the end!
         subtitle = (
-            f"Hybrid lexicon + LLM model · Score: {sign}{composite_score:.2f} "
-            f"({label}) · {meeting_date}"
+            f"Data as of {meeting_date} MPC Meeting | Hybrid Lexicon + LLM Model"
         )
 
     EconStyle.add_top_rule(ax)
     EconStyle.set_title(ax, title, subtitle)
-    EconStyle.add_source(fig, "RBI MPC Documents  |  The Economics Hub RBI Sentinel")
+    
+    # Restored your default dynamic footer!
+    EconStyle.add_source(fig, "RBI MPC Documents")
+
+    fig.subplots_adjust(top=0.90, bottom=0.02, left=0.01, right=0.99)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     EconStyle.save_chart(fig, output_path)

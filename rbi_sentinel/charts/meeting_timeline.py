@@ -71,13 +71,14 @@ def generate(
 
     # ── Figure ─────────────────────────────────────────────────────────────────
     fig, (ax_score, ax_time) = plt.subplots(
-        2, 1, figsize=(12, 4.5),
-        gridspec_kw={"height_ratios": [1, 2], "hspace": 0.04},
+        2, 1, figsize=(12, 5.0),
+        sharex=True,  # Locks the top and bottom X-axes together perfectly
+        gridspec_kw={"height_ratios": [2.5, 1], "hspace": 0.05}, # Flipped! Top gets more space
     )
     fig.patch.set_facecolor(EconStyle.BACKGROUND)
     for a in (ax_score, ax_time):
         a.set_facecolor(EconStyle.BACKGROUND)
-
+        
     dates = grouped["meeting_date"].values
     scores = grouped["composite_overall_score"].fillna(0).values
 
@@ -86,9 +87,13 @@ def generate(
         "#CC0000" if s > 0.15 else "#C9563C" if s > 0 else "#4472C4" if s > -0.15 else "#003366"
         for s in scores
     ]
-    ax_score.bar(dates, scores, width=20, color=bar_colors, alpha=0.75, zorder=3)
+    
+    # Convert dates to matplotlib floats so width=30 actually draws 30 days wide
+    dates_num = mdates.date2num(dates)
+    ax_score.bar(dates_num, scores, width=30, color=bar_colors, alpha=0.90, zorder=3)
+    
     ax_score.axhline(0, color="#000000", lw=0.7, alpha=0.6, zorder=2)
-    ax_score.set_ylim(-1.1, 1.1)
+    ax_score.set_ylim(-1.2, 1.2) # Slightly expanded to give the bars headroom
     ax_score.set_yticks([-1, 0, 1])
     ax_score.set_yticklabels(["-1", "0", "+1"], fontsize=6.5, color="#606060")
     ax_score.set_ylabel("Score", fontsize=7, color="#606060")
@@ -111,8 +116,7 @@ def generate(
     for yr in years:
         ax_score.axvline(yr, color="#D6D6D6", lw=0.5, ls=":", alpha=0.7, zorder=1)
         ax_time.axvline(yr, color="#D6D6D6", lw=0.5, ls=":", alpha=0.7, zorder=1)
-        ax_time.text(yr, 0.55, str(yr.year),
-                     ha="center", va="bottom", fontsize=7.5, color="#606060")
+        # Removed the floating year text to prevent duplication and overlap
 
     # Dots
     for _, row in grouped.iterrows():
@@ -179,27 +183,33 @@ def generate(
         mpatches.Patch(color=_ACTION_COLORS[RATE_HIKE], label="Rate Hike"),
         mpatches.Patch(color=_ACTION_COLORS[RATE_HOLD], label="Hold"),
     ]
-    ax_time.legend(
-        handles=legend_handles, loc="upper right",
-        fontsize=7.5, frameon=False, ncol=3,
-        bbox_to_anchor=(0.99, 0.98),
+    
+    # MOVED: Attached to ax_score instead of ax_time. 
+    # bbox_to_anchor=(1.0, 1.02) places it perfectly aligned with the right edge,
+    # floating exactly on the subtitle line.
+    ax_score.legend(
+        handles=legend_handles, loc="lower right",
+        fontsize=9, frameon=False, ncol=3,
+        bbox_to_anchor=(1.0, 1.02), 
     )
 
     # ── Title & branding ───────────────────────────────────────────────────────
     n_cycles = len(grouped)
     if mode == "newsletter":
         title = "Every RBI Decision Since the MPC Era"
-        subtitle = f"Timeline of {n_cycles} MPC meeting cycles · Oct 2016 to present · Bar height = sentiment score"
+        subtitle = f"Policy sentiment vs. rate decisions · {n_cycles} cycles (Oct 2016 – Present)"
     else:
-        title = "RBI MPC Meeting History — Rate Actions & Sentiment Scores"
-        subtitle = (
-            f"{n_cycles} MPC cycles · Oct 2016 to present · "
-            "Top bar = sentiment score · Bottom dots = rate action"
-        )
+        title = "Historical RBI Rate Actions and Policy Sentiment"
+        # OPTIMIZED: Clean, executive summary style.
+        subtitle = f"Policy sentiment trajectory vs. rate decisions | {n_cycles} cycles (Oct 2016 – Present)"
 
     EconStyle.add_top_rule(ax_score)
     EconStyle.set_title(ax_score, title, subtitle)
-    EconStyle.add_source(fig, "RBI  |  The Economics Hub RBI Sentinel")
+    EconStyle.add_source(fig, "RBI MPC Documents")
+
+    # ADJUSTED: Since the legend is gone from the bottom, we can shrink the bottom 
+    # margin from 0.20 to 0.12, giving the chart even more room to breathe.
+    fig.subplots_adjust(top=0.88, bottom=0.12, left=0.05, right=0.96)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     EconStyle.save_chart(fig, output_path)

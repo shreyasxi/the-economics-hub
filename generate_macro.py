@@ -649,7 +649,7 @@ def chart_macro_table(engine, output_dir):
         ax.plot([0.5, 9.5], [y - row_h/2, y - row_h/2], color="#e2e8f0", linewidth=0.8, linestyle=":")
 
     footer_y = y - row_h/2 - 0.40
-    ax.text(0.5, footer_y, f"Source: FRED, OECD, ICE BofA, S&P Global  |  {datetime.now().strftime('%d %b %Y')}", fontsize=8, color="#666666", ha="left", va="bottom")
+    ax.text(0.5, footer_y, f"Source: FRED, OECD, ICE BofA, S&P Global", fontsize=8, color="#666666", ha="left", va="bottom")
     ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT, fontproperties=EconStyle._get_masthead_font(), fontsize=13, color="#1A1A1A", ha="right", va="bottom")
 
     EconStyle.finalize(fig, ax, source=None, tight=False)

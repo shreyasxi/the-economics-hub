@@ -55,7 +55,7 @@ def generate(
     ax1.set_facecolor(EconStyle.BACKGROUND)
 
     # ── Left axis: Repo Rate (step line) ─────────────────────────────────────
-    india_color = EconStyle.get_color("india")  # Saffron
+    india_color = EconStyle.get_color("pink")  
     ax1.step(
         df_rate["meeting_date"], df_rate["repo_rate_pct"],
         where="post",
@@ -133,13 +133,12 @@ def generate(
     else:
         title = "RBI Repo Rate vs. Composite Sentiment Score"
         subtitle = (
-            "Step line = Repo Rate (%) · Line = Sentiment composite · "
             "Sentiment leading repo rate decisions by 1–2 meetings signals predictive value"
         )
 
     EconStyle.add_top_rule(ax1)
     EconStyle.set_title(ax1, title, subtitle)
-    EconStyle.add_source(fig, "RBI  |  The Economics Hub RBI Sentinel")
+    EconStyle.add_source(fig, "Researcher calculations based on RBI MPC documents")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     EconStyle.save_chart(fig, output_path)

@@ -73,7 +73,7 @@ def generate(
             dates[res_mask], df["resolution_score"][res_mask],
             color=EconStyle.get_color("us"),       # Navy
             lw=1.8, marker="o", markersize=4.5,
-            label="Policy Resolution", zorder=4,
+            label="Policy Statement", zorder=4,
         )
 
     # Minutes score — Saffron (India color — RBI is an Indian institution)
@@ -120,17 +120,16 @@ def generate(
     # ── Title & branding ──────────────────────────────────────────────────────
     if mode == "newsletter":
         title = "The RBI's Mood Over Time"
-        subtitle = "Policy Resolution vs. MPC Minutes sentiment score · Oct 2016 to present"
+        subtitle = "Policy Statement vs. MPC Minutes sentiment score · Oct 2016 to present"
     else:
-        title = "RBI MPC Sentiment Trajectory — Resolution vs. Minutes"
+        title = "RBI Sentiment Trajectory — MPS vs. Minutes"
         subtitle = (
-            "Hybrid lexicon + LLM composite score per meeting · "
-            "−1.0 = Extremely Dovish  ·  +1.0 = Extremely Hawkish"
+            "Hybrid lexicon + LLM composite score per meeting | Oct 2016 to present"
         )
 
     EconStyle.add_top_rule(ax)
     EconStyle.set_title(ax, title, subtitle)
-    EconStyle.add_source(fig, "RBI MPC Documents  |  The Economics Hub RBI Sentinel")
+    EconStyle.add_source(fig, "RBI MPC Documents")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     EconStyle.save_chart(fig, output_path)
