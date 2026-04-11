@@ -46,8 +46,8 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* ── Google Fonts: Inter (UI) + Merriweather (editorial) ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,700;0,900;1,400&display=swap');
+    /* ── Google Fonts: Inter (UI) + Merriweather (body) + Playfair Display (Masthead) ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&display=swap');
 
     /* ── Global base ── */
     html, body, [class*="css"] {
@@ -166,129 +166,183 @@ st.markdown(
         text-transform: uppercase !important;
     }
 
-    /* ── App & Sidebar Background Color ── */
+    /* ── App Background Color (The Seamless Canvas) ── */
     .stApp, [data-testid="stHeader"] {
-        background-color: #FFFFF0;
+        background-color: #FFF0E6; /* Keeps the main chart area crisp cream */
     }
 
-    /* ── Institutional dark sidebar ── */
+    /* ── Editorial Print Sidebar (FT Salmon Pink) ── */
     [data-testid="stSidebar"] {
-        background-color: #0D1B2E;
+        background-color: #FFF0E6; /* BANGER: The subtle tinted pink! */
+        border-right: 3px solid #D9C6B5; /* A complementary darker salmon border */
     }
+    
     [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-        padding-top: 0.5rem;
+        padding-top: 1.5rem;
     }
-    /* Force all default Streamlit text inside sidebar to white */
+    
+    /* Force default Streamlit text to deep charcoal, not harsh black */
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span,
     [data-testid="stSidebar"] label,
     [data-testid="stSidebar"] .stMarkdown {
-        color: #C8D3E0 !important;
+        color: #222222 !important;
     }
-    /* Sidebar logo container */
+    
+    /* 1. Header Block & Logo */
     .sb-logo-wrap {
         text-align: center;
-        padding: 1.0rem 0 0.4rem 0;
+        padding: 0 1rem 1rem 1rem;
     }
-    /* Publication title block */
+    .sb-logo-wrap img {
+        mix-blend-mode: multiply; /* MAGICAL: Dissolves the white background of the image! */
+        width: 65%; /* Shrinks it to a tasteful, premium size */
+        margin: 0 auto;
+    }
+    
+  
+    /* ── The High-Finance Masthead Title ── */
     .sb-pub-name {
-        font-family: 'Merriweather', Georgia, serif;
-        font-size: 0.92rem;
-        font-weight: 700;
-        color: #FFFFFF;
+        font-family: 'Playfair Display', Georgia, serif; /* The premium editorial serif */
+        font-size: 1.35rem; /* Larger and more commanding */
+        font-weight: 900;
+        color: #111111;
         text-align: center;
-        letter-spacing: 0.02em;
-        margin: 0;
-        line-height: 1.3;
+        letter-spacing: 0.04em; /* Serifs need a tiny bit of room to breathe */
+        text-transform: uppercase;
+        margin: 0.5rem 0 0 0;
+        line-height: 1.2;
     }
     .sb-pub-tagline {
         font-family: 'Inter', sans-serif;
-        font-size: 0.63rem;
-        font-weight: 500;
-        color: #7A9BB5;
+        font-size: 0.60rem;
+        font-weight: 700;
+        color: #666666;
         text-align: center;
-        letter-spacing: 0.10em;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
-        margin: 0.15rem 0 0 0;
+        margin: 0.3rem 0 1rem 0;
     }
-    /* Thin rule in sidebar */
-    .sb-rule {
+
+    /* Rules */
+    .sb-rule-thick {
         border: none;
-        border-top: 1px solid #1E3352;
-        margin: 0.65rem 0;
+        border-top: 2px solid #111111;
+        margin: 1.2rem 0;
     }
-    /* Section label (e.g. "About", "Data Sources") */
+    .sb-rule-thin {
+        border: none;
+        border-top: 1px solid #E2DFD8;
+        margin: 1rem 0;
+    }
+
+    /* 2. The Byline Block */
+    .sb-byline-label {
+        font-family: 'Merriweather', Georgia, serif;
+        font-size: 0.85rem;
+        font-style: italic;
+        color: #444444;
+        margin: 0 0 0.1rem 0;
+        text-align: center;
+    }
+    .sb-byline-name {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #111111;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 0.5rem 0;
+        text-align: center;
+    }
+    .sb-coverage {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #666666;
+        text-align: center;
+        line-height: 1.4;
+        margin-bottom: 1.5rem;
+    }
+
+    /* 3. Action Buttons (Editorial Style) */
+    .sb-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #111111 !important;
+        background-color: transparent;
+        border: 1px solid #111111;
+        padding: 0.6rem 0;
+        margin-bottom: 0.5rem;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+    }
+    .sb-btn:hover {
+        background-color: #111111;
+        color: #FFFFF0 !important;
+    }
+
+    /* 4. Data Matrix (Institutional Upgrade) */
     .sb-section-label {
         font-family: 'Inter', sans-serif;
-        font-size: 0.60rem;
-        font-weight: 700;
-        color: #4A7FA5;
-        letter-spacing: 0.12em;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #111111;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
-        margin: 0.55rem 0 0.25rem 0;
+        margin: 0 0 0.8rem 0;
+        border-bottom: 2px solid #111111; /* BANGER: A heavy structural underline */
+        padding-bottom: 0.4rem;
     }
-    /* Body text inside sidebar */
-    .sb-body {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.71rem;
-        font-weight: 400;
-        color: #B0BEC5;
-        line-height: 1.5;
+    .sb-data-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* Perfectly centers the text vertically */
+        border-bottom: 1px solid #E2DFD8; /* Swapped dotted for a clean, elegant solid line */
+        padding: 0.45rem 0;
         margin: 0;
     }
-    /* Links */
-    .sb-link {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.71rem;
-        font-weight: 500;
-        color: #7EB6D9;
-        text-decoration: none;
-        display: block;
-        margin-bottom: 0.25rem;
+    /* Targets the last row to remove the bottom border so it looks like a clean table */
+    .sb-data-row:last-of-type {
+        border-bottom: none; 
     }
-    .sb-link:hover { color: #FFFFFF; text-decoration: none; }
-    /* Pipeline admin label */
-    .sb-admin-label {
+    .sb-data-label {
         font-family: 'Inter', sans-serif;
-        font-size: 0.60rem;
+        font-size: 0.65rem; /* INCREASED from 0.55rem */
         font-weight: 700;
-        letter-spacing: 0.10em;
+        color: #666666;
         text-transform: uppercase;
-        color: #E8A030;
-        margin-bottom: 0.15rem;
+        letter-spacing: 0.08em;
     }
-    /* Pipeline run buttons */
+    .sb-data-val {
+        font-family: 'Merriweather', Georgia, serif;
+        font-size: 0.75rem; /* INCREASED from 0.65rem */
+        font-style: italic; 
+        color: #111111;
+        text-align: right;
+    }
+    
+    /* Pipeline Buttons (Light mode adjustments) */
     [data-testid="stSidebar"] .stButton > button {
-        background-color: #1E3352;
-        color: #C8D3E0;
-        border: 1px solid #2A4A70;
-        border-radius: 3px;
+        background-color: #F5F3EC;
+        color: #111111;
+        border: 1px solid #D1CDC4;
+        border-radius: 0px;
         font-family: 'Inter', sans-serif;
-        font-size: 0.72rem;
+        font-size: 0.70rem;
         font-weight: 600;
+        text-transform: uppercase;
         letter-spacing: 0.04em;
     }
     [data-testid="stSidebar"] .stButton > button:hover {
-        background-color: #2A4A70;
-        color: #FFFFFF;
-        border-color: #4A7FA5;
+        border-color: #111111;
     }
-    /* Sidebar expander header color */
-    [data-testid="stSidebar"] .streamlit-expanderHeader {
-        background-color: transparent;
-        color: #C8D3E0 !important;
-        font-size: 0.72rem;
-        font-weight: 600;
-    }
-    /* Legacy sidebar link class — keep for backward compat */
-    .sidebar-link {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.73rem;
-        font-weight: 500;
-        color: #7EB6D9;
-        text-decoration: none;
-    }
-    .sidebar-link:hover { text-decoration: underline; }
 
     /* ── Chart cards: white cards elevated over the grey background ── */
     .main [data-testid="stImage"] img,
@@ -331,66 +385,60 @@ st.markdown(
 # ---------------------------------------------------------------------------
 
 with st.sidebar:
-    # ── Logo ────────────────────────────────────────────────────────────────────
-    logo_path = PROJECT_ROOT / "charts" / "Econhub_logo.jpg"
+    # ── 1. Logo & Masthead ─────────────────────────────────────────────────────
+    # (Once you make your logo transparent, save it as a PNG and update the filename here if needed!)
+    logo_path = PROJECT_ROOT / "charts" / "Econhub_logo.jpg" 
     if logo_path.exists():
         st.markdown('<div class="sb-logo-wrap">', unsafe_allow_html=True)
         st.image(str(logo_path), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ── Publication name ────────────────────────────────────────────────────────
+    # REMOVED: The Global Macro tagline is gone.
     st.markdown(
         '<p class="sb-pub-name">The Economics Hub</p>'
-        '<p class="sb-pub-tagline">Global Macro &amp; Cross-Asset</p>',
+        '<hr class="sb-rule-thick">',
         unsafe_allow_html=True,
     )
 
-    # ── Divider ─────────────────────────────────────────────────────────────────
-    st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
-
-    # ── About ───────────────────────────────────────────────────────────────────
-    st.markdown('<p class="sb-section-label">About</p>', unsafe_allow_html=True)
+    # ── 2. The Byline ──────────────────────────────────────────────────────────
     st.markdown(
-        '<p class="sb-body">Independent macro research by <strong style="color:#FFFFFF;">Shreyas Urgunde</strong>. '
-        'Charts published weekly — covering equities, rates, FX, commodities, and India.</p>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        '<a class="sb-link" href="https://economicshub.substack.com/" target="_blank">'
-        '&#x2709; Substack Newsletter</a>'
-        '<a class="sb-link" href="https://shreyasxi.github.io/" target="_blank">'
-        '&#x1F310; shreyasxi.github.io</a>',
+        '<p class="sb-byline-label">Research by</p>'
+        '<p class="sb-byline-name">Shreyas Urgunde</p>'
+        '<p class="sb-coverage">Weekly coverage of global equities, rates, FX, commodities, and the Indian economy.</p>',
         unsafe_allow_html=True,
     )
 
-    # ── Data sources ────────────────────────────────────────────────────────────
-    st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
-    st.markdown('<p class="sb-section-label">Data Sources</p>', unsafe_allow_html=True)
+    # ── 3. Premium Action Buttons ──────────────────────────────────────────────
     st.markdown(
-        '<p class="sb-body">'
-        'Markets: Yahoo Finance<br>'
-        'Macro: FRED · St. Louis Fed<br>'
-        'International: IMF · OECD · DBnomics<br>'
-        'India: RBI · MoSPI · NSDL · CAG<br>'
-        'RBI text: Anthropic Claude (LLM scoring)'
-        '</p>',
+        '<a class="sb-btn" href="https://economicshub.substack.com/" target="_blank">Subscribe on Substack ↗</a>'
+        '<a class="sb-btn" href="https://shreyasxi.github.io/" target="_blank">Academic Website ↗</a>'
+        '<hr class="sb-rule-thick">', # CHANGED: Using a thick rule here to firmly separate sections
         unsafe_allow_html=True,
+    )
+
+    # ── 4. The Data Matrix ─────────────────────────────────────────────────────
+    st.markdown('<p class="sb-section-label">Data Architecture</p>', unsafe_allow_html=True)
+    
+    st.markdown(
+        '<div class="sb-data-row"><span class="sb-data-label">Markets</span><span class="sb-data-val">Yahoo Finance</span></div>'
+        '<div class="sb-data-row"><span class="sb-data-label">Global Macro</span><span class="sb-data-val">FRED &middot; OECD</span></div>'
+        '<div class="sb-data-row"><span class="sb-data-label">India Macro</span><span class="sb-data-val">RBI &middot; MoSPI</span></div>'
+        '<div class="sb-data-row"><span class="sb-data-label">NLP Engine</span><span class="sb-data-val">Anthropic Claude</span></div>',
+        unsafe_allow_html=True
     )
 
     # ── License ─────────────────────────────────────────────────────────────────
-    st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
+    st.markdown('<hr class="sb-rule-thin">', unsafe_allow_html=True)
     st.markdown(
-        '<p class="sb-body" style="color:#4A6680;">Licensed under CC BY-NC 4.0 &nbsp;·&nbsp; '
-        'Not investment advice</p>',
+        '<p style="font-family:Inter; font-size:0.55rem; color:#888888; text-align:center; text-transform:uppercase; letter-spacing:0.05em;">'
+        'CC BY-NC 4.0 &middot; Not Investment Advice</p>',
         unsafe_allow_html=True,
     )
 
-    # ── Pipeline control — only visible when PIPELINE_KEY secret is set ─────────
+    # ── Pipeline control ────────────────────────────────────────────────────────
     if is_pipeline_admin():
-        st.markdown('<hr class="sb-rule">', unsafe_allow_html=True)
-        st.markdown('<p class="sb-admin-label">Pipeline Control</p>', unsafe_allow_html=True)
-        st.markdown('<p class="sb-body" style="color:#7A9BB5;margin-bottom:0.4rem;">Publisher access only.</p>',
-                    unsafe_allow_html=True)
+        st.markdown('<hr class="sb-rule-thick">', unsafe_allow_html=True)
+        st.markdown('<p class="sb-section-label" style="color:#CC0000;">Pipeline Control</p>', unsafe_allow_html=True)
 
         with st.expander("Run Generators", expanded=False):
             _GENERATORS = {
@@ -400,7 +448,7 @@ with st.sidebar:
                 "RBI Sentinel":    ("generate_rbi_sentinel.py", False),
             }
             for label, (script, has_mode) in _GENERATORS.items():
-                if st.button(f"▶  {label}", key=f"btn_{script}", use_container_width=True):
+                if st.button(f"▶ {label}", key=f"btn_{script}", use_container_width=True):
                     cmd = [sys.executable, script]
                     if has_mode:
                         cmd += ["--mode", "dashboard"]
