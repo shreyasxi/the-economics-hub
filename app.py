@@ -106,22 +106,26 @@ st.markdown(
         margin-top: 0.5rem;
         margin-bottom: 2.5rem;
     }
-    /* ── Substack Callout Box ── */
+    /* ── Substack Callout Box (Institutional Upgrade) ── */
     .substack-box {
-        background-color: #FFF8F0;
-        border-left: 3px solid #FF6719;
-        padding: 0.35rem 0.75rem;
+        background-color: #F4F6F9; /* Ice-grey to match the RBI/India abstract */
+        border-left: 3px solid #003366; /* Signature Navy border */
+        padding: 0.40rem 0.85rem;
         margin-top: 0.5rem;
-        margin-bottom: 0.8rem; /* Pushes the horizontal line down slightly */
+        margin-bottom: 0.8rem;
         display: inline-block; 
         border-radius: 0 3px 3px 0; 
+        transition: all 0.2s ease;
     }
     
-    /* Force the link inside the box to be orange and underlined */
     .substack-box a {
-        color: #FF6719 !important;
-        font-weight: 600 !important;
-        text-decoration: underline !important;
+        color: #003366 !important; 
+        font-family: 'Inter', sans-serif;
+        font-weight: 700 !important;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        text-decoration: underline !important; /* Forces the underline to always show */
     }
     
     /* ── Section headers — Inter 800, all-caps, navy ── */
@@ -201,17 +205,17 @@ st.markdown(
     }
     
   
-    /* ── The High-Finance Masthead Title ── */
+    /* ── The High-Finance Masthead Title (Sidebar) ── */
     .sb-pub-name {
-        font-family: 'Playfair Display', Georgia, serif; /* The premium editorial serif */
-        font-size: 1.50rem !important; /* Larger and more commanding */
-        font-weight: 900;
-        color: #111111;
+        font-family: 'Playfair Display', Georgia, serif; 
+        font-size: 1.65rem !important; /* Scaled up for dominance */
+        font-weight: 900 !important;
+        color: #0A1128; /* Deep navy/black to match the main header */
         text-align: center;
-        letter-spacing: 0.04em; /* Serifs need a tiny bit of room to breathe */
+        letter-spacing: -0.04em; /* Aggressively tight tracking, just like the main header */
         text-transform: uppercase;
         margin: 0.5rem 0 0 0;
-        line-height: 1.2;
+        line-height: 1.1;
     }
     .sb-pub-tagline {
         font-family: 'Inter', sans-serif;
@@ -465,7 +469,7 @@ st.markdown(
     '<div class="substack-center-container">'
         '<div class="substack-box">'
             '<a href="https://economicshub.substack.com/" target="_blank">'
-            'Subscribe on Substack →</a>'
+            'Subscribe on Substack ↗</a>'
         '</div>'
     '</div>'
     '<div class="insti-rule"></div>',
