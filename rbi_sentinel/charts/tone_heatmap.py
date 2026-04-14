@@ -123,32 +123,8 @@ def generate(
                 zorder=3,
             )
 
-    # ── Row consensus/divergence indicator in right margin ────────────────────
-    for row_i in range(n_rows):
-        row_vals = [score_matrix[row_i, j] for j in range(n_cols) if not np.isnan(score_matrix[row_i, j])]
-        if len(row_vals) < 2:
-            continue
-        spread = max(row_vals) - min(row_vals)
-        if spread < 0.15:
-            marker_text = "ALIGNED"
-            marker_color = "#2E7D32"
-        elif spread > 0.30:
-            marker_text = "DIVERGENT"
-            marker_color = "#CC0000"
-        else:
-            marker_text = ""
-            marker_color = "#888888"
-
-        if marker_text:
-            ax.text(
-                n_cols + 0.12, row_i + 0.5, marker_text,
-                ha="left", va="center",
-                fontsize=6.5, color=marker_color, fontweight="bold",
-                zorder=3,
-            )
-
     # ── Axes setup ────────────────────────────────────────────────────────────
-    ax.set_xlim(0, n_cols + 1.2)
+    ax.set_xlim(0, n_cols)
     ax.set_ylim(0, n_rows)
 
     # X-axis: column labels at top
@@ -180,14 +156,11 @@ def generate(
 
     # ── Title & branding ──────────────────────────────────────────────────────
     if mode == "newsletter":
-        title = "When Does the Committee Speak With One Voice?"
-        subtitle = "Tone alignment across all three MPC documents"
+        title = "The Committee in Color — Sentiment Across All Three Documents"
+        subtitle = "Resolution, Minutes & Governor scores per MPC cycle"
     else:
-        title = "Three-Document Tone Alignment Matrix"
-        subtitle = (
-            f"Last {len(df)} MPC cycles | "
-            "ALIGNED = spread < 0.15 | DIVERGENT = spread > 0.30"
-        )
+        title = "Tripartite Sentiment Score Matrix"
+        subtitle = f"Last {len(df)} MPC cycles | Resolution, MPC Minutes & Governor's Statement"
 
     EconStyle.add_top_rule(ax)
     EconStyle.set_title(ax, title, subtitle)

@@ -339,12 +339,13 @@ def run_generate_charts(
         mode=mode,
     )
 
-    # Chart 03: Resolution vs Minutes (last N meetings)
+    # Chart 03: Tripartite comparison — last 4 MPC cycles
     recent = db.get_recent_composites(COMPARISON_CHART_MEETINGS)
     comparison_mod.generate(
         composites=recent,
         output_path=output_dir / "03_rbi_resolution_vs_minutes.png",
         mode=mode,
+        n_meetings=4,
     )
 
     # Chart 04: Sub-dimension Radar

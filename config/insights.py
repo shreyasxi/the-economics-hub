@@ -525,20 +525,21 @@ position, often a precursor to a change-in-stance announcement.
 """,
 
     "rbi_tone_heatmap": """\
-**How to read this chart:** Each row represents one MPC meeting cycle. The three columns show the \
+**How to read this chart:** Each row is one MPC meeting cycle; the three columns show the \
 sentiment scores for the Policy Resolution, MPC Minutes, and Governor's Statement respectively. \
-Cells are colored on a diverging scale: deep navy (−1.0, extremely dovish) → white (0.0, neutral) \
-→ deep red (+1.0, extremely hawkish). The numeric score is printed inside each cell. Rows labelled \
-ALIGNED (green) have a cross-document spread below 0.15; rows labelled DIVERGENT (red) have a \
-spread above 0.30, indicating significant fragmentation across the three documents.
+Cells are shaded on a diverging colormap: deep navy (−1.0, extremely dovish) through white \
+(0.0, neutral) to deep red (+1.0, extremely hawkish). The numeric score is printed inside each \
+cell. Read down a column to track how a single document type has evolved over time; read across \
+a row to see how much the three documents agreed at a given meeting.
 
-**Practical takeaway:** Aligned hawkish rows — all three cells red — represent the highest-quality \
-tightening signals in the model: the Governor, the committee's formal statement, and the internal \
-deliberation record all corroborate the stance simultaneously. These rows have historically \
-preceded rate actions with the shortest lag. Divergent rows require more caution: when the \
-Governor's cell is notably more hawkish than the Minutes cell, it typically means the Governor is \
-personally ahead of the committee — track whether the divergence narrows (committee aligns) or \
-reverses (Governor backs down) at the following meeting.
+**Practical takeaway:** When an entire row is shaded deep red, the three communication channels \
+are all corroborating a hawkish stance — the highest-confidence signal in the model and the \
+pattern most closely associated with subsequent rate action. A row where the Governor's cell is \
+noticeably darker than the Minutes cell signals that the Governor is personally ahead of the \
+committee, a pattern that has historically preceded formal stance changes by one to two meetings. \
+A row where the Minutes cell alone is dark blue while the other two are neutral or red is a \
+classic "internal dissent" pattern: the committee's published statement is understating the \
+dovish pressure building inside the deliberation room.
 """,
 
 }

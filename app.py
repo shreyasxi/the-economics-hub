@@ -808,10 +808,12 @@ with tab_rbi:
                 "the deliberative record of individual member views and dissents, and the Governor's personal "
                 "forward guidance — three analytically distinct signals that frequently diverge.\n\n"
                 "**Why Standard Lexicons Are Insufficient**\n\n"
-                "Loughran-McDonald and similar bag-of-words approaches perform well on corporate earnings "
-                "transcripts where sentiment is expressed explicitly. Central bank communications rely on "
-                "deliberate linguistic hedging: a phrase such as *\"remaining vigilant on inflation\"* conveys "
-                "hawkish intent without a single term appearing in any standard financial dictionary. "
+                "The seminal [Loughran & McDonald (2011)](https://doi.org/10.1111/j.1540-6261.2010.01625.x) "
+                "word-list, while effective on corporate filings, performs poorly on central bank transcripts. "
+                "As documented by [Lucca & Trebbi (2009)](https://www.nber.org/papers/w15367) in their "
+                "automated analysis of FOMC statements, policymakers rely on deliberate linguistic hedging: "
+                "a phrase such as *\"remaining vigilant on inflation\"* conveys hawkish intent without a single "
+                "term appearing in any standard financial dictionary. "
                 "Context-sensitivity and negation handling are prerequisites, not refinements.\n\n"
                 "**Two-Stage Hybrid Pipeline**\n\n"
                 "*Stage 1 — Domain Lexicon:* A bespoke lexicon of 30+ hawkish and 30+ dovish phrases, "
@@ -821,11 +823,16 @@ with tab_rbi:
                 "normalized via tanh(score / √word\\_count × 3) to correct for document length variance. "
                 "Weight in fusion: **25%**.\n\n"
                 "*Stage 2 — LLM Semantic Parsing:* Each document is submitted to a large language model "
-                "under a structured prompt that returns a validated JSON payload containing: six sub-dimension "
-                "scores (inflation stance, growth stance, liquidity stance, rate guidance, FX/external stance, "
+                "under a structured prompt, following the approach demonstrated by "
+                "[López-Lira & Tang (2023)](https://doi.org/10.2139/ssrn.4412788), who show that LLMs "
+                "substantially outperform lexicon-based methods on nuanced, context-dependent financial text. "
+                "The prompt returns a validated JSON payload containing: six sub-dimension scores "
+                "(inflation stance, growth stance, liquidity stance, rate guidance, FX/external stance, "
                 "overall), a confidence estimate, a ranked list of pivotal phrases, and a two-paragraph "
-                "narrative summary. When model confidence falls below 0.55, a higher-capacity model is "
-                "invoked as a fallback. Weight in fusion: **75%**.\n\n"
+                "narrative summary. This structured-output approach draws on methods popularised by "
+                "[Araci (2019)](https://arxiv.org/abs/1908.10063) for domain-adapted financial NLP. "
+                "When model confidence falls below 0.55, a higher-capacity model is invoked as a fallback. "
+                "Weight in fusion: **75%**.\n\n"
                 "*Conflict Detection:* When |lexicon score − LLM score| > 0.40, a conflict flag is raised "
                 "and confidence is capped at 0.45, signalling that the document warrants manual review.\n\n"
                 "**Composite Meeting Score**\n\n"
@@ -844,48 +851,42 @@ with tab_rbi:
             try:
                 from streamlit_mermaid import st_mermaid
                 st_mermaid(
-                    """
-flowchart TD
-    subgraph FETCH["① Fetch Layer"]
-        A["rbi.org.in\nMPC Documents Catalogue"] --> B["Master Fetcher\nHTTP · ASP.NET pagination"]
-        B --> C{"Cache?\nrbi_sentinel_cache/"}
-        C -->|HIT| D["Cached HTML / PDF"]
-        C -->|MISS| B2["Live HTTP Request"]
-        B2 --> D
-    end
-
-    subgraph CLEAN["② Extraction & Cleaning"]
-        D --> E{Format?}
-        E -->|HTML| F["HTML Extractor\nVersioned CSS selectors\nSmart TD fallback"]
-        E -->|PDF| G["PDF Extractor\npdfplumber → PyMuPDF"]
-        F --> H["Text Normalizer\nDedup · sentence splitting"]
-        G --> H
-    end
-
-    subgraph SCORE["③ Hybrid Scoring Engine"]
-        H --> I["Stage 1: Domain Lexicon\n30+ hawkish · 30+ dovish phrases\n5-token negation window · Weight: 25%"]
-        H --> J["Stage 2: LLM Parser\nClaude Haiku → Sonnet fallback\nStructured JSON · 6 sub-dimensions · Weight: 75%"]
-        I --> K["Score Fusion\nConflict flag: Δ > 0.40\nFinal = 0.25×lex + 0.75×llm"]
-        J --> K
-    end
-
-    subgraph DB["④ Storage — SQLite"]
-        K --> L[("rbi_sentinel.db\nsentiment_scores")]
-        L --> M["Composite Engine\nMinutes 50% · Resolution 35%\n· Governor 15%"]
-        M --> N[("meeting_composites")]
-    end
-
-    subgraph VIZ["⑤ Visualisation"]
-        N --> O["Chart Generator\n9 EconStyle matplotlib charts"]
-        O --> P["Streamlit Dashboard\nThe RBI Sentinel Tab"]
-    end
-
-    classDef layer fill:#F4F6F9,stroke:#003366,stroke-width:1.5px,color:#111111
-    classDef store fill:#E8EFF8,stroke:#003366,stroke-width:1px,color:#111111
-    class FETCH,CLEAN,SCORE,VIZ layer
-    class DB store
-                    """,
-                    height=580,
+                    "flowchart TD\n"
+                    "    subgraph F1[\"1 - Fetch\"]\n"
+                    "        A[rbi.org.in MPC Catalogue] --> B[Master Fetcher]\n"
+                    "        B --> C{Cached?}\n"
+                    "        C -->|Yes| D[File Cache]\n"
+                    "        C -->|No| B2[Live HTTP]\n"
+                    "        B2 --> D\n"
+                    "    end\n"
+                    "    subgraph F2[\"2 - Extract and Clean\"]\n"
+                    "        D --> E{Format}\n"
+                    "        E -->|HTML| F[HTML Extractor]\n"
+                    "        E -->|PDF| G[PDF Extractor]\n"
+                    "        F --> H[Text Normalizer]\n"
+                    "        G --> H\n"
+                    "    end\n"
+                    "    subgraph F3[\"3 - Hybrid Scoring\"]\n"
+                    "        H --> I[Lexicon Stage - Weight 25pct]\n"
+                    "        H --> J[LLM Semantic Stage - Weight 75pct]\n"
+                    "        I --> K[Score Fusion and Conflict Check]\n"
+                    "        J --> K\n"
+                    "    end\n"
+                    "    subgraph F4[\"4 - SQLite Storage\"]\n"
+                    "        K --> L[(sentiment_scores)]\n"
+                    "        L --> M[Composite Engine]\n"
+                    "        M --> N[(meeting_composites)]\n"
+                    "    end\n"
+                    "    subgraph F5[\"5 - Visualisation\"]\n"
+                    "        N --> O[Chart Generator]\n"
+                    "        O --> P[Streamlit Dashboard]\n"
+                    "    end\n"
+                    "    style F1 fill:#F4F6F9,stroke:#003366\n"
+                    "    style F2 fill:#F4F6F9,stroke:#003366\n"
+                    "    style F3 fill:#F4F6F9,stroke:#003366\n"
+                    "    style F4 fill:#E8EFF8,stroke:#003366\n"
+                    "    style F5 fill:#F4F6F9,stroke:#003366\n",
+                    height=560,
                 )
             except ImportError:
                 st.info("Install `streamlit-mermaid` to render the pipeline architecture diagram.")
