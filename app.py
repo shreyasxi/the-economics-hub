@@ -788,22 +788,107 @@ with tab_rbi:
             '<div style="background-color: #F4F6F9; border-left: 3px solid #003366; padding: 0.8rem 1.2rem; margin-bottom: 1.0rem; border-radius: 0 4px 4px 0;">'
             '<p style="font-family: \'Merriweather\', Georgia, serif; font-size: 0.90rem; font-style: italic; color: #111111; line-height: 1.6; margin: 0;">'
             '<strong style="font-family: \'Inter\', sans-serif; font-style: normal; font-size: 0.80rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; margin-right: 0.3rem;">The RBI Sentinel</strong> '
-            "quantifies shifts in India's monetary policy by parsing official central bank communications through a hybrid text-mining model. It combines standard financial dictionaries with advanced language models to accurately read the tone of forward guidance to generate a net hawkish or dovish premium. All outputs are quantitative estimates for research purposes."
+            "quantifies shifts in India's monetary policy by parsing all three classes of official MPC communication — the Monetary Policy Resolution, the MPC Meeting Minutes, and the Governor's Statement — through a domain-specific hybrid text-mining model. "
+            "It fuses a curated central-bank lexicon with a large language model to score each document on a bounded hawkish/dovish scale, producing both a per-document signal and a composite meeting score. All outputs are quantitative estimates intended for research purposes."
             '</p>'
             '</div>',
             unsafe_allow_html=True,
         )
 
         # 2. The Technical Expander (The Methodology "Button")
-        with st.expander("⚙️ NLP Architecture & Methodology", expanded=False):
+        with st.expander("⚙️ Scoring Methodology & Pipeline Architecture", expanded=False):
             st.markdown(
-                "### The Hybrid Approach: Why Lexicons Aren't Enough\n\n"
-                "Traditional financial sentiment models (such as the Loughran-McDonald dictionary) rely on a 'bag-of-words' approach. While highly effective for corporate earnings calls, they routinely fail on central bank transcripts. Policymakers rarely use explicitly negative or panicked vocabulary; instead, they deploy highly diplomatic, contextual phrasing.\n\n"
-                "To solve this, the RBI Sentinel deploys a two-tier hybrid architecture:\n"
-                "* **Baseline Polarity (Lexicon):** Scans the document to establish a foundational density of standard financial terminology.\n"
-                "* **Semantic Parsing (Claude AI):** Anthropic's Claude evaluates the contextual syntax. Recent literature in quantitative finance demonstrates that large language models (LLMs) significantly outperform legacy methods in deciphering 'Fedspeak' by understanding when a phrase like *'calibrated tightening'* represents a dovish pivot versus a hawkish hold.\n\n"
-                "**Documents Analyzed:** The engine processes both the immediate *Monetary Policy Statement* (Resolution) and the delayed *MPC Meeting Minutes*, allowing me to track the divergence between public consensus and closed-door debate."
+                "### Scoring Methodology\n\n"
+                "**Corpus**\n\n"
+                "The engine processes three official documents per Monetary Policy Committee (MPC) cycle: "
+                "the *Monetary Policy Resolution* (published on the rate-decision date), "
+                "the *MPC Meeting Minutes* (published approximately 14 days post-decision), "
+                "and the *Governor's Statement* (published on the rate-decision date alongside the Resolution). "
+                "This tripartite corpus captures the full communication spectrum: the formal committee decision, "
+                "the deliberative record of individual member views and dissents, and the Governor's personal "
+                "forward guidance — three analytically distinct signals that frequently diverge.\n\n"
+                "**Why Standard Lexicons Are Insufficient**\n\n"
+                "Loughran-McDonald and similar bag-of-words approaches perform well on corporate earnings "
+                "transcripts where sentiment is expressed explicitly. Central bank communications rely on "
+                "deliberate linguistic hedging: a phrase such as *\"remaining vigilant on inflation\"* conveys "
+                "hawkish intent without a single term appearing in any standard financial dictionary. "
+                "Context-sensitivity and negation handling are prerequisites, not refinements.\n\n"
+                "**Two-Stage Hybrid Pipeline**\n\n"
+                "*Stage 1 — Domain Lexicon:* A bespoke lexicon of 30+ hawkish and 30+ dovish phrases, "
+                "each weighted to reflect diagnostic value in RBI communications. A 5-token negation window "
+                "reverses phrase polarity when a negation operator precedes a scored term (e.g., "
+                "*\"not concerned about inflation\"* scores dovish, not hawkish). The raw count score is "
+                "normalized via tanh(score / √word\\_count × 3) to correct for document length variance. "
+                "Weight in fusion: **25%**.\n\n"
+                "*Stage 2 — LLM Semantic Parsing:* Each document is submitted to a large language model "
+                "under a structured prompt that returns a validated JSON payload containing: six sub-dimension "
+                "scores (inflation stance, growth stance, liquidity stance, rate guidance, FX/external stance, "
+                "overall), a confidence estimate, a ranked list of pivotal phrases, and a two-paragraph "
+                "narrative summary. When model confidence falls below 0.55, a higher-capacity model is "
+                "invoked as a fallback. Weight in fusion: **75%**.\n\n"
+                "*Conflict Detection:* When |lexicon score − LLM score| > 0.40, a conflict flag is raised "
+                "and confidence is capped at 0.45, signalling that the document warrants manual review.\n\n"
+                "**Composite Meeting Score**\n\n"
+                "Individual document scores are aggregated into a per-meeting composite using a fixed "
+                "weighting scheme reflecting each document's informational hierarchy:\n\n"
+                "| Document | Weight | Rationale |\n"
+                "|---|---|---|\n"
+                "| MPC Minutes | 50% | Captures individual member deliberation and dissent votes |\n"
+                "| Monetary Policy Resolution | 35% | The formal committee decision statement |\n"
+                "| Governor's Statement | 15% | Governor's personal forward guidance overlay |\n\n"
+                "All scores are expressed on a bounded [−1.0, +1.0] scale. "
+                "−1.0 denotes maximum dovishness; +1.0 denotes maximum hawkishness.\n\n"
+                "---\n\n"
+                "### Pipeline Architecture\n"
             )
+            try:
+                from streamlit_mermaid import st_mermaid
+                st_mermaid(
+                    """
+flowchart TD
+    subgraph FETCH["① Fetch Layer"]
+        A["rbi.org.in\nMPC Documents Catalogue"] --> B["Master Fetcher\nHTTP · ASP.NET pagination"]
+        B --> C{"Cache?\nrbi_sentinel_cache/"}
+        C -->|HIT| D["Cached HTML / PDF"]
+        C -->|MISS| B2["Live HTTP Request"]
+        B2 --> D
+    end
+
+    subgraph CLEAN["② Extraction & Cleaning"]
+        D --> E{Format?}
+        E -->|HTML| F["HTML Extractor\nVersioned CSS selectors\nSmart TD fallback"]
+        E -->|PDF| G["PDF Extractor\npdfplumber → PyMuPDF"]
+        F --> H["Text Normalizer\nDedup · sentence splitting"]
+        G --> H
+    end
+
+    subgraph SCORE["③ Hybrid Scoring Engine"]
+        H --> I["Stage 1: Domain Lexicon\n30+ hawkish · 30+ dovish phrases\n5-token negation window · Weight: 25%"]
+        H --> J["Stage 2: LLM Parser\nClaude Haiku → Sonnet fallback\nStructured JSON · 6 sub-dimensions · Weight: 75%"]
+        I --> K["Score Fusion\nConflict flag: Δ > 0.40\nFinal = 0.25×lex + 0.75×llm"]
+        J --> K
+    end
+
+    subgraph DB["④ Storage — SQLite"]
+        K --> L[("rbi_sentinel.db\nsentiment_scores")]
+        L --> M["Composite Engine\nMinutes 50% · Resolution 35%\n· Governor 15%"]
+        M --> N[("meeting_composites")]
+    end
+
+    subgraph VIZ["⑤ Visualisation"]
+        N --> O["Chart Generator\n9 EconStyle matplotlib charts"]
+        O --> P["Streamlit Dashboard\nThe RBI Sentinel Tab"]
+    end
+
+    classDef layer fill:#F4F6F9,stroke:#003366,stroke-width:1.5px,color:#111111
+    classDef store fill:#E8EFF8,stroke:#003366,stroke-width:1px,color:#111111
+    class FETCH,CLEAN,SCORE,VIZ layer
+    class DB store
+                    """,
+                    height=580,
+                )
+            except ImportError:
+                st.info("Install `streamlit-mermaid` to render the pipeline architecture diagram.")
 
         # Hero: Stance Meter (full width)
         stance, charts = _pop_summary(charts, ["01_rbi_stance_meter"])
@@ -832,6 +917,10 @@ with tab_rbi:
         if rate_chart:
             _section("Repo Rate vs. Sentiment")
             st.image(str(rate_chart), use_container_width=True)
+            insight = get_insight(rate_chart.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    st.markdown(insight)
 
         # ── Meeting Analysis ──
         _section("Meeting Analysis")
@@ -857,11 +946,36 @@ with tab_rbi:
                     with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
                         st.markdown(insight)
 
-        # ── Meeting History (CENTERED) ──
+        # ── Governor Signal Analysis ──
+        gov_divergence, charts = _pop_summary(charts, ["07_rbi_governor_divergence"])
+        tone_heatmap, charts = _pop_summary(charts, ["09_rbi_tone_heatmap"])
+
+        if gov_divergence or tone_heatmap:
+            _section("Governor Signal Analysis")
+
+        if gov_divergence:
+            st.image(str(gov_divergence), use_container_width=True)
+            insight = get_insight(gov_divergence.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    st.markdown(insight)
+
+        if tone_heatmap:
+            st.image(str(tone_heatmap), use_container_width=True)
+            insight = get_insight(tone_heatmap.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    st.markdown(insight)
+
+        # ── Meeting History ──
         timeline, charts = _pop_summary(charts, ["06_rbi_meeting_timeline"])
         if timeline:
-         _section("Meeting History")
-         st.image(str(timeline), use_container_width=True)
+            _section("Meeting History")
+            st.image(str(timeline), use_container_width=True)
+            insight = get_insight(timeline.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    st.markdown(insight)
 
         # ── Catch-all ──
         if charts:

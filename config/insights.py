@@ -445,21 +445,100 @@ that has not yet been communicated publicly.
 """,
 
     "rbi_resolution_vs_minutes": """\
-**How to read this chart:** For each of the last eight MPC meetings, two bars are shown \
-side-by-side — the sentiment score derived from the official Policy Resolution and the score from \
-the MPC Minutes. The delta (Δ) annotated above each pair is the "Minutes Premium": the difference \
-between Minutes and Resolution scores. A positive delta means the Minutes revealed a more hawkish \
-internal debate than the official statement suggested. RBI Minutes are structured differently from \
-Fed Minutes: each MPC member's individual assessment is published in full, enabling richer \
-sentiment extraction per member.
+**How to read this chart:** For each of the last eight MPC meetings, three bars are shown \
+per cycle — the sentiment score derived from the official Policy Resolution, the score from the \
+MPC Minutes, and the score from the Governor's Statement. The spread (s) annotated above each \
+group is the maximum score minus the minimum score across all three documents. A high spread \
+indicates fragmented signalling; a low spread indicates consensus across the full corpus. \
+RBI Minutes are structured differently from Fed Minutes: each MPC member's individual assessment \
+is published in full, enabling richer sentiment extraction per member.
 
-**Practical takeaway:** When the Minutes Premium is consistently negative over 2–3 cycles — \
-Minutes more dovish than the Resolution — it signals the committee is more concerned about growth \
-than the press release language reveals. This pattern has preceded RBI rate pivot announcements in \
-previous cycles. A sudden reversal — Minutes becoming significantly more hawkish than the \
-Resolution — indicates a regime shift in progress, often driven by a minority view gaining \
-traction within the committee before it reaches the majority. This is the most reliable leading \
-indicator in the RBI Sentinel framework.
+**Practical takeaway:** When all three bars are tightly clustered (spread < 0.15) on the hawkish \
+side, the signal has the highest conviction — the Governor, the Resolution, and the internal \
+deliberation all corroborate the stance. When bars diverge sharply (spread > 0.30), exercise \
+caution: the official statement may not reflect the full complexity of the committee's view. \
+A Governor bar that is persistently above both the Resolution and the Minutes is a forward-looking \
+signal that the Governor is personally advocating for tightening ahead of formal consensus.
+""",
+
+    "rbi_subdimension_radar": """\
+**How to read this chart:** The five axes represent orthogonal dimensions of the MPC's policy \
+stance: Inflation Stance (dismissive → alarmed), Growth Stance (concerned → optimistic), \
+Liquidity Stance (accommodative → tightening), Rate Guidance (cuts ahead → hikes ahead), \
+and FX/External Stance (depreciation-tolerant → defensive). Each polygon represents one MPC \
+meeting. A larger polygon area indicates a more hawkish meeting overall; the shape of the polygon \
+reveals which dimensions are driving the stance. The current meeting is plotted against the \
+previous meeting for direct comparison.
+
+**Practical takeaway:** The Rate Guidance axis is the most forward-looking dimension and the \
+highest-weight signal for near-term positioning. When Rate Guidance shifts hawkish while Inflation \
+Stance remains neutral, the committee is front-running inflation data — typically a signal to trim \
+duration. When Growth Stance collapses toward "concerned" while all other axes remain hawkish, \
+the committee is approaching a forced pivot: watch for a Resolution score reversal in the following \
+1–2 meetings.
+""",
+
+    "rbi_rate_and_sentiment": """\
+**How to read this chart:** The left axis (saffron step line) tracks the RBI repo rate over time. \
+The right axis (black smooth line) tracks the composite sentiment score derived from the MPC \
+documents. Shaded bands identify hawkish (red) and dovish (blue) sentiment regimes. The purpose \
+of overlaying these two series is to test whether the sentiment model leads or lags the actual \
+rate-setting cycle.
+
+**Practical takeaway:** In multiple historical cycles, the composite sentiment score crossed +0.30 \
+one to two meetings before the first rate hike, and crossed −0.30 before the first rate cut. This \
+lead time exists because the MPC communicates its intent through language shifts in the Minutes and \
+Governor's Statement before the formal rate vote occurs. When the sentiment line diverges sharply \
+from the repo rate step — a sustained positive score during a prolonged hold, or a falling \
+sentiment score while rates remain elevated — the probability of an imminent rate action is \
+elevated.
+""",
+
+    "rbi_meeting_timeline": """\
+**How to read this chart:** Each dot represents one MPC meeting, spanning the full history of the \
+committee from its inception in October 2016. Color encodes the rate decision at that meeting: \
+green = rate cut, red = rate hike, gray = hold. The sentiment bar strip above the timeline shows \
+the composite score direction for each meeting.
+
+**Practical takeaway:** This chart is most useful for regime identification — scanning for \
+structural breaks rather than meeting-by-meeting analysis. A cluster of gray holds with a gradually \
+rising sentiment strip is the classic tightening-preparation pattern that precedes an eventual hike \
+cycle. A long red-dot sequence followed by the first gray dot with a rapidly improving (less \
+negative) sentiment strip marks the inflection point of easing cycle exhaustion. Use this chart to \
+place the current MPC meeting in its full historical context before interpreting near-term signals.
+""",
+
+    "rbi_governor_divergence": """\
+**How to read this chart:** Each bar shows how much the Governor's Statement score deviates from \
+the meeting's composite score (Minutes 50% + Resolution 35% + Governor 15%). Positive bars \
+indicate the Governor is more hawkish than the committee consensus; negative bars indicate the \
+Governor is more dovish. The zero line represents perfect alignment between the Governor's personal \
+tone and the committee average.
+
+**Practical takeaway:** The Governor's Statement is released simultaneously with the Resolution \
+but is entirely the Governor's own voice — not a committee document. Persistent positive divergence \
+(Governor more hawkish than the composite for 2+ cycles) is a forward-looking signal: the Governor \
+is personally building a rhetorical case for tightening ahead of formal committee alignment. This \
+pattern has historically preceded rate hike cycles by one to two meetings. Conversely, a sharp \
+negative divergence signals a Governor who is more open to easing than the committee's formal \
+position, often a precursor to a change-in-stance announcement.
+""",
+
+    "rbi_tone_heatmap": """\
+**How to read this chart:** Each row represents one MPC meeting cycle. The three columns show the \
+sentiment scores for the Policy Resolution, MPC Minutes, and Governor's Statement respectively. \
+Cells are colored on a diverging scale: deep navy (−1.0, extremely dovish) → white (0.0, neutral) \
+→ deep red (+1.0, extremely hawkish). The numeric score is printed inside each cell. Rows labelled \
+ALIGNED (green) have a cross-document spread below 0.15; rows labelled DIVERGENT (red) have a \
+spread above 0.30, indicating significant fragmentation across the three documents.
+
+**Practical takeaway:** Aligned hawkish rows — all three cells red — represent the highest-quality \
+tightening signals in the model: the Governor, the committee's formal statement, and the internal \
+deliberation record all corroborate the stance simultaneously. These rows have historically \
+preceded rate actions with the shortest lag. Divergent rows require more caution: when the \
+Governor's cell is notably more hawkish than the Minutes cell, it typically means the Governor is \
+personally ahead of the committee — track whether the divergence narrows (committee aligns) or \
+reverses (Governor backs down) at the following meeting.
 """,
 
 }

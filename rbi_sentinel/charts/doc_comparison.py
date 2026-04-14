@@ -27,8 +27,9 @@ _MINUTES_COLOR    = EconStyle.get_color("india") if hasattr(EconStyle, "get_colo
 def _merge_by_cycle(composites: list[dict], n_meetings: int) -> pd.DataFrame:
     """
     The composites table has one row per *document publication date*, not per
-    MPC cycle. This function groups by YYYY-MM, merges resolution_score and
-    minutes_score from their respective rows, and returns one row per cycle.
+    MPC cycle. This function groups by YYYY-MM, merges resolution_score,
+    minutes_score, and governor_score from their respective rows, and returns
+    one row per cycle.
     """
     df = pd.DataFrame(composites)
     if df.empty:
@@ -43,7 +44,8 @@ def _merge_by_cycle(composites: list[dict], n_meetings: int) -> pd.DataFrame:
         .agg(
             meeting_date=("meeting_date", "min"),
             resolution_score=("resolution_score", lambda s: next((v for v in s if pd.notna(v)), None)),
-            minutes_score=("minutes_score",    lambda s: next((v for v in s if pd.notna(v)), None)),
+            minutes_score=("minutes_score",       lambda s: next((v for v in s if pd.notna(v)), None)),
+            governor_score=("governor_score",     lambda s: next((v for v in s if pd.notna(v)), None)),
         )
         .reset_index(drop=True)
     )
@@ -82,7 +84,7 @@ def generate(
     labels = [pd.to_datetime(d).strftime("%b\n%Y") for d in df["meeting_date"]]
 
     x = np.arange(len(df))
-    bar_width = 0.35
+    bar_width = 0.25
 
     fig, ax = plt.subplots(figsize=EconStyle.SIZE_WIDE)
     fig.patch.set_facecolor(EconStyle.BACKGROUND)
@@ -90,59 +92,70 @@ def generate(
 
     # ── Bars ──────────────────────────────────────────────────────────────────
     res_scores_raw = pd.to_numeric(df["resolution_score"], errors="coerce").values
-    min_scores_raw = pd.to_numeric(df["minutes_score"], errors="coerce").values
+    min_scores_raw = pd.to_numeric(df["minutes_score"],    errors="coerce").values
+    gov_scores_raw = pd.to_numeric(df["governor_score"],   errors="coerce").values
 
     has_res = ~np.isnan(res_scores_raw)
     has_min = ~np.isnan(min_scores_raw)
+    has_gov = ~np.isnan(gov_scores_raw)
 
     # Use 0.0 so missing data sits flat on the axis
     res_scores = np.nan_to_num(res_scores_raw)
     min_scores = np.nan_to_num(min_scores_raw)
+    gov_scores = np.nan_to_num(gov_scores_raw)
 
-    # Fetch your strict brand colors
     res_color = EconStyle.get_color("pink") if hasattr(EconStyle, "get_color") else "#900C3F"
     min_color = EconStyle.get_color("us")   if hasattr(EconStyle, "get_color") else "#4472C4"
+    gov_color = "#2E7D32"
 
-    bars_res = ax.bar(
-        x - bar_width / 2, res_scores,
+    ax.bar(
+        x - bar_width, res_scores,
         width=bar_width,
         color=[res_color if has_res[i] else "#CCCCCC" for i in range(len(res_scores))],
         alpha=0.90, zorder=3,
         edgecolor=["none" if has_res[i] else "#999999" for i in range(len(res_scores))],
         linewidth=1.0
     )
-    bars_min = ax.bar(
-        x + bar_width / 2, min_scores,
+    ax.bar(
+        x, min_scores,
         width=bar_width,
         color=[min_color if has_min[i] else "#CCCCCC" for i in range(len(min_scores))],
         alpha=0.90, zorder=3,
         edgecolor=["none" if has_min[i] else "#999999" for i in range(len(min_scores))],
         linewidth=1.0
     )
-    
-    # ── Divergence annotation ──────────────────────────────────────────────────
-    for i, (rs, ms, hr, hm) in enumerate(zip(res_scores_raw, min_scores_raw, has_res, has_min)):
-        if not (hr and hm):
-            continue  
-            
-        divergence = ms - rs
-        if abs(divergence) < 0.01:
+    ax.bar(
+        x + bar_width, gov_scores,
+        width=bar_width,
+        color=[gov_color if has_gov[i] else "#CCCCCC" for i in range(len(gov_scores))],
+        alpha=0.90, zorder=3,
+        edgecolor=["none" if has_gov[i] else "#999999" for i in range(len(gov_scores))],
+        linewidth=1.0
+    )
+
+    # ── Three-way spread annotation ───────────────────────────────────────────
+    for i in range(len(df)):
+        available = [s for s, h in zip(
+            [res_scores_raw[i], min_scores_raw[i], gov_scores_raw[i]],
+            [has_res[i], has_min[i], has_gov[i]]
+        ) if h]
+        if len(available) < 2:
             continue
-            
-        # Position smartly above or below the bars
-        if rs < 0 and ms < 0:
-            y_pos = min(rs, ms) - 0.05
-            va = "top"
-        else:
-            y_pos = max(rs, ms) + 0.05
-            va = "bottom"
-            
-        sign = "+" if divergence > 0 else ""
+
+        spread = max(available) - min(available)
+        if spread < 0.01:
+            continue
+
+        all_vals = [s for s, h in zip(
+            [res_scores[i], min_scores[i], gov_scores[i]],
+            [has_res[i], has_min[i], has_gov[i]]
+        ) if h]
+        y_pos = max(all_vals) + 0.05
         ax.text(
             i, y_pos,
-            f"d = {sign}{divergence:.2f}",  # ADDED 'd = ' BACK HERE
-            ha="center", va=va,
-            fontsize=8, color="#222222", fontweight="bold",
+            f"s = {spread:.2f}",
+            ha="center", va="bottom",
+            fontsize=7.5, color="#222222", fontweight="bold",
             zorder=5,
         )
 
@@ -176,21 +189,21 @@ def generate(
                 arrowprops=dict(arrowstyle="->", color="#003366", lw=1.5),
                 ha="center", va="center", rotation=90, fontsize=8, color="#003366", fontweight="bold")
    
-   # ── Legend ────────────────────────────────────────────────────────────────
-    # Removed the redundant 'Unavailable' patch. Empty space speaks for itself.
+    # ── Legend ────────────────────────────────────────────────────────────────
     legend_handles = [
         mpatches.Patch(facecolor=res_color, alpha=0.90, label="Policy Statement"),
         mpatches.Patch(facecolor=min_color, alpha=0.90, label="Minutes"),
+        mpatches.Patch(facecolor=gov_color, alpha=0.90, label="Governor's Statement"),
     ]
     ax.legend(handles=legend_handles, loc="upper right", fontsize=8.5, frameon=False)
 
     # ── Title & branding ──────────────────────────────────────────────────────
     if mode == "newsletter":
-        title = "What the Minutes Reveal"
-        subtitle = "Resolution vs. MPC Minutes sentiment divergence"
+        title = "What the Documents Reveal"
+        subtitle = "Resolution, MPC Minutes & Governor sentiment — three-document comparison"
     else:
-        title = "Policy Statement vs. Minutes — Sentiment Divergence"
-        subtitle = f"Last {len(df)} MPC cycles | d = Minutes minus Policy Statement score"
+        title = "Tripartite Sentiment — Resolution, Minutes & Governor"
+        subtitle = f"Last {len(df)} MPC cycles | s = spread (max score − min score across all three documents)"
 
     EconStyle.add_top_rule(ax)
     EconStyle.set_title(ax, title, subtitle)

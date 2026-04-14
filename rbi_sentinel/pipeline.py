@@ -44,10 +44,13 @@ def _import_charts():
         subdimension_radar,
         rate_and_sentiment,
         meeting_timeline,
+        governor_divergence,
+        tone_heatmap,
     )
     return (
         stance_meter, sentiment_trajectory, doc_comparison,
         subdimension_radar, rate_and_sentiment, meeting_timeline,
+        governor_divergence, tone_heatmap,
     )
 
 
@@ -310,6 +313,7 @@ def run_generate_charts(
     (
         stance_meter_mod, trajectory_mod, comparison_mod,
         radar_mod, rate_mod, timeline_mod,
+        governor_divergence_mod, tone_heatmap_mod,
     ) = _import_charts()
 
     composites = db.get_all_composites()
@@ -394,6 +398,20 @@ def run_generate_charts(
     timeline_mod.generate(
         composites=composites,
         output_path=output_dir / "06_rbi_meeting_timeline.png",
+        mode=mode,
+    )
+
+    # Chart 07: Governor vs. Committee Divergence Strip
+    governor_divergence_mod.generate(
+        composites=composites,
+        output_path=output_dir / "07_rbi_governor_divergence.png",
+        mode=mode,
+    )
+
+    # Chart 09: Three-Document Tone Alignment Heatmap
+    tone_heatmap_mod.generate(
+        composites=composites,
+        output_path=output_dir / "09_rbi_tone_heatmap.png",
         mode=mode,
     )
 
