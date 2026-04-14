@@ -40,8 +40,8 @@ def generate(
     df["meeting_date"] = pd.to_datetime(df["meeting_date"])
     df = df.sort_values("meeting_date")
 
-    # Drop rows where both scores are missing
-    df = df.dropna(subset=["resolution_score", "minutes_score"], how="all")
+    # Drop rows where all three scores are missing
+    df = df.dropna(subset=["resolution_score", "minutes_score", "governor_score"], how="all")
     if df.empty:
         log.warning("No scored meetings for trajectory chart")
         return
@@ -86,6 +86,16 @@ def generate(
             label="MPC Minutes", zorder=4, ls="--",
         )
 
+    # Governor's Statement score — Forest green (distinct personal signal channel)
+    gov_mask = df["governor_score"].notna()
+    if gov_mask.any():
+        ax.plot(
+            dates[gov_mask], df["governor_score"][gov_mask],
+            color="#2E7D32",
+            lw=1.4, marker="D", markersize=3.5,
+            label="Governor's Statement", zorder=4, ls="-",
+        )
+
     # ── Meeting date vertical hairlines ──────────────────────────────────────
     for dt in dates:
         ax.axvline(dt, color="#D6D6D6", lw=0.4, alpha=0.7, zorder=1)
@@ -120,9 +130,9 @@ def generate(
     # ── Title & branding ──────────────────────────────────────────────────────
     if mode == "newsletter":
         title = "The RBI's Mood Over Time"
-        subtitle = "Policy Statement vs. MPC Minutes sentiment score · Oct 2016 to present"
+        subtitle = "Policy Statement, MPC Minutes & Governor sentiment score · Oct 2016 to present"
     else:
-        title = "RBI Sentiment Trajectory — MPS vs. Minutes"
+        title = "RBI Sentiment Trajectory — MPS, Minutes & Governor"
         subtitle = (
             "Hybrid lexicon + LLM composite score per meeting | Oct 2016 to present"
         )
