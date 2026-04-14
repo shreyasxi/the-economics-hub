@@ -808,13 +808,15 @@ with tab_rbi:
                 "the deliberative record of individual member views and dissents, and the Governor's personal "
                 "forward guidance — three analytically distinct signals that frequently diverge.\n\n"
                 "**Why Standard Lexicons Are Insufficient**\n\n"
-                "The seminal [Loughran & McDonald (2011)](https://doi.org/10.1111/j.1540-6261.2010.01625.x) "
-                "word-list, while effective on corporate filings, performs poorly on central bank transcripts. "
-                "As documented by [Lucca & Trebbi (2009)](https://www.nber.org/papers/w15367) in their "
-                "automated analysis of FOMC statements, policymakers rely on deliberate linguistic hedging: "
-                "a phrase such as *\"remaining vigilant on inflation\"* conveys hawkish intent without a single "
-                "term appearing in any standard financial dictionary. "
-                "Context-sensitivity and negation handling are prerequisites, not refinements.\n\n"
+                "Standard financial word-lists, including the widely cited Loughran-McDonald dictionary "
+                "(see [Loughran & McDonald, 2011](https://doi.org/10.1111/j.1540-6261.2010.01625.x)), "
+                "perform well on corporate filings but systematically fail on central bank transcripts. "
+                "Policymakers rely on deliberate linguistic hedging: a phrase such as "
+                "*\"remaining vigilant on inflation\"* conveys clear hawkish intent without a single term "
+                "appearing in any standard financial dictionary. This problem is well-documented in the "
+                "automated analysis of FOMC statements "
+                "(see [Lucca & Trebbi, 2009](https://www.nber.org/papers/w15367)), where context-sensitivity "
+                "and negation handling are shown to be prerequisites, not refinements.\n\n"
                 "**Two-Stage Hybrid Pipeline**\n\n"
                 "*Stage 1 — Domain Lexicon:* A bespoke lexicon of 30+ hawkish and 30+ dovish phrases, "
                 "each weighted to reflect diagnostic value in RBI communications. A 5-token negation window "
@@ -823,14 +825,14 @@ with tab_rbi:
                 "normalized via tanh(score / √word\\_count × 3) to correct for document length variance. "
                 "Weight in fusion: **25%**.\n\n"
                 "*Stage 2 — LLM Semantic Parsing:* Each document is submitted to a large language model "
-                "under a structured prompt, following the approach demonstrated by "
-                "[López-Lira & Tang (2023)](https://doi.org/10.2139/ssrn.4412788), who show that LLMs "
-                "substantially outperform lexicon-based methods on nuanced, context-dependent financial text. "
-                "The prompt returns a validated JSON payload containing: six sub-dimension scores "
+                "under a structured prompt. Large language models substantially outperform lexicon-based "
+                "methods on nuanced, context-dependent financial text "
+                "(see [López-Lira & Tang, 2023](https://doi.org/10.2139/ssrn.4412788)). "
+                "The prompt returns a validated JSON payload containing six sub-dimension scores "
                 "(inflation stance, growth stance, liquidity stance, rate guidance, FX/external stance, "
                 "overall), a confidence estimate, a ranked list of pivotal phrases, and a two-paragraph "
-                "narrative summary. This structured-output approach draws on methods popularised by "
-                "[Araci (2019)](https://arxiv.org/abs/1908.10063) for domain-adapted financial NLP. "
+                "narrative summary, drawing on domain-adapted NLP methods for structured financial output "
+                "(see [Araci, 2019](https://arxiv.org/abs/1908.10063)). "
                 "When model confidence falls below 0.55, a higher-capacity model is invoked as a fallback. "
                 "Weight in fusion: **75%**.\n\n"
                 "*Conflict Detection:* When |lexicon score − LLM score| > 0.40, a conflict flag is raised "
@@ -848,48 +850,97 @@ with tab_rbi:
                 "---\n\n"
                 "### Pipeline Architecture\n"
             )
-            try:
-                from streamlit_mermaid import st_mermaid
-                st_mermaid(
-                    "flowchart TD\n"
-                    "    subgraph F1[\"1 - Fetch\"]\n"
-                    "        A[rbi.org.in MPC Catalogue] --> B[Master Fetcher]\n"
-                    "        B --> C{Cached?}\n"
-                    "        C -->|Yes| D[File Cache]\n"
-                    "        C -->|No| B2[Live HTTP]\n"
-                    "        B2 --> D\n"
-                    "    end\n"
-                    "    subgraph F2[\"2 - Extract and Clean\"]\n"
-                    "        D --> E{Format}\n"
-                    "        E -->|HTML| F[HTML Extractor]\n"
-                    "        E -->|PDF| G[PDF Extractor]\n"
-                    "        F --> H[Text Normalizer]\n"
-                    "        G --> H\n"
-                    "    end\n"
-                    "    subgraph F3[\"3 - Hybrid Scoring\"]\n"
-                    "        H --> I[Lexicon Stage - Weight 25pct]\n"
-                    "        H --> J[LLM Semantic Stage - Weight 75pct]\n"
-                    "        I --> K[Score Fusion and Conflict Check]\n"
-                    "        J --> K\n"
-                    "    end\n"
-                    "    subgraph F4[\"4 - SQLite Storage\"]\n"
-                    "        K --> L[(sentiment_scores)]\n"
-                    "        L --> M[Composite Engine]\n"
-                    "        M --> N[(meeting_composites)]\n"
-                    "    end\n"
-                    "    subgraph F5[\"5 - Visualisation\"]\n"
-                    "        N --> O[Chart Generator]\n"
-                    "        O --> P[Streamlit Dashboard]\n"
-                    "    end\n"
-                    "    style F1 fill:#F4F6F9,stroke:#003366\n"
-                    "    style F2 fill:#F4F6F9,stroke:#003366\n"
-                    "    style F3 fill:#F4F6F9,stroke:#003366\n"
-                    "    style F4 fill:#E8EFF8,stroke:#003366\n"
-                    "    style F5 fill:#F4F6F9,stroke:#003366\n",
-                    height=560,
-                )
-            except ImportError:
-                st.info("Install `streamlit-mermaid` to render the pipeline architecture diagram.")
+            st.markdown("""
+<style>
+.arch-wrap { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111; padding: 8px 0; }
+.arch-stage { display: flex; align-items: stretch; margin-bottom: 6px; }
+.arch-label { background: #003366; color: #fff; font-weight: 700; font-size: 11px;
+              writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+              min-width: 32px; display: flex; align-items: center; justify-content: center;
+              border-radius: 4px 0 0 4px; padding: 4px 2px; letter-spacing: 0.5px; }
+.arch-content { background: #F4F6F9; border: 1px solid #CCCCCC; border-left: none;
+                border-radius: 0 4px 4px 0; flex: 1; display: flex;
+                align-items: center; gap: 6px; padding: 10px 14px; flex-wrap: wrap; }
+.arch-box { background: #D6E4F0; border: 1px solid #003366; border-radius: 5px;
+            padding: 6px 12px; text-align: center; min-width: 130px; }
+.arch-box b { display: block; font-size: 12px; color: #111; }
+.arch-box span { font-size: 10.5px; color: #444; }
+.arch-box-db { background: #A8C8E8; border: 1px solid #003366; border-radius: 5px;
+               padding: 6px 12px; text-align: center; min-width: 130px; }
+.arch-box-db b { display: block; font-size: 12px; color: #111; }
+.arch-box-db span { font-size: 10.5px; color: #333; }
+.arch-box-dark { background: #003366; border: 1px solid #003366; border-radius: 5px;
+                 padding: 6px 12px; text-align: center; min-width: 130px; }
+.arch-box-dark b { display: block; font-size: 12px; color: #fff; }
+.arch-box-dark span { font-size: 10.5px; color: #cce; }
+.arch-arrow { font-size: 18px; color: #555; flex-shrink: 0; }
+.arch-branch { display: flex; flex-direction: column; gap: 6px; }
+.arch-down { text-align: center; font-size: 20px; color: #555; line-height: 1; margin: 2px 0; }
+</style>
+<div class="arch-wrap">
+
+  <div class="arch-stage">
+    <div class="arch-label">Fetch</div>
+    <div class="arch-content">
+      <div class="arch-box"><b>rbi.org.in</b><span>MPC Documents Catalogue</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><b>Master Fetcher</b><span>HTTP + ASP.NET Pagination</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><b>File Cache</b><span>HTML / PDF</span></div>
+    </div>
+  </div>
+
+  <div class="arch-down">↓</div>
+
+  <div class="arch-stage">
+    <div class="arch-label">Extract</div>
+    <div class="arch-content">
+      <div class="arch-box"><b>Document Extractor</b><span>HTML (CSS selectors) + PDF (pdfplumber)</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><b>Text Normalizer</b><span>Dedup + sentence splitting</span></div>
+    </div>
+  </div>
+
+  <div class="arch-down">↓</div>
+
+  <div class="arch-stage">
+    <div class="arch-label">Score</div>
+    <div class="arch-content">
+      <div class="arch-branch">
+        <div class="arch-box"><b>Domain Lexicon — 25%</b><span>30+ phrases · 5-token negation window</span></div>
+        <div class="arch-box"><b>LLM Semantic Parser — 75%</b><span>Claude API · 6 sub-dimensions · structured JSON</span></div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><b>Score Fusion</b><span>0.25×lex + 0.75×llm · conflict flag: |Δ| &gt; 0.40</span></div>
+    </div>
+  </div>
+
+  <div class="arch-down">↓</div>
+
+  <div class="arch-stage">
+    <div class="arch-label">Store</div>
+    <div class="arch-content">
+      <div class="arch-box-db"><b>sentiment_scores</b><span>SQLite — raw per-doc scores</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><b>Composite Engine</b><span>Minutes 50% · Resolution 35% · Governor 15%</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box-db"><b>meeting_composites</b><span>SQLite — per-meeting aggregates</span></div>
+    </div>
+  </div>
+
+  <div class="arch-down">↓</div>
+
+  <div class="arch-stage">
+    <div class="arch-label">Visualise</div>
+    <div class="arch-content">
+      <div class="arch-box"><b>Chart Generator</b><span>7 EconStyle matplotlib charts</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box-dark"><b>Streamlit Dashboard</b><span>The RBI Sentinel Tab</span></div>
+    </div>
+  </div>
+
+</div>
+""", unsafe_allow_html=True)
 
         # Hero: Stance Meter (full width)
         stance, charts = _pop_summary(charts, ["01_rbi_stance_meter"])
@@ -949,21 +1000,11 @@ with tab_rbi:
 
         # ── Governor Signal Analysis ──
         gov_divergence, charts = _pop_summary(charts, ["07_rbi_governor_divergence"])
-        tone_heatmap, charts = _pop_summary(charts, ["09_rbi_tone_heatmap"])
-
-        if gov_divergence or tone_heatmap:
-            _section("Governor Signal Analysis")
 
         if gov_divergence:
+            _section("Governor Signal Analysis")
             st.image(str(gov_divergence), use_container_width=True)
             insight = get_insight(gov_divergence.name)
-            if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
-                    st.markdown(insight)
-
-        if tone_heatmap:
-            st.image(str(tone_heatmap), use_container_width=True)
-            insight = get_insight(tone_heatmap.name)
             if insight:
                 with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
                     st.markdown(insight)

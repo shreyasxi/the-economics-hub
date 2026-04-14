@@ -524,22 +524,4 @@ negative divergence signals a Governor who is more open to easing than the commi
 position, often a precursor to a change-in-stance announcement.
 """,
 
-    "rbi_tone_heatmap": """\
-**How to read this chart:** Each row is one MPC meeting cycle; the three columns show the \
-sentiment scores for the Policy Resolution, MPC Minutes, and Governor's Statement respectively. \
-Cells are shaded on a diverging colormap: deep navy (−1.0, extremely dovish) through white \
-(0.0, neutral) to deep red (+1.0, extremely hawkish). The numeric score is printed inside each \
-cell. Read down a column to track how a single document type has evolved over time; read across \
-a row to see how much the three documents agreed at a given meeting.
-
-**Practical takeaway:** When an entire row is shaded deep red, the three communication channels \
-are all corroborating a hawkish stance — the highest-confidence signal in the model and the \
-pattern most closely associated with subsequent rate action. A row where the Governor's cell is \
-noticeably darker than the Minutes cell signals that the Governor is personally ahead of the \
-committee, a pattern that has historically preceded formal stance changes by one to two meetings. \
-A row where the Minutes cell alone is dark blue while the other two are neutral or red is a \
-classic "internal dissent" pattern: the committee's published statement is understating the \
-dovish pressure building inside the deliberation room.
-""",
-
 }

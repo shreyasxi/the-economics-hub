@@ -133,31 +133,6 @@ def generate(
         linewidth=1.0
     )
 
-    # ── Three-way spread annotation ───────────────────────────────────────────
-    for i in range(len(df)):
-        available = [s for s, h in zip(
-            [res_scores_raw[i], min_scores_raw[i], gov_scores_raw[i]],
-            [has_res[i], has_min[i], has_gov[i]]
-        ) if h]
-        if len(available) < 2:
-            continue
-
-        spread = max(available) - min(available)
-        if spread < 0.01:
-            continue
-
-        all_vals = [s for s, h in zip(
-            [res_scores[i], min_scores[i], gov_scores[i]],
-            [has_res[i], has_min[i], has_gov[i]]
-        ) if h]
-        y_pos = max(all_vals) + 0.05
-        ax.text(
-            i, y_pos,
-            f"s = {spread:.2f}",
-            ha="center", va="bottom",
-            fontsize=7.5, color="#222222", fontweight="bold",
-            zorder=5,
-        )
 
     # ── Zero line ─────────────────────────────────────────────────────────────
     ax.axhline(0, color="#000000", lw=0.8, ls="-", alpha=0.6, zorder=2)
@@ -203,7 +178,7 @@ def generate(
         subtitle = "Resolution, MPC Minutes & Governor sentiment — three-document comparison"
     else:
         title = "Tripartite Sentiment — Resolution, Minutes & Governor"
-        subtitle = f"Last {len(df)} MPC cycles | s = spread (max score − min score across all three documents)"
+        subtitle = f"Last {len(df)} MPC cycles | Sentiment score per document type"
 
     EconStyle.add_top_rule(ax)
     EconStyle.set_title(ax, title, subtitle)
