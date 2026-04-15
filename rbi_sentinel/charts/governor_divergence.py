@@ -108,13 +108,6 @@ def generate(
 
     # ── Zero line with label ──────────────────────────────────────────────────
     ax.axhline(0, color="#000000", lw=0.9, ls="-", alpha=0.7, zorder=2)
-    ax.text(
-        len(df) - 0.5, 0.015,
-        "Governor = Committee Consensus",
-        ha="right", va="bottom",
-        fontsize=6.5, color="#404040", alpha=0.8,
-        zorder=4,
-    )
 
     # ── Axes ──────────────────────────────────────────────────────────────────
     ax.set_xticks(x)
@@ -152,11 +145,10 @@ def generate(
         title = "Is the Governor Signalling Ahead of the Committee?"
         subtitle = "Governor's Statement score minus composite meeting score"
     else:
-        title = "Governor vs. Committee Consensus — Divergence"
+        title = "MPC Consensus vs. Governor Stance Divergence"
         subtitle = (
             f"Last {len(df)} MPC cycles | "
-            "Divergence = Governor's Statement score − composite score "
-            "| +ve = Governor more hawkish"
+            "Divergence = Governor's Statement score − composite score"
         )
 
     EconStyle.add_top_rule(ax)

@@ -26,6 +26,8 @@ from utils.chart_loader import (
 )
 from config.insights import get_insight
 
+from rbi_sentinel.db.manager import get_latest_composite
+
 PROJECT_ROOT = Path(__file__).resolve().parent
 
 # ---------------------------------------------------------------------------
@@ -852,30 +854,41 @@ with tab_rbi:
             )
             st.markdown("""
 <style>
-.arch-wrap { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111; padding: 8px 0; }
-.arch-stage { display: flex; align-items: stretch; margin-bottom: 6px; }
+/* 1. Aligned to Inter font */
+.arch-wrap { font-family: 'Inter', sans-serif; font-size: 13px; color: #111; padding: 8px 0; }
+
+/* 2. Added subtle elevation shadow and rounded the container */
+.arch-stage { display: flex; align-items: stretch; margin-bottom: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-radius: 4px; }
+
 .arch-label { background: #003366; color: #fff; font-weight: 700; font-size: 11px;
               writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
               min-width: 32px; display: flex; align-items: center; justify-content: center;
               border-radius: 4px 0 0 4px; padding: 4px 2px; letter-spacing: 0.5px; }
-.arch-content { background: #F4F6F9; border: 1px solid #CCCCCC; border-left: none;
+
+/* 3. Softened the structural border to match your custom grey */
+.arch-content { background: #F4F6F9; border: 1px solid #E2DFD8; border-left: none;
                 border-radius: 0 4px 4px 0; flex: 1; display: flex;
                 align-items: center; gap: 6px; padding: 10px 14px; flex-wrap: wrap; }
+
 .arch-box { background: #D6E4F0; border: 1px solid #003366; border-radius: 5px;
             padding: 6px 12px; text-align: center; min-width: 130px; }
 .arch-box b { display: block; font-size: 12px; color: #111; }
 .arch-box span { font-size: 10.5px; color: #444; }
+
 .arch-box-db { background: #A8C8E8; border: 1px solid #003366; border-radius: 5px;
                padding: 6px 12px; text-align: center; min-width: 130px; }
 .arch-box-db b { display: block; font-size: 12px; color: #111; }
 .arch-box-db span { font-size: 10.5px; color: #333; }
+
 .arch-box-dark { background: #003366; border: 1px solid #003366; border-radius: 5px;
                  padding: 6px 12px; text-align: center; min-width: 130px; }
 .arch-box-dark b { display: block; font-size: 12px; color: #fff; }
 .arch-box-dark span { font-size: 10.5px; color: #cce; }
-.arch-arrow { font-size: 18px; color: #555; flex-shrink: 0; }
+
+/* Softened the flow arrows so they don't compete with the data */
+.arch-arrow { font-size: 18px; color: #888888; font-weight: 300; flex-shrink: 0; padding: 0 2px; }
 .arch-branch { display: flex; flex-direction: column; gap: 6px; }
-.arch-down { text-align: center; font-size: 20px; color: #555; line-height: 1; margin: 2px 0; }
+.arch-down { text-align: center; font-size: 20px; color: #888888; font-weight: 300; line-height: 1; margin: 4px 0; }
 </style>
 <div class="arch-wrap">
 
@@ -942,17 +955,71 @@ with tab_rbi:
 </div>
 """, unsafe_allow_html=True)
 
-        # Hero: Stance Meter (full width)
+        # ── Hero: Stance Meter & AI Briefing (Side-by-Side) ──
         stance, charts = _pop_summary(charts, ["01_rbi_stance_meter"])
         if stance:
-            _section("Current MPC Stance")
-            _, col_mid, _ = st.columns([1, 2, 1])
-            with col_mid:
+            _section("Current MPC Stance & Executive Summary")
+            
+            # Fetch the latest qualitative narrative from the database
+            latest_comp = get_latest_composite()
+            ai_summary = latest_comp.get("composite_narrative") if latest_comp else None
+            
+            # If no summary exists, default to a clean placeholder
+            if not ai_summary:
+                ai_summary = "Awaiting narrative generation for the current policy cycle."
+
+            # Split the layout: 55% for the chart, 45% for the text widget
+            col_chart, col_text = st.columns([1.2, 1])
+            
+            with col_chart:
                 st.image(str(stance), use_container_width=True)
                 insight = get_insight(stance.name)
                 if insight:
                     with st.expander("ℹ️ How to read the Stance Meter"):
                         st.markdown(insight)
+                        
+            with col_text:
+                # ── Format the pure AI Summary for HTML ──
+                clean_summary = ai_summary
+                if clean_summary and "Awaiting narrative" not in clean_summary:
+                    import re
+                    
+                    # 1. Strip Claude's hardcoded labels (with and without markdown bolding)
+                    labels_to_remove = [
+                        "**How to read this document:**", "How to read this document:",
+                        "**Practical takeaway:**", "Practical takeaway:"
+                    ]
+                    for label in labels_to_remove:
+                        clean_summary = clean_summary.replace(label, "")
+                    
+                    # Clean up any leading whitespace left behind after stripping
+                    clean_summary = clean_summary.strip()
+                    
+                    # 2. Safely convert any remaining accidental markdown bolding
+                    clean_summary = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', clean_summary)
+                    
+                    # 3. Preserve Claude's natural paragraph breaks
+                    clean_summary = clean_summary.replace('\n\n', '<br><br>')
+                    
+                    # 4. Strip stray single newlines so the text justifies perfectly
+                    clean_summary = clean_summary.replace('\n', ' ')
+
+                st.markdown(
+                    f"""
+                    <div style="background-color: #F4F6F9; padding: 0.8rem 1.4rem 1.4rem 1.4rem; border-radius: 4px; border: 1px solid #E2DFD8; height: 100%;">
+                        <p style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #003366; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0; margin-bottom: 0.2rem;">
+                            Executive Summary
+                        </p>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 0.70rem; font-weight: 700; color: #666666; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 1.2rem;">
+                            NLP-driven narrative synthesis of the current policy cycle
+                        </p>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #222222; line-height: 1.65; text-align: justify; margin-bottom: 0;">
+                            {clean_summary}
+                        </p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
         # ── Sentiment Over Time (PRIMARY) ──
         trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])
@@ -964,15 +1031,6 @@ with tab_rbi:
                 with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
                     st.markdown(insight)
 
-        # ── Repo Rate vs Sentiment (PRIMARY) ──
-        rate_chart, charts = _pop_summary(charts, ["05_rbi_rate_and_sentiment"])
-        if rate_chart:
-            _section("Repo Rate vs. Sentiment")
-            st.image(str(rate_chart), use_container_width=True)
-            insight = get_insight(rate_chart.name)
-            if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
-                    st.markdown(insight)
 
         # ── Meeting Analysis ──
         _section("Meeting Analysis")
@@ -997,6 +1055,16 @@ with tab_rbi:
                 if insight:
                     with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
                         st.markdown(insight)
+                        
+        # ── Repo Rate vs Sentiment (PRIMARY) ──
+        rate_chart, charts = _pop_summary(charts, ["05_rbi_rate_and_sentiment"])
+        if rate_chart:
+            _section("Repo Rate vs. Sentiment")
+            st.image(str(rate_chart), use_container_width=True)
+            insight = get_insight(rate_chart.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    st.markdown(insight)
 
         # ── Governor Signal Analysis ──
         gov_divergence, charts = _pop_summary(charts, ["07_rbi_governor_divergence"])

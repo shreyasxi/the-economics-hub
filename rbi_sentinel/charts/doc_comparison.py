@@ -177,7 +177,7 @@ def generate(
         title = "What the Documents Reveal"
         subtitle = "Resolution, MPC Minutes & Governor sentiment — three-document comparison"
     else:
-        title = "Tripartite Sentiment — Resolution, Minutes & Governor"
+        title = "Latest Tripartite Policy Sentiment"
         subtitle = f"Last {len(df)} MPC cycles | Sentiment score per document type"
 
     EconStyle.add_top_rule(ax)
