@@ -404,6 +404,7 @@ with st.sidebar:
     # ── 3. Premium Action Buttons ──────────────────────────────────────────────
     st.markdown(
         '<a class="sb-btn" href="https://economicshub.substack.com/" target="_blank">Subscribe on Substack ↗</a>'
+        '<a class="sb-btn" href="https://shreyasxi.github.io/economics-hub/" target="_blank">System Architecture ↗</a>'
         '<a class="sb-btn" href="https://shreyasxi.github.io/" target="_blank">Academic Website ↗</a>'
         '<hr class="sb-rule-thick">', # CHANGED: Using a thick rule here to firmly separate sections
         unsafe_allow_html=True,
