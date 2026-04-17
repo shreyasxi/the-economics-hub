@@ -16,6 +16,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+manual_india_update.py
 
 # ── Virtual Environment ──
 .venv/
@@ -46,3 +47,7 @@ Desktop.ini
 # ── RBI Sentinel — local data, cache, logs ──
 data/rbi_sentinel_cache/
 logs/
+
+# Ignore SQLite temp files
+*.db-shm
+*.db-wal
