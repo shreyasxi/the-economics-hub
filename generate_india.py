@@ -1,20 +1,25 @@
 """
 Economics Hub — India Macro Dashboard
 ========================================
-Generates India-specific charts from manually maintained CSV data
-PLUS fiscal data from CAG Monthly Accounts Dashboard.
+Generates India-specific charts from data/india_macro.db (SQLite),
+with CSV fallback for legacy compatibility.
+Also generates fiscal charts from CAG Monthly Accounts Dashboard.
 
 Data sources:
-  MANUAL (CSV):
-  - Manufacturing PMI:   tradingeconomics.com/india/manufacturing-pmi (1st biz day)
-  - Services PMI:        tradingeconomics.com/india/services-pmi (3rd biz day)
-  - GST Revenue:         pib.gov.in (1st of month, ₹ Lakh Cr)
-  - Bank Credit Growth:  RBI monthly bulletin (YoY %)
-  - Unemployment:        MoSPI PLFS / CMIE (monthly)
-  - FPI Flows:           fpi.nsdl.co.in (net monthly, $B)
-  - CPI (Headline):      mospi.gov.in (12th of month, YoY %)
-  - Core CPI:            RBI / mospi.gov.in (YoY %)
-  - Food CPI:            mospi.gov.in (YoY %)
+  AUTO (india_macro.db — populated by data/fetchers/india_fetcher.py):
+  - CPI Headline / Core / Food: FRED (OECD series, ~6-week lag)
+  - Bank Credit / Deposit Growth: RBI DBIE
+  - M3 Money Supply:             RBI DBIE
+  - IIP:                         RBI DBIE
+  - FPI Flows:                   RBI DBIE
+  - Exports / Imports:           RBI DBIE
+  - Forex Reserves (weekly):     RBI DBIE
+
+  MANUAL (enter into DB via india_fetcher --seed or SQLite direct write):
+  - Manufacturing PMI:   S&P Global (1st biz day of month)
+  - Services PMI:        S&P Global (3rd biz day of month)
+  - GST Revenue:         PIB / Finance Ministry (1st of month, ₹ Lakh Cr)
+  - See docs/india_manual_reminders.md for exact URLs and entry workflow
 
   CAG EXCEL (data/cag_monthly_accounts.xlsx):
   - Fiscal Deficit, Capital Expenditure, Net Tax Revenue, etc.
@@ -22,21 +27,21 @@ Data sources:
 
 Usage:
   python generate_india.py                    # Generate all charts
-  python generate_india.py --csv path.csv     # Use custom CSV path
   python generate_india.py --cag path.xlsx    # Use custom CAG file
   python generate_india.py --months 18        # Last 18 months only
-
-Monthly workflow:
-  1. Open data/india_manual.csv → add new row
-  2. Download CAG file → save as data/cag_monthly_accounts.xlsx
-  3. Run: python generate_india.py
-  4. Charts appear in output/india/YYYY-MM/
+  python generate_india.py --mode dashboard   # Explicit mode flag
 """
 
 import argparse
 import sys
+import io
 from pathlib import Path
 from datetime import datetime
+
+# Force UTF-8 output on Windows (avoids cp1252 errors with ₹, →, ⚠ etc.)
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 import pandas as pd
 import numpy as np
@@ -54,9 +59,10 @@ from style.economics_hub_style import EconStyle
 # CONFIG
 # ═══════════════════════════════════════════
 
-DEFAULT_CSV = Path(__file__).parent / "data" / "india_manual.csv"
-DEFAULT_CAG = Path(__file__).parent / "data" / "cag_monthly_accounts.xlsx"
-OUTPUT_BASE = Path(__file__).parent / "output" / "india"
+DEFAULT_CSV   = Path(__file__).parent / "data" / "india_manual.csv"
+DEFAULT_CAG   = Path(__file__).parent / "data" / "cag_monthly_accounts.xlsx"
+DEFAULT_DB    = Path(__file__).parent / "data" / "india_macro.db"
+OUTPUT_BASE   = Path(__file__).parent / "output" / "india"
 
 # Colors
 C_MFG_PMI       = "#003366"     # Navy — manufacturing
@@ -81,12 +87,25 @@ C_CUSTOMS       = "#D97706"     # Amber — customs
 
 # Section colors for table (matching macro_table style)
 SECTION_COLORS = {
-    "INFLATION":       "#B91C1C",
-    "PMI":             "#FF9933",
-    "FISCAL":          "#059669",
-    "CREDIT & FLOWS":  "#7C3AED",
-    "LABOUR":          "#0F172A",
+    "INFLATION":        "#B91C1C",
+    "PMI":              "#FF9933",
+    "FISCAL":           "#059669",
+    "CREDIT & FLOWS":   "#7C3AED",
+    "LABOUR":           "#0F172A",
+    "MONETARY":         "#0369A1",   # Blue — monetary conditions section
+    "EXTERNAL SECTOR":  "#0F766E",   # Teal — external sector section
 }
+
+# New chart colors for additions
+C_DEPOSIT      = "#0EA5E9"    # Sky blue — deposit growth
+C_M3           = "#8B5CF6"    # Violet — money supply
+C_EXPORTS      = "#059669"    # Green — exports
+C_IMPORTS      = "#DC2626"    # Red — imports
+C_DEFICIT_LINE = "#991B1B"    # Dark red — trade deficit line
+C_RESERVES     = "#0369A1"    # Blue — forex reserves
+C_REPO_RATE    = "#FF9933"    # Saffron — RBI repo rate
+C_IIP_POS      = "#16A34A"    # Green — positive IIP
+C_IIP_NEG      = "#DC2626"    # Red — negative IIP
 
 SECTION_BG = "#F1F5F9"  # Slate 100
 
@@ -96,22 +115,76 @@ SECTION_BG = "#F1F5F9"  # Slate 100
 # ═══════════════════════════════════════════
 
 def load_india_data(csv_path=DEFAULT_CSV, months=None):
-    """Load and validate the India manual CSV."""
+    """
+    Load India monthly macro data.
+    Primary:  data/india_macro.db  (india_monthly table)
+    Fallback: data/india_manual.csv (legacy)
+    """
+    # ── Try SQLite primary source ─────────────────────────────────────────────
+    if DEFAULT_DB.exists():
+        try:
+            import sqlite3
+            with sqlite3.connect(DEFAULT_DB) as conn:
+                df = pd.read_sql_query(
+                    "SELECT * FROM india_monthly ORDER BY month ASC", conn
+                )
+            if not df.empty:
+                df["date"] = pd.to_datetime(df["month"])
+                df = df.drop(columns=["month", "source_flags", "fetched_at"], errors="ignore")
+                df = df.sort_values("date").reset_index(drop=True)
+                if months:
+                    cutoff = df["date"].max() - pd.DateOffset(months=months)
+                    df = df[df["date"] >= cutoff].reset_index(drop=True)
+                print(f"   Loaded {len(df)} months from india_macro.db")
+                print(f"   Range: {df['date'].min():%b %Y} to {df['date'].max():%b %Y}")
+                return df
+        except Exception as e:
+            print(f"   Warning: SQLite load failed ({e}), falling back to CSV")
+
+    # ── CSV fallback ──────────────────────────────────────────────────────────
     if not csv_path.exists():
-        print(f"❌ CSV not found: {csv_path}")
-        print(f"   Create it with columns: date,india_mfg_pmi,india_svc_pmi,...")
+        print(f"❌ No data source found. Run: python data/fetchers/india_fetcher.py --seed")
         sys.exit(1)
 
     df = pd.read_csv(csv_path, parse_dates=["date"])
+    df = df[[c for c in df.columns if not c.startswith("Unnamed")]]
     df = df.sort_values("date").reset_index(drop=True)
 
     if months:
         cutoff = df["date"].max() - pd.DateOffset(months=months)
         df = df[df["date"] >= cutoff].reset_index(drop=True)
 
-    print(f"   Loaded {len(df)} months from {csv_path.name}")
-    print(f"   Range: {df['date'].min():%b %Y} → {df['date'].max():%b %Y}")
+    print(f"   Loaded {len(df)} months from {csv_path.name} (CSV fallback)")
+    print(f"   Range: {df['date'].min():%b %Y} to {df['date'].max():%b %Y}")
     return df
+
+
+def load_forex_weekly(n_weeks=78):
+    """
+    Load weekly forex reserves from india_macro.db (india_weekly table).
+    Returns DataFrame with columns: week_ending (datetime), forex_reserves_usd_bn,
+    forex_reserves_wow_chg.  Returns None if no data is available.
+    """
+    if not DEFAULT_DB.exists():
+        return None
+    try:
+        import sqlite3
+        with sqlite3.connect(DEFAULT_DB) as conn:
+            df = pd.read_sql_query(
+                "SELECT * FROM india_weekly ORDER BY week_ending DESC LIMIT ?",
+                conn, params=[n_weeks]
+            )
+        if df.empty:
+            return None
+        df = df.sort_values("week_ending").reset_index(drop=True)
+        df["week_ending"] = pd.to_datetime(df["week_ending"])
+        df = df.drop(columns=["fetched_at"], errors="ignore")
+        print(f"   Loaded {len(df)} weeks of forex reserve data")
+        return df
+    except Exception as e:
+        print(f"   Warning: Forex weekly load failed: {e}")
+        return None
+
 
 
 def load_cag_data(cag_path=DEFAULT_CAG):
@@ -299,9 +372,32 @@ def _add_end_label(ax, dates, vals, label, color, offset_x=8, offset_y=0):
     )
 
 
-def _format_date_axis(ax):
-    """Clean date formatting for monthly data."""
-    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+def _format_date_axis(ax, n_points: int = 0):
+    """
+    Dynamically space x-axis date labels based on the number of data points
+    so labels never overlap regardless of dataset size.
+
+    Pass n_points explicitly (len(dates)) for best results; the fallback
+    estimates from the axis x-range in months when not provided.
+    """
+    if n_points <= 0:
+        try:
+            xmin, xmax = ax.get_xlim()
+            # matplotlib stores dates as float days since epoch
+            n_points = max(1, int((xmax - xmin) / 30))
+        except Exception:
+            n_points = 24
+
+    if n_points <= 18:
+        interval = 1
+    elif n_points <= 36:
+        interval = 3
+    elif n_points <= 60:
+        interval = 6
+    else:
+        interval = 12
+
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=interval))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
     plt.setp(ax.get_xticklabels(), rotation=0, ha="center", fontsize=8)
 
@@ -346,7 +442,7 @@ def chart_pmi(df, output_dir):
         ax.fill_between(dates, 50, mfg, where=(mfg < 50),
                         color=C_FPI_NEG, alpha=0.04, interpolate=True)
 
-    _format_date_axis(ax)
+    _format_date_axis(ax, len(dates))
     ax.set_ylabel("PMI Index", fontsize=EconStyle.FONT_SIZE_AXIS)
     
     # Legend at top-right, inline with subtitle
@@ -404,7 +500,7 @@ def chart_gst(df, output_dir):
     ax.axhline(y=2.0, color="#FF9933", linewidth=1.5, linestyle="--",
                alpha=0.7, zorder=2, label="₹2L Cr Target")
 
-    _format_date_axis(ax)
+    _format_date_axis(ax, len(dates))
     ax.set_ylabel("₹ Lakh Crore", fontsize=EconStyle.FONT_SIZE_AXIS)
     
     # Legend at top-right, inline with subtitle
@@ -424,95 +520,62 @@ def chart_gst(df, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 3: BANK CREDIT GROWTH
+# CHART 4: FPI FLOWS (WEEKLY)
 # ═══════════════════════════════════════════
 
-def chart_credit(df, output_dir):
-    """Bank credit growth YoY trend."""
-    if "india_bank_credit_yoy" not in df.columns:
-        print("   ⚠ Skipping Bank Credit — column not found")
+def chart_fpi(df_weekly, output_dir):
+    """
+    Weekly FPI net flows from NSE via jugaad-data.
+    Reads from india_weekly.fpi_net_flows_usd_bn (weekly table).
+    Shows last 52 weeks as green/red bars with rolling 4-week MA and cumulative annotation.
+    """
+    if df_weekly is None or df_weekly.empty or "fpi_net_flows_usd_bn" not in df_weekly.columns:
+        print("   ⚠ Skipping FPI — no weekly FPI data (run india_fetcher.py --append first)")
         return None
 
-    fig, ax = EconStyle.create_figure(size="wide")
-
-    dates = df["date"].tolist()
-    vals = df["india_bank_credit_yoy"].values
-
-    # Area fill + line
-    ax.fill_between(dates, 0, vals, color=C_CREDIT, alpha=0.08)
-    ax.plot(dates, vals, color=C_CREDIT, linewidth=2.5, zorder=5,
-            solid_capstyle="round")
-    ax.plot(dates, vals, color=C_CREDIT, linewidth=3.7, alpha=0.07,
-            zorder=4, solid_capstyle="round")
-    _add_end_label(ax, dates, vals, "Credit Growth", C_CREDIT)
-
-    # Reference lines
-    ax.axhline(y=15, color="#999999", linewidth=0.8, linestyle="--", zorder=1)
-    ax.text(dates[0], 15.2, "15% (strong growth)", fontsize=7.5,
-            color="#888888", va="bottom", fontfamily=EconStyle.FONT_FAMILY)
-
-    _format_date_axis(ax)
-    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
-    ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
-
-    EconStyle.set_title(ax, "Bank Credit Growth",
-                        "Scheduled Commercial Banks — YoY Credit Growth")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI Monthly Bulletin")
-
-    fp = output_dir / "03_india_credit.png"
-    EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Bank Credit Growth")
-    return fp
-
-
-# ═══════════════════════════════════════════
-# CHART 4: FPI FLOWS
-# ═══════════════════════════════════════════
-
-def chart_fpi(df, output_dir):
-    """FPI net flows — green/red bar chart with YTD cumulative annotation."""
-    if "india_fpi_flows" not in df.columns:
-        print("   ⚠ Skipping FPI — column not found")
+    plot_df = df_weekly[df_weekly["fpi_net_flows_usd_bn"].notna()].copy()
+    if plot_df.empty:
+        print("   ⚠ Skipping FPI — all weekly FPI values are null")
         return None
 
-    fig, ax = EconStyle.create_figure(size="wide")
-
-    dates = df["date"].tolist()
-    vals = df["india_fpi_flows"].values
+    # Limit to last 52 weeks for a clean annual view
+    plot_df = plot_df.tail(52).reset_index(drop=True)
+    dates = plot_df["week_ending"].tolist()
+    vals  = plot_df["fpi_net_flows_usd_bn"].values
     colors = [C_FPI_POS if v >= 0 else C_FPI_NEG for v in vals]
 
-    # Subtle gridlines
-    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+    fig, ax = EconStyle.create_figure(size="wide")
+
+    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
     ax.set_axisbelow(True)
 
-    bar_width = 20
+    bar_width = 5   # days — narrower than monthly bars
     ax.bar(dates, vals, width=bar_width, color=colors, alpha=0.8,
            edgecolor="none", zorder=3)
-
-    # Zero line
     ax.axhline(y=0, color="#000000", linewidth=0.8, zorder=2)
 
-    # Cumulative calculation
-    cumulative = vals.sum()
-    cum_color = C_FPI_POS if cumulative >= 0 else C_FPI_NEG
+    # 4-week rolling MA
+    ma = plot_df["fpi_net_flows_usd_bn"].rolling(4, min_periods=2).mean()
+    ax.plot(dates, ma.values, color="#1E3A5F", linewidth=1.8,
+            linestyle="--", zorder=6, label="4-Week MA")
 
-    # YTD Cumulative annotation in subtitle area (top-right)
-    ax.text(0.99, 1.02, f"Cumulative: ${cumulative:+.1f}B",
-            transform=ax.transAxes, fontsize=11, fontweight='bold',
-            color=cum_color, ha='right', va='bottom',
-            bbox=dict(boxstyle='round,pad=0.3', facecolor='white',
-                     edgecolor=cum_color, linewidth=1.5))
+    # Cumulative annotation
+    cumulative = float(vals.sum())
+    cum_color  = C_FPI_POS if cumulative >= 0 else C_FPI_NEG
+    ax.text(0.99, 1.02, f"52W Cumulative: ${cumulative:+.1f}B",
+            transform=ax.transAxes, fontsize=11, fontweight="bold",
+            color=cum_color, ha="right", va="bottom",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
+                      edgecolor=cum_color, linewidth=1.5))
 
-    _format_date_axis(ax)
+    _format_date_axis(ax, len(dates))
     ax.set_ylabel("Net FPI Flows ($B)", fontsize=EconStyle.FONT_SIZE_AXIS)
 
     EconStyle.set_title(ax, "Foreign Portfolio Flows",
-                        "Monthly Net FPI Flows into India ($B)")
+                        "Weekly Net FPI/FII Flows into India ($B) — Last 52 Weeks")
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "NSDL")
+    EconStyle.add_source(fig, "NSE / jugaad-data")
 
     fp = output_dir / "04_india_fpi.png"
     EconStyle.save_chart(fig, fp)
@@ -524,10 +587,11 @@ def chart_fpi(df, output_dir):
 # CHART 5: INDIA MACRO PULSE TABLE
 # ═══════════════════════════════════════════
 
-def chart_table(df, output_dir, cag_data=None):
+def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     """
     India Macro Pulse Table — Bloomberg/FT style matching macro_table.py
-    Now includes CPI section at top and CAG fiscal data with asterisk.
+    Includes CPI section, CAG fiscal data with asterisk, and External Sector
+    when forex/trade data is available in india_macro.db.
     """
     EconStyle.apply_global_style()
     
@@ -557,12 +621,24 @@ def chart_table(df, output_dir, cag_data=None):
         ]),
         ("CREDIT & FLOWS", [
             ("Bank Credit Growth", "india_bank_credit_yoy", "% YoY", lambda v: f"{v:.1f}%"),
-            ("FPI Net Flows", "india_fpi_flows", "$B", lambda v: f"${v:+.1f}B"),
         ]),
         ("LABOUR", [
             ("Unemployment (PLFS)", "india_unemployment", "%", lambda v: f"{v:.1f}%"),
         ]),
+        ("EXTERNAL SECTOR", [
+            ("Exports", "india_exports_usd_bn", "$B", lambda v: f"${v:.1f}B"),
+            ("Imports", "india_imports_usd_bn", "$B", lambda v: f"${v:.1f}B"),
+            ("Trade Deficit", "india_trade_deficit_usd_bn", "$B", lambda v: f"${v:.1f}B"),
+        ]),
     ]
+
+    # Determine if we have any external sector data worth showing
+    has_external = any(
+        col in df.columns and pd.notna(df.iloc[-1].get(col))
+        for col in ["india_exports_usd_bn", "india_imports_usd_bn", "india_trade_deficit_usd_bn"]
+    )
+    if not has_external:
+        TABLE_SECTIONS = [s for s in TABLE_SECTIONS if s[0] != "EXTERNAL SECTOR"]
     
     # ═══════════════════════════════════════════
     # BUILD ROW DATA
@@ -588,6 +664,32 @@ def chart_table(df, output_dir, cag_data=None):
                     "unit": unit,
                 })
     
+    # Add weekly forex reserves if available (from india_weekly table)
+    if df_weekly is not None and not df_weekly.empty and "forex_reserves_usd_bn" in df_weekly.columns:
+        latest_fx = df_weekly.iloc[-1]
+        fx_val = latest_fx.get("forex_reserves_usd_bn")
+        fx_chg = latest_fx.get("forex_reserves_wow_chg")
+        if pd.notna(fx_val):
+            # Find or create EXTERNAL SECTOR section
+            ext_section_name = "EXTERNAL SECTOR"
+            # Insert forex at beginning of external sector rows
+            ext_rows_start = len(rows)
+            for i, r in enumerate(rows):
+                if r["section"] == ext_section_name:
+                    ext_rows_start = i
+                    break
+            rows.insert(ext_rows_start, {
+                "section": ext_section_name,
+                "name": "Forex Reserves",
+                "value": fx_val,
+                "value_str": f"${fx_val:.1f}B",
+                "change": float(fx_chg) if pd.notna(fx_chg) else None,
+                "unit": "WoW",
+            })
+            # Ensure section colors knows about EXTERNAL SECTOR
+            if ext_section_name not in SECTION_COLORS:
+                SECTION_COLORS[ext_section_name] = "#0F766E"
+
     # Add CAG fiscal data if available
     if has_cag:
         fiscal_section = "FISCAL *"
@@ -743,7 +845,7 @@ def chart_table(df, output_dir, cag_data=None):
     # ═══════════════════════════════════════════
     footer_y = y - row_h/2 - 0.25  # Reduced from 0.40
 
-    source_text = "Source: S&P Global, RBI, MoSPI, PIB, CAG, NSDL"
+    source_text = "Source: S&P Global, RBI DBIE, FRED, MoSPI, PIB, CAG, NSDL"
     ax.text(0.5, footer_y, source_text,
             fontsize=8, color="#666666", ha="left", va="bottom")
     
@@ -813,7 +915,7 @@ def chart_inflation_bar(df, output_dir):
     ax.axhline(y=4, color="#666666", linewidth=0.8, linestyle=":", zorder=1)
     
     # 7. Formatting
-    _format_date_axis(ax)
+    _format_date_axis(ax, len(dates))
     ax.set_ylabel("YoY % Change", fontsize=EconStyle.FONT_SIZE_AXIS)
 
     # 8. LEGEND (Now includes the RBI Band)
@@ -833,6 +935,337 @@ def chart_inflation_bar(df, output_dir):
     fp = output_dir / "06_india_inflation_bar.png"
     EconStyle.save_chart(fig, fp)
     print(f"   ✓ Inflation Bar Chart")
+    return fp
+
+
+# ═══════════════════════════════════════════
+# (Chart 12 removed — RBI Repo Rate is covered in the RBI Sentinel section)
+# ═══════════════════════════════════════════
+
+
+
+# ═══════════════════════════════════════════
+# CHART 13: MONEY SUPPLY vs CREDIT
+# ═══════════════════════════════════════════
+
+def chart_money_supply(df, output_dir):
+    """
+    M3 YoY % vs Bank Credit YoY % dual-line trend chart.
+    M3 data populated when DBIE endpoints are configured in india_fetcher.py.
+    Falls back to credit-only chart if M3 not yet available.
+    """
+    has_credit = "india_bank_credit_yoy" in df.columns
+    has_m3 = "india_m3_yoy" in df.columns and df["india_m3_yoy"].notna().any()
+
+    if not has_credit:
+        print("   ⚠ Skipping Money Supply — no credit data")
+        return None
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    dates = df["date"].tolist()
+
+    # Bank Credit YoY
+    credit = df["india_bank_credit_yoy"].values
+    ax.plot(dates, credit, color=C_CREDIT, linewidth=2.5, label="Bank Credit YoY",
+            zorder=5, solid_capstyle="round")
+    ax.plot(dates, credit, color=C_CREDIT, linewidth=3.7, alpha=0.07,
+            zorder=4, solid_capstyle="round")
+    ax.fill_between(dates, 0, credit, color=C_CREDIT, alpha=0.04)
+    _add_end_label(ax, dates, credit, "Credit", C_CREDIT, offset_y=6)
+
+    # M3 YoY (when available)
+    if has_m3:
+        m3 = df["india_m3_yoy"].values
+        ax.plot(dates, m3, color=C_M3, linewidth=2.2, linestyle="--",
+                label="M3 Money Supply YoY", zorder=5, solid_capstyle="round")
+        _add_end_label(ax, dates, m3, "M3", C_M3, offset_y=-14)
+    else:
+        ax.text(0.02, 0.04, "M3 data pending DBIE configuration",
+                transform=ax.transAxes, fontsize=8, color="#94A3B8",
+                style="italic", va="bottom")
+
+    # Reference line
+    ax.axhline(y=15, color="#999999", linewidth=0.8, linestyle="--", zorder=1, alpha=0.5)
+    ax.text(dates[0], 15.2, "15%", fontsize=7, color="#888888",
+            va="bottom", fontfamily=EconStyle.FONT_FAMILY)
+
+    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
+              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+
+    _format_date_axis(ax, len(dates))
+    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
+    ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
+
+    EconStyle.set_title(ax, "Monetary Conditions — Credit & Money Supply",
+                        "Bank Credit YoY vs M3 Money Supply YoY (%)")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "RBI DBIE")
+
+    fp = output_dir / "13_india_money_supply.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Money Supply vs Credit")
+    return fp
+
+
+# ═══════════════════════════════════════════
+# CHART 14: CREDIT vs DEPOSIT GROWTH
+# ═══════════════════════════════════════════
+
+def chart_credit_deposit(df, output_dir):
+    """
+    Bank Credit Growth vs Deposit Growth — grouped bars with CD ratio overlay.
+    Deposit data populated when DBIE endpoints are configured.
+    """
+    has_credit = "india_bank_credit_yoy" in df.columns and df["india_bank_credit_yoy"].notna().any()
+    has_deposit = "india_deposit_growth_yoy" in df.columns and df["india_deposit_growth_yoy"].notna().any()
+
+    if not has_credit:
+        print("   ⚠ Skipping Credit/Deposit — no data")
+        return None
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    dates = df["date"].tolist()
+    bar_width = 8  # days
+
+    if has_deposit:
+        # Grouped bars
+        dates_credit = [d - pd.Timedelta(days=bar_width / 2) for d in dates]
+        dates_dep    = [d + pd.Timedelta(days=bar_width / 2) for d in dates]
+        credit_vals  = df["india_bank_credit_yoy"].values
+        deposit_vals = df["india_deposit_growth_yoy"].values
+
+        ax.bar(dates_credit, credit_vals, width=bar_width, color=C_CREDIT,
+               alpha=0.8, label="Bank Credit YoY", edgecolor="none", zorder=3)
+        ax.bar(dates_dep, deposit_vals, width=bar_width, color=C_DEPOSIT,
+               alpha=0.8, label="Deposit Growth YoY", edgecolor="none", zorder=3)
+
+        # Credit-Deposit ratio overlay on right axis
+        cd_ratio = credit_vals / deposit_vals * 100
+        ax2 = ax.twinx()
+        ax2.plot(dates, cd_ratio, color="#0F172A", linewidth=1.5,
+                 linestyle="--", zorder=6, label="C/D Ratio")
+        ax2.axhline(y=75, color="#0F172A", linewidth=0.7, linestyle=":",
+                    alpha=0.5)
+        ax2.set_ylabel("Credit-Deposit Ratio (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                       color="#0F172A")
+        ax2.tick_params(axis="y", colors="#0F172A")
+        ax2.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.0f%%"))
+    else:
+        # Credit only until DBIE is configured
+        credit_vals = df["india_bank_credit_yoy"].values
+        ax.bar(dates, credit_vals, width=16, color=C_CREDIT,
+               alpha=0.75, label="Bank Credit YoY", edgecolor="none", zorder=3)
+        ax.text(0.02, 0.04, "Deposit data pending DBIE configuration",
+                transform=ax.transAxes, fontsize=8, color="#94A3B8",
+                style="italic", va="bottom")
+
+    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
+              ncol=3, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+    ax.axhline(y=0, color="#000000", linewidth=0.6, zorder=2)
+    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
+
+    _format_date_axis(ax, len(dates))
+    ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
+
+    EconStyle.set_title(ax, "Bank Credit & Deposit Growth",
+                        "Scheduled Commercial Banks — YoY Growth (%)")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "RBI DBIE")
+
+    fp = output_dir / "14_india_credit_deposit.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Bank Credit & Deposit Growth")
+    return fp
+
+
+# ═══════════════════════════════════════════
+# CHART 15: IIP — INDUSTRIAL PRODUCTION
+# ═══════════════════════════════════════════
+
+def chart_iip(df, output_dir):
+    """
+    IIP (Index of Industrial Production) YoY % — bar chart with 3M MA.
+    Data populated when DBIE endpoints are configured in india_fetcher.py.
+    """
+    if "india_iip_yoy" not in df.columns or not df["india_iip_yoy"].notna().any():
+        print("   ⚠ Skipping IIP — data pending DBIE configuration")
+        return None
+
+    df_iip = df.dropna(subset=["india_iip_yoy"]).copy()
+    if df_iip.empty:
+        return None
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    dates = df_iip["date"].tolist()
+    vals  = df_iip["india_iip_yoy"].values
+
+    ax.yaxis.grid(True, linestyle="-", alpha=0.12, color="#9CA3AF", zorder=0)
+    ax.set_axisbelow(True)
+
+    colors = [C_IIP_POS if v >= 0 else C_IIP_NEG for v in vals]
+    ax.bar(dates, vals, width=20, color=colors, alpha=0.8,
+           edgecolor="none", zorder=3, label="IIP YoY")
+
+    # 3-month moving average
+    if len(vals) >= 3:
+        ma3 = pd.Series(vals).rolling(3).mean().values
+        ax.plot(dates, ma3, color="#000000", linewidth=2.0, linestyle="-",
+                label="3M Avg", zorder=5, solid_capstyle="round")
+        valid_ma = [(d, v) for d, v in zip(dates, ma3) if not np.isnan(v)]
+        if valid_ma:
+            _add_end_label(ax, [d for d, _ in valid_ma],
+                          [v for _, v in valid_ma], "3M Avg", "#000000")
+
+    ax.axhline(y=0, color="#000000", linewidth=0.8, zorder=2)
+
+    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
+              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+    _format_date_axis(ax, len(dates))
+    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
+    ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
+
+    EconStyle.set_title(ax, "Industrial Production (IIP)",
+                        "Index of Industrial Production — YoY % Change")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "RBI DBIE / MoSPI")
+
+    fp = output_dir / "15_india_iip.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ IIP Industrial Production")
+    return fp
+
+
+# ═══════════════════════════════════════════
+# CHART 16: FOREX RESERVES
+# ═══════════════════════════════════════════
+
+def chart_forex_reserves(df_weekly, output_dir):
+    """
+    Forex Reserves: dual-panel — area chart for level + bar chart for WoW change.
+    Data sourced from india_weekly table (weekly RBI release).
+    """
+    if df_weekly is None or df_weekly.empty:
+        print("   ⚠ Skipping Forex Reserves — data pending DBIE configuration")
+        return None
+    if "forex_reserves_usd_bn" not in df_weekly.columns:
+        return None
+    if not df_weekly["forex_reserves_usd_bn"].notna().any():
+        return None
+
+    fig, (ax_level, ax_chg) = EconStyle.create_figure(
+        size="wide", nrows=1, ncols=2
+    )
+
+    dates = df_weekly["week_ending"].tolist()
+    levels = df_weekly["forex_reserves_usd_bn"].values
+
+    # Left panel: Reserves level (area chart)
+    ax_level.fill_between(dates, 0, levels, color=C_RESERVES, alpha=0.12)
+    ax_level.plot(dates, levels, color=C_RESERVES, linewidth=2.0,
+                  zorder=5, solid_capstyle="round")
+    _add_end_label(ax_level, dates, levels, f"${levels[-1]:.0f}B", C_RESERVES)
+    ax_level.set_ylabel("USD Billion", fontsize=EconStyle.FONT_SIZE_AXIS)
+    ax_level.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+    ax_level.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    plt.setp(ax_level.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+    EconStyle.set_title(ax_level, "Forex Reserves Level", "USD Billion")
+    EconStyle.add_top_rule(ax_level)
+
+    # Right panel: WoW change
+    if "forex_reserves_wow_chg" in df_weekly.columns:
+        chg_vals = df_weekly["forex_reserves_wow_chg"].fillna(0).values
+        chg_colors = [C_IIP_POS if v >= 0 else C_IIP_NEG for v in chg_vals]
+        ax_chg.bar(dates, chg_vals, color=chg_colors, width=5,
+                   alpha=0.8, edgecolor="none", zorder=3)
+        ax_chg.axhline(y=0, color="#000000", linewidth=0.8, zorder=2)
+        ax_chg.set_ylabel("WoW Change ($B)", fontsize=EconStyle.FONT_SIZE_AXIS)
+        ax_chg.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+        ax_chg.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+        plt.setp(ax_chg.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+        EconStyle.set_title(ax_chg, "Weekly Change", "WoW Change (USD Billion)")
+        EconStyle.add_top_rule(ax_chg)
+
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "RBI DBIE")
+
+    fp = output_dir / "16_india_forex_reserves.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Forex Reserves")
+    return fp
+
+
+# ═══════════════════════════════════════════
+# CHART 17: TRADE BALANCE
+# ═══════════════════════════════════════════
+
+def chart_trade_balance(df, output_dir):
+    """
+    Monthly Exports and Imports as grouped bars; Trade Deficit as line on right axis.
+    Data populated when DBIE endpoints are configured.
+    """
+    needed = ["india_exports_usd_bn", "india_imports_usd_bn"]
+    has_data = all(
+        col in df.columns and df[col].notna().any() for col in needed
+    )
+    if not has_data:
+        print("   ⚠ Skipping Trade Balance — data pending DBIE configuration")
+        return None
+
+    df_trade = df.dropna(subset=needed).copy()
+    if df_trade.empty:
+        return None
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    ax2 = ax.twinx()
+
+    dates = df_trade["date"].tolist()
+    exports = df_trade["india_exports_usd_bn"].values
+    imports = df_trade["india_imports_usd_bn"].values
+    deficit = imports - exports  # positive = deficit (imports > exports)
+
+    bar_width = 10
+    dates_exp = [d - pd.Timedelta(days=bar_width / 2) for d in dates]
+    dates_imp = [d + pd.Timedelta(days=bar_width / 2) for d in dates]
+
+    ax.yaxis.grid(True, linestyle="-", alpha=0.12, color="#9CA3AF", zorder=0)
+    ax.set_axisbelow(True)
+
+    ax.bar(dates_exp, exports, width=bar_width, color=C_EXPORTS,
+           alpha=0.8, label="Exports", edgecolor="none", zorder=3)
+    ax.bar(dates_imp, imports, width=bar_width, color="#DC2626",
+           alpha=0.75, label="Imports", edgecolor="none", zorder=3)
+
+    ax2.plot(dates, deficit, color=C_DEFICIT_LINE, linewidth=2.0,
+             linestyle="--", zorder=6, label="Trade Deficit")
+    _add_end_label(ax2, dates, deficit, f"Deficit\n${deficit[-1]:.0f}B",
+                   C_DEFICIT_LINE, offset_y=5)
+
+    ax.set_ylabel("USD Billion", fontsize=EconStyle.FONT_SIZE_AXIS)
+    ax2.set_ylabel("Trade Deficit ($B)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                   color=C_DEFICIT_LINE)
+    ax2.tick_params(axis="y", colors=C_DEFICIT_LINE)
+
+    # Combined legend
+    lines1, labels1 = ax.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax.legend(lines1 + lines2, labels1 + labels2,
+              loc="lower right", bbox_to_anchor=(1.1, 1.02),
+              ncol=3, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+
+    _format_date_axis(ax, len(dates))
+
+    EconStyle.set_title(ax, "India Trade Balance",
+                        "Monthly Merchandise Exports & Imports ($B)")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "RBI DBIE / DGCI&S")
+
+    fp = output_dir / "17_india_trade.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Trade Balance")
     return fp
 
 
@@ -1306,38 +1739,49 @@ def main():
         description="Generate Economics Hub India Macro Dashboard"
     )
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV,
-                        help="Path to india_manual.csv")
+                        help="Path to india_manual.csv (fallback if DB unavailable)")
     parser.add_argument("--cag", type=Path, default=DEFAULT_CAG,
                         help="Path to CAG Monthly Accounts Excel file")
     parser.add_argument("--months", type=int, default=None,
                         help="Limit to last N months (default: all)")
+    parser.add_argument("--mode", choices=["dashboard", "full"], default="dashboard",
+                        help="dashboard: skip CAG if missing; full: require CAG")
     args = parser.parse_args()
 
     now = datetime.now()
     output_dir = OUTPUT_BASE / now.strftime("%Y-%m")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"🇮🇳 Generating Economics Hub — India Macro Dashboard")
+    print(f"Generating Economics Hub — India Macro Dashboard")
     print(f"   Output: {output_dir}")
 
-    # Load data
+    # ── Load data ──────────────────────────────────────────────────────────────
     df = load_india_data(args.csv, args.months)
+    df_weekly = load_forex_weekly()
     cag_data, df_monthly, df_prev_monthly = load_cag_data(args.cag)
 
-    # Generate charts
+    # ── Activity & PMI charts ──────────────────────────────────────────────────
     print(f"\n   Generating charts...")
-    
-    # Core charts (from your CSV)
     chart_pmi(df, output_dir)
     chart_gst(df, output_dir)
-    chart_credit(df, output_dir)
-    chart_fpi(df, output_dir)
-    chart_inflation_bar(df, output_dir)  # Your beautiful chart!
-    
-    # Summary table (with CAG fiscal data integrated)
-    chart_table(df, output_dir, cag_data)
-    
-    # Fiscal charts (from CAG) — FT-style
+    chart_fpi(df_weekly, output_dir)
+    chart_inflation_bar(df, output_dir)
+
+    # ── Summary table (integrates CAG fiscal + weekly forex) ───────────────────
+    chart_table(df, output_dir, cag_data, df_weekly)
+
+    # ── Monetary Conditions charts ─────────────────────────────────────────────
+    chart_money_supply(df, output_dir)
+    chart_credit_deposit(df, output_dir)
+
+    # ── Economic Activity — IIP (new) ──────────────────────────────────────────
+    chart_iip(df, output_dir)
+
+    # ── External Sector charts (new) ──────────────────────────────────────────
+    chart_forex_reserves(df_weekly, output_dir)
+    chart_trade_balance(df, output_dir)
+
+    # ── Fiscal charts (from CAG) — FROZEN, no changes ─────────────────────────
     if cag_data:
         chart_expenditure_quality(cag_data, df_monthly, output_dir)
         chart_tax_composition(cag_data, output_dir)
@@ -1345,15 +1789,16 @@ def main():
         chart_monthly_fiscal_pulse(cag_data, df_monthly, output_dir)
         chart_fiscal_deficit_gdp(args.cag, output_dir)
 
-    chart_count = 11 if cag_data else 6
-    print(f"\n✅ India Dashboard complete! {chart_count} charts saved to:")
+    non_cag_count = 11  # charts 01–06 + 12–17 (chart 03/credit removed, 6 new)
+    chart_count = non_cag_count + (5 if cag_data else 0)
+    print(f"\n India Dashboard complete! {chart_count} charts saved to:")
     print(f"   {output_dir}")
-    
+
     if cag_data:
-        print(f"\n📊 Fiscal Summary ({cag_data['fy']} through {cag_data['latest_month']}):")
-        print(f"   • Capex YTD: ₹{cag_data['capex_ytd']:.0f} Lakh Cr ({cag_data['capex_pct_be']:.1f}% of BE)")
-        print(f"   • Fiscal Deficit YTD: ₹{cag_data['fiscal_deficit_ytd']:.0f} Lakh Cr")
-        print(f"   • Net Tax Revenue YTD: ₹{cag_data['net_tax_ytd']:.0f} Lakh Cr")
+        print(f"\n Fiscal Summary ({cag_data['fy']} through {cag_data['latest_month']}):")
+        print(f"   Capex YTD: {cag_data['capex_ytd']:.0f} Lakh Cr ({cag_data['capex_pct_be']:.1f}% of BE)")
+        print(f"   Fiscal Deficit YTD: {cag_data['fiscal_deficit_ytd']:.0f} Lakh Cr")
+        print(f"   Net Tax Revenue YTD: {cag_data['net_tax_ytd']:.0f} Lakh Cr")
 
 
 if __name__ == "__main__":

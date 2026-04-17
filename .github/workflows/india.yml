@@ -1,33 +1,29 @@
 name: India Dashboard Generator
 
 on:
-  # No schedule — India data is manually maintained by Shreyas.
-  # Trigger this workflow ONLY after updating:
-  #   data/india_manual.csv
-  #   data/cag_monthly_accounts.xlsx
-  # Commit and push those files first, then run this workflow.
+  # Weekly auto-run: Saturday 08:00 UTC (after weekly macro pipeline at 06:00)
+  schedule:
+    - cron: "0 8 * * 6"
+
+  # Manual trigger — use after updating india_manual.csv / cag_monthly_accounts.xlsx,
+  # or to force-regenerate charts without a data fetch.
   workflow_dispatch:
     inputs:
-      confirm:
-        description: >
-          Type "run" to confirm you have updated india_manual.csv
-          and cag_monthly_accounts.xlsx and pushed the changes.
-        required: true
-        default: ''
+      skip_fetch:
+        description: "Set to 'true' to skip data fetch and regenerate charts only"
+        required: false
+        default: "false"
 
 jobs:
-  generate-india:
+  # ── Job 1: Fetch latest India macro data ──────────────────────────────────
+  # continue-on-error: true — a fetch failure (API downtime, WAF block, jugaad-data
+  # break) must NEVER prevent chart generation. Charts render from last-known-good
+  # DB state. A stale chart with a timestamp is always better than a crashed pipeline.
+  fetch-data:
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
-      - name: Validate confirmation input
-        run: |
-          if [ "${{ github.event.inputs.confirm }}" != "run" ]; then
-            echo "ERROR: Confirmation input must be exactly 'run'."
-            echo "Update your data files, push, then trigger this workflow."
-            exit 1
-          fi
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -37,17 +33,60 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch latest India data
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          PYTHONPATH: "."
+        run: python data/fetchers/india_fetcher.py --append
+
+      - name: Commit updated DB
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/india_macro.db
+          git diff --staged --quiet && echo "No DB changes to commit." && exit 0
+          git commit -m "auto: india data fetch $(date -u +%Y-%m-%d)"
+          git push
+
+  # ── Job 2: Generate charts ────────────────────────────────────────────────
+  # if: always() — runs unconditionally, even if fetch-data failed or was skipped.
+  # Reads exclusively from data/india_macro.db (SQLite). If the DB has no new data
+  # after a fetch failure, charts regenerate from the previous state — no crash.
+  generate-charts:
+    runs-on: ubuntu-latest
+    needs: fetch-data
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Pull latest DB commit (if fetch-data pushed one)
+        run: git pull --rebase origin main || true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Generate India charts
         env:
-          # No FRED_API_KEY needed — India pipeline reads local CSV/XLSX only.
           PYTHONPATH: "."
-        run: python generate_india.py
+        run: python generate_india.py --mode dashboard
 
       - name: Copy charts to assets/
         run: |
@@ -67,6 +106,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add assets/india/
-          git diff --staged --quiet && echo "No changes to commit." && exit 0
+          git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
           git push

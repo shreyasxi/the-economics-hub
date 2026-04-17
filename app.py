@@ -518,7 +518,7 @@ def _render_grid(charts: list[Path], cols: int = 2) -> None:
             )
             insight = get_insight(chart_path.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
     
 def _section(title: str) -> None:
@@ -731,7 +731,7 @@ with tab_india:
             _render_summary(summary)
 
         # 1. High-Frequency Growth Indicators
-        growth_kws = ["pmi", "credit"]
+        growth_kws = ["pmi", "iip"]
         growth = [c for c in charts if any(k in c.name for k in growth_kws)]
         charts = [c for c in charts if c not in growth]
         if growth:
@@ -746,15 +746,23 @@ with tab_india:
             _section("Inflation Dynamics")
             _render_grid(inflation)
 
-        # 3. Fiscal Policy & Public Finances
-        fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
-        fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
-        charts = [c for c in charts if c not in fiscal]
-        if fiscal:
-            _section("Fiscal Policy & Public Finances")
-            _render_grid(fiscal)
+        # 3. Monetary Conditions
+        monetary_kws = ["money", "supply", "credit", "deposit", "m3"]
+        monetary = [c for c in charts if any(k in c.name for k in monetary_kws)]
+        charts = [c for c in charts if c not in monetary]
+        if monetary:
+            _section("Monetary Conditions")
+            _render_grid(monetary)
 
-        # 4. Capital Flows
+        # 4. External Sector
+        external_kws = ["forex", "reserves", "trade", "export", "import"]
+        external = [c for c in charts if any(k in c.name for k in external_kws)]
+        charts = [c for c in charts if c not in external]
+        if external:
+            _section("External Sector")
+            _render_grid(external)
+
+        # 5. Capital Flows
         flows_kws = ["flows", "fii", "fpi", "portfolio"]
         flows = [c for c in charts if any(k in c.name for k in flows_kws)]
         charts = [c for c in charts if c not in flows]
@@ -762,13 +770,18 @@ with tab_india:
             _section("Capital Flows")
             _render_grid(flows)
 
+        # 6. Fiscal Policy & Public Finances
+        fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
+        fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
+        charts = [c for c in charts if c not in fiscal]
+        if fiscal:
+            _section("Fiscal Policy & Public Finances")
+            _render_grid(fiscal)
+
         # Catch-all
         if charts:
             _section("Other")
             _render_grid(charts)
-
-        if charts:
-            _render_grid(charts, cols=2)
 
 
 # ── RBI Sentinel tab ────────────────────────────────────────────────────────
@@ -1029,7 +1042,7 @@ with tab_rbi:
             st.image(str(trajectory), use_container_width=True)
             insight = get_insight(trajectory.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
 
@@ -1044,7 +1057,7 @@ with tab_rbi:
             st.image(str(comparison), use_container_width=True)
             insight = get_insight(comparison.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
         # Supporting chart (CENTERED)
@@ -1054,7 +1067,7 @@ with tab_rbi:
                 st.image(str(radar), use_container_width=True)
                 insight = get_insight(radar.name)
                 if insight:
-                    with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                    with st.expander("ℹ️ Chart Insights"):
                         st.markdown(insight)
                         
         # ── Repo Rate vs Sentiment (PRIMARY) ──
@@ -1064,7 +1077,7 @@ with tab_rbi:
             st.image(str(rate_chart), use_container_width=True)
             insight = get_insight(rate_chart.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
         # ── Governor Signal Analysis ──
@@ -1075,7 +1088,7 @@ with tab_rbi:
             st.image(str(gov_divergence), use_container_width=True)
             insight = get_insight(gov_divergence.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
         # ── Meeting History ──
@@ -1085,7 +1098,7 @@ with tab_rbi:
             st.image(str(timeline), use_container_width=True)
             insight = get_insight(timeline.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Practical Takeaways"):
+                with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
         # ── Catch-all ──

@@ -328,9 +328,9 @@ CHART_INSIGHTS: dict[str, str] = {
 """,
 
     "india_fpi": """\
-**How to read this chart:** Monthly net Foreign Portfolio Investment (FPI) flows into India, disaggregated into equity and debt components where available. Positive bars represent net inflows (foreign investors buying Indian assets); negative bars represent net outflows (selling). FPI data is sourced from NSDL. The scale of flows matters less than the direction and duration — sustained outflows over 3+ months have historically preceded INR depreciation and NIFTY underperformance.
+**How to read this chart:** Weekly net FII/FPI (Foreign Institutional/Portfolio Investor) cash-market flows into India, sourced from NSE via jugaad-data. Each bar represents a single trading day's net buying or selling by foreign institutions (₹ Crore, converted to USD bn). The 4-week rolling moving average cuts through daily noise to reveal the underlying flow trend. The 52-week cumulative annotation at top-right shows whether the overall year has been a net inflow or outflow period — the single most important number for understanding foreign ownership trends.
 
-**Practical takeaway:** FPI flows are India's most politically and market-sensitive capital flow component. They are highly responsive to three external factors — US dollar strength, Fed rate expectations, and global risk appetite — and two domestic factors — India's earnings growth relative to EM peers and RBI/government policy credibility. A pattern of equity inflows combined with debt outflows typically signals foreign investors are positive on India's growth story but concerned about currency/rate risk. Conversely, simultaneous equity and debt outflows (both bars negative) signal a classic "sudden stop" — the most damaging scenario for the INR and equity markets simultaneously. Watch for the September–October window, when FPI rebalancing ahead of EM index reweights (MSCI, FTSE) can generate large, temporary flow distortions.
+**Practical takeaway:** Weekly FPI data is significantly more actionable than monthly aggregates because it reveals intra-month reversals that monthly averages mask. Three consecutive weeks of outflows exceeding $500M each are historically associated with 2–4% NIFTY underperformance in the following 4 weeks. The key asymmetry: inflows tend to be gradual and persistent (weeks of steady accumulation), while outflows can be sharp and concentrated (a single week of panic selling can erase a month of inflows). Foreign flows are structurally driven by India's weight in EM benchmarks (MSCI EM, FTSE EM) — MSCI weight increases have historically preceded 3–6 months of sustained inflows regardless of the macro backdrop. For timing, note that September–October typically sees FPI outflows as global fund managers rebalance ahead of Q3 earnings seasons in the US and Europe.
 """,
 
     "india_inflation_bar": """\
@@ -367,6 +367,48 @@ CHART_INSIGHTS: dict[str, str] = {
 **How to read this chart:** India's fiscal deficit as a percentage of GDP, tracked over multiple fiscal years to show the consolidation trajectory. This is the single most important fiscal credibility metric for sovereign credit rating agencies (S&P, Moody's, Fitch), bond market investors, and the RBI. The chart contextualises the current year's deficit within the medium-term consolidation path India has committed to under FRBM targets.
 
 **Practical takeaway:** India's trajectory from a 9.2% deficit-to-GDP in FY21 (COVID year) toward the 4.5–5% range represents one of the fastest post-pandemic fiscal consolidations among major EMs — a structural positive for India's sovereign rating and 10-year G-Sec yield trajectory. The market's implied "fair value" for fiscal consolidation is a deficit below 5% of GDP sustaining for two or more consecutive years, which has historically correlated with a 50–75 bps compression in the 10Y G-Sec spread over US Treasuries. Any fiscal slippage above 5.5% GDP — whether from revenue disappointment, election-related expenditure, or crisis spending — triggers a reassessment of India's rate cut timeline by the RBI. The relationship between India's fiscal deficit and the 10-year G-Sec yield is the central transmission mechanism for domestic bond market pricing.
+""",
+
+    # ── INDIA: MONETARY CONDITIONS ───────────────────────────────────────────
+
+    "india_repo_rate": """\
+**How to read this chart:** The RBI's policy repo rate history shown as a step chart — each horizontal segment represents a policy hold period, each vertical step represents an MPC decision to hike or cut. Annotated with each meeting date and the prevailing rate. This is the anchor of India's entire yield curve: repo rate decisions directly set the overnight interbank rate (WACR) and, with a lag, influence 91-day T-bills, 10-year G-Secs, and ultimately bank lending and deposit rates.
+
+**Practical takeaway:** The rate cycle context determines everything downstream in India macro. Identify whether the RBI is in a tightening cycle (2022–23), a prolonged hold (2023–24), or an easing cycle (2024-onwards). Each phase has a distinct transmission: tightening compresses credit growth and slows home loans; easing stimulates both. India's neutral real rate is estimated at 1–1.5%, meaning a repo rate above 5.5–6% is restrictive. Watch the gap between the repo rate and current CPI — when the real rate turns positive and persistent, the preconditions for a rate cut cycle are satisfied.
+""",
+
+    "india_money_supply": """\
+**How to read this chart:** Two lines showing M3 (broad money supply) growth YoY % versus aggregate bank credit growth YoY %. The gap between the two is the monetary transmission signal: when credit growth exceeds M3 growth, banks are expanding loan books faster than deposits are accumulating — a structural tightening of liquidity; when M3 grows faster than credit, excess money creation is sitting idle (risk-off environment) or being deployed into government securities rather than private credit.
+
+**Practical takeaway:** The credit-M3 spread is one of the cleanest leading indicators of RBI liquidity operations. A sustained positive spread (credit > M3) precedes CRR/SLR adjustments and OMO purchases by the RBI to inject liquidity. A negative spread (M3 > credit) signals monetary accommodation in excess of private credit demand — consistent with a rate cut cycle or low investment sentiment. India's historical "normal" for bank credit growth is 12–15% YoY; below 10% is a soft-credit regime; above 16% risks asset quality concerns in the medium term.
+""",
+
+    "india_credit_deposit": """\
+**How to read this chart:** Grouped bars showing bank credit growth YoY % and deposit growth YoY % side-by-side each month, with the Credit-Deposit (CD) ratio overlaid as a secondary-axis line. The CD ratio (total credit ÷ total deposits) is the core liquidity health metric for India's banking system: a rising CD ratio means the system is lending more of every deposit rupee, compressing the liquidity buffer.
+
+**Practical takeaway:** India's banking system historically operates with a CD ratio between 70–78%. Sustained CD ratios above 78% signal that deposit mobilisation is lagging credit demand — which has historically preceded RBI calls for banks to raise deposit rates, moderated loan growth, or tighter systemic liquidity. The chart also shows whether credit-deposit divergence is cyclical (temporary growth surge) or structural (persistent deposit shortfall). When deposit growth consistently trails credit growth for 4+ months, watch for RBI governor commentary on deposit mobilisation — this has been a frequent conference theme in 2023–24.
+""",
+
+    # ── INDIA: ECONOMIC ACTIVITY ──────────────────────────────────────────────
+
+    "india_iip": """\
+**How to read this chart:** India's Index of Industrial Production (IIP) year-on-year percentage change, shown as green/red monthly bars with a 3-month moving average overlay. IIP measures the volume of output across manufacturing (77% weight), mining (14%), and electricity (9%). It is released monthly by MoSPI with a 6-week lag and serves as the official measure of industrial output — the closest India has to a monthly GDP proxy for the real sector.
+
+**Practical takeaway:** IIP is inherently volatile due to base effects and seasonal manufacturing cycles; the 3M MA is more informative than any single month. Sustained IIP above 5–6% YoY is consistent with RBI's 7%+ real GDP growth projections. Cross-reference with PMI: PMI is forward-looking (surveys) while IIP is backward-looking (actual output); when both are elevated simultaneously, India's manufacturing cycle is genuinely strong. IIP weakness below 2% for 3+ consecutive months has historically preceded downward revisions to advance GDP estimates and triggered RBI accommodation discussions.
+""",
+
+    # ── INDIA: EXTERNAL SECTOR ────────────────────────────────────────────────
+
+    "india_forex_reserves": """\
+**How to read this chart:** Dual panel showing India's total foreign exchange reserves in USD billions (area chart, left panel) and the week-on-week change in reserves (diverging bars, right panel). Data sourced from the RBI's weekly statistical supplement, released every Friday for the prior week. India's forex reserves are the RBI's primary instrument for INR management: they buy USD (accumulate reserves) when the INR is appreciating and sell USD (draw down reserves) when the INR is under depreciation pressure.
+
+**Practical takeaway:** Reserves above $600B provide approximately 12 months of import cover — a historically strong buffer that the RBI uses as a communications anchor. The weekly change chart is more actionable: sustained weekly drawdowns of $2–4B over 4+ consecutive weeks almost always indicate active RBI intervention to defend the INR. Sharp single-week drops ($5–8B) typically reflect forward contract settlements or emergency intervention during EM sell-offs (e.g., during US rate hike cycles). Reserve accumulation weeks confirm a period of INR stability or RBI building a buffer ahead of anticipated external volatility.
+""",
+
+    "india_trade": """\
+**How to read this chart:** Monthly merchandise exports and imports in USD billions shown as grouped bars, with the trade deficit plotted as a secondary-axis line. Data sourced from DGCI&S via RBI DBIE. India is structurally a trade deficit country — imports (primarily crude oil, gold, electronics) consistently exceed exports — making the deficit magnitude a key variable for the current account balance and INR pressure.
+
+**Practical takeaway:** India's merchandise trade deficit typically runs at $20–25B per month under stable conditions. Deficits below $20B signal either weak import demand (slowdown) or strong export performance; deficits above $28–30B signal commodity price surges (crude oil being the dominant driver — every $10/barrel rise in Brent adds approximately $12–14B to India's annual import bill) or gold import spikes. The services trade surplus (software exports, remittances) partially offsets the merchandise deficit but is not captured here — for the full current account picture, note that India's services surplus of ~$150B/year (FY24) structurally cushions the merchandise gap.
 """,
 
     # ── WEEKLY: CRYPTO ASSETS ────────────────────────────────────────────────
