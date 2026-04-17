@@ -462,12 +462,6 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
 
     monthly_data: dict[str, dict] = {}
 
-    # Source 1: FRED CPI
-    if fred_api_key:
-        for month, vals in fetch_fred_cpi(fred_api_key, dry_run=dry_run).items():
-            monthly_data.setdefault(month, {}).update(vals)
-    else:
-        log.warning("No FRED_API_KEY — skipping CPI auto-fetch")
 
     # Source 2a: jugaad-data repo rate (diagnostic only)
     fetch_repo_rate_current(dry_run=dry_run)

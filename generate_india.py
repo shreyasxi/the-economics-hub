@@ -407,7 +407,10 @@ def _format_date_axis(ax, n_points: int = 0):
 # ═══════════════════════════════════════════
 
 def chart_pmi(df, output_dir):
-    """Manufacturing + Services PMI with expansion/contraction zones."""
+    """Manufacturing + Services PMI with expansion/contraction zones.
+    Includes custom horizontal X-axis logic that forces the latest date to appear,
+    optimized for higher label density.
+    """
     fig, ax = EconStyle.create_figure(size="wide")
 
     dates = df["date"].tolist()
@@ -427,6 +430,7 @@ def chart_pmi(df, output_dir):
         vals = df["india_svc_pmi"].values
         ax.plot(dates, vals, color=C_SVC_PMI, linewidth=2.2,
                 label="Services", zorder=5, solid_capstyle="round")
+        # Shadow for depth
         ax.plot(dates, vals, color=C_SVC_PMI, linewidth=3.4,
                 alpha=0.07, zorder=4, solid_capstyle="round")
         _add_end_label(ax, dates, vals, "Svc", C_SVC_PMI, offset_y=-14)
@@ -442,7 +446,26 @@ def chart_pmi(df, output_dir):
         ax.fill_between(dates, 50, mfg, where=(mfg < 50),
                         color=C_FPI_NEG, alpha=0.04, interpolate=True)
 
-    _format_date_axis(ax, len(dates))
+    # ── CUSTOM X-AXIS OVERRIDE (DENSE HORIZONTAL) ──
+    # 1. More aggressive interval: Every 1 month if < 18 months, 2 months if < 36, etc.
+    interval = 1 if len(dates) <= 18 else (2 if len(dates) <= 36 else (4 if len(dates) <= 72 else 6))
+    locator = mdates.MonthLocator(interval=interval)
+    
+    # 2. Get the mathematical ticks Matplotlib *wants* to use
+    locs = locator.tick_values(dates[0], dates[-1])
+    last_date_num = mdates.date2num(dates[-1])
+    
+    # 3. Shorter exclusion zone: Keep ticks at least ~40 days away from the last date
+    new_locs = [loc for loc in locs if (last_date_num - loc) > 40 and loc >= mdates.date2num(dates[0])]
+    
+    # 4. Strictly append the absolute latest date
+    new_locs.append(last_date_num) 
+    
+    # 5. Apply the custom ticks with perfectly horizontal formatting
+    ax.xaxis.set_ticks(new_locs)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    plt.setp(ax.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+
     ax.set_ylabel("PMI Index", fontsize=EconStyle.FONT_SIZE_AXIS)
     
     # Legend at top-right, inline with subtitle
@@ -459,7 +482,6 @@ def chart_pmi(df, output_dir):
     EconStyle.save_chart(fig, fp)
     print(f"   ✓ PMI Dashboard")
     return fp
-
 
 # ═══════════════════════════════════════════
 # CHART 2: GST REVENUE
@@ -501,6 +523,7 @@ def chart_gst(df, output_dir):
                alpha=0.7, zorder=2, label="₹2L Cr Target")
 
     _format_date_axis(ax, len(dates))
+    ax.set_ylim(bottom=1.3, top=np.nanmax(df["india_gst_revenue"].values) * 1.05)
     ax.set_ylabel("₹ Lakh Crore", fontsize=EconStyle.FONT_SIZE_AXIS)
     
     # Legend at top-right, inline with subtitle
@@ -520,66 +543,72 @@ def chart_gst(df, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 4: FPI FLOWS (WEEKLY)
+# CHART: FOREIGN PORTFOLIO FLOWS (MONTHLY)
 # ═══════════════════════════════════════════
 
-def chart_fpi(df_weekly, output_dir):
+def chart_fpi_flows(df, output_dir):
     """
-    Weekly FPI net flows from NSE via jugaad-data.
-    Reads from india_weekly.fpi_net_flows_usd_bn (weekly table).
-    Shows last 52 weeks as green/red bars with rolling 4-week MA and cumulative annotation.
+    Monthly Net FPI Flows (USD Billion) — Bar chart.
+    Replaces the weekly version for better historical data availability.
     """
-    if df_weekly is None or df_weekly.empty or "fpi_net_flows_usd_bn" not in df_weekly.columns:
-        print("   ⚠ Skipping FPI — no weekly FPI data (run india_fetcher.py --append first)")
+    if "india_fpi_flows" not in df.columns or not df["india_fpi_flows"].notna().any():
+        print("   ⚠ Skipping FPI Flows — no monthly data found")
         return None
 
-    plot_df = df_weekly[df_weekly["fpi_net_flows_usd_bn"].notna()].copy()
-    if plot_df.empty:
-        print("   ⚠ Skipping FPI — all weekly FPI values are null")
+    # Drop empty rows and get the last 24 months
+    df_fpi = df.dropna(subset=["india_fpi_flows"]).tail(24).copy()
+    
+    if df_fpi.empty:
         return None
-
-    # Limit to last 52 weeks for a clean annual view
-    plot_df = plot_df.tail(52).reset_index(drop=True)
-    dates = plot_df["week_ending"].tolist()
-    vals  = plot_df["fpi_net_flows_usd_bn"].values
-    colors = [C_FPI_POS if v >= 0 else C_FPI_NEG for v in vals]
 
     fig, ax = EconStyle.create_figure(size="wide")
+    
+    dates = df_fpi["date"].tolist()
+    vals = df_fpi["india_fpi_flows"].values
 
+    # Subtle horizontal grid
     ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
     ax.set_axisbelow(True)
 
-    bar_width = 5   # days — narrower than monthly bars
-    ax.bar(dates, vals, width=bar_width, color=colors, alpha=0.8,
-           edgecolor="none", zorder=3)
-    ax.axhline(y=0, color="#000000", linewidth=0.8, zorder=2)
+    # Clean Spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
 
-    # 4-week rolling MA
-    ma = plot_df["fpi_net_flows_usd_bn"].rolling(4, min_periods=2).mean()
-    ax.plot(dates, ma.values, color="#1E3A5F", linewidth=1.8,
-            linestyle="--", zorder=6, label="4-Week MA")
+    # Colors: Green for Inflows, Red for Outflows
+    try:
+        colors = [C_FPI_POS if v >= 0 else C_FPI_NEG for v in vals]
+    except NameError:
+        colors = ["#10B981" if v >= 0 else "#EF4444" for v in vals]
 
-    # Cumulative annotation
-    cumulative = float(vals.sum())
-    cum_color  = C_FPI_POS if cumulative >= 0 else C_FPI_NEG
-    ax.text(0.99, 1.02, f"52W Cumulative: ${cumulative:+.1f}B",
-            transform=ax.transAxes, fontsize=11, fontweight="bold",
-            color=cum_color, ha="right", va="bottom",
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
-                      edgecolor=cum_color, linewidth=1.5))
+    # Draw the bars (width=20 days looks perfectly spaced for monthly data)
+    ax.bar(dates, vals, width=20, color=colors, alpha=0.9, edgecolor="none", zorder=3)
 
+    # Bold Zero Line
+    ax.axhline(y=0, color="#000000", linewidth=1.2, zorder=4)
+
+    # Labels & Formatting
     _format_date_axis(ax, len(dates))
     ax.set_ylabel("Net FPI Flows ($B)", fontsize=EconStyle.FONT_SIZE_AXIS)
 
+    # Calculate Cumulative 24M for the floating badge
+    cum_flow = df_fpi["india_fpi_flows"].sum()
+    sign = "+" if cum_flow >= 0 else ""
+    
+    # Custom floating badge in the top right
+    bbox_props = dict(boxstyle="round,pad=0.4", fc="white", ec="#0F172A", lw=1.5)
+    ax.text(0.98, 1.05, f"24M Cumulative: ${sign}{cum_flow:.1f}B", 
+            transform=ax.transAxes, fontsize=10, fontweight='bold', 
+            color="#0F172A", ha="right", va="bottom", bbox=bbox_props)
+
     EconStyle.set_title(ax, "Foreign Portfolio Flows",
-                        "Weekly Net FPI/FII Flows into India ($B) — Last 52 Weeks")
+                        "Monthly Net FPI/FII Flows into India ($B) — Last 24 Months")
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "NSE / jugaad-data")
+    EconStyle.add_source(fig, "NSDL / RBI DBIE")
 
-    fp = output_dir / "04_india_fpi.png"
+    fp = output_dir / "03_india_fpi_monthly.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ FPI Flows")
+    print(f"   ✓ FPI Flows (Monthly)")
     return fp
 
 
@@ -621,6 +650,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
         ]),
         ("CREDIT & FLOWS", [
             ("Bank Credit Growth", "india_bank_credit_yoy", "% YoY", lambda v: f"{v:.1f}%"),
+            ("Net FPI Flows", "india_fpi_flows", "$B", lambda v: f"${v:.1f}B"),
         ]),
         ("LABOUR", [
             ("Unemployment (PLFS)", "india_unemployment", "%", lambda v: f"{v:.1f}%"),
@@ -634,7 +664,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
 
     # Determine if we have any external sector data worth showing
     has_external = any(
-        col in df.columns and pd.notna(df.iloc[-1].get(col))
+        col in df.columns and df[col].notna().any()
         for col in ["india_exports_usd_bn", "india_imports_usd_bn", "india_trade_deficit_usd_bn"]
     )
     if not has_external:
@@ -646,23 +676,27 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     rows = []
     for section_name, items in TABLE_SECTIONS:
         for display_name, col, unit, fmt_fn in items:
-            if col in df.columns and pd.notna(latest.get(col)):
-                val = latest[col]
+            if col in df.columns:
+                # Hunt backwards for the most recent non-empty data specifically for this indicator
+                valid_data = df[df[col].notna()]
                 
-                # Calculate MoM change
-                if prev is not None and col in df.columns and pd.notna(prev.get(col)):
-                    chg = val - prev[col]
-                else:
-                    chg = None
-                
-                rows.append({
-                    "section": section_name,
-                    "name": display_name,
-                    "value": val,
-                    "value_str": fmt_fn(val),
-                    "change": chg,
-                    "unit": unit,
-                })
+                if not valid_data.empty:
+                    val = valid_data.iloc[-1][col]
+                    
+                    # Calculate MoM change safely using the last two valid rows
+                    if len(valid_data) >= 2:
+                        chg = val - valid_data.iloc[-2][col]
+                    else:
+                        chg = None
+                    
+                    rows.append({
+                        "section": section_name,
+                        "name": display_name,
+                        "value": val,
+                        "value_str": fmt_fn(val),
+                        "change": chg,
+                        "unit": unit,
+                    })
     
     # Add weekly forex reserves if available (from india_weekly table)
     if df_weekly is not None and not df_weekly.empty and "forex_reserves_usd_bn" in df_weekly.columns:
@@ -861,7 +895,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     # Set tight ylim to trim extra space
     ax.set_ylim(footer_y - 0.1, fig_h)
 
-    fp = output_dir / "05_india_table.png"
+    fp = output_dir / "00_india_table.png"
     fig.savefig(fp, dpi=EconStyle.DPI, bbox_inches="tight",
                 facecolor=EconStyle.BACKGROUND, pad_inches=0.08)
     plt.close(fig)
@@ -1014,8 +1048,8 @@ def chart_money_supply(df, output_dir):
 
 def chart_credit_deposit(df, output_dir):
     """
-    Bank Credit Growth vs Deposit Growth — grouped bars with CD ratio overlay.
-    Deposit data populated when DBIE endpoints are configured.
+    Bank Credit vs Deposit Growth — Clean line chart with 'Jaws' liquidity gap fill.
+    Legend moved inside the chart, safely ignores NaN values.
     """
     has_credit = "india_bank_credit_yoy" in df.columns and df["india_bank_credit_yoy"].notna().any()
     has_deposit = "india_deposit_growth_yoy" in df.columns and df["india_deposit_growth_yoy"].notna().any()
@@ -1026,49 +1060,57 @@ def chart_credit_deposit(df, output_dir):
 
     fig, ax = EconStyle.create_figure(size="wide")
     dates = df["date"].tolist()
-    bar_width = 8  # days
+
+    # Subtle horizontal grid only
+    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
+    ax.set_axisbelow(True)
+    
+    # Clean up spines for a modern, open look
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    C_CREDIT_LINE = "#1E3A8A"  # Deep professional Navy
+    C_DEPOSIT_LINE = "#D97706" # Bright Amber/Orange (highly distinct from Navy)
 
     if has_deposit:
-        # Grouped bars
-        dates_credit = [d - pd.Timedelta(days=bar_width / 2) for d in dates]
-        dates_dep    = [d + pd.Timedelta(days=bar_width / 2) for d in dates]
         credit_vals  = df["india_bank_credit_yoy"].values
         deposit_vals = df["india_deposit_growth_yoy"].values
 
-        ax.bar(dates_credit, credit_vals, width=bar_width, color=C_CREDIT,
-               alpha=0.8, label="Bank Credit YoY", edgecolor="none", zorder=3)
-        ax.bar(dates_dep, deposit_vals, width=bar_width, color=C_DEPOSIT,
-               alpha=0.8, label="Deposit Growth YoY", edgecolor="none", zorder=3)
+        # 1. Plot the Thick Trend Lines
+        ax.plot(dates, credit_vals, color=C_CREDIT_LINE, linewidth=2.5, 
+                label="Credit Growth YoY", zorder=4, solid_capstyle="round")
+        ax.plot(dates, deposit_vals, color=C_DEPOSIT_LINE, linewidth=2.5, 
+                linestyle="--", label="Deposit Growth YoY", zorder=4, solid_capstyle="round")
 
-        # Credit-Deposit ratio overlay on right axis
-        cd_ratio = credit_vals / deposit_vals * 100
-        ax2 = ax.twinx()
-        ax2.plot(dates, cd_ratio, color="#0F172A", linewidth=1.5,
-                 linestyle="--", zorder=6, label="C/D Ratio")
-        ax2.axhline(y=75, color="#0F172A", linewidth=0.7, linestyle=":",
-                    alpha=0.5)
-        ax2.set_ylabel("Credit-Deposit Ratio (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                       color="#0F172A")
-        ax2.tick_params(axis="y", colors="#0F172A")
-        ax2.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.0f%%"))
+        # 2. Visual Liquidity Gap (The "Jaws" Shaded Regions)
+        ax.fill_between(dates, credit_vals, deposit_vals, where=(credit_vals > deposit_vals), 
+                        facecolor='#EF4444', alpha=0.15, interpolate=True, label="Liquidity Squeeze")
+        
+        ax.fill_between(dates, credit_vals, deposit_vals, where=(credit_vals <= deposit_vals), 
+                        facecolor='#10B981', alpha=0.15, interpolate=True, label="Surplus Liquidity")
     else:
-        # Credit only until DBIE is configured
         credit_vals = df["india_bank_credit_yoy"].values
-        ax.bar(dates, credit_vals, width=16, color=C_CREDIT,
-               alpha=0.75, label="Bank Credit YoY", edgecolor="none", zorder=3)
-        ax.text(0.02, 0.04, "Deposit data pending DBIE configuration",
-                transform=ax.transAxes, fontsize=8, color="#94A3B8",
-                style="italic", va="bottom")
+        ax.plot(dates, credit_vals, color=C_CREDIT_LINE, linewidth=2.5, label="Credit Growth YoY", zorder=4)
 
-    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
-              ncol=3, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
-    ax.axhline(y=0, color="#000000", linewidth=0.6, zorder=2)
+    # Bold Zero Line
+    ax.axhline(y=0, color="#000000", linewidth=1.0, zorder=2)
+
+    # Legend moved INSIDE the chart (upper left), arranged in a clean 2x2 grid
+    ax.legend(loc="upper left", ncol=2, frameon=True, facecolor="white", 
+              edgecolor="none", framealpha=0.85, fontsize=9, borderpad=0.6)
+    
     ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
-
     _format_date_axis(ax, len(dates))
+    
+    # Pad the top of the Y-axis slightly, using np.nanmax to safely ignore missing recent data
+    if has_deposit:
+        ax.set_ylim(top=max(np.nanmax(credit_vals), np.nanmax(deposit_vals)) * 1.15)
+    else:
+        ax.set_ylim(top=np.nanmax(credit_vals) * 1.15)
+        
     ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
 
-    EconStyle.set_title(ax, "Bank Credit & Deposit Growth",
+    EconStyle.set_title(ax, "Systemic Liquidity: Bank Credit & Deposit Growth",
                         "Scheduled Commercial Banks — YoY Growth (%)")
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
@@ -1087,13 +1129,15 @@ def chart_credit_deposit(df, output_dir):
 def chart_iip(df, output_dir):
     """
     IIP (Index of Industrial Production) YoY % — bar chart with 3M MA.
-    Data populated when DBIE endpoints are configured in india_fetcher.py.
+    Filtered to start from March 2022 to remove pandemic base-effect spikes.
     """
     if "india_iip_yoy" not in df.columns or not df["india_iip_yoy"].notna().any():
         print("   ⚠ Skipping IIP — data pending DBIE configuration")
         return None
 
-    df_iip = df.dropna(subset=["india_iip_yoy"]).copy()
+    # ── NEW FILTER: Start from March 2022 ──
+    df_iip = df[(df["date"] >= "2022-01-01") & (df["india_iip_yoy"].notna())].copy()
+    
     if df_iip.empty:
         return None
 
@@ -1144,8 +1188,7 @@ def chart_iip(df, output_dir):
 
 def chart_forex_reserves(df_weekly, output_dir):
     """
-    Forex Reserves: dual-panel — area chart for level + bar chart for WoW change.
-    Data sourced from india_weekly table (weekly RBI release).
+    Forex Reserves: dual-panel — bounded area chart for level + bar chart for WoW change.
     """
     if df_weekly is None or df_weekly.empty:
         print("   ⚠ Skipping Forex Reserves — data pending DBIE configuration")
@@ -1162,29 +1205,55 @@ def chart_forex_reserves(df_weekly, output_dir):
     dates = df_weekly["week_ending"].tolist()
     levels = df_weekly["forex_reserves_usd_bn"].values
 
-    # Left panel: Reserves level (area chart)
-    ax_level.fill_between(dates, 0, levels, color=C_RESERVES, alpha=0.12)
-    ax_level.plot(dates, levels, color=C_RESERVES, linewidth=2.0,
-                  zorder=5, solid_capstyle="round")
-    _add_end_label(ax_level, dates, levels, f"${levels[-1]:.0f}B", C_RESERVES)
+    # Clean up spines and add subtle grids for both panels
+    for ax in [ax_level, ax_chg]:
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
+        ax.set_axisbelow(True)
+
+    C_RESERVES = "#0369A1" # Deep Blue
+
+    # ── LEFT PANEL: Reserves Level ──
+    # Dynamically bound the Y-axis so the trend isn't squashed by 0
+    min_level = min(levels)
+    max_level = max(levels)
+    y_bottom = min_level - 15  # Add a $15B visual cushion below the lowest point
+
+    # Fill down to the new floor instead of 0
+    ax_level.fill_between(dates, y_bottom, levels, color=C_RESERVES, alpha=0.12, zorder=3)
+    ax_level.plot(dates, levels, color=C_RESERVES, linewidth=2.5, zorder=5, solid_capstyle="round")
+    
+    # Apply dynamic limits
+    ax_level.set_ylim(bottom=y_bottom, top=max_level + 15)
+    
+    _add_end_label(ax_level, dates, levels, f"${levels[-1]:.0f}B", C_RESERVES, offset_y=5)
     ax_level.set_ylabel("USD Billion", fontsize=EconStyle.FONT_SIZE_AXIS)
-    ax_level.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-    ax_level.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-    plt.setp(ax_level.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+    
+    # Use our universal date formatter
+    _format_date_axis(ax_level, len(dates))
+    
     EconStyle.set_title(ax_level, "Forex Reserves Level", "USD Billion")
     EconStyle.add_top_rule(ax_level)
 
-    # Right panel: WoW change
+    # ── RIGHT PANEL: WoW Change ──
     if "forex_reserves_wow_chg" in df_weekly.columns:
         chg_vals = df_weekly["forex_reserves_wow_chg"].fillna(0).values
-        chg_colors = [C_IIP_POS if v >= 0 else C_IIP_NEG for v in chg_vals]
-        ax_chg.bar(dates, chg_vals, color=chg_colors, width=5,
-                   alpha=0.8, edgecolor="none", zorder=3)
-        ax_chg.axhline(y=0, color="#000000", linewidth=0.8, zorder=2)
+        C_POS = "#16A34A"
+        C_NEG = "#DC2626"
+        chg_colors = [C_POS if v >= 0 else C_NEG for v in chg_vals]
+        
+        ax_chg.bar(dates, chg_vals, color=chg_colors, width=4,
+                   alpha=0.85, edgecolor="none", zorder=3)
+        
+        # Bold Zero Line
+        ax_chg.axhline(y=0, color="#000000", linewidth=1.2, zorder=4)
+        
         ax_chg.set_ylabel("WoW Change ($B)", fontsize=EconStyle.FONT_SIZE_AXIS)
-        ax_chg.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-        ax_chg.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-        plt.setp(ax_chg.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+        
+        # Use our universal date formatter
+        _format_date_axis(ax_chg, len(dates))
+        
         EconStyle.set_title(ax_chg, "Weekly Change", "WoW Change (USD Billion)")
         EconStyle.add_top_rule(ax_chg)
 
@@ -1203,8 +1272,7 @@ def chart_forex_reserves(df_weekly, output_dir):
 
 def chart_trade_balance(df, output_dir):
     """
-    Monthly Exports and Imports as grouped bars; Trade Deficit as line on right axis.
-    Data populated when DBIE endpoints are configured.
+    Monthly Exports and Imports as faded grouped bars; Trade Deficit as a bold, distinct line.
     """
     needed = ["india_exports_usd_bn", "india_imports_usd_bn"]
     has_data = all(
@@ -1230,29 +1298,50 @@ def chart_trade_balance(df, output_dir):
     dates_exp = [d - pd.Timedelta(days=bar_width / 2) for d in dates]
     dates_imp = [d + pd.Timedelta(days=bar_width / 2) for d in dates]
 
-    ax.yaxis.grid(True, linestyle="-", alpha=0.12, color="#9CA3AF", zorder=0)
+    # Clean Spines
+    ax.spines['top'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+
+    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
     ax.set_axisbelow(True)
 
-    ax.bar(dates_exp, exports, width=bar_width, color=C_EXPORTS,
-           alpha=0.8, label="Exports", edgecolor="none", zorder=3)
-    ax.bar(dates_imp, imports, width=bar_width, color="#DC2626",
-           alpha=0.75, label="Imports", edgecolor="none", zorder=3)
+    # Colors
+    C_EXPORTS = "#059669"      # Green
+    C_IMPORTS = "#DC2626"      # Red
+    C_DEFICIT_BOLD = "#0F172A" # Dark Slate/Navy — completely distinct from the Red bars
 
-    ax2.plot(dates, deficit, color=C_DEFICIT_LINE, linewidth=2.0,
-             linestyle="--", zorder=6, label="Trade Deficit")
-    _add_end_label(ax2, dates, deficit, f"Deficit\n${deficit[-1]:.0f}B",
-                   C_DEFICIT_LINE, offset_y=5)
+    # Fade the bars to push them into the background (alpha reduced to 0.45)
+    ax.bar(dates_exp, exports, width=bar_width, color=C_EXPORTS,
+           alpha=0.45, label="Exports", edgecolor="none", zorder=3)
+    ax.bar(dates_imp, imports, width=bar_width, color=C_IMPORTS,
+           alpha=0.45, label="Imports", edgecolor="none", zorder=3)
+
+    # Bold, distinct deficit line (solid, thick, dark)
+    ax2.plot(dates, deficit, color=C_DEFICIT_BOLD, linewidth=3.5,
+             linestyle="-", zorder=6, label="Trade Deficit")
+             
+    # Custom end label for Trade Deficit to perfectly format the $ and B
+    last_val = deficit[-1]
+    ax2.annotate(
+        f"Deficit\n${last_val:.1f}B",
+        xy=(dates[-1], last_val),
+        xytext=(8, 5), textcoords="offset points",
+        fontsize=9, fontweight="bold", color=C_DEFICIT_BOLD,
+        fontfamily=EconStyle.FONT_FAMILY,
+        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.85),
+        zorder=10,
+    )
 
     ax.set_ylabel("USD Billion", fontsize=EconStyle.FONT_SIZE_AXIS)
     ax2.set_ylabel("Trade Deficit ($B)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                   color=C_DEFICIT_LINE)
-    ax2.tick_params(axis="y", colors=C_DEFICIT_LINE)
+                   color=C_DEFICIT_BOLD)
+    ax2.tick_params(axis="y", colors=C_DEFICIT_BOLD)
 
     # Combined legend
     lines1, labels1 = ax.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax.legend(lines1 + lines2, labels1 + labels2,
-              loc="lower right", bbox_to_anchor=(1.1, 1.02),
+              loc="lower right", bbox_to_anchor=(1.1, 1.05),
               ncol=3, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
 
     _format_date_axis(ax, len(dates))
@@ -1764,7 +1853,7 @@ def main():
     print(f"\n   Generating charts...")
     chart_pmi(df, output_dir)
     chart_gst(df, output_dir)
-    chart_fpi(df_weekly, output_dir)
+    chart_fpi_flows(df, output_dir)
     chart_inflation_bar(df, output_dir)
 
     # ── Summary table (integrates CAG fiscal + weekly forex) ───────────────────
