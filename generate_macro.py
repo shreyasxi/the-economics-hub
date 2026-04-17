@@ -368,34 +368,60 @@ def _add_end_label(ax, dates, values, name, color):
 
 def chart_inflation(engine, output_dir, mode="dashboard"):
     EconStyle.apply_global_style()
-    # Use the standard wide template instead of the cramped 1x2 subplot
     fig, ax1 = EconStyle.create_figure(size="wide")
     fig.patch.set_linewidth(2)
     fig.patch.set_edgecolor('#000000')
 
+    # 1. Harmonized Color Palette
+    # Deep Blue (Headline), Emerald Green (Core PCE), Amber (Expectations)
+    # These colors are distinct, colorblind-friendly, and don't clash.
+    custom_colors = {
+        "us_cpi_yoy": "#1E3A8A",       
+        "us_core_pce": "#059669",      
+        "us_inflation_exp": "#D97706"  
+    }
+
+    first_date = None
+
     for ind_id in ["us_cpi_yoy", "us_core_pce", "us_inflation_exp"]:
+        if ind_id not in MACRO_INDICATORS: continue
         ind = MACRO_INDICATORS[ind_id]
         series = engine.get_transformed(ind_id)
         if series.empty: continue
+        
         dates, vals = series.index.to_pydatetime().tolist(), series.values
-        # Increased linewidth to 2.8 for better quality/visibility
-        ax1.plot(dates, vals, color=ind["color"], linewidth=2.8, solid_capstyle="round", zorder=3)
-        _add_end_label(ax1, dates, vals, ind["name"], ind["color"])
+        if first_date is None: first_date = dates[0]
 
-    # Target line styling
-    ax1.axhline(y=2.0, color=EconStyle.NEGATIVE, linewidth=1.2, linestyle="--", alpha=0.6, zorder=1)
-    ax1.text(ax1.get_xlim()[0], 2.05, " Fed 2% target", fontsize=9, fontweight="bold", color=EconStyle.NEGATIVE, alpha=0.8, va="bottom")
+        # Override the global dict color with our custom harmonized palette
+        color = custom_colors.get(ind_id, ind.get("color", "#000000"))
+        
+        # 2. Add labels directly to the plot call for the legend
+        ax1.plot(dates, vals, color=color, linewidth=2.5, solid_capstyle="round", zorder=4, label=ind["name"])
+
+    # 3. Refined Target Line
+    # Softened from bright red to a neutral slate grey so it doesn't distract from the data
+    target_color = "#64748B"
+    ax1.axhline(y=2.0, color=target_color, linewidth=1.5, linestyle="--", alpha=0.8, zorder=2)
+    
+    if first_date:
+        # Move the target text slightly right of the y-axis so it doesn't clip
+        ax1.text(first_date, 2.05, " Fed 2% Target", fontsize=9, fontweight="bold", color=target_color, alpha=0.9, va="bottom")
     
     _style_axis(ax1, ylabel="YoY Rate (%)")
     
-    # Clean up spines
+    # 4. Clean up spines
     for spine in ["top", "right", "left"]: 
         ax1.spines[spine].set_visible(False)
     ax1.spines["bottom"].set_visible(True)
     ax1.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
     
-    # Add padding to the right for labels
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.15)
+    # 5. Add a clean, boxed legend (Upper Right)
+    # The semi-transparent white facecolor ensures it stays readable even if a line crosses behind it
+    ax1.legend(loc="upper right", frameon=True, facecolor="white", edgecolor="#E5E7EB", 
+               framealpha=0.95, fontsize=10, borderpad=0.8, labelspacing=0.6)
+
+    # Note: Removed the hardcoded X-axis padding from the old code 
+    # since we no longer need to make room for labels on the right edge.
 
     # Elite Narrative Titles
     _t, _s = MACRO_TITLES["inflation"][mode]
