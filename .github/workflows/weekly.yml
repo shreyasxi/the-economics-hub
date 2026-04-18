@@ -45,11 +45,19 @@ jobs:
           echo "Charts in assets/weekly/$DATE_FOLDER/:"
           ls "assets/weekly/$DATE_FOLDER/"
 
+      - name: Update README showcase charts
+        run: |
+          mkdir -p assets/readme_showcase
+          DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
+          cp "output/weekly/$DATE_FOLDER/00_summary_table.png" "assets/readme_showcase/weekly_summary_table.png"
+          cp "output/weekly/$DATE_FOLDER/10_sector_rotation.png" "assets/readme_showcase/weekly_sector_rotation.png"
+          echo "README showcase updated from $DATE_FOLDER"
+
       - name: Commit and push charts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/weekly/
+          git add assets/weekly/ assets/readme_showcase/
           git diff --staged --quiet && echo "No changes to commit." && exit 0
           git commit -m "chore: weekly charts $(date -u +%Y-%m-%d)"
           git push

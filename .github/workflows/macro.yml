@@ -47,11 +47,19 @@ jobs:
           echo "Charts in assets/macro/$MONTH_FOLDER/:"
           ls "assets/macro/$MONTH_FOLDER/"
 
+      - name: Update README showcase charts
+        run: |
+          mkdir -p assets/readme_showcase
+          MONTH_FOLDER=$(ls output/macro/ | sort | tail -1)
+          cp "output/macro/$MONTH_FOLDER/00_macro_table.png" "assets/readme_showcase/macro_table.png"
+          cp "output/macro/$MONTH_FOLDER/08_macro_housing.png" "assets/readme_showcase/macro_housing.png"
+          echo "README showcase updated from $MONTH_FOLDER"
+
       - name: Commit and push charts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/macro/
+          git add assets/macro/ assets/readme_showcase/
           git diff --staged --quiet && echo "No changes to commit." && exit 0
           git commit -m "chore: macro charts $(date -u +%Y-%m)"
           git push

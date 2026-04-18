@@ -101,11 +101,19 @@ jobs:
           echo "Charts in assets/india/$MONTH_FOLDER/:"
           ls "assets/india/$MONTH_FOLDER/"
 
+      - name: Update README showcase charts
+        run: |
+          mkdir -p assets/readme_showcase
+          MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
+          cp "output/india/$MONTH_FOLDER/10_india_monthly_capex.png" "assets/readme_showcase/india_monthly_capex.png"
+          cp "output/india/$MONTH_FOLDER/07_india_expenditure_quality.png" "assets/readme_showcase/india_expenditure_quality.png"
+          echo "README showcase updated from $MONTH_FOLDER"
+
       - name: Commit and push charts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/india/
+          git add assets/india/ assets/readme_showcase/
           git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
           git push
