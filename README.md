@@ -1,9 +1,9 @@
-# The Economics Hub — Macro Dashboard
+# Automated Macro Dashboard & RBI Sentiment Tracker
 
 An automated Python pipeline tracking Global Equities, Forex, Sovereign Bonds, Commodities, and Indian Markets — published via [The Economics Hub on Substack](https://economicshub.substack.com/).
 
 <p align="center">
-  <a href="https://the-economics-hub.streamlit.app">
+  <a href="https://weekly-macro-dashboard.streamlit.app/">
     <img src="https://img.shields.io/badge/Launch%20Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Launch Dashboard">
   </a>
 </p>
@@ -110,7 +110,13 @@ Generates 15 India-specific charts (FPI, GST, Fiscal, Credit, Trade). Update `da
 python generate_india.py
 ```
 
-### 4. Ad-Hoc Chart Tool
+### 4. Reserve Bank of India Policy Related Charts
+Generates sentiment analysis and related charts in the RBI sentinel section. 
+```bash
+python generate_rbi_sentinel.py
+```
+
+### 5. Ad-Hoc Chart Tool
 Quickly generate a styled chart from any CSV without modifying the codebase.
 ```bash
 python make_chart.py
