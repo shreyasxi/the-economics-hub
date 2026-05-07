@@ -1,0 +1,31 @@
+name: Keep Streamlit App Alive
+
+on:
+  schedule:
+    # 00:00, 10:00, 20:00 UTC — maximum gap is 10 h (Streamlit hibernates at 12 h inactivity)
+    - cron: '0 0,10,20 * * *'
+  workflow_dispatch:  # Allow manual trigger from the Actions UI
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Selenium
+        # Selenium 4.6+ ships with selenium-manager, which auto-downloads
+        # the matching ChromeDriver — no manual chromedriver install needed.
+        run: pip install "selenium>=4.18"
+
+      - name: Run keep-alive script
+        run: python config/selenium.py
