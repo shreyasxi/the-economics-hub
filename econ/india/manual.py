@@ -67,6 +67,14 @@ FIELDS = [
           "CPI food & beverages %% YoY (MoSPI, ~12th)"),
     Field("--unemployment", "india_unemployment", "%", 0, 30, "plfs",
           "PLFS unemployment rate %% (MoSPI)"),
+    # IIP is entered by hand rather than parsed from the DBIE workbook. In the
+    # September 2026 vintage RBI switched that column to a basis that matches no
+    # published MoSPI figure (Dec-25 read 147.1 where MoSPI publishes 170.7) and
+    # carried an unexplained 16% step at Jan-2026, which turned every 2026 YoY
+    # into a comparison across a discontinuity. MoSPI states the growth rate
+    # directly in its monthly release, so that number is taken at source.
+    Field("--iip", "india_iip_yoy", "% YoY", -30, 30, "mospi",
+          "IIP %% YoY as stated by MoSPI/PIB, e.g. 4.8 (~12th, with CPI)"),
 ]
 BY_DEST = {f.dest: f for f in FIELDS}
 

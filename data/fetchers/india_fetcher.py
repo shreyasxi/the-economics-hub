@@ -79,9 +79,17 @@ SENTINEL_DB = _ROOT / "data" / "rbi_sentinel.db"
 DEFAULT_CSV = _ROOT / "data" / "india_manual.csv"
 
 # Column layout of the DBIE Excel (0-indexed, header row = row index 3)
+# NOTE ON IIP (removed from this map, 2026-09)
+# Column 4 is labelled "Index of Industrial Production", but as of the
+# September 2026 DBIE vintage its values match no published MoSPI figure:
+# the workbook reads 147.1 for Dec-2025 where MoSPI publishes 170.7, and the
+# series steps down 16% at Jan-2026 (a transition that is normally ~+2%),
+# making every 2026 year-on-year comparison span a discontinuity.
+# No other column in the workbook carries the official series either.
+# IIP is therefore entered from the MoSPI release instead:
+#     python -m econ.india.manual set 2026-02 --iip 4.8
 _MONTHLY_COLS = {
     "period":     1,
-    "iip":        4,    # IIP index (base 2011-12=100)
     "exports":    17,   # Foreign Trade Exports Total (USD Million)
     "imports":    18,   # Foreign Trade Imports Total (USD Million)
     "trade_bal":  19,   # Foreign Trade Balance Total (USD Million, negative = deficit)
@@ -289,6 +297,49 @@ def _parse_period_monthly(raw: str) -> Optional[str]:
     return None
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Plausibility bounds
+# ─────────────────────────────────────────────────────────────────────────────
+# A minimal version of a series contract. These are not forecasts — they are
+# the outer edge of what each series can physically do in a month. A value
+# outside the bound means the source changed underneath us (a rebasing, a
+# column shift, a units change), not that the economy did something dramatic.
+#
+# This exists because RBI silently re-based the DBIE IIP column in September
+# 2026 and the pipeline published a fabricated -8.7% industrial contraction
+# without complaint. Anything rejected here is logged loudly and left NULL,
+# which shows up as a gap in the chart rather than a false number.
+_SANITY_BOUNDS = {
+    "india_bank_credit_yoy":      (-10, 40),
+    "india_deposit_growth_yoy":   (-10, 40),
+    "india_m3_yoy":               (-10, 40),
+    "india_iip_yoy":              (-30, 30),
+    "india_exports_usd_bn":       (5, 120),
+    "india_imports_usd_bn":       (5, 160),
+    "india_trade_deficit_usd_bn": (-40, 80),
+    "india_cpi_yoy":              (-5, 25),
+}
+
+
+def _reject_implausible(month: str, row: dict) -> dict:
+    """Drop values outside their contract rather than publishing them."""
+    clean = {}
+    for key, value in row.items():
+        lo_hi = _SANITY_BOUNDS.get(key)
+        if lo_hi is not None and isinstance(value, (int, float)):
+            lo, hi = lo_hi
+            if not (lo <= value <= hi):
+                log.error(
+                    "REJECTED %s for %s: %.4g is outside %s-%s. The source "
+                    "series has probably been re-based or re-ordered — verify "
+                    "the workbook column before trusting this run.",
+                    key, month, value, lo, hi,
+                )
+                continue
+        clean[key] = value
+    return clean
+
+
 def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
     """
     Parse Monthly sheet: IIP YoY, Exports, Imports, Trade Deficit.
@@ -308,7 +359,6 @@ def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
     def _col(key):
         return pd.to_numeric(data.iloc[:, _MONTHLY_COLS[key]], errors="coerce")
 
-    iip_yoy  = _yoy_pct(_col("iip"))
     exports  = (_col("exports")   / 1000).round(4)
     imports  = (_col("imports")   / 1000).round(4)
     deficit  = (-_col("trade_bal") / 1000).round(4)
@@ -316,8 +366,6 @@ def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
     results: dict[str, dict] = {}
     for i, month in enumerate(data["_month"]):
         row: dict = {}
-        if pd.notna(iip_yoy.iloc[i]):
-            row["india_iip_yoy"] = float(iip_yoy.iloc[i])
         if pd.notna(exports.iloc[i]):
             row["india_exports_usd_bn"] = float(exports.iloc[i])
         if pd.notna(imports.iloc[i]):
@@ -326,7 +374,7 @@ def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
             row["india_trade_deficit_usd_bn"] = float(deficit.iloc[i])
         if row:
             row["_sources"] = {k: "dbie_excel_monthly" for k in row}
-            results[month] = row
+            results[month] = _reject_implausible(month, row)
 
     log.info("DBIE Monthly sheet: %d months parsed", len(results))
     return results
@@ -370,7 +418,7 @@ def fetch_dbie_fortnightly(source: Path) -> dict[str, dict]:
             row["india_m3_yoy"] = float(m3_yoy.iloc[i])
         if row:
             row["_sources"] = {k: "dbie_excel_fortnightly" for k in row}
-            results[month] = row
+            results[month] = _reject_implausible(month, row)
 
     log.info("DBIE Fortnightly sheet: %d months parsed", len(results))
     return results
