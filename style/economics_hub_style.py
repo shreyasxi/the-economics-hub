@@ -149,7 +149,13 @@ class EconStyle:
             "xtick.color":          cls.TEXT_SECONDARY,
             "ytick.color":          cls.TEXT_SECONDARY,
             "font.family":          "sans-serif",
-            "font.sans-serif":      ["Poppins", "Arial", "Calibri", "sans-serif"],
+            # Arial and Calibri were removed: neither ships the Indian Rupee sign
+            # (U+20B9), so every "₹" in the India charts rendered as a blank box
+            # on macOS. They are also Windows/macOS-only, so local output never
+            # matched what CI published. DejaVu Sans ships with matplotlib on
+            # every platform and has the glyph, so local now matches CI exactly.
+            # Drop a Poppins TTF into assets/fonts/ to get the intended face back.
+            "font.sans-serif":      ["Poppins", "DejaVu Sans", "sans-serif"],
             # ─── v5: RENDERING QUALITY ───
             "lines.antialiased":    True,
             "patch.antialiased":    True,
