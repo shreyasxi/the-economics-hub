@@ -9,6 +9,8 @@ Usage:
     text = get_insight("09_vix_trend.png")   # → str or None
 """
 
+from __future__ import annotations
+
 import re
 from pathlib import Path
 

@@ -187,6 +187,26 @@ def load_forex_weekly(n_weeks=78):
 
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Unit conversion — CAG Monthly Accounts
+# ─────────────────────────────────────────────────────────────────────────────
+# The CAG workbook records every monetary value in ₹ crore.
+# 1 lakh crore = 100,000 crore.
+#
+# Until 2026-09 this module divided by 100 and labelled the result
+# "₹ Lakh Crore", overstating every published fiscal figure by exactly 1,000×.
+# Feb-26 capital expenditure (₹87,041 crore = ₹0.87 lakh crore) was published
+# as ₹870 lakh crore — roughly half of India's annual GDP, for one month.
+CRORE_PER_LAKH_CRORE = 100_000
+
+
+def crore_to_lakh_crore(value):
+    """Convert ₹ crore (CAG workbook native unit) to ₹ lakh crore."""
+    if value is None:
+        return None
+    return value / CRORE_PER_LAKH_CRORE
+
+
 def load_cag_data(cag_path=DEFAULT_CAG):
     """
     Load CAG Monthly Accounts Dashboard data.
@@ -290,11 +310,11 @@ def load_cag_data(cag_path=DEFAULT_CAG):
         # MoM changes (in ₹ Lakh Cr)
         capex_mom = None
         if capex_monthly is not None and capex_prev_monthly is not None:
-            capex_mom = (capex_monthly - capex_prev_monthly) / 100  # Convert to L Cr
+            capex_mom = (capex_monthly - capex_prev_monthly) / CRORE_PER_LAKH_CRORE  # Convert to L Cr
         
         fiscal_deficit_mom = None
         if fiscal_deficit_monthly is not None and fiscal_deficit_prev_monthly is not None:
-            fiscal_deficit_mom = (fiscal_deficit_monthly - fiscal_deficit_prev_monthly) / 100
+            fiscal_deficit_mom = (fiscal_deficit_monthly - fiscal_deficit_prev_monthly) / CRORE_PER_LAKH_CRORE
         
         # Load GDP data for % of GDP calculations
         df_gdp = pd.read_excel(xlsx, sheet_name='GDP')
@@ -310,37 +330,37 @@ def load_cag_data(cag_path=DEFAULT_CAG):
             'latest_month': latest_month,
             'latest_date': datetime(year, month_num, 1),
             # GDP
-            'gdp': gdp / 100 if gdp else None,  # ₹ Lakh Cr
+            'gdp': gdp / CRORE_PER_LAKH_CRORE if gdp else None,  # ₹ Lakh Cr
             # YTD values (₹ Lakh Cr)
-            'fiscal_deficit_ytd': fiscal_deficit_ytd / 100,
+            'fiscal_deficit_ytd': fiscal_deficit_ytd / CRORE_PER_LAKH_CRORE,
             'fiscal_deficit_pct_gdp': fiscal_deficit_pct_gdp,  # % of GDP
-            'capex_ytd': capex_ytd / 100,
-            'revenue_exp_ytd': revenue_exp_ytd / 100,
-            'net_tax_ytd': net_tax_ytd / 100,
-            'gross_tax_ytd': gross_tax / 100,
+            'capex_ytd': capex_ytd / CRORE_PER_LAKH_CRORE,
+            'revenue_exp_ytd': revenue_exp_ytd / CRORE_PER_LAKH_CRORE,
+            'net_tax_ytd': net_tax_ytd / CRORE_PER_LAKH_CRORE,
+            'gross_tax_ytd': gross_tax / CRORE_PER_LAKH_CRORE,
             # Monthly values (₹ Lakh Cr)
-            'capex_monthly': capex_monthly / 100 if capex_monthly else None,
-            'fiscal_deficit_monthly': fiscal_deficit_monthly / 100 if fiscal_deficit_monthly else None,
+            'capex_monthly': capex_monthly / CRORE_PER_LAKH_CRORE if capex_monthly else None,
+            'fiscal_deficit_monthly': fiscal_deficit_monthly / CRORE_PER_LAKH_CRORE if fiscal_deficit_monthly else None,
             # MoM changes
             'capex_mom': capex_mom,
             'fiscal_deficit_mom': fiscal_deficit_mom,
             # Budget
             'capex_pct_be': capex_pct_be,
-            'be_capex': be_capex / 100 if be_capex else None,
-            'be_revenue_exp': be_revenue_exp / 100 if be_revenue_exp else None,
+            'be_capex': be_capex / CRORE_PER_LAKH_CRORE if be_capex else None,
+            'be_revenue_exp': be_revenue_exp / CRORE_PER_LAKH_CRORE if be_revenue_exp else None,
             # Tax breakdown (₹ Lakh Cr)
-            'corp_tax_ytd': latest.get('Corporation Tax', 0) / 100,
-            'income_tax_ytd': latest.get('Income Tax', 0) / 100,
-            'gst_ytd': (latest.get('CGST', 0) + latest.get('IGST', 0) + latest.get('UTGST', 0)) / 100,
-            'customs_ytd': latest.get('Customs', 0) / 100,
-            'excise_ytd': latest.get('Union Excise', 0) / 100,
+            'corp_tax_ytd': latest.get('Corporation Tax', 0) / CRORE_PER_LAKH_CRORE,
+            'income_tax_ytd': latest.get('Income Tax', 0) / CRORE_PER_LAKH_CRORE,
+            'gst_ytd': (latest.get('CGST', 0) + latest.get('IGST', 0) + latest.get('UTGST', 0)) / CRORE_PER_LAKH_CRORE,
+            'customs_ytd': latest.get('Customs', 0) / CRORE_PER_LAKH_CRORE,
+            'excise_ytd': latest.get('Union Excise', 0) / CRORE_PER_LAKH_CRORE,
             # Expenditure breakdown
-            'interest_ytd': latest.get('Interest Payments', 0) / 100,
-            'subsidies_ytd': latest.get('Major Subsidies', 0) / 100,
+            'interest_ytd': latest.get('Interest Payments', 0) / CRORE_PER_LAKH_CRORE,
+            'subsidies_ytd': latest.get('Major Subsidies', 0) / CRORE_PER_LAKH_CRORE,
         }
         
         print(f"   Loaded CAG data: {current_fy} through {latest_month}")
-        print(f"   Capex YTD: ₹{capex_ytd/100:.1f}L Cr ({capex_pct_be:.1f}% of BE)")
+        print(f"   Capex YTD: ₹{capex_ytd / CRORE_PER_LAKH_CRORE:.2f}L Cr ({capex_pct_be:.1f}% of BE)")
         
         return cag_summary, df_current_monthly, df_prev_monthly
         
@@ -737,7 +757,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
         
         cag_rows = [
             ("Capex", cag_data['capex_monthly'], 
-             f"₹{cag_data['capex_monthly']:.0f}L Cr" if cag_data['capex_monthly'] else "-",
+             f"₹{cag_data['capex_monthly']:.2f}L Cr" if cag_data['capex_monthly'] else "-",
              cag_data['capex_mom'], "₹L Cr"),
             ("Capex (% of BE)", cag_data['capex_pct_be'],
              f"{cag_data['capex_pct_be']:.1f}%" if cag_data['capex_pct_be'] else "-",
@@ -1375,8 +1395,8 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     
     # Get monthly data
     months = df_monthly['Month'].str.split('-').str[0].tolist()
-    capex = (df_monthly['Capital Expenditure_monthly'] / 100).values  # ₹ Lakh Cr
-    rev_exp = (df_monthly['Revenue Expenditure'].diff().fillna(df_monthly['Revenue Expenditure'].iloc[0]) / 100).values
+    capex = (df_monthly['Capital Expenditure_monthly'] / CRORE_PER_LAKH_CRORE).values  # ₹ Lakh Cr
+    rev_exp = (df_monthly['Revenue Expenditure'].diff().fillna(df_monthly['Revenue Expenditure'].iloc[0]) / CRORE_PER_LAKH_CRORE).values
     
     x = np.arange(len(months))
     width = 0.35
@@ -1398,9 +1418,10 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
                    color=C_REVENUE_EXP, alpha=0.9, edgecolor='white', linewidth=0.5, zorder=5)
     
     # Add value labels on capex bars only
+    _lbl_off = np.nanmax(np.concatenate([capex, rev_exp])) * 0.02
     for i, c in enumerate(capex):
         if not np.isnan(c) and c > 0:
-            ax.text(x[i] - width/2, c + 30, f'₹{c:.0f}L', ha='center', va='bottom',
+            ax.text(x[i] - width/2, c + _lbl_off, f'₹{c:.2f}L', ha='center', va='bottom',
                    fontsize=7, color=C_CAPEX, fontweight='bold', zorder=10)
     
     # Capex ratio line (secondary insight)
@@ -1475,9 +1496,10 @@ def chart_tax_composition(cag_data, output_dir):
     bars = ax.barh(y_pos, values, color=colors, alpha=0.85, edgecolor='white', linewidth=0.5, height=0.6, zorder=3)
     
     # Add value labels
+    _lbl_off = max(values) * 0.02
     for i, (bar, val) in enumerate(zip(bars, values)):
-        ax.text(val + 20, bar.get_y() + bar.get_height()/2, 
-               f'₹{val:.0f}L Cr', va='center', fontsize=10, fontweight='bold', color=colors[i])
+        ax.text(val + _lbl_off, bar.get_y() + bar.get_height()/2, 
+               f'₹{val:.2f}L Cr', va='center', fontsize=10, fontweight='bold', color=colors[i])
     
     # Percentage labels
     total = sum(values)
@@ -1493,7 +1515,7 @@ def chart_tax_composition(cag_data, output_dir):
     ax.invert_yaxis()
     
     # Add total annotation
-    ax.text(0.98, 0.02, f"Gross Tax: ₹{cag_data['gross_tax_ytd']:.0f}L Cr\nNet (post devolution): ₹{cag_data['net_tax_ytd']:.0f}L Cr",
+    ax.text(0.98, 0.02, f"Gross Tax: ₹{cag_data['gross_tax_ytd']:.2f}L Cr\nNet (post devolution): ₹{cag_data['net_tax_ytd']:.2f}L Cr",
             transform=ax.transAxes, fontsize=10, ha='right', va='bottom',
             bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor='#E5E7EB'))
     
@@ -1539,8 +1561,8 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
     df_curr = df_curr.sort_values('month_idx')
     
     x_curr = df_curr['month_idx'].values
-    capex_curr = (df_curr['Capital Expenditure'] / 100).values
-    deficit_curr = (df_curr['Fiscal Deficit'] / 100).values
+    capex_curr = (df_curr['Capital Expenditure'] / CRORE_PER_LAKH_CRORE).values
+    deficit_curr = (df_curr['Fiscal Deficit'] / CRORE_PER_LAKH_CRORE).values
     
     # Previous FY (if available)
     if df_prev_monthly is not None:
@@ -1550,8 +1572,8 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
         df_prev = df_prev.sort_values('month_idx')
         
         x_prev = df_prev['month_idx'].values
-        capex_prev = (df_prev['Capital Expenditure'] / 100).values
-        deficit_prev = (df_prev['Fiscal Deficit'] / 100).values
+        capex_prev = (df_prev['Capital Expenditure'] / CRORE_PER_LAKH_CRORE).values
+        deficit_prev = (df_prev['Fiscal Deficit'] / CRORE_PER_LAKH_CRORE).values
     
     # LEFT: Capex YTD Progress
     ax1 = axes[0]
@@ -1565,7 +1587,7 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
     # Budget target line
     if cag_data['be_capex']:
         ax1.axhline(y=cag_data['be_capex'], color='#059669', linewidth=1.5, linestyle='--', zorder=3)
-        ax1.text(11, cag_data['be_capex'] + 20, f"BE: ₹{cag_data['be_capex']:.0f}L Cr", 
+        ax1.text(11, cag_data['be_capex'] * 1.02, f"BE: ₹{cag_data['be_capex']:.2f}L Cr", 
                 fontsize=8, color='#059669')
     
     ax1.set_xticks(range(12))
@@ -1576,7 +1598,7 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
     ax1.set_xlim(-0.5, 11.5)
     
     # End label
-    ax1.annotate(f"₹{capex_curr[-1]:.0f}L Cr\n({cag_data['capex_pct_be']:.0f}% of BE)",
+    ax1.annotate(f"₹{capex_curr[-1]:.2f}L Cr\n({cag_data['capex_pct_be']:.0f}% of BE)",
                 xy=(x_curr[-1], capex_curr[-1]), xytext=(10, 0), textcoords='offset points',
                 fontsize=9, fontweight='bold', color=C_CAPEX,
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor=C_CAPEX))
@@ -1598,7 +1620,7 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
     ax2.set_xlim(-0.5, 11.5)
     
     # End label
-    ax2.annotate(f"₹{deficit_curr[-1]:.0f}L Cr",
+    ax2.annotate(f"₹{deficit_curr[-1]:.2f}L Cr",
                 xy=(x_curr[-1], deficit_curr[-1]), xytext=(10, 0), textcoords='offset points',
                 fontsize=9, fontweight='bold', color=C_FISCAL_DEF,
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor=C_FISCAL_DEF))
@@ -1636,7 +1658,7 @@ def chart_monthly_fiscal_pulse(cag_data, df_monthly, output_dir):
     fig, ax = EconStyle.create_figure(size="wide")
     
     months = df_monthly['Month'].str.split('-').str[0].tolist()
-    capex_monthly = (df_monthly['Capital Expenditure_monthly'] / 100).values
+    capex_monthly = (df_monthly['Capital Expenditure_monthly'] / CRORE_PER_LAKH_CRORE).values
     
     x = np.arange(len(months))
     
@@ -1654,14 +1676,14 @@ def chart_monthly_fiscal_pulse(cag_data, df_monthly, output_dir):
     # Add value labels
     for i, (bar, val) in enumerate(zip(bars, capex_monthly)):
         if not np.isnan(val) and val > 0:
-            ax.text(bar.get_x() + bar.get_width()/2, val + 3,
-                   f'₹{val:.0f}L', ha='center', va='bottom', fontsize=8, 
+            ax.text(bar.get_x() + bar.get_width()/2, val + np.nanmax(capex_monthly) * 0.02,
+                   f'₹{val:.2f}L', ha='center', va='bottom', fontsize=8, 
                    fontweight='bold', color='#1F2937', zorder=5)
     
     # Monthly target line
     if be_monthly_target > 0:
         target_line = ax.axhline(y=be_monthly_target, color='#DC2626', linewidth=2, linestyle='--',
-                  label=f'Monthly Target (₹{be_monthly_target:.0f}L Cr)', zorder=4)
+                  label=f'Monthly Target (₹{be_monthly_target:.2f}L Cr)', zorder=4)
     
     # 3-month moving average
     ma3 = pd.Series(capex_monthly).rolling(3, min_periods=1).mean().values
@@ -1677,7 +1699,7 @@ def chart_monthly_fiscal_pulse(cag_data, df_monthly, output_dir):
               ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
     
     # YTD annotation
-    ax.text(0.98, 0.95, f"YTD: ₹{cag_data['capex_ytd']:.0f}L Cr\n({cag_data['capex_pct_be']:.1f}% of BE)",
+    ax.text(0.98, 0.95, f"YTD: ₹{cag_data['capex_ytd']:.2f}L Cr\n({cag_data['capex_pct_be']:.1f}% of BE)",
             transform=ax.transAxes, fontsize=10, fontweight='bold',
             color=C_CAPEX, ha='right', va='top',
             bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor=C_CAPEX), zorder=10)
@@ -1885,9 +1907,9 @@ def main():
 
     if cag_data:
         print(f"\n Fiscal Summary ({cag_data['fy']} through {cag_data['latest_month']}):")
-        print(f"   Capex YTD: {cag_data['capex_ytd']:.0f} Lakh Cr ({cag_data['capex_pct_be']:.1f}% of BE)")
-        print(f"   Fiscal Deficit YTD: {cag_data['fiscal_deficit_ytd']:.0f} Lakh Cr")
-        print(f"   Net Tax Revenue YTD: {cag_data['net_tax_ytd']:.0f} Lakh Cr")
+        print(f"   Capex YTD: {cag_data['capex_ytd']:.2f} Lakh Cr ({cag_data['capex_pct_be']:.1f}% of BE)")
+        print(f"   Fiscal Deficit YTD: {cag_data['fiscal_deficit_ytd']:.2f} Lakh Cr")
+        print(f"   Net Tax Revenue YTD: {cag_data['net_tax_ytd']:.2f} Lakh Cr")
 
 
 if __name__ == "__main__":

@@ -593,7 +593,13 @@ def chart_macro_table(engine, output_dir):
             elif "claims" in ind_id: latest_str = f"{latest/1000:,.0f}K"
             elif "spread" in ind_id or "hy" in ind_id: latest_str = f"{latest*100:.0f} bps"
             elif "usd_index" in ind_id: latest_str = f"{latest:.1f}"
-            elif ind.get("unit") == "USD": latest_str = f"{latest:.2f}"  # <--- ADD THIS LINE
+            elif ind.get("unit") == "USD": latest_str = f"{latest:.2f}"
+            # WALCL is published by FRED in MILLIONS of USD; the row is labelled $B.
+            # Without this the table printed 6,593,871 "$B" — a thousand-fold overstatement.
+            elif ind_id == "fed_balance_sheet": latest_str = f"{latest / 1000:,.0f}"
+            # An index level is not a percentage — respect the declared unit before
+            # falling through to the magnitude heuristics below.
+            elif ind.get("unit") == "index": latest_str = f"{latest:.2f}"
             elif abs(latest) > 100: latest_str = f"{latest:,.0f}"
             elif abs(latest) >= 1: latest_str = f"{latest:.2f}%"
             else: latest_str = f"{latest:.2f}"
@@ -603,6 +609,7 @@ def chart_macro_table(engine, output_dir):
                     change_k = change / 1000
                     change_str = "0.0" if abs(change_k) < 0.1 else f"{change_k:+.1f}"
                 elif "spread" in ind_id or "hy" in ind_id: change_str = f"{change*100:+.0f}"
+                elif ind_id == "fed_balance_sheet": change_str = f"{change / 1000:+,.1f}"
                 elif abs(change) < 0.005: change_str = "0.00"
                 else: change_str = f"{change:+.2f}"
             else: change_str = "-"
