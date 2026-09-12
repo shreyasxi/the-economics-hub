@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════
+# Economics Hub — line-ending and diff policy
+# Repo moved Windows → macOS; normalise once, then stay LF.
+# ═══════════════════════════════════════════════════════════
+
+# Default: detect text, store and check out LF
+* text=auto eol=lf
+
+# Explicit text
+*.py    text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.sql   text eol=lf
+*.csv   text eol=lf
+*.txt   text eol=lf
+*.json  text eol=lf
+
+# Binary — never touch, never diff as text
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.db    binary
+*.xlsx  binary
+*.xls   binary
+*.pdf   binary
+*.ico   binary
