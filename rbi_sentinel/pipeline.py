@@ -277,21 +277,73 @@ def run_clean_and_score(
 # ── Stage 2b: Compute Composites ────────────────────────────────────────────────
 
 def run_compute_composites() -> None:
-    """Recompute meeting_composites for all meetings with at least one score."""
+    """
+    Recompute meeting_composites, one per policy cycle.
+
+    RBI publishes a single decision across several dates — resolution and
+    governor statement on the day, minutes 14 days later, and a Monthly
+    Bulletin reprint of the first two some weeks after. Composites are
+    therefore computed per policy_cycle, not per meeting row, and stored
+    against the cycle's anchor meeting so chart queries are unaffected.
+
+    Run rbi_sentinel.db.migrate_policy_cycle first; without policy_cycle
+    populated this falls back to the old per-meeting behaviour and logs a
+    warning, because that produced composites made of one document.
+    """
     log.info("=== COMPOSITE COMPUTATION ===")
-    meetings = db.get_all_meetings()
-    for meeting in meetings:
-        meeting_id = meeting["meeting_id"]
-        meeting_date = meeting["meeting_date"]
-        scores = db.get_scores_for_meeting(meeting_id)
+
+    cycles = db.get_all_policy_cycles()
+    if not cycles:
+        log.warning(
+            "No policy_cycle values found — falling back to per-meeting "
+            "composites, which double-count Bulletin reprints and treat "
+            "minutes as a separate meeting. Run: "
+            "python -m rbi_sentinel.db.migrate_policy_cycle"
+        )
+        for meeting in db.get_all_meetings():
+            scores = db.get_scores_for_meeting(meeting["meeting_id"])
+            if not scores:
+                continue
+            db.upsert_composite(
+                meeting_id=meeting["meeting_id"],
+                **compute_meeting_composite(scores),
+            )
+        log.info("Composite computation complete (legacy per-meeting mode)")
+        return
+
+    pruned = db.prune_non_anchor_composites()
+    if pruned:
+        log.info(
+            "Pruned %d composite(s) attached to non-anchor meeting rows "
+            "(pre-cycle artefacts, each built from a single document)", pruned,
+        )
+
+    written = skipped = 0
+    doc_counts = Counter()
+    for cycle in cycles:
+        scores = db.get_scores_for_cycle(cycle["policy_cycle"])
         if not scores:
+            skipped += 1
             continue
         composite = compute_meeting_composite(scores)
-        db.upsert_composite(meeting_id=meeting_id, **composite)
-        log.debug(
-            "Composite for %s: %.3f",
-            meeting_date, composite.get("composite_overall_score") or 0,
+        db.upsert_composite(
+            meeting_id=cycle["anchor_meeting_id"], **composite
         )
+        written += 1
+        doc_counts[len(scores)] += 1
+        log.debug(
+            "Composite for cycle %s: %.3f from %d document(s)",
+            cycle["policy_cycle"],
+            composite.get("composite_overall_score") or 0,
+            len(scores),
+        )
+
+    log.info(
+        "Composites written for %d of %d cycles (%d had no scores)",
+        written, len(cycles), skipped,
+    )
+    for n in sorted(doc_counts):
+        log.info("  %d cycle(s) built from %d document(s)", doc_counts[n], n)
     log.info("Composite computation complete")
 
 

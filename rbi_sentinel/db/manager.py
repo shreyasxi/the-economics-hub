@@ -250,6 +250,69 @@ def get_scores_for_meeting(
     return [dict(r) for r in rows]
 
 
+def get_scores_for_cycle(
+    policy_cycle: str,
+    model_version: str = SCORING_MODEL_VERSION,
+) -> list[dict]:
+    """
+    All document scores belonging to one policy cycle.
+
+    A single MPC decision is published across several dates — the resolution
+    and governor statement on the day, the minutes 14 days later, and a
+    Monthly Bulletin reprint of the first two some weeks after that. Scores
+    must be gathered across every meeting row sharing a policy_cycle, or a
+    "composite" ends up being one document renormalised to 100%.
+
+    Bulletin reprints are excluded: they are the same text as the press
+    release and would double-count the resolution. Documents with no
+    extracted text are excluded for the same reason they carry no analysis.
+    """
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT s.*, d.doc_type
+            FROM sentiment_scores s
+            JOIN rbi_documents d ON d.doc_id = s.doc_id
+            JOIN mpc_meetings   m ON m.meeting_id = d.meeting_id
+            WHERE m.policy_cycle = ?
+              AND s.scoring_model_version = ?
+              AND d.source_kind = 'press_release'
+              AND d.word_count IS NOT NULL AND d.word_count > 0
+            ORDER BY d.publication_date
+            """,
+            (policy_cycle, model_version),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_all_policy_cycles() -> list[dict]:
+    """
+    One row per policy cycle, with the anchor meeting that represents it.
+
+    The anchor is the meeting whose date IS the decision date — the row the
+    composite is stored against, so existing chart queries keep working.
+    Note meeting_id is assigned in fetch order (newest first), not date
+    order, so it cannot be used to pick the anchor.
+    """
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT c.policy_cycle,
+                   (SELECT a.meeting_id
+                      FROM mpc_meetings a
+                     WHERE a.policy_cycle = c.policy_cycle
+                     ORDER BY (a.meeting_date <> a.policy_cycle), a.meeting_date
+                     LIMIT 1)      AS anchor_meeting_id,
+                   COUNT(*)        AS meeting_rows
+            FROM mpc_meetings c
+            WHERE c.policy_cycle IS NOT NULL
+            GROUP BY c.policy_cycle
+            ORDER BY c.policy_cycle
+            """
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ── meeting_composites ─────────────────────────────────────────────────────────
 
 def upsert_composite(
@@ -286,6 +349,39 @@ def upsert_composite(
              minutes_score, governor_score,
              score_divergence, composite_narrative),
         )
+
+
+def prune_non_anchor_composites(
+    model_version: str = SCORING_MODEL_VERSION,
+) -> int:
+    """
+    Delete composites attached to meeting rows that are not a cycle anchor.
+
+    Before policy cycles existed, every publication date got its own
+    composite — so one decision produced up to three, each built from a
+    single document. Those rows would still be picked up by the charts.
+    Returns the number deleted.
+    """
+    with _connect() as conn:
+        cur = conn.execute(
+            """
+            DELETE FROM meeting_composites
+            WHERE scoring_model_version = ?
+              AND meeting_id NOT IN (
+                    SELECT (SELECT a.meeting_id
+                              FROM mpc_meetings a
+                             WHERE a.policy_cycle = c.policy_cycle
+                             ORDER BY (a.meeting_date <> a.policy_cycle),
+                                      a.meeting_date
+                             LIMIT 1)
+                      FROM mpc_meetings c
+                     WHERE c.policy_cycle IS NOT NULL
+                     GROUP BY c.policy_cycle
+              )
+            """,
+            (model_version,),
+        )
+        return cur.rowcount
 
 
 def get_latest_composite(

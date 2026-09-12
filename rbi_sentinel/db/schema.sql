@@ -12,7 +12,15 @@ PRAGMA foreign_keys=ON;
 CREATE TABLE IF NOT EXISTS mpc_meetings (
     meeting_id          INTEGER PRIMARY KEY AUTOINCREMENT,
     meeting_date        TEXT NOT NULL UNIQUE,   -- Date of rate decision (YYYY-MM-DD)
-    policy_cycle        TEXT,                   -- e.g. "FY2026-Q1" for grouping
+    policy_cycle        TEXT,                   -- Decision date (YYYY-MM-DD) of the MPC cycle
+                                                -- this row belongs to. RBI publishes one
+                                                -- decision across several dates (resolution +
+                                                -- governor statement on the day, minutes +14d,
+                                                -- Bulletin reprint later), each of which became
+                                                -- a separate meeting row. Composites are
+                                                -- computed per policy_cycle and stored against
+                                                -- the row whose meeting_date IS the cycle date.
+                                                -- Backfill: rbi_sentinel.db.migrate_policy_cycle
     repo_rate_pct       REAL,                   -- Repo rate set at this meeting (%)
     rate_action         TEXT,                   -- "hike" | "cut" | "hold"
     rate_change_bps     INTEGER,                -- bps change (positive=hike, negative=cut, 0=hold)
@@ -32,6 +40,11 @@ CREATE TABLE IF NOT EXISTS rbi_documents (
     doc_type            TEXT NOT NULL,          -- "resolution" | "minutes" | "governor_statement"
     publication_date    TEXT NOT NULL,          -- Date document was published (YYYY-MM-DD)
     source_url          TEXT NOT NULL,
+    source_kind         TEXT,                   -- press_release | bulletin_reprint | other
+                                                -- The RBI Monthly Bulletin reprints the
+                                                -- resolution and governor statement weeks
+                                                -- later; those rows are duplicates and are
+                                                -- excluded from composites.
     source_format       TEXT NOT NULL,          -- "html" | "pdf"
     fetch_status        TEXT NOT NULL,          -- "success" | "failed" | "cached"
     raw_text            TEXT,                   -- Full extracted text (NULL if fetch failed)
