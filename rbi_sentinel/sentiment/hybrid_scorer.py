@@ -15,7 +15,6 @@ from typing import Optional
 from rbi_sentinel.config import (
     CONFLICT_THRESHOLD,
     LEXICON_WEIGHT,
-    LOW_CONFIDENCE_THRESHOLD,
     LLM_WEIGHT,
     SCORING_MODEL_VERSION,
 )

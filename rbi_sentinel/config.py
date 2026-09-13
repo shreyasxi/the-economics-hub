@@ -90,14 +90,30 @@ MIN_VALID_WORD_COUNT = 100
 SCORING_MODEL_VERSION = "hybrid_v2"
 
 # Fusion weights
-LEXICON_WEIGHT = 0.25
-LLM_WEIGHT = 0.75
+# The lexicon and the LLM score on incommensurable scales. Measured across
+# the 159-document corpus: lexicon sd 0.263 against LLM sd 0.587 -- the
+# keyword counter is 2.2x narrower because tanh normalisation compresses it
+# toward zero. Blending at 25% therefore dragged every confident reading
+# toward the middle: a document the model read at -0.95 could not be matched
+# by a lexicon whose range stops near -0.64. Dropping to 10% recovers ~11%
+# of signal amplitude while keeping the lexicon as an independent cross-check.
+LEXICON_WEIGHT = 0.10
+LLM_WEIGHT = 0.90
 
 # Conflict threshold: |lexicon_score - llm_score| > this → WARNING + low confidence
-CONFLICT_THRESHOLD = 0.4
+# Divergence above which the lexicon and the LLM are treated as genuinely
+# disagreeing. At 0.40 this fired on 43% of the corpus, because mean
+# divergence is 0.357 -- the threshold sat inside the normal distribution and
+# was measuring the scale mismatch above, not analytical disagreement. 0.60
+# flags the real outliers (9%). This is an internal data-quality signal: a
+# sudden rise across many documents means something upstream has changed.
+CONFLICT_THRESHOLD = 0.60
 
-# Low-confidence threshold: use Sonnet instead of Haiku for re-scoring
-LOW_CONFIDENCE_THRESHOLD = 0.55
+# LOW_CONFIDENCE_THRESHOLD removed (Sep 2026). It was imported but never
+# referenced, so the advertised "escalate uncertain documents to a stronger
+# model" behaviour never ran. Reinstating it would mean a human deciding what
+# to do with the flag, which is manual work this pipeline exists to avoid.
+# LLM_FALLBACK_MODEL is retained for the transient-failure retry path.
 
 # ── Anthropic API ─────────────────────────────────────────────────────────────
 # Default model. Scoring a central bank document is a judgement task, not an
