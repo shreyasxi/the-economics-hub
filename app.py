@@ -90,32 +90,35 @@ st.markdown(
     }
 
     /* ── Key metrics container ──────────────────────────────────────────
-       Financial-table conventions: a small letter-spaced label above a
-       large figure set in tabular numerals with tight tracking, and the
-       qualifier carried below in muted grey. The numeral stack leads with
-       faces that ship real lining figures so the digits align in a column
-       and do not drift between browsers. */
+       Financial-table convention: a small letter-spaced label above a large
+       figure in tabular lining numerals, qualifier below in muted grey.
+       The block spacing below (--mpc-gap) is shared by every element in the
+       right column so the rhythm is even rather than ad hoc. */
+    .mpc-metrics, .mpc-exec-head, .mpc-exec-body, .mpc-sources {
+        --mpc-gap: 1.15rem;
+    }
     .mpc-metrics {
         background: #FFFFFF;
-        border: 1px solid #DFE3EA;
+        border: 1px solid #DDE2E9;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(10,31,61,0.07);
-        padding: 1.1rem 1.35rem 1.2rem 1.35rem;
+        padding: 1.05rem 1.3rem 1.15rem 1.3rem;
+        margin-bottom: var(--mpc-gap);
     }
     .mpc-metrics-head {
         display: flex; justify-content: space-between; align-items: baseline;
         gap: 1rem; flex-wrap: wrap;
-        padding-bottom: 0.8rem; margin-bottom: 1rem;
+        padding-bottom: 0.75rem; margin-bottom: 0.95rem;
         border-bottom: 1px solid #EDF0F4;
     }
-    .mpc-inst {
+    .mpc-metrics-eyebrow {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
-        text-transform: uppercase; color: #0A1F3D;
+        font-size: 0.63rem; font-weight: 700; letter-spacing: 0.13em;
+        text-transform: uppercase; color: #7A828F;
     }
     .mpc-date {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.74rem; font-weight: 500; color: #6B7480;
+        font-size: 0.82rem; font-weight: 600; color: #0A1F3D;
         font-variant-numeric: tabular-nums; white-space: nowrap;
     }
 
@@ -126,48 +129,89 @@ st.markdown(
     .mpc-metric-label {
         font-family: 'Inter', -apple-system, sans-serif;
         font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em;
-        text-transform: uppercase; color: #7A828F; margin-bottom: 0.38rem;
+        text-transform: uppercase; color: #7A828F; margin-bottom: 0.34rem;
     }
     .mpc-metric-value {
         font-family: 'Inter', 'SF Pro Display', -apple-system,
                      'Helvetica Neue', Arial, sans-serif;
-        font-size: 2.15rem; font-weight: 600; letter-spacing: -0.03em;
+        font-size: 2.05rem; font-weight: 600; letter-spacing: -0.03em;
         line-height: 1; color: #0A1F3D;
         font-variant-numeric: tabular-nums lining-nums;
-        font-feature-settings: 'tnum' 1, 'lnum' 1, 'ss01' 1;
+        font-feature-settings: 'tnum' 1, 'lnum' 1;
     }
     .mpc-unit {
-        font-size: 1.05rem; font-weight: 500; letter-spacing: 0;
-        color: #6B7480; margin-left: 0.1rem;
+        font-size: 1.0rem; font-weight: 500; letter-spacing: 0;
+        color: #7A828F; margin-left: 0.08rem;
     }
-    .mpc-metric-sub {
-        font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em;
-        margin-top: 0.22rem; text-transform: capitalize;
-    }
+    /* Direction and change sit on one line rather than stacking, which
+       kept the two metric columns the same height and removed the
+       vertical bloat under the stance figure. */
     .mpc-metric-delta {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.7rem; font-weight: 500; color: #7A828F;
-        margin-top: 0.42rem; line-height: 1.35;
-        font-variant-numeric: tabular-nums;
+        font-size: 0.71rem; font-weight: 500; color: #7A828F;
+        margin-top: 0.4rem; line-height: 1.4;
     }
+    .mpc-metric-delta .mpc-hawkish,
+    .mpc-metric-delta .mpc-dovish,
+    .mpc-metric-delta .mpc-neutral { font-weight: 700; }
+    .mpc-sep { color: #C3C9D2; margin: 0 0.32rem; }
+    .mpc-chg { font-variant-numeric: tabular-nums; }
     .mpc-d-hike { color: #A61B29; }
     .mpc-d-cut  { color: #1F4E79; }
     .mpc-hawkish { color: #A61B29; }
     .mpc-dovish  { color: #1F4E79; }
     .mpc-neutral { color: #4A5262; }
 
-    /* ── Provenance ── */
-    .mpc-label {
+    /* ── Executive summary ──────────────────────────────────────────────
+       The tinted fill is confined to the heading band. The page ground is
+       #F4F5F7 and the old panel was #F4F6F9 — near-identical, which is why
+       the block read as flat and the prose looked like a text dump. The
+       narrative now sits directly on the page, where #24282F gives it real
+       contrast. */
+    .mpc-exec-head {
+        background: #E7EDF5;
+        border-left: 3px solid #003366;
+        border-radius: 0 4px 4px 0;
+        padding: 0.7rem 1.1rem 0.75rem 1.1rem;
+        margin-bottom: 0.95rem;
+    }
+    .mpc-exec-title {
+        font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800;
+        color: #003366; text-transform: uppercase; letter-spacing: 0.08em;
+        margin: 0 0 0.15rem 0; line-height: 1.2;
+    }
+    .mpc-exec-sub {
+        font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600;
+        color: #5F6B7A; letter-spacing: 0.04em; margin: 0; line-height: 1.35;
+    }
+    .mpc-exec-body { margin-bottom: var(--mpc-gap); padding: 0 0.1rem; }
+
+    /* LOCKED — approved typography for the narrative paragraphs. */
+    .mpc-body {
+        font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #24282F;
+        line-height: 1.72; text-align: left; margin: 0 0 0.85rem 0;
+    }
+    .mpc-body:last-of-type { margin-bottom: 0; }
+
+    /* ── Source documents ── */
+    .mpc-sources {
+        background: #FFFFFF;
+        border: 1px solid #DDE2E9;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(10,31,61,0.07);
+        padding: 0.95rem 1.3rem 1.05rem 1.3rem;
+    }
+    .mpc-sources-label {
         font-family: 'Inter', -apple-system, sans-serif;
         font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em;
-        text-transform: uppercase; color: #7A828F; margin: 0 0 0.35rem 0;
+        text-transform: uppercase; color: #7A828F;
+        margin: 0 0 0.5rem 0; padding-bottom: 0.55rem;
+        border-bottom: 1px solid #EDF0F4;
     }
-    .mpc-prov-head { margin-top: 1.35rem; }
     .mpc-prov { list-style: none; padding: 0; margin: 0; }
     .mpc-prov li {
         display: flex; justify-content: space-between; align-items: baseline;
-        gap: 1rem; padding: 0.42rem 0; border-bottom: 1px solid #F0F2F5;
+        gap: 1rem; padding: 0.42rem 0; border-bottom: 1px solid #F3F5F8;
     }
     .mpc-prov li:last-child { border-bottom: none; }
     .mpc-prov a {
@@ -183,8 +227,9 @@ st.markdown(
     }
     .mpc-prov-note {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.68rem; font-style: italic; color: #8A919C;
-        line-height: 1.5; margin: 0.8rem 0 0 0;
+        font-size: 0.67rem; font-style: italic; color: #8A919C;
+        line-height: 1.5; margin: 0.75rem 0 0 0;
+        padding-top: 0.6rem; border-top: 1px solid #F3F5F8;
     }
 
     @media (max-width: 640px) {
@@ -1161,15 +1206,23 @@ with tab_rbi:
                     if _prev is not None:
                         _chg = _sc - _prev
                         _arrow = "&uarr;" if _chg > 0 else ("&darr;" if _chg < 0 else "&middot;")
-                        _stance_delta = f"{_arrow} {abs(_chg):.2f} vs previous cycle"
+                        _stance_line = (
+                            f'<span class="mpc-{_dir}">{_dir.title()}</span>'
+                            f'<span class="mpc-sep">&mdash;</span>'
+                            f'<span class="mpc-chg">{_arrow} {abs(_chg):.2f} vs previous cycle</span>'
+                        )
                     else:
-                        _stance_delta = "First scored cycle"
+                        _stance_line = (
+                            f'<span class="mpc-{_dir}">{_dir.title()}</span>'
+                            f'<span class="mpc-sep">&mdash;</span>'
+                            f'<span class="mpc-chg">first scored cycle</span>'
+                        )
 
                     st.markdown(
                         f"""
 <div class="mpc-metrics">
   <div class="mpc-metrics-head">
-    <span class="mpc-inst">Reserve Bank of India &middot; Monetary Policy Committee</span>
+    <span class="mpc-metrics-eyebrow">Latest MPC meeting</span>
     <span class="mpc-date">{_meeting_long}</span>
   </div>
   <div class="mpc-metrics-grid">
@@ -1181,8 +1234,7 @@ with tab_rbi:
     <div class="mpc-metric">
       <span class="mpc-metric-label">Policy stance</span>
       <span class="mpc-metric-value mpc-{_dir}">{_sc:+.2f}</span>
-      <span class="mpc-metric-sub mpc-{_dir}">{_dir}</span>
-      <span class="mpc-metric-delta">{_stance_delta}</span>
+      <span class="mpc-metric-delta">{_stance_line}</span>
     </div>
   </div>
 </div>
@@ -1190,7 +1242,7 @@ with tab_rbi:
                         unsafe_allow_html=True,
                     )
 
-                # ── Executive summary: original panel, below the metrics box ──
+                # ── Executive summary ──
                 ai_summary = (brief or {}).get("composite_narrative")
                 if not ai_summary:
                     ai_summary = "Awaiting narrative generation for the current policy cycle."
@@ -1204,27 +1256,21 @@ with tab_rbi:
                         clean_summary = clean_summary.replace(_label, "")
                     clean_summary = clean_summary.strip()
                     clean_summary = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", clean_summary)
-                    clean_summary = clean_summary.replace("\n\n", "<br><br>")
+                    clean_summary = clean_summary.replace("\n\n", "</p><p class='mpc-body'>")
                     clean_summary = clean_summary.replace("\n", " ")
 
                 st.markdown(
                     f"""
-<div style="background-color: #F4F6F9; padding: 0.8rem 1.4rem 1.4rem 1.4rem; border-radius: 4px; border: 1px solid #E2DFD8; border-left: 3px solid #003366; margin-top: 1.25rem;">
-    <p style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #003366; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0; margin-bottom: 0.2rem;">
-        Executive Summary
-    </p>
-    <p style="font-family: 'Inter', sans-serif; font-size: 0.70rem; font-weight: 700; color: #666666; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 1.2rem;">
-        NLP-driven narrative synthesis of the current policy cycle
-    </p>
-    <p style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #222222; line-height: 1.65; text-align: justify; margin-bottom: 0;">
-        {clean_summary}
-    </p>
+<div class="mpc-exec-head">
+  <p class="mpc-exec-title">Executive Summary</p>
+  <p class="mpc-exec-sub">NLP-driven narrative synthesis of the current policy cycle</p>
 </div>
+<div class="mpc-exec-body"><p class="mpc-body">{clean_summary}</p></div>
 """,
                     unsafe_allow_html=True,
                 )
 
-                # ── Provenance ──
+                # ── Source documents ──
                 if brief and brief.get("documents"):
                     _names = {
                         "resolution": "Resolution",
@@ -1241,11 +1287,13 @@ with tab_rbi:
                             f'&middot; {_doc["word_count"]:,} words</span></li>'
                         )
                     st.markdown(
-                        '<p class="mpc-label mpc-prov-head">Source documents</p>'
+                        '<div class="mpc-sources">'
+                        '<p class="mpc-sources-label">Source documents</p>'
                         '<ul class="mpc-prov">' + "".join(_rows) + "</ul>"
                         '<p class="mpc-prov-note">Published by the Reserve Bank of India '
                         'at rbi.org.in. Scores are computed from the full text of each '
-                        'document; no summary or excerpt is used.</p>',
+                        'document; no summary or excerpt is used.</p>'
+                        '</div>',
                         unsafe_allow_html=True,
                     )
 
