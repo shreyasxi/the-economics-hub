@@ -53,42 +53,9 @@ st.markdown(
     /* ── Google Fonts: Inter (UI) + Merriweather (body) + Playfair Display (Masthead) ── */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&display=swap');
 
-    /* ── Global base ──────────────────────────────────────────────────
-       One typeface across the whole surface. The old rule matched only
-       [class*="css"], but current Streamlit emits st-emotion-cache-*
-       class names, so its own widgets — expanders, captions, tabs,
-       buttons, dataframes — were falling through to the browser default
-       and the page mixed two faces. */
-    html, body,
-    [class*="css"], [class*="st-emotion"], [class^="st-"],
-    .stApp, .stMarkdown, .stButton, .stSelectbox, .stTextInput,
-    [data-testid="stMarkdownContainer"],
-    [data-testid="stExpander"], [data-testid="stCaptionContainer"],
-    [data-testid="stMetricValue"], [data-testid="stMetricLabel"],
-    [data-testid="stImageCaption"], [data-baseweb="tab"],
-    button, input, select, textarea {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont,
-                     'Segoe UI', Roboto, sans-serif !important;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-
-    /* Deliberate hierarchy: bold carries headers and figures, regular
-       carries prose, and one muted grey carries every piece of secondary
-       metadata (dates, counts, captions, sources). */
-    body { color: #24282F; }
-    h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.015em; }
-    [data-testid="stImageCaption"],
-    [data-testid="stCaptionContainer"],
-    [data-testid="stExpander"] summary {
-        color: #6B7480 !important;
-        font-size: 0.78rem !important;
-        font-weight: 500 !important;
-    }
-    [data-testid="stExpander"] summary { letter-spacing: 0.01em; }
-    /* Tabular figures wherever numbers are meant to line up. */
-    [data-testid="stMetricValue"], .stDataFrame, table {
-        font-variant-numeric: tabular-nums;
+    /* ── Global base ── */
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     /* ── Reduce Streamlit's default top padding ── */
@@ -97,80 +64,91 @@ st.markdown(
         padding-bottom: 2rem;
     }
     
-    /* ═══ RBI policy panel ═══════════════════════════════════════════
-       Structure from rules, whitespace and one bordered container.
-       The only saturated colour is the stance direction, which carries
-       meaning. Figures use tabular numerals so they align down a column.
-       NOTE: .mpc-body is locked — do not alter its typography. */
+    /* ═══ RBI policy panel ═══════════════════════════════════════════ */
 
-    /* ── Masthead: full-bleed navy bar ── */
+    /* ── Masthead: full-width institutional bar ── */
     .mpc-bar {
         background: #0A1F3D;
-        margin: 0.5rem 0 1.75rem 0;
-        padding: 0.95rem 1.5rem;
-        border-radius: 6px;
-        display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap;
+        margin: 0.5rem 0 1.5rem 0;
+        padding: 0.85rem 1.5rem;
+        border-radius: 4px;
+        display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
     }
     .mpc-bar-title {
-        font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 700;
-        letter-spacing: -0.015em; color: #FFFFFF; line-height: 1.2;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 1.02rem; font-weight: 700; letter-spacing: 0.01em;
+        color: #FFFFFF; line-height: 1.2;
+    }
+    .mpc-bar-rule {
+        width: 1px; height: 16px; background: rgba(255,255,255,0.30);
+        display: inline-block;
     }
     .mpc-bar-sub {
-        font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
-        letter-spacing: 0.1em; text-transform: uppercase;
-        color: rgba(255,255,255,0.62);
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.74rem; font-weight: 600; letter-spacing: 0.11em;
+        text-transform: uppercase; color: rgba(255,255,255,0.72);
     }
 
-    /* ── Key metrics container ── */
+    /* ── Key metrics container ──────────────────────────────────────────
+       Financial-table conventions: a small letter-spaced label above a
+       large figure set in tabular numerals with tight tracking, and the
+       qualifier carried below in muted grey. The numeral stack leads with
+       faces that ship real lining figures so the digits align in a column
+       and do not drift between browsers. */
     .mpc-metrics {
         background: #FFFFFF;
         border: 1px solid #DFE3EA;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(10,31,61,0.06);
-        padding: 1.15rem 1.35rem 1.25rem 1.35rem;
+        box-shadow: 0 1px 3px rgba(10,31,61,0.07);
+        padding: 1.1rem 1.35rem 1.2rem 1.35rem;
     }
     .mpc-metrics-head {
-        display: flex; flex-direction: column;
-        padding-bottom: 0.95rem; margin-bottom: 1.05rem;
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 1rem; flex-wrap: wrap;
+        padding-bottom: 0.8rem; margin-bottom: 1rem;
         border-bottom: 1px solid #EDF0F4;
     }
     .mpc-inst {
-        font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 700;
-        color: #0A1F3D; letter-spacing: -0.01em; line-height: 1.25;
-    }
-    .mpc-inst-sub {
-        font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 600;
-        letter-spacing: 0.1em; text-transform: uppercase;
-        color: #6B7480; margin-top: 0.12rem;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.09em;
+        text-transform: uppercase; color: #0A1F3D;
     }
     .mpc-date {
-        font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 500;
-        color: #6B7480; margin-top: 0.45rem;
-        font-variant-numeric: tabular-nums;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.74rem; font-weight: 500; color: #6B7480;
+        font-variant-numeric: tabular-nums; white-space: nowrap;
     }
 
     .mpc-metrics-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem;
     }
     .mpc-metric { display: flex; flex-direction: column; }
     .mpc-metric-label {
-        font-family: 'Inter', sans-serif; font-size: 0.64rem; font-weight: 700;
-        letter-spacing: 0.12em; text-transform: uppercase;
-        color: #6B7480; margin-bottom: 0.3rem;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em;
+        text-transform: uppercase; color: #7A828F; margin-bottom: 0.38rem;
     }
     .mpc-metric-value {
-        font-family: 'Inter', sans-serif; font-size: 1.85rem; font-weight: 700;
-        letter-spacing: -0.035em; line-height: 1.05; color: #0A1F3D;
-        font-variant-numeric: tabular-nums;
-        display: flex; align-items: baseline; gap: 0.3rem;
+        font-family: 'Inter', 'SF Pro Display', -apple-system,
+                     'Helvetica Neue', Arial, sans-serif;
+        font-size: 2.15rem; font-weight: 600; letter-spacing: -0.03em;
+        line-height: 1; color: #0A1F3D;
+        font-variant-numeric: tabular-nums lining-nums;
+        font-feature-settings: 'tnum' 1, 'lnum' 1, 'ss01' 1;
     }
     .mpc-unit {
-        font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600;
-        letter-spacing: 0.01em; color: #6B7480;
+        font-size: 1.05rem; font-weight: 500; letter-spacing: 0;
+        color: #6B7480; margin-left: 0.1rem;
+    }
+    .mpc-metric-sub {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em;
+        margin-top: 0.22rem; text-transform: capitalize;
     }
     .mpc-metric-delta {
-        font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 500;
-        color: #6B7480; margin-top: 0.4rem; line-height: 1.35;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.7rem; font-weight: 500; color: #7A828F;
+        margin-top: 0.42rem; line-height: 1.35;
         font-variant-numeric: tabular-nums;
     }
     .mpc-d-hike { color: #A61B29; }
@@ -179,55 +157,39 @@ st.markdown(
     .mpc-dovish  { color: #1F4E79; }
     .mpc-neutral { color: #4A5262; }
 
-    /* ── Executive summary ── */
-    .mpc-sublabel {
-        font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 400;
-        font-style: italic; color: #6B7480;
-        margin: -0.25rem 0 1.1rem 0; line-height: 1.45;
-    }
-    /* Constrain the measure: the locked body type needs ~65 characters a
-       line to read well, and the content column is far wider than that. */
-    .mpc-summary { max-width: 68ch; }
-
-    /* LOCKED — typography approved, do not alter. */
-    .mpc-body {
-        font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #24282F;
-        line-height: 1.72; text-align: left; margin: 0 0 0.85rem 0;
-    }
-    .mpc-body:last-of-type { margin-bottom: 0; }
-
     /* ── Provenance ── */
     .mpc-label {
-        font-family: 'Inter', sans-serif; font-size: 0.64rem; font-weight: 700;
-        letter-spacing: 0.12em; text-transform: uppercase;
-        color: #6B7480; margin: 0 0 0.35rem 0;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em;
+        text-transform: uppercase; color: #7A828F; margin: 0 0 0.35rem 0;
     }
-    .mpc-prov-head { margin-top: 1.4rem; }
+    .mpc-prov-head { margin-top: 1.35rem; }
     .mpc-prov { list-style: none; padding: 0; margin: 0; }
     .mpc-prov li {
         display: flex; justify-content: space-between; align-items: baseline;
-        gap: 1rem; padding: 0.42rem 0;
-        border-bottom: 1px solid #F0F2F5;
+        gap: 1rem; padding: 0.42rem 0; border-bottom: 1px solid #F0F2F5;
     }
     .mpc-prov li:last-child { border-bottom: none; }
     .mpc-prov a {
-        font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600;
-        color: #0A1F3D; text-decoration: none;
-        border-bottom: 1px solid rgba(10,31,61,0.22);
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.82rem; font-weight: 600; color: #0A1F3D;
+        text-decoration: none; border-bottom: 1px solid rgba(10,31,61,0.22);
     }
     .mpc-prov a:hover { border-bottom-color: #0A1F3D; }
     .mpc-prov-meta {
-        font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
-        color: #8A919C; white-space: nowrap; font-variant-numeric: tabular-nums;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.72rem; font-weight: 500; color: #8A919C;
+        white-space: nowrap; font-variant-numeric: tabular-nums;
     }
     .mpc-prov-note {
-        font-family: 'Inter', sans-serif; font-size: 0.68rem; font-style: italic;
-        color: #8A919C; line-height: 1.5; margin: 0.8rem 0 0 0;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.68rem; font-style: italic; color: #8A919C;
+        line-height: 1.5; margin: 0.8rem 0 0 0;
     }
 
     @media (max-width: 640px) {
-        .mpc-metrics-grid { grid-template-columns: 1fr; gap: 1rem; }
-        .mpc-metric-value { font-size: 1.6rem; }
+        .mpc-metrics-grid { grid-template-columns: 1fr; gap: 1.1rem; }
+        .mpc-metric-value { font-size: 1.85rem; }
     }
 
     /* ── Centered Section Divider ── */
@@ -1155,7 +1117,7 @@ with tab_rbi:
         if stance:
             brief = get_latest_cycle_brief()
 
-            # ── Masthead: full-bleed navy bar anchoring the section ──
+            # ── Masthead: full-width institutional bar ──
             if brief:
                 _d = datetime.strptime(brief["meeting_date"], "%Y-%m-%d")
                 _meeting_long = f'{_d.day} {_d.strftime("%B %Y")}'
@@ -1173,8 +1135,9 @@ with tab_rbi:
                 st.markdown(
                     """
 <div class="mpc-bar">
-  <span class="mpc-bar-title">RBI Sentinel</span>
-  <span class="mpc-bar-sub">Monetary Policy Committee &middot; Sentiment Analysis</span>
+  <span class="mpc-bar-title">Reserve Bank of India</span>
+  <span class="mpc-bar-rule"></span>
+  <span class="mpc-bar-sub">Monetary Policy Committee</span>
 </div>
 """,
                     unsafe_allow_html=True,
@@ -1190,7 +1153,7 @@ with tab_rbi:
                         st.markdown(insight)
 
             with col_text:
-                # ── Key metrics: one bordered container, four data points ──
+                # ── Key metrics container ──
                 if brief and brief.get("composite_overall_score") is not None:
                     _sc = brief["composite_overall_score"]
                     _dir = "hawkish" if _sc > 0.05 else ("dovish" if _sc < -0.05 else "neutral")
@@ -1206,8 +1169,7 @@ with tab_rbi:
                         f"""
 <div class="mpc-metrics">
   <div class="mpc-metrics-head">
-    <span class="mpc-inst">Reserve Bank of India</span>
-    <span class="mpc-inst-sub">Monetary Policy Committee</span>
+    <span class="mpc-inst">Reserve Bank of India &middot; Monetary Policy Committee</span>
     <span class="mpc-date">{_meeting_long}</span>
   </div>
   <div class="mpc-metrics-grid">
@@ -1218,7 +1180,8 @@ with tab_rbi:
     </div>
     <div class="mpc-metric">
       <span class="mpc-metric-label">Policy stance</span>
-      <span class="mpc-metric-value mpc-{_dir}">{_sc:+.2f}<span class="mpc-unit mpc-{_dir}">{_dir}</span></span>
+      <span class="mpc-metric-value mpc-{_dir}">{_sc:+.2f}</span>
+      <span class="mpc-metric-sub mpc-{_dir}">{_dir}</span>
       <span class="mpc-metric-delta">{_stance_delta}</span>
     </div>
   </div>
@@ -1226,6 +1189,40 @@ with tab_rbi:
 """,
                         unsafe_allow_html=True,
                     )
+
+                # ── Executive summary: original panel, below the metrics box ──
+                ai_summary = (brief or {}).get("composite_narrative")
+                if not ai_summary:
+                    ai_summary = "Awaiting narrative generation for the current policy cycle."
+
+                clean_summary = ai_summary
+                if "Awaiting narrative" not in clean_summary:
+                    for _label in (
+                        "**How to read this document:**", "How to read this document:",
+                        "**Practical takeaway:**", "Practical takeaway:",
+                    ):
+                        clean_summary = clean_summary.replace(_label, "")
+                    clean_summary = clean_summary.strip()
+                    clean_summary = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", clean_summary)
+                    clean_summary = clean_summary.replace("\n\n", "<br><br>")
+                    clean_summary = clean_summary.replace("\n", " ")
+
+                st.markdown(
+                    f"""
+<div style="background-color: #F4F6F9; padding: 0.8rem 1.4rem 1.4rem 1.4rem; border-radius: 4px; border: 1px solid #E2DFD8; border-left: 3px solid #003366; margin-top: 1.25rem;">
+    <p style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #003366; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0; margin-bottom: 0.2rem;">
+        Executive Summary
+    </p>
+    <p style="font-family: 'Inter', sans-serif; font-size: 0.70rem; font-weight: 700; color: #666666; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 1.2rem;">
+        NLP-driven narrative synthesis of the current policy cycle
+    </p>
+    <p style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #222222; line-height: 1.65; text-align: justify; margin-bottom: 0;">
+        {clean_summary}
+    </p>
+</div>
+""",
+                    unsafe_allow_html=True,
+                )
 
                 # ── Provenance ──
                 if brief and brief.get("documents"):
@@ -1251,31 +1248,6 @@ with tab_rbi:
                         'document; no summary or excerpt is used.</p>',
                         unsafe_allow_html=True,
                     )
-
-            # ── Executive summary: its own section, below the metrics ──
-            ai_summary = (brief or {}).get("composite_narrative")
-            if not ai_summary:
-                ai_summary = "Awaiting narrative generation for the current policy cycle."
-
-            clean_summary = ai_summary
-            if "Awaiting narrative" not in clean_summary:
-                for _label in (
-                    "**How to read this document:**", "How to read this document:",
-                    "**Practical takeaway:**", "Practical takeaway:",
-                ):
-                    clean_summary = clean_summary.replace(_label, "")
-                clean_summary = clean_summary.strip()
-                clean_summary = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", clean_summary)
-                clean_summary = clean_summary.replace("\n\n", "</p><p class='mpc-body'>")
-                clean_summary = clean_summary.replace("\n", " ")
-
-            _section("Executive Summary")
-            st.markdown(
-                '<p class="mpc-sublabel">NLP-driven narrative synthesis of the '
-                'current policy cycle</p>'
-                f'<div class="mpc-summary"><p class="mpc-body">{clean_summary}</p></div>',
-                unsafe_allow_html=True,
-            )
 
         # ── Sentiment Over Time (PRIMARY) ──
         trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])
