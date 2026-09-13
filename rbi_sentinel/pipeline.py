@@ -33,6 +33,11 @@ from rbi_sentinel.sentiment.score_normalizer import compute_meeting_composite
 
 log = logging.getLogger("rbi_sentinel.pipeline")
 
+# Stop a scoring run after this many consecutive failures. A run that cannot
+# score several documents in a row has an account- or network-level problem,
+# not a document-level one, and continuing just burns wall-clock time.
+MAX_CONSECUTIVE_SCORING_FAILURES = 5
+
 
 # ── Chart imports (lazy) ────────────────────────────────────────────────────────
 
@@ -247,22 +252,38 @@ def run_clean_and_score(
     )
 
     if full_rescore:
+        # Score press releases only. The Monthly Bulletin reprints the
+        # resolution and governor statement weeks later; those 100 documents
+        # are the same text, are excluded from composites, and scoring them
+        # would add ~$4 of API spend per full rescore for no analytical gain.
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         rows = conn.execute(
-            "SELECT * FROM rbi_documents "
-            "WHERE raw_text IS NOT NULL AND fetch_status IN ('success','cached')"
+            """
+            SELECT * FROM rbi_documents
+            WHERE raw_text IS NOT NULL
+              AND fetch_status IN ('success','cached')
+              AND source_kind = 'press_release'
+            ORDER BY publication_date
+            """
         ).fetchall()
         conn.close()
         docs_to_score = [dict(r) for r in rows]
     else:
-        docs_to_score = db.get_documents_without_scores()
+        docs_to_score = [
+            d for d in db.get_documents_without_scores()
+            if d.get("source_kind") == "press_release"
+        ]
 
     if not docs_to_score:
         log.info("No documents pending scoring")
         return
 
     log.info("%d documents to score", len(docs_to_score))
+
+    scoring_failures = 0
+    consecutive_failures = 0
+    scored = 0
     scorer = HybridScorer()
 
     for doc in docs_to_score:
@@ -310,6 +331,25 @@ def run_clean_and_score(
             sentences=norm.get("sentences"),
         )
 
+        if score_result is None:
+            # The document could not be scored. Store nothing — a missing
+            # score is honest, a fabricated one is not.
+            consecutive_failures += 1
+            scoring_failures += 1
+            if consecutive_failures >= MAX_CONSECUTIVE_SCORING_FAILURES:
+                log.error(
+                    "Aborting: %d consecutive scoring failures. This is almost "
+                    "always an account-level problem (spend cap reached, key "
+                    "revoked, model unavailable) rather than anything about "
+                    "these documents, and every remaining call would fail the "
+                    "same way. %d of %d documents were scored before the stop.",
+                    consecutive_failures, scored, len(docs_to_score),
+                )
+                break
+            continue
+
+        consecutive_failures = 0
+
         if review_mode:
             print(f"\n{'='*60}")
             print(f"DOC: {doc_type} | DATE: {meeting_date}")
@@ -337,16 +377,26 @@ def run_clean_and_score(
             meeting_id=meeting_id,
             **score_result,
         )
+        scored += 1
         log.info(
-            "Scored doc %d (%s %s): %.3f",
-            doc_id, doc_type, meeting_date, score_result["overall_score"],
+            "Scored doc %d (%s %s): %.3f  [%d/%d]",
+            doc_id, doc_type, meeting_date,
+            score_result["overall_score"], scored, len(docs_to_score),
         )
 
     # Recompute composites after all scoring
     if not dry_run and not review_mode:
         run_compute_composites()
 
-    log.info("Score stage complete")
+    if scoring_failures:
+        log.error(
+            "Score stage finished INCOMPLETE: %d scored, %d could not be "
+            "scored and were not stored. Composites cover only the cycles "
+            "whose documents were scored; re-run to fill the rest.",
+            scored, scoring_failures,
+        )
+    else:
+        log.info("Score stage complete: %d document(s) scored", scored)
 
 
 # ── Stage 2b: Compute Composites ────────────────────────────────────────────────

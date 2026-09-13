@@ -50,7 +50,7 @@ class HybridScorer:
         doc_type: str,
         meeting_date: str,
         sentences: Optional[list[str]] = None,
-    ) -> dict:
+    ) -> Optional[dict]:
         """
         Score a document. Always returns a result dict — never raises.
         Falls back to lexicon-only if LLM fails.
@@ -72,20 +72,20 @@ class HybridScorer:
         llm_result = self._llm.score(text, doc_type, meeting_date)
 
         if llm_result is None:
-            # LLM failed — use lexicon-only with low confidence
-            log.warning(
-                "LLM failed for %s %s — using lexicon score only (low confidence)",
-                doc_type, meeting_date
+            # Return None rather than a lexicon-only score.
+            #
+            # This used to fall back to the lexicon at 0.30 confidence and
+            # return it like any other result, so the caller stored it. When
+            # the API cut off mid-run on 2026-09-13, that turned a single hard
+            # failure into 98 stored "scores" that were keyword counts wearing
+            # the same shape as real sentiment analysis — and the run reported
+            # success. A document that could not be scored must be absent, not
+            # quietly downgraded.
+            log.error(
+                "LLM scoring failed for %s %s — no score will be stored",
+                doc_type, meeting_date,
             )
-            return self._build_result(
-                overall_score=lexicon_score,
-                score_confidence=0.30,
-                lexicon_raw_score=lexicon_score,
-                lexicon_hawkish_hits=hawkish_hits,
-                lexicon_dovish_hits=dovish_hits,
-                llm_raw_response=None,
-                llm_result=None,
-            )
+            return None
 
         llm_score = float(llm_result["overall_score"])
         llm_confidence = float(llm_result.get("score_confidence", 0.70))
