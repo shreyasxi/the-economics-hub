@@ -12,8 +12,10 @@ behind PIPELINE_KEY — only visible to the publisher.
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -26,7 +28,7 @@ from utils.chart_loader import (
 )
 from config.insights import get_insight
 
-from rbi_sentinel.db.manager import get_latest_composite
+from rbi_sentinel.db.manager import get_latest_composite, get_latest_cycle_brief
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
@@ -62,6 +64,115 @@ st.markdown(
         padding-bottom: 2rem;
     }
     
+    /* ═══ RBI policy panel ═══════════════════════════════════════════
+       Typographic, not decorative. Hairline rules and whitespace do the
+       structural work; the only saturated colour is the stance direction,
+       which carries meaning. Figures use tabular numerals so they align
+       down the column. */
+
+    .mpc-masthead {
+        border-top: 2px solid #003366;
+        border-bottom: 1px solid #D8DCE3;
+        padding: 0.75rem 0 0.7rem 0;
+        margin: 0 0 1.5rem 0;
+    }
+    .mpc-masthead-row {
+        display: flex; justify-content: space-between;
+        align-items: flex-end; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .mpc-eyebrow {
+        font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 700;
+        letter-spacing: 0.13em; text-transform: uppercase;
+        color: #5A6472; margin: 0 0 0.15rem 0;
+    }
+    .mpc-meeting {
+        font-family: 'Inter', sans-serif; font-size: 1.35rem; font-weight: 700;
+        letter-spacing: -0.02em; color: #0A1128; margin: 0; line-height: 1.1;
+    }
+    .mpc-decision { text-align: right; }
+    .mpc-rate {
+        font-family: 'Inter', sans-serif; font-size: 1.35rem; font-weight: 700;
+        color: #003366; font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em; display: block; line-height: 1.1;
+    }
+    .mpc-rate-label {
+        font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 500;
+        color: #5A6472; letter-spacing: 0.01em;
+    }
+
+    .mpc-panel {
+        background: #FFFFFF; border: 1px solid #D8DCE3;
+        border-left: 3px solid #003366;
+        padding: 1.25rem 1.5rem 1.35rem 1.5rem;
+    }
+    .mpc-label {
+        font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 700;
+        letter-spacing: 0.13em; text-transform: uppercase;
+        color: #5A6472; margin: 0 0 0.35rem 0;
+    }
+    .mpc-label-sep {
+        margin-top: 1.4rem; padding-top: 1.1rem;
+        border-top: 1px solid #E8EBF0;
+    }
+    .mpc-sublabel {
+        font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 400;
+        color: #7A828F; margin: 0 0 0.85rem 0; line-height: 1.4;
+    }
+
+    .mpc-score-row { display: flex; align-items: baseline; gap: 0.6rem; }
+    .mpc-score {
+        font-family: 'Inter', sans-serif; font-size: 2.6rem; font-weight: 700;
+        letter-spacing: -0.045em; line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+    .mpc-score-word {
+        font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600;
+        text-transform: lowercase; letter-spacing: 0.01em;
+    }
+    .mpc-hawkish { color: #A61B29; }
+    .mpc-dovish  { color: #1F4E79; }
+    .mpc-neutral { color: #4A5262; }
+    .mpc-delta {
+        font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 500;
+        color: #5A6472; display: block; margin-top: 0.45rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Left-aligned, not justified: at this column width justification
+       opens rivers of whitespace that make the prose hard to track. */
+    .mpc-body {
+        font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #24282F;
+        line-height: 1.72; text-align: left; margin: 0 0 0.85rem 0;
+    }
+    .mpc-body:last-of-type { margin-bottom: 0; }
+
+    .mpc-prov { list-style: none; padding: 0; margin: 0; }
+    .mpc-prov li {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 1rem; padding: 0.42rem 0;
+        border-bottom: 1px solid #F0F2F5;
+    }
+    .mpc-prov li:last-child { border-bottom: none; }
+    .mpc-prov a {
+        font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600;
+        color: #003366; text-decoration: none;
+        border-bottom: 1px solid rgba(0,51,102,0.25);
+    }
+    .mpc-prov a:hover { border-bottom-color: #003366; }
+    .mpc-prov-meta {
+        font-family: 'Inter', sans-serif; font-size: 0.72rem; color: #7A828F;
+        white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+    .mpc-prov-note {
+        font-family: 'Inter', sans-serif; font-size: 0.68rem; color: #8A919C;
+        line-height: 1.5; margin: 0.8rem 0 0 0;
+    }
+
+    @media (max-width: 640px) {
+        .mpc-decision { text-align: left; }
+        .mpc-score { font-size: 2.1rem; }
+    }
+
     /* ── Centered Section Divider ── */
     .section-divider {
         height: 2px; /* This controls the thickness */
@@ -985,67 +1096,125 @@ with tab_rbi:
         # ── Hero: Stance Meter & AI Briefing (Side-by-Side) ──
         stance, charts = _pop_summary(charts, ["01_rbi_stance_meter"])
         if stance:
-            _section("Current MPC Stance & Executive Summary")
-            
-            # Fetch the latest qualitative narrative from the database
-            latest_comp = get_latest_composite()
-            ai_summary = latest_comp.get("composite_narrative") if latest_comp else None
-            
-            # If no summary exists, default to a clean placeholder
-            if not ai_summary:
-                ai_summary = "Awaiting narrative generation for the current policy cycle."
+            brief = get_latest_cycle_brief()
 
-            # Split the layout: 55% for the chart, 45% for the text widget
-            col_chart, col_text = st.columns([1.2, 1])
-            
+            # ── Masthead: the decision, stated the way a policy note opens ──
+            if brief:
+                _d = datetime.strptime(brief["meeting_date"], "%Y-%m-%d")
+                _meeting = f'{_d.day} {_d.strftime("%B %Y")}'
+                _rate = brief.get("repo_rate_pct")
+                _action = (brief.get("rate_action") or "").lower()
+                _bps = brief.get("rate_change_bps")
+                if _action == "hold":
+                    _decision = "Unchanged"
+                elif _action in ("hike", "cut") and _bps:
+                    _decision = f'{"Raised" if _action == "hike" else "Lowered"} {abs(int(_bps))} bps'
+                else:
+                    _decision = _action.title() or "—"
+
+                st.markdown(
+                    f"""
+<div class="mpc-masthead">
+  <div class="mpc-masthead-row">
+    <div>
+      <p class="mpc-eyebrow">Reserve Bank of India &middot; Monetary Policy Committee</p>
+      <p class="mpc-meeting">{_meeting}</p>
+    </div>
+    <div class="mpc-decision">
+      <span class="mpc-rate">{_rate:.2f}%</span>
+      <span class="mpc-rate-label">Policy repo rate &middot; {_decision}</span>
+    </div>
+  </div>
+</div>
+""",
+                    unsafe_allow_html=True,
+                )
+
+            col_chart, col_text = st.columns([1.2, 1], gap="large")
+
             with col_chart:
                 st.image(str(stance), use_container_width=True)
                 insight = get_insight(stance.name)
                 if insight:
-                    with st.expander("ℹ️ How to read the Stance Meter"):
+                    with st.expander("How to read the Stance Meter"):
                         st.markdown(insight)
-                        
+
             with col_text:
-                # ── Format the pure AI Summary for HTML ──
+                ai_summary = (brief or {}).get("composite_narrative")
+                if not ai_summary:
+                    ai_summary = "Awaiting narrative generation for the current policy cycle."
+
                 clean_summary = ai_summary
-                if clean_summary and "Awaiting narrative" not in clean_summary:
-                    import re
-                    
-                    # 1. Strip Claude's hardcoded labels (with and without markdown bolding)
-                    labels_to_remove = [
+                if "Awaiting narrative" not in clean_summary:
+                    for _label in (
                         "**How to read this document:**", "How to read this document:",
-                        "**Practical takeaway:**", "Practical takeaway:"
-                    ]
-                    for label in labels_to_remove:
-                        clean_summary = clean_summary.replace(label, "")
-                    
-                    # Clean up any leading whitespace left behind after stripping
+                        "**Practical takeaway:**", "Practical takeaway:",
+                    ):
+                        clean_summary = clean_summary.replace(_label, "")
                     clean_summary = clean_summary.strip()
-                    
-                    # 2. Safely convert any remaining accidental markdown bolding
-                    clean_summary = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', clean_summary)
-                    
-                    # 3. Preserve Claude's natural paragraph breaks
-                    clean_summary = clean_summary.replace('\n\n', '<br><br>')
-                    
-                    # 4. Strip stray single newlines so the text justifies perfectly
-                    clean_summary = clean_summary.replace('\n', ' ')
+                    clean_summary = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", clean_summary)
+                    clean_summary = clean_summary.replace("\n\n", "</p><p class='mpc-body'>")
+                    clean_summary = clean_summary.replace("\n", " ")
+
+                # ── The number first, then why ──
+                _score_block = ""
+                if brief and brief.get("composite_overall_score") is not None:
+                    _sc = brief["composite_overall_score"]
+                    _dir = "hawkish" if _sc > 0.05 else ("dovish" if _sc < -0.05 else "neutral")
+                    _prev = brief.get("previous_score")
+                    _delta_html = ""
+                    if _prev is not None:
+                        _chg = _sc - _prev
+                        _arrow = "&uarr;" if _chg > 0 else ("&darr;" if _chg < 0 else "&middot;")
+                        _delta_html = (
+                            f'<span class="mpc-delta">{_arrow} {abs(_chg):.2f} '
+                            f'since the previous cycle</span>'
+                        )
+                    _score_block = f"""
+  <p class="mpc-label">Policy stance</p>
+  <div class="mpc-score-row">
+    <span class="mpc-score mpc-{_dir}">{_sc:+.2f}</span>
+    <span class="mpc-score-word mpc-{_dir}">{_dir}</span>
+  </div>
+  {_delta_html}
+"""
+
+                # ── Provenance: what was read, when, and where it came from ──
+                _prov = ""
+                if brief and brief.get("documents"):
+                    _names = {
+                        "resolution": "Resolution",
+                        "minutes": "Minutes",
+                        "governor_statement": "Governor&rsquo;s Statement",
+                    }
+                    _rows = []
+                    for _doc in brief["documents"]:
+                        _dd = datetime.strptime(_doc["publication_date"], "%Y-%m-%d")
+                        _rows.append(
+                            f'<li><a href="{_doc["source_url"]}" target="_blank" rel="noopener">'
+                            f'{_names.get(_doc["doc_type"], _doc["doc_type"])}</a>'
+                            f'<span class="mpc-prov-meta">{_dd.day} {_dd.strftime("%b %Y")} '
+                            f'&middot; {_doc["word_count"]:,} words</span></li>'
+                        )
+                    _prov = (
+                        '<p class="mpc-label mpc-label-sep">Source documents</p>'
+                        '<ul class="mpc-prov">' + "".join(_rows) + "</ul>"
+                        '<p class="mpc-prov-note">Published by the Reserve Bank of India '
+                        'at rbi.org.in. Scores are computed from the full text of each '
+                        'document; no summary or excerpt is used.</p>'
+                    )
 
                 st.markdown(
                     f"""
-                    <div style="background-color: #F4F6F9; padding: 0.8rem 1.4rem 1.4rem 1.4rem; border-radius: 4px; border: 1px solid #E2DFD8; height: 100%;">
-                        <p style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #003366; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0; margin-bottom: 0.2rem;">
-                            Executive Summary
-                        </p>
-                        <p style="font-family: 'Inter', sans-serif; font-size: 0.70rem; font-weight: 700; color: #666666; letter-spacing: 0.05em; margin-top: 0; margin-bottom: 1.2rem;">
-                            NLP-driven narrative synthesis of the current policy cycle
-                        </p>
-                        <p style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #222222; line-height: 1.65; text-align: justify; margin-bottom: 0;">
-                            {clean_summary}
-                        </p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
+<div class="mpc-panel">
+{_score_block}
+  <p class="mpc-label mpc-label-sep">Executive summary</p>
+  <p class="mpc-sublabel">NLP-driven narrative synthesis of the current policy cycle</p>
+  <p class="mpc-body">{clean_summary}</p>
+{_prov}
+</div>
+""",
+                    unsafe_allow_html=True,
                 )
 
         # ── Sentiment Over Time (PRIMARY) ──

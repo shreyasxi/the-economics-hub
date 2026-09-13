@@ -365,6 +365,68 @@ def upsert_composite(
         )
 
 
+def get_latest_cycle_brief(
+    model_version: str = SCORING_MODEL_VERSION,
+) -> Optional[dict]:
+    """
+    Everything the dashboard header needs for the most recent policy cycle:
+    the decision, the composite and its components, and the source documents.
+
+    Returned as one dict so the UI makes a single call rather than stitching
+    three queries together at render time.
+    """
+    with _connect() as conn:
+        row = conn.execute(
+            """
+            SELECT m.policy_cycle, m.meeting_date, m.repo_rate_pct,
+                   m.rate_action, m.rate_change_bps,
+                   k.composite_overall_score, k.resolution_score,
+                   k.minutes_score, k.governor_score, k.score_divergence,
+                   k.composite_narrative, k.computed_at
+            FROM meeting_composites k
+            JOIN mpc_meetings m ON m.meeting_id = k.meeting_id
+            WHERE k.scoring_model_version = ?
+            ORDER BY m.policy_cycle DESC
+            LIMIT 1
+            """,
+            (model_version,),
+        ).fetchone()
+        if row is None:
+            return None
+        brief = dict(row)
+
+        # The cycle immediately before, for the change figure.
+        prev = conn.execute(
+            """
+            SELECT k.composite_overall_score
+            FROM meeting_composites k
+            JOIN mpc_meetings m ON m.meeting_id = k.meeting_id
+            WHERE k.scoring_model_version = ? AND m.policy_cycle < ?
+            ORDER BY m.policy_cycle DESC
+            LIMIT 1
+            """,
+            (model_version, brief["policy_cycle"]),
+        ).fetchone()
+        brief["previous_score"] = prev["composite_overall_score"] if prev else None
+
+        # Source documents, for provenance.
+        brief["documents"] = [
+            dict(r) for r in conn.execute(
+                """
+                SELECT d.doc_type, d.publication_date, d.word_count, d.source_url
+                FROM rbi_documents d
+                JOIN mpc_meetings m ON m.meeting_id = d.meeting_id
+                WHERE m.policy_cycle = ?
+                  AND d.source_kind = 'press_release'
+                  AND d.word_count > 0
+                ORDER BY d.publication_date, d.doc_type
+                """,
+                (brief["policy_cycle"],),
+            ).fetchall()
+        ]
+    return brief
+
+
 def prune_non_anchor_composites(
     model_version: str = SCORING_MODEL_VERSION,
 ) -> int:

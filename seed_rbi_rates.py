@@ -45,6 +45,10 @@ RATE_CHANGES = [
     ("2025-04-09", 6.00, "cut",  -25),   # Apr 2025: 6.25 → 6.00
     ("2025-06-06", 5.50, "cut",  -50),   # Jun 2025: 6.00 → 5.50
     ("2025-12-05", 5.25, "cut",  -25),   # Dec 2025: 5.50 → 5.25
+    # 2026 holds — confirmed against the published Resolution text,
+    # not inferred. Extend this list after each MPC decision.
+    ("2026-06-05", 5.25, "hold", 0),
+    ("2026-08-05", 5.25, "hold", 0),
 ]
 
 # Convert to sorted list of (date_obj, rate, action, bps)
