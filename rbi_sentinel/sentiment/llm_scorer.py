@@ -12,8 +12,10 @@ from typing import Optional
 
 from rbi_sentinel.config import (
     LLM_DEFAULT_MODEL,
+    LLM_EFFORT,
     LLM_FALLBACK_MODEL,
     LLM_MAX_OUTPUT_TOKENS,
+    LLM_MODELS_WITHOUT_EFFORT,
     SCORING_MODEL_VERSION,
 )
 
@@ -158,19 +160,63 @@ class LLMScorer:
         )
         return None
 
+    @staticmethod
+    def _supports_effort(model: str) -> bool:
+        """Haiku 4.5 and Sonnet 4.5 reject output_config.effort with a 400."""
+        return not any(m in model for m in LLM_MODELS_WITHOUT_EFFORT)
+
     def _call_api(self, client, model: str, prompt: str) -> Optional[dict]:
+        request = {
+            "model": model,
+            "max_tokens": LLM_MAX_OUTPUT_TOKENS,
+            "system": _SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if LLM_EFFORT and self._supports_effort(model):
+            request["output_config"] = {"effort": LLM_EFFORT}
+
         try:
-            message = client.messages.create(
-                model=model,
-                max_tokens=LLM_MAX_OUTPUT_TOKENS,
-                system=_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            raw_text = message.content[0].text.strip()
-            return self._parse_and_validate(raw_text)
+            message = client.messages.create(**request)
         except Exception as exc:
-            log.error("Anthropic API call failed: %s", exc)
+            log.error("Anthropic API call failed (%s): %s", model, exc)
             return None
+
+        if message.stop_reason == "refusal":
+            detail = getattr(message, "stop_details", None)
+            log.error(
+                "Model declined to score this document (%s)",
+                getattr(detail, "category", "no category given"),
+            )
+            return None
+
+        if message.stop_reason == "max_tokens":
+            log.warning(
+                "Response hit max_tokens (%d) — the JSON is probably truncated. "
+                "On thinking-capable models this budget is shared with thinking; "
+                "raise LLM_MAX_OUTPUT_TOKENS or lower LLM_EFFORT.",
+                LLM_MAX_OUTPUT_TOKENS,
+            )
+
+        # Thinking-capable models put a `thinking` block first, so content[0]
+        # is not necessarily the text. Reading content[0].text raised
+        # AttributeError on every document, which the old blanket except
+        # swallowed into a silent scoring failure.
+        raw_text = next(
+            (b.text for b in message.content if getattr(b, "type", None) == "text"),
+            None,
+        )
+        if raw_text is None:
+            log.error(
+                "No text block in response from %s (blocks: %s)",
+                model, [getattr(b, "type", "?") for b in message.content],
+            )
+            return None
+
+        usage = message.usage
+        log.debug(
+            "%s usage: in=%d out=%d", model, usage.input_tokens, usage.output_tokens
+        )
+        return self._parse_and_validate(raw_text.strip())
 
     def _parse_and_validate(self, raw_text: str) -> Optional[dict]:
         """Parse JSON response and validate required keys."""

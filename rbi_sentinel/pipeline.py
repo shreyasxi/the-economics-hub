@@ -153,6 +153,81 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
     )
 
 
+# ── Stage 1b: Extract text (free) ───────────────────────────────────────────────
+
+def run_extract_text() -> None:
+    """
+    Extract and store text for any fetched document that has none yet.
+
+    run_fetch() caches the HTML but leaves raw_text empty; extraction normally
+    happens inside run_clean_and_score(), which also calls the LLM. That
+    couples "read the document" to "pay to score it", so a newly fetched
+    document has no word_count until you have spent money on it — and
+    word_count is what migrate_policy_cycle uses to identify a real decision.
+
+    This stage breaks that dependency. It costs nothing, and afterwards the
+    cycle migration and any sanity checks can run before a single token is
+    billed.
+    """
+    log.info("=== TEXT EXTRACTION (no API calls) ===")
+
+    pending = [
+        d for d in db.get_documents_without_text()
+        if d.get("cache_path")
+    ]
+    if not pending:
+        log.info("Every fetched document already has text")
+        return
+
+    log.info("%d document(s) awaiting extraction", len(pending))
+    extracted = failed = 0
+
+    for doc in pending:
+        cache_path = Path(doc["cache_path"])
+        if not cache_path.exists():
+            log.warning(
+                "Cache file missing for %s %s: %s",
+                doc["doc_type"], doc["publication_date"], cache_path,
+            )
+            failed += 1
+            continue
+
+        raw_bytes = cache_path.read_bytes()
+        if doc.get("source_format") == "pdf":
+            text = pdf_extractor.extract_text(raw_bytes)
+        else:
+            text = html_extractor.extract_text(raw_bytes)
+
+        if not text:
+            log.warning(
+                "Extracted nothing from %s %s — the page layout may have "
+                "changed; check HTML_CONTENT_SELECTORS",
+                doc["doc_type"], doc["publication_date"],
+            )
+            failed += 1
+            continue
+
+        norm = text_normalizer.normalize(text)
+        db.upsert_document(
+            meeting_id=doc["meeting_id"],
+            doc_type=doc["doc_type"],
+            publication_date=doc["publication_date"],
+            source_url=doc["source_url"],
+            source_format=doc.get("source_format", "html"),
+            fetch_status=doc["fetch_status"],
+            raw_text=norm["text"],
+            word_count=norm["word_count"],
+            cache_path=doc.get("cache_path"),
+        )
+        log.info(
+            "Extracted %s %s: %d words",
+            doc["doc_type"], doc["publication_date"], norm["word_count"],
+        )
+        extracted += 1
+
+    log.info("Extraction complete: %d extracted, %d failed", extracted, failed)
+
+
 # ── Stage 2: Clean + Score ──────────────────────────────────────────────────────
 
 def run_clean_and_score(

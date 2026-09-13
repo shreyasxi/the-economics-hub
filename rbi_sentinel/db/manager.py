@@ -169,6 +169,20 @@ def get_documents_without_scores(
     return [dict(r) for r in rows]
 
 
+def get_documents_without_text() -> list[dict]:
+    """Fetched documents whose text has not been extracted yet."""
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT * FROM rbi_documents
+            WHERE (raw_text IS NULL OR raw_text = '')
+              AND fetch_status IN ('success', 'cached')
+            ORDER BY publication_date DESC
+            """
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # ── sentiment_scores ───────────────────────────────────────────────────────────
 
 def upsert_score(
