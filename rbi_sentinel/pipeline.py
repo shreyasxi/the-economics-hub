@@ -49,12 +49,10 @@ def _import_charts():
         subdimension_radar,
         rate_and_sentiment,
         meeting_timeline,
-        governor_divergence,
     )
     return (
         stance_meter, sentiment_trajectory, doc_comparison,
         subdimension_radar, rate_and_sentiment, meeting_timeline,
-        governor_divergence,
     )
 
 
@@ -489,7 +487,6 @@ def run_generate_charts(
     (
         stance_meter_mod, trajectory_mod, comparison_mod,
         radar_mod, rate_mod, timeline_mod,
-        governor_divergence_mod,
     ) = _import_charts()
 
     composites = db.get_all_composites()
@@ -578,11 +575,9 @@ def run_generate_charts(
         mode=mode,
     )
 
-    # Chart 07: Governor vs. Committee Divergence Strip
-    governor_divergence_mod.generate(
-        composites=composites,
-        output_path=output_dir / "07_rbi_governor_divergence.png",
-        mode=mode,
-    )
+    # Chart 07 (Governor vs. Committee Divergence) was removed in Sep 2026.
+    # It plotted governor_score - composite_overall_score, but the governor
+    # score is itself 15% of that composite, so the chart partly compared a
+    # number with itself and the divergence was damped by construction.
 
     log.info("Charts saved to %s", output_dir)
