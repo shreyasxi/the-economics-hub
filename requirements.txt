@@ -16,7 +16,7 @@ jugaad-data>=0.26.0
 matplotlib>=3.7.0
 
 # Dashboard / App
-streamlit>=1.30.0
+streamlit==1.50.0       # pinned: match local; later releases change the DOM the custom CSS targets
 
 # Environment / Config
 python-dotenv>=1.0.0

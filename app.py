@@ -12,6 +12,7 @@ behind PIPELINE_KEY — only visible to the publisher.
 
 from __future__ import annotations
 
+import importlib
 import re
 import subprocess
 import sys
@@ -29,7 +30,9 @@ from utils.chart_loader import (
 from config.insights import get_insight
 
 from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
-from rbi_sentinel.db.manager import get_latest_composite, get_latest_cycle_brief
+import rbi_sentinel.cleaners.policy_facts as _policy_facts
+import rbi_sentinel.db.manager as _manager
+from rbi_sentinel.db.manager import get_latest_composite
 from rbi_sentinel.sentiment.score_normalizer import _DOC_WEIGHTS
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -105,6 +108,21 @@ st.markdown(
         font-size: 1.0rem; font-weight: 700; color: #0A1F3D;
         font-variant-numeric: tabular-nums;
     }
+
+    /* ── Methodology tables: navy header row, white text ── */
+    .method-table {
+        width: 100%; border-collapse: collapse; margin: 0.4rem 0 1.1rem 0;
+        font-family: 'Inter', sans-serif; font-size: 0.86rem;
+    }
+    .method-table th {
+        background: #003366; color: #FFFFFF; font-weight: 700;
+        text-align: left; padding: 0.55rem 0.8rem; border: 1px solid #003366;
+    }
+    .method-table td {
+        padding: 0.5rem 0.8rem; border: 1px solid #DDE2E9; color: #24282F;
+        vertical-align: top;
+    }
+    .method-table tbody tr:nth-child(even) td { background: rgba(0,51,102,0.03); }
 
     /* ── Decision strip ──────────────────────────────────────────────────
        The cycle's facts in one row between the method note and the charts.
@@ -429,10 +447,16 @@ st.markdown(
 
     
     
-    /* ── Tab bar ── */
-    button[data-baseweb="tab"], 
-    button[data-baseweb="tab"] p, 
-    button[data-baseweb="tab"] span {
+    /* ── Tab bar ──
+       Two selectors: Streamlit up to 1.50 renders tabs as BaseWeb buttons
+       (data-baseweb="tab"); later releases replaced them with a new
+       component that carries data-testid="stTab" and no BaseWeb attribute. */
+    button[data-baseweb="tab"],
+    button[data-baseweb="tab"] p,
+    button[data-baseweb="tab"] span,
+    [data-testid="stTab"],
+    [data-testid="stTab"] p,
+    [data-testid="stTab"] span {
         font-family: 'Inter', sans-serif !important;
         font-weight: 700 !important;
         font-size: 0.80rem !important;
@@ -789,6 +813,31 @@ def _render_grid(charts: list[Path], cols: int = 2) -> None:
                 with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
     
+# Fields the RBI tab reads from the cycle brief beyond the original set.
+_BRIEF_KEYS = frozenset({
+    "previous_cycle", "facts", "previous_facts", "last_rate_move",
+    "decision_streak", "signals", "previous_signals",
+})
+
+
+def _load_cycle_brief() -> dict | None:
+    """
+    The latest cycle brief, guaranteed to come from the current code.
+
+    Streamlit Cloud applies a push by re-running app.py inside the same
+    Python process, so modules imported earlier stay in memory at their old
+    version. A new app.py then calls an old get_latest_cycle_brief() and the
+    fields added since are silently absent. If any expected field is missing,
+    reload the modules that build the brief and fetch it again.
+    """
+    brief = _manager.get_latest_cycle_brief()
+    if brief is not None and not _BRIEF_KEYS <= brief.keys():
+        importlib.reload(_policy_facts)
+        importlib.reload(_manager)
+        brief = _manager.get_latest_cycle_brief()
+    return brief
+
+
 def _stance_dir(score: float) -> str:
     return "hawkish" if score > 0.05 else ("dovish" if score < -0.05 else "neutral")
 
@@ -807,7 +856,7 @@ def _decision_strip_html(brief: dict) -> str:
     prev_facts = brief.get("previous_facts") or {}
     prev_label = (
         datetime.strptime(brief["previous_cycle"], "%Y-%m-%d").strftime("%b %Y")
-        if brief.get("previous_cycle") else None
+        if brief.get("previous_cycle") else "previous meeting"
     )
 
     def cell(label: str, value: str, sub: str = "") -> str:
@@ -922,7 +971,7 @@ def _decision_strip_html(brief: dict) -> str:
             cell("Repo rate", rate_value, rate_sub),
             cell("Status", status_value, status_sub),
         ])
-        + group("Sentinel reading", [
+        + group("Sentiment", [
             cell("Stance score", score_value, score_sub),
             cell("Change", chg_value, chg_sub),
         ])
@@ -982,10 +1031,11 @@ def _takeaways_html(brief: dict) -> str:
     """
     facts = brief.get("facts") or {}
     prev_facts = brief.get("previous_facts") or {}
-    prev_label = (
-        datetime.strptime(brief["previous_cycle"], "%Y-%m-%d").strftime("%B")
-        if brief.get("previous_cycle") else None
-    )
+    if brief.get("previous_cycle"):
+        _month = datetime.strptime(brief["previous_cycle"], "%Y-%m-%d").strftime("%B")
+        prev_in, prev_since = f"in {_month}", f"since {_month}"
+    else:
+        prev_in, prev_since = "at the previous meeting", "since the previous meeting"
     rows = []
 
     # Decision
@@ -1012,9 +1062,9 @@ def _takeaways_html(brief: dict) -> str:
         if stated and stated != sdir:
             text += f", firmer than the stated {stated} stance" if sdir == "hawkish" and stated in ("neutral", "accommodative") \
                 else f", at odds with the stated {stated} stance"
-        if prev is not None and prev_label:
+        if prev is not None:
             verb = "up" if score > prev else ("down" if score < prev else "unchanged")
-            text += f"; {verb} from {prev:+.2f} in {prev_label}" if verb != "unchanged" else f"; unchanged from {prev_label}"
+            text += f"; {verb} from {prev:+.2f} {prev_in}" if verb != "unchanged" else f"; unchanged {prev_since}"
         rows.append(("Tone", text + "."))
 
     # What moved
@@ -1035,7 +1085,7 @@ def _takeaways_html(brief: dict) -> str:
                 f'<span class="mpc-tk-fig" title="{label}: {scale}">{_signed(old)} &rarr; {_signed(new)}</span> '
                 f'({up if new > old else down})'
             )
-        rows.append(("Shift", " and ".join(parts) + (f" since {prev_label}." if prev_label else ".")))
+        rows.append(("Shift", " and ".join(parts) + f" {prev_since}."))
     elif old_dims:
         rows.append(("Shift", "No sub-dimension moved by more than 0.10 since the previous meeting."))
 
@@ -1374,7 +1424,7 @@ with tab_rbi:
         )
     else:
         _render_status_bar(date_label, "rbi_sentinel", show_updated=False)
-        brief = get_latest_cycle_brief()
+        brief = _load_cycle_brief()
 
         # ── Header: title, one-line standfirst, latest meeting ──
         _meeting_meta = ""
@@ -1449,24 +1499,26 @@ with tab_rbi:
                 "in how the RBI writes.\n\n"
                 "**Composite meeting score**\n\n"
                 "Document scores are combined into one score per policy cycle with fixed weights:\n\n"
-                "| Document | Weight | Rationale |\n"
-                "|---|---|---|\n"
-                "| MPC Minutes | 50% | Individual member deliberation, reasoning and dissent |\n"
-                "| Monetary Policy Resolution | 35% | The formal committee decision statement |\n"
-                "| Governor's Statement | 15% | The Governor's forward-guidance overlay |\n\n"
+                '<table class="method-table"><thead><tr>'
+                '<th>Document</th><th>Weight</th><th>Rationale</th></tr></thead><tbody>'
+                '<tr><td>MPC Minutes</td><td>50%</td><td>Individual member deliberation, reasoning and dissent</td></tr>'
+                '<tr><td>Monetary Policy Resolution</td><td>35%</td><td>The formal committee decision statement</td></tr>'
+                '<tr><td>Governor&rsquo;s Statement</td><td>15%</td><td>The Governor&rsquo;s forward-guidance overlay</td></tr>'
+                '</tbody></table>\n\n'
                 "**Reading the scores**\n\n"
                 "Every score runs from **−1.0** to **+1.0**. The overall and composite scores measure "
                 "policy tone: −1 is maximally dovish (leaning toward cuts), +1 maximally hawkish (leaning "
                 "toward hikes), 0 balanced. A score near zero is not an absence of view; it often means the "
                 "committee is actively weighing competing risks. The five sub-dimensions each isolate one "
                 "part of the committee's reasoning:\n\n"
-                "| Sub-dimension | −1.0 means | +1.0 means |\n"
-                "|---|---|---|\n"
-                "| Inflation concern | Unconcerned about inflation | Alarmed about inflation |\n"
-                "| Growth assessment | Worried about India's growth | Confident about India's growth |\n"
-                "| Liquidity stance | Adding liquidity, easy conditions | Draining liquidity, tight conditions |\n"
-                "| Rate guidance | Signalling cuts ahead | Signalling hikes ahead |\n"
-                "| External stance | Tolerant of rupee weakness | Defensive of the rupee |\n\n"
+                '<table class="method-table"><thead><tr>'
+                '<th>Sub-dimension</th><th>&minus;1.0 means</th><th>+1.0 means</th></tr></thead><tbody>'
+                '<tr><td>Inflation concern</td><td>Unconcerned about inflation</td><td>Alarmed about inflation</td></tr>'
+                '<tr><td>Growth assessment</td><td>Worried about India&rsquo;s growth</td><td>Confident about India&rsquo;s growth</td></tr>'
+                '<tr><td>Liquidity stance</td><td>Adding liquidity, easy conditions</td><td>Draining liquidity, tight conditions</td></tr>'
+                '<tr><td>Rate guidance</td><td>Signalling cuts ahead</td><td>Signalling hikes ahead</td></tr>'
+                '<tr><td>External stance</td><td>Tolerant of rupee weakness</td><td>Defensive of the rupee</td></tr>'
+                '</tbody></table>\n\n'
                 "Growth assessment is read in the committee's own framing of the domestic economy (real GDP "
                 "and activity), not as a GDP number. A more confident growth reading leans hawkish in effect: "
                 "the less the economy needs support, the more room the MPC has to focus on inflation.\n\n"
@@ -1485,7 +1537,8 @@ with tab_rbi:
                 "new meetings do not. All outputs are quantitative estimates intended for research, not "
                 "investment advice.\n\n"
                 "---\n\n"
-                "### Pipeline Architecture\n"
+                "### Pipeline Architecture\n",
+                unsafe_allow_html=True,
             )
             st.markdown("""
 <style>
