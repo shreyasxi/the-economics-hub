@@ -5,6 +5,7 @@ SQLite CRUD layer for the RBI Sentinel pipeline.
 All DB access goes through this module — no inline SQL elsewhere.
 """
 
+import hashlib
 import json
 import logging
 import sqlite3
@@ -581,6 +582,39 @@ def get_all_composites(
             (model_version,),
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def chart_data_fingerprint(
+    model_version: str = SCORING_MODEL_VERSION,
+) -> str:
+    """
+    SHA-256 of every database value the six RBI charts are drawn from:
+    rate decisions, composite and per-document scores, and sub-dimensions.
+
+    Chart generation stamps this next to the images it publishes. A stamp that
+    no longer matches means the data changed after the charts were drawn —
+    which is how the June and August 2026 holds went missing from charts 05
+    and 06 in September 2026.
+    """
+    queries = (
+        """SELECT meeting_date, policy_cycle, repo_rate_pct, rate_action, rate_change_bps
+           FROM mpc_meetings ORDER BY meeting_date""",
+        """SELECT m.meeting_date, k.composite_overall_score, k.resolution_score,
+                  k.minutes_score, k.governor_score
+           FROM meeting_composites k JOIN mpc_meetings m ON m.meeting_id = k.meeting_id
+           WHERE k.scoring_model_version = ? ORDER BY m.meeting_date""",
+        """SELECT d.doc_id, s.overall_score, s.inflation_stance, s.growth_stance,
+                  s.liquidity_stance, s.rate_guidance, s.fx_external_stance
+           FROM sentiment_scores s JOIN rbi_documents d ON d.doc_id = s.doc_id
+           WHERE s.scoring_model_version = ? ORDER BY d.doc_id""",
+    )
+    digest = hashlib.sha256(model_version.encode())
+    with _connect() as conn:
+        for sql in queries:
+            params = (model_version,) if "?" in sql else ()
+            for row in conn.execute(sql, params):
+                digest.update(repr(tuple(row)).encode())
+    return digest.hexdigest()
 
 
 def get_recent_composites(

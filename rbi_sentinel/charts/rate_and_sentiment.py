@@ -4,7 +4,8 @@ rbi_sentinel/charts/rate_and_sentiment.py
 Chart 05: Repo Rate vs. Sentiment Score
 Dual-axis: repo rate as stepped line (left, India saffron),
 sentiment composite as smooth line (right, black).
-Shows whether sentiment score leads rate decisions.
+Shows how MPC tone moves with the rate cycle. It is descriptive: the composite
+does not predict the next decision beyond the RBI's stated stance.
 """
 
 import logging
@@ -127,14 +128,17 @@ def generate(
     )
 
     # ── Title & branding ──────────────────────────────────────────────────────
+    # The subtitle describes what the chart shows, not a forecasting claim.
+    # Tested in Sep 2026 (HAC regressions, ordered probit, expanding-window
+    # out-of-sample forecasts): the composite correlates most with the decision
+    # in the same meeting and adds no predictive power for the next decision
+    # beyond the RBI's own stated stance.
     if mode == "newsletter":
-        title = "Does Sentiment Lead Rate Decisions?"
-        subtitle = "RBI Repo Rate (saffron, left) vs. MPC Sentiment Score (black, right)"
+        title = "Sentiment and the Policy Cycle"
+        subtitle = "RBI repo rate (left) vs. MPC composite sentiment score (right)"
     else:
         title = "RBI Repo Rate vs. Composite Sentiment Score"
-        subtitle = (
-            "Sentiment leading repo rate decisions by 1–2 meetings signals predictive value"
-        )
+        subtitle = "Sentiment tracks the policy cycle: hawkish through tightening, dovish through easing"
 
     EconStyle.add_top_rule(ax1)
     EconStyle.set_title(ax1, title, subtitle)

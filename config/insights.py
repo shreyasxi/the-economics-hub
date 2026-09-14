@@ -523,19 +523,19 @@ the committee is approaching a forced pivot: watch for a Resolution score revers
 """,
 
     "rbi_rate_and_sentiment": """\
-**How to read this chart:** The left axis (saffron step line) tracks the RBI repo rate over time. \
-The right axis (black smooth line) tracks the composite sentiment score derived from the MPC \
-documents. Shaded bands identify hawkish (red) and dovish (blue) sentiment regimes. The purpose \
-of overlaying these two series is to test whether the sentiment model leads or lags the actual \
-rate-setting cycle.
+**How to read this chart:** The step line (left axis) is the RBI repo rate; the black line (right \
+axis) is the composite sentiment score for each MPC meeting, from −1 (most dovish) to +1 (most \
+hawkish). The two series sit on different scales, so read the direction and timing of each line \
+rather than the gap between them.
 
-**Practical takeaway:** In multiple historical cycles, the composite sentiment score crossed +0.30 \
-one to two meetings before the first rate hike, and crossed −0.30 before the first rate cut. This \
-lead time exists because the MPC communicates its intent through language shifts in the Minutes and \
-Governor's Statement before the formal rate vote occurs. When the sentiment line diverges sharply \
-from the repo rate step — a sustained positive score during a prolonged hold, or a falling \
-sentiment score while rates remain elevated — the probability of an imminent rate action is \
-elevated.
+**Practical takeaway:** Committee tone moves with the rate cycle — firmly hawkish through the \
+2022–23 tightening and the long hold that followed, dovish through the 2019–20 and 2025 easing \
+cycles. The score is most closely tied to the decision taken at the same meeting (correlation \
+0.72, falling to 0.57 for the next meeting). In formal tests covering every meeting since \
+October 2016 — regressions with robust standard errors and out-of-sample forecasts from 2020 — \
+the composite did not predict the next rate decision beyond what the RBI's own stated stance \
+already signals. Read a gap between tone and policy, such as a hawkish score during a hold, as \
+evidence of how the committee is framing its pause rather than as a forecast of the next move.
 """,
 
     "rbi_meeting_timeline": """\

@@ -116,3 +116,15 @@ def seed():
 
 if __name__ == "__main__":
     seed()
+
+    # A rate change alters charts 05 and 06. Regenerate and publish the charts
+    # whenever the data no longer matches what they were drawn from, so a new
+    # decision can never reach the database without reaching the dashboard.
+    import logging
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    from rbi_sentinel.pipeline import refresh_charts_if_stale
+
+    if refresh_charts_if_stale():
+        print("Rate data changed: charts regenerated and published to assets/rbi_sentinel/.")
+    else:
+        print("Charts already reflect the current rate data.")

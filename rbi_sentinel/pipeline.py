@@ -6,6 +6,7 @@ Called by generate_rbi_sentinel.py. Not invoked directly.
 """
 
 import logging
+import shutil
 import sqlite3
 from collections import Counter
 from datetime import datetime, date
@@ -581,3 +582,52 @@ def run_generate_charts(
     # number with itself and the divergence was damped by construction.
 
     log.info("Charts saved to %s", output_dir)
+    _publish_charts(output_dir)
+
+
+# ── Chart freshness ─────────────────────────────────────────────────────────────
+
+FINGERPRINT_FILE = ".data_fingerprint"
+
+
+def _publish_charts(output_dir: Path) -> None:
+    """
+    Copy freshly generated charts into assets/ — the folder the dashboard and
+    Streamlit Cloud read — and stamp them with the data fingerprint.
+
+    RBI charts have no CI workflow, so this copy used to be manual; forgetting
+    it left the dashboard on old images even after a regeneration.
+    """
+    target = ASSETS_DIR / output_dir.name
+    target.mkdir(parents=True, exist_ok=True)
+    for png in sorted(output_dir.glob("*.png")):
+        shutil.copy2(png, target / png.name)
+    stamp = db.chart_data_fingerprint()
+    for folder in (output_dir, target):
+        (folder / FINGERPRINT_FILE).write_text(stamp + "\n")
+    log.info("Published charts to %s (fingerprint %s)", target, stamp[:12])
+
+
+def latest_published_charts() -> Optional[Path]:
+    """The newest month folder under assets/rbi_sentinel, which the app shows."""
+    folders = sorted(p for p in ASSETS_DIR.glob("20[0-9][0-9]-[01][0-9]") if p.is_dir())
+    return folders[-1] if folders else None
+
+
+def charts_are_current() -> bool:
+    """True when the published charts were drawn from the data now in the DB."""
+    folder = latest_published_charts()
+    if folder is None:
+        return False
+    stamp = folder / FINGERPRINT_FILE
+    return stamp.exists() and stamp.read_text().strip() == db.chart_data_fingerprint()
+
+
+def refresh_charts_if_stale(mode: str = "dashboard") -> bool:
+    """Regenerate and publish the charts if the data has changed. Returns True if it did."""
+    if charts_are_current():
+        log.info("Charts are current; no regeneration needed")
+        return False
+    log.warning("Chart data has changed since the charts were published; regenerating")
+    run_generate_charts(mode=mode)
+    return True
