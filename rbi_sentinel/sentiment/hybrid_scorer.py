@@ -4,7 +4,7 @@ rbi_sentinel/sentiment/hybrid_scorer.py
 Orchestrates the two-stage hybrid scoring pipeline:
   Stage 1: Lexicon pre-score (deterministic, auditable)
   Stage 2: LLM score (contextual, generates narrative)
-  Stage 3: Fusion (0.25 × lexicon + 0.75 × LLM)
+  Stage 3: Fusion (LEXICON_WEIGHT × lexicon + LLM_WEIGHT × LLM; 0.10 / 0.90)
   Conflict detection: |lexicon - llm| > threshold → WARNING + low confidence
 """
 

@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import streamlit as st
@@ -28,7 +28,9 @@ from utils.chart_loader import (
 )
 from config.insights import get_insight
 
+from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
 from rbi_sentinel.db.manager import get_latest_composite, get_latest_cycle_brief
+from rbi_sentinel.sentiment.score_normalizer import _DOC_WEIGHTS
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
@@ -51,7 +53,7 @@ st.markdown(
     """
     <style>
     /* ── Google Fonts: Inter (UI) + Merriweather (body) + Playfair Display (Masthead) ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&display=swap');
 
     /* ── Global base ── */
     html, body, [class*="css"] {
@@ -66,96 +68,103 @@ st.markdown(
     
     /* ═══ RBI policy panel ═══════════════════════════════════════════ */
 
-    /* ── Masthead: full-width institutional bar ── */
-    .mpc-bar {
-        background: #0A1F3D;
-        margin: 0.5rem 0 1.5rem 0;
-        padding: 0.85rem 1.5rem;
-        border-radius: 4px;
-        display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+    /* ── Tab header ──────────────────────────────────────────────────────
+       Replaces the italic abstract callout and the separate masthead bar:
+       a title and one-line standfirst on the left, the latest meeting on
+       the right, closed by a navy rule. The full method stays one click
+       away in the expander below. */
+    .rbi-head {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        gap: 0.8rem 2rem; flex-wrap: wrap;
+        margin: 0.4rem 0 1rem 0; padding-bottom: 0.85rem;
+        border-bottom: 2px solid #0A1F3D;
     }
-    .mpc-bar-title {
+    .rbi-head-text { flex: 1 1 28rem; min-width: 0; }
+    .rbi-head-title {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 1.02rem; font-weight: 700; letter-spacing: 0.01em;
-        color: #FFFFFF; line-height: 1.2;
+        font-size: 1.45rem; font-weight: 800; letter-spacing: 0.04em;
+        text-transform: uppercase; color: #0A1F3D;
+        line-height: 1.15; margin: 0 0 0.35rem 0;
     }
-    .mpc-bar-rule {
-        width: 1px; height: 16px; background: rgba(255,255,255,0.30);
-        display: inline-block;
-    }
-    .mpc-bar-sub {
+    .rbi-head-dek {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.74rem; font-weight: 600; letter-spacing: 0.11em;
-        text-transform: uppercase; color: rgba(255,255,255,0.72);
+        font-size: 0.9rem; font-weight: 400; color: #4A5262;
+        line-height: 1.5; margin: 0; max-width: 46rem;
     }
-
-    /* ── Key metrics container ──────────────────────────────────────────
-       Financial-table convention: a small letter-spaced label above a large
-       figure in tabular lining numerals, qualifier below in muted grey.
-       The block spacing below (--mpc-gap) is shared by every element in the
-       right column so the rhythm is even rather than ad hoc. */
-    .mpc-metrics, .mpc-exec-head, .mpc-exec-body, .mpc-sources {
-        --mpc-gap: 1.15rem;
+    .rbi-head-meta {
+        display: flex; flex-direction: column; align-items: flex-end;
+        gap: 0.2rem; white-space: nowrap;
     }
-    .mpc-metrics {
-        background: #FFFFFF;
-        border: 1px solid #DDE2E9;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(10,31,61,0.07);
-        padding: 1.05rem 1.3rem 1.15rem 1.3rem;
-        margin-bottom: var(--mpc-gap);
-    }
-    .mpc-metrics-head {
-        display: flex; justify-content: space-between; align-items: baseline;
-        gap: 1rem; flex-wrap: wrap;
-        padding-bottom: 0.75rem; margin-bottom: 0.95rem;
-        border-bottom: 1px solid #EDF0F4;
-    }
-    .mpc-metrics-eyebrow {
-        font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.63rem; font-weight: 700; letter-spacing: 0.13em;
-        text-transform: uppercase; color: #7A828F;
-    }
-    .mpc-date {
-        font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.82rem; font-weight: 600; color: #0A1F3D;
-        font-variant-numeric: tabular-nums; white-space: nowrap;
-    }
-
-    .mpc-metrics-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem;
-    }
-    .mpc-metric { display: flex; flex-direction: column; }
-    .mpc-metric-label {
+    .rbi-head-meta-label {
         font-family: 'Inter', -apple-system, sans-serif;
         font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em;
-        text-transform: uppercase; color: #7A828F; margin-bottom: 0.34rem;
+        text-transform: uppercase; color: #7A828F;
     }
-    .mpc-metric-value {
-        font-family: 'Inter', 'SF Pro Display', -apple-system,
-                     'Helvetica Neue', Arial, sans-serif;
-        font-size: 2.05rem; font-weight: 600; letter-spacing: -0.03em;
-        line-height: 1; color: #0A1F3D;
+    .rbi-head-meta-value {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 1.0rem; font-weight: 700; color: #0A1F3D;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Decision strip ──────────────────────────────────────────────────
+       The cycle's facts in one row between the method note and the charts.
+       Separation is carried by whitespace, not rules: no dividers between
+       cells or groups, a wide column gap, and a faint outer edge only so the
+       panel reads as one object on the page ground. Figures are tabular
+       lining numerals; colour appears only where it carries direction. */
+    .mpc-exec-head, .mpc-exec-body, .mpc-sources { --mpc-gap: 1.15rem; }
+    .dx {
+        display: grid; grid-template-columns: 2fr 2fr 2fr 1.1fr;
+        column-gap: 2.6rem; row-gap: 1.4rem;
+        background: #FCFCFD;
+        border: 1px solid #E8EBF0; border-radius: 12px;
+        box-shadow: 0 8px 26px -20px rgba(10,31,61,0.16);
+        padding: 1.15rem 1.7rem 1.25rem 1.7rem;
+        margin: 0.9rem 0 1.6rem 0;
+    }
+    .dx-group { min-width: 0; }
+    .dx-group-label {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em;
+        text-transform: uppercase; color: #0A1F3D;
+        margin: 0 0 0.8rem 0; white-space: nowrap;
+    }
+    .dx-cells {
+        display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+        column-gap: 1.5rem;
+    }
+    .dx-cell { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+    .dx-label {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em;
+        text-transform: uppercase; color: #7A828F; white-space: nowrap;
+    }
+    .dx-value {
+        font-family: 'Inter', 'SF Pro Display', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+        font-size: clamp(1.35rem, 1.6vw, 1.75rem); font-weight: 600; letter-spacing: -0.025em;
+        line-height: 1.05; color: #0A1F3D; white-space: nowrap;
         font-variant-numeric: tabular-nums lining-nums;
         font-feature-settings: 'tnum' 1, 'lnum' 1;
     }
-    .mpc-unit {
-        font-size: 1.0rem; font-weight: 500; letter-spacing: 0;
-        color: #7A828F; margin-left: 0.08rem;
+    .dx-unit {
+        font-size: 0.95rem; font-weight: 500; letter-spacing: 0;
+        color: #7A828F; margin-left: 0.1rem;
     }
-    /* Direction and change sit on one line rather than stacking, which
-       kept the two metric columns the same height and removed the
-       vertical bloat under the stance figure. */
-    .mpc-metric-delta {
+    .dx-date { font-size: clamp(1.1rem, 1.25vw, 1.35rem); letter-spacing: -0.015em; }
+    .dx-missing { color: #B4BAC3; font-weight: 400; }
+    .dx-sub {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.71rem; font-weight: 500; color: #7A828F;
-        margin-top: 0.4rem; line-height: 1.4;
+        font-size: 0.74rem; font-weight: 500; color: #6B7380;
+        line-height: 1.35; font-variant-numeric: tabular-nums;
     }
-    .mpc-metric-delta .mpc-hawkish,
-    .mpc-metric-delta .mpc-dovish,
-    .mpc-metric-delta .mpc-neutral { font-weight: 700; }
-    .mpc-sep { color: #C3C9D2; margin: 0 0.32rem; }
-    .mpc-chg { font-variant-numeric: tabular-nums; }
+    .dx-sub b { font-weight: 700; }
+    @media (max-width: 1200px) {
+        .dx { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+        .dx { grid-template-columns: 1fr; padding: 1rem 1.1rem; }
+        .dx-value { font-size: 1.5rem; }
+    }
     .mpc-d-hike { color: #A61B29; }
     .mpc-d-cut  { color: #1F4E79; }
     .mpc-hawkish { color: #A61B29; }
@@ -163,28 +172,57 @@ st.markdown(
     .mpc-neutral { color: #4A5262; }
 
     /* ── Executive summary ──────────────────────────────────────────────
-       The tinted fill is confined to the heading band. The page ground is
-       #F4F5F7 and the old panel was #F4F6F9 — near-identical, which is why
-       the block read as flat and the prose looked like a text dump. The
-       narrative now sits directly on the page, where #24282F gives it real
-       contrast. */
+       Heading sits on the page with a rule beneath it rather than in a
+       tinted box; the narrative below keeps the locked body typography. */
     .mpc-exec-head {
-        background: #E7EDF5;
-        border-left: 3px solid #003366;
-        border-radius: 0 4px 4px 0;
-        padding: 0.7rem 1.1rem 0.75rem 1.1rem;
-        margin-bottom: 0.95rem;
+        padding: 0 0 0.65rem 0; margin-bottom: 1rem;
+        border-bottom: 2px solid #0A1F3D;
     }
     .mpc-exec-title {
-        font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800;
-        color: #003366; text-transform: uppercase; letter-spacing: 0.08em;
-        margin: 0 0 0.15rem 0; line-height: 1.2;
+        font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 900;
+        color: #0A1F3D; text-transform: uppercase; letter-spacing: 0.07em;
+        margin: 0 0 0.25rem 0; line-height: 1.2;
     }
     .mpc-exec-sub {
-        font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600;
-        color: #5F6B7A; letter-spacing: 0.04em; margin: 0; line-height: 1.35;
+        font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 400;
+        font-style: italic; color: #4A5262; margin: 0; line-height: 1.4;
     }
     .mpc-exec-body { margin-bottom: var(--mpc-gap); padding: 0 0.1rem; }
+
+    /* ── Key takeaways ───────────────────────────────────────────────────
+       Five scannable lines ahead of the narrative. A fixed label column
+       lets the eye run down the topics, then across to the one fact that
+       matters; spacing, not bullets or rules, separates the rows. */
+    .mpc-tk {
+        list-style: none; margin: 0 0 1.35rem 0; padding: 0 0 1.1rem 0;
+        border-bottom: 1px solid #E3E7EC;
+    }
+    .mpc-tk li {
+        display: grid; grid-template-columns: 7.4rem minmax(0, 1fr);
+        column-gap: 0.9rem; align-items: baseline;
+        margin: 0 0 0.62rem 0; padding: 0;
+    }
+    .mpc-tk li:last-child { margin-bottom: 0; }
+    .mpc-tk-label {
+        font-family: 'Inter', sans-serif; font-size: 0.66rem; font-weight: 700;
+        letter-spacing: 0.1em; text-transform: uppercase; color: #0A1F3D;
+    }
+    .mpc-tk-text {
+        font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #24282F;
+        line-height: 1.5; font-variant-numeric: tabular-nums;
+    }
+    .mpc-tk-text b { font-weight: 700; color: #0A1F3D; }
+    .mpc-tk-text b.mpc-hawkish { color: #A61B29; }
+    .mpc-tk-text b.mpc-dovish { color: #1F4E79; }
+    .mpc-tk-text q { font-style: italic; quotes: "\\201C" "\\201D"; }
+    .mpc-tk-src { color: #6B7380; font-size: 0.8rem; white-space: nowrap; }
+    .mpc-tk-fig {
+        color: #4A5262; white-space: nowrap; cursor: help;
+        text-decoration: underline dotted #B4BAC3; text-underline-offset: 3px;
+    }
+    @media (max-width: 640px) {
+        .mpc-tk li { grid-template-columns: 1fr; row-gap: 0.15rem; }
+    }
 
     /* LOCKED — approved typography for the narrative paragraphs. */
     .mpc-body {
@@ -193,48 +231,103 @@ st.markdown(
     }
     .mpc-body:last-of-type { margin-bottom: 0; }
 
-    /* ── Source documents ── */
-    .mpc-sources {
-        background: #FFFFFF;
-        border: 1px solid #DDE2E9;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(10,31,61,0.07);
-        padding: 0.95rem 1.3rem 1.05rem 1.3rem;
-    }
+    /* ── Source documents ──────────────────────────────────────────────
+       Sits under the Stance Meter as a references strip rather than a
+       white card: no fill, no shadow. A short navy rule and eyebrow open
+       it, and the three documents run as columns divided by hairlines —
+       the chart column is wide enough that a stacked list wasted it. */
+    .mpc-sources { margin-top: 1.1rem; }
     .mpc-sources-label {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.13em;
         text-transform: uppercase; color: #7A828F;
-        margin: 0 0 0.5rem 0; padding-bottom: 0.55rem;
-        border-bottom: 1px solid #EDF0F4;
+        margin: 0 0 0.7rem 0; padding-top: 0.6rem;
+        border-top: 2px solid #0A1F3D; display: inline-block;
     }
-    .mpc-prov { list-style: none; padding: 0; margin: 0; }
+    .mpc-prov {
+        list-style: none; padding: 0; margin: 0;
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid #D5DAE1; border-bottom: 1px solid #D5DAE1;
+    }
     .mpc-prov li {
-        display: flex; justify-content: space-between; align-items: baseline;
-        gap: 1rem; padding: 0.42rem 0; border-bottom: 1px solid #F3F5F8;
+        display: flex; flex-direction: column; gap: 0.45rem;
+        padding: 0.85rem 1rem 0.9rem 1rem; margin: 0;
+        border-left: 1px solid #E3E7EC; min-width: 0;
     }
-    .mpc-prov li:last-child { border-bottom: none; }
+    /* Share row tracks across the three columns so a name that wraps to
+       two lines does not push its score out of line with the others. */
+    @supports (grid-template-rows: subgrid) {
+        .mpc-prov li {
+            display: grid; grid-row: span 4; grid-template-rows: subgrid;
+            row-gap: 0.45rem; align-items: end;
+        }
+        .mpc-prov li > .mpc-doc-top { align-self: start; }
+    }
+    .mpc-prov li:first-child { border-left: none; padding-left: 0.1rem; }
+    /* Row 1: document name, with its weight in the composite beneath —
+       stacked rather than side by side so "Governor's Statement" never
+       wraps the weight and knocks the three columns out of line. */
+    .mpc-doc-top {
+        display: flex; flex-direction: column; align-items: flex-start;
+        gap: 0.18rem;
+    }
     .mpc-prov a {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.82rem; font-weight: 600; color: #0A1F3D;
-        text-decoration: none; border-bottom: 1px solid rgba(10,31,61,0.22);
+        font-size: 0.98rem; font-weight: 600; color: #0A1F3D;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(10,31,61,0.22);
     }
+    .mpc-prov a::after { content: " \\2197"; font-size: 0.8rem; color: #7A828F; }
     .mpc-prov a:hover { border-bottom-color: #0A1F3D; }
+    .mpc-doc-weight {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+        text-transform: uppercase; color: #7A828F; white-space: nowrap;
+    }
+    /* Row 2: the document's own stance score */
+    .mpc-doc-score {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em;
+        line-height: 1; font-variant-numeric: tabular-nums lining-nums;
+    }
+    .mpc-doc-dir {
+        font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+        margin-left: 0.45rem; vertical-align: 0.2em;
+    }
+    /* Row 3: position on the bounded [-1, +1] scale, centre tick at 0 */
+    .mpc-doc-track {
+        position: relative; display: block; height: 10px; margin: 0.1rem 0;
+    }
+    .mpc-doc-track::before {
+        content: ""; position: absolute; left: 0; right: 0; top: 50%;
+        height: 2px; margin-top: -1px; border-radius: 1px;
+        background: linear-gradient(90deg, #1F4E79 0%, #D5DAE1 50%, #A61B29 100%);
+        opacity: 0.35;
+    }
+    .mpc-doc-track::after {
+        content: ""; position: absolute; left: 50%; top: 0;
+        width: 1px; height: 10px; background: #9AA2AD;
+    }
+    .mpc-doc-track i {
+        position: absolute; top: 50%; width: 9px; height: 9px;
+        margin: -4.5px 0 0 -4.5px; border-radius: 50%;
+        border: 1.5px solid #F4F5F7; z-index: 1;
+    }
+    .mpc-dot-hawkish { background: #A61B29; }
+    .mpc-dot-dovish  { background: #1F4E79; }
+    .mpc-dot-neutral { background: #4A5262; }
+    /* Row 4: provenance */
     .mpc-prov-meta {
         font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.72rem; font-weight: 500; color: #8A919C;
+        font-size: 0.8rem; font-weight: 500; color: #6B7380;
         white-space: nowrap; font-variant-numeric: tabular-nums;
-    }
-    .mpc-prov-note {
-        font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.67rem; font-style: italic; color: #8A919C;
-        line-height: 1.5; margin: 0.75rem 0 0 0;
-        padding-top: 0.6rem; border-top: 1px solid #F3F5F8;
     }
 
     @media (max-width: 640px) {
-        .mpc-metrics-grid { grid-template-columns: 1fr; gap: 1.1rem; }
-        .mpc-metric-value { font-size: 1.85rem; }
+        .mpc-prov { grid-template-columns: 1fr; }
+        .mpc-prov li { display: flex; grid-row: auto; }
+        .mpc-prov li { border-left: none; border-top: 1px solid #E3E7EC; padding-left: 0.1rem; }
+        .mpc-prov li:first-child { border-top: none; }
     }
 
     /* ── Centered Section Divider ── */
@@ -665,8 +758,8 @@ tab_weekly, tab_macro, tab_india, tab_rbi = st.tabs(
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
-def _render_status_bar(date_label: str | None, subdir: str) -> None:
-    mtime = get_folder_mtime(subdir)
+def _render_status_bar(date_label: str | None, subdir: str, show_updated: bool = True) -> None:
+    mtime = get_folder_mtime(subdir) if show_updated else None
     col_label, col_mtime = st.columns([3, 1])
     with col_label:
         if date_label:
@@ -696,6 +789,316 @@ def _render_grid(charts: list[Path], cols: int = 2) -> None:
                 with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
     
+def _stance_dir(score: float) -> str:
+    return "hawkish" if score > 0.05 else ("dovish" if score < -0.05 else "neutral")
+
+
+def _decision_strip_html(brief: dict) -> str:
+    """
+    The RBI tab's decision strip: rate and decision, the Sentinel reading
+    and its change, the MPC's own projections and their revision, and the
+    next meeting — four labelled groups in one row.
+
+    Every figure comes from the database or the Resolution text; anything
+    missing renders as a dash rather than being inferred.
+    """
+    dash = '<span class="dx-missing">&mdash;</span>'
+    facts = brief.get("facts") or {}
+    prev_facts = brief.get("previous_facts") or {}
+    prev_label = (
+        datetime.strptime(brief["previous_cycle"], "%Y-%m-%d").strftime("%b %Y")
+        if brief.get("previous_cycle") else None
+    )
+
+    def cell(label: str, value: str, sub: str = "") -> str:
+        return (
+            '<div class="dx-cell">'
+            f'<span class="dx-label">{label}</span>'
+            f'<span class="dx-value">{value}</span>'
+            f'<span class="dx-sub">{sub or "&nbsp;"}</span>'
+            '</div>'
+        )
+
+    def group(label: str, cells: list[str]) -> str:
+        return (
+            '<div class="dx-group">'
+            f'<p class="dx-group-label">{label}</p>'
+            f'<div class="dx-cells" style="--n:{len(cells)}">{"".join(cells)}</div>'
+            '</div>'
+        )
+
+    def arrow(delta: float) -> str:
+        return "&uarr;" if delta > 0 else ("&darr;" if delta < 0 else "&rarr;")
+
+    # ── Policy decision ──
+    rate = brief.get("repo_rate_pct")
+    rate_value = f'{rate:.2f}<span class="dx-unit">%</span>' if rate is not None else dash
+    action = (brief.get("rate_action") or "").lower()
+    bps = brief.get("rate_change_bps")
+    move = brief.get("last_rate_move")
+    if action == "hold":
+        status_value = "Unchanged"
+        if move:
+            _md = datetime.strptime(move["policy_cycle"], "%Y-%m-%d")
+            status_sub = (
+                f'Last move: {move["rate_action"]} {abs(int(move["rate_change_bps"] or 0))} bps, '
+                f'{_md:%b %Y}'
+            )
+        else:
+            status_sub = "No change on record"
+    elif action in ("hike", "cut") and bps:
+        status_value = (
+            f'<span class="mpc-d-{action}">{"Raised" if action == "hike" else "Cut"} '
+            f'{abs(int(bps))}<span class="dx-unit">bps</span></span>'
+        )
+        status_sub = f"From {rate - bps / 100:.2f}%" if rate is not None else ""
+    else:
+        status_value, status_sub = dash, ""
+    stated = facts.get("stated_stance")
+    rate_sub = f"Stated stance: {stated.capitalize()}" if stated else ""
+
+    # ── Sentinel reading ──
+    score = brief.get("composite_overall_score")
+    prev_score = brief.get("previous_score")
+    if score is not None:
+        sdir = _stance_dir(score)
+        score_value = f'<span class="mpc-{sdir}">{score:+.2f}</span>'
+        score_sub = f'<b class="mpc-{sdir}">{sdir.title()}</b> on a &minus;1 to +1 scale'
+    else:
+        score_value, score_sub = dash, ""
+    if score is not None and prev_score is not None:
+        chg = score - prev_score
+        cdir = _stance_dir(chg * 20)  # colour any visible move, not only |0.05|+
+        chg_value = f'<span class="mpc-{cdir}">{arrow(chg)} {abs(chg):.2f}</span>'
+        chg_sub = f"vs {prev_label} ({prev_score:+.2f})"
+    else:
+        chg_value, chg_sub = dash, "First scored cycle"
+
+    # ── RBI projections ──
+    def projection(key: str) -> tuple[str, str, str]:
+        cur, old = facts.get(key), prev_facts.get(key)
+        if not cur:
+            return "", dash, ""
+        fy = f'FY{cur["fy"][-2:]}'
+        value = f'{cur["value"]:.1f}<span class="dx-unit">%</span>'
+        if old and old["fy"] == cur["fy"]:
+            d = round(cur["value"] - old["value"], 1)
+            sub = (
+                f'{arrow(d)} {abs(d):.1f} pp vs {prev_label}' if d
+                else f"Unchanged vs {prev_label}"
+            )
+        else:
+            sub = f"First projection for {fy}"
+        return fy, value, sub
+
+    cpi_fy, cpi_value, cpi_sub = projection("cpi")
+    gdp_fy, gdp_value, gdp_sub = projection("gdp")
+    proj_fy = cpi_fy or gdp_fy
+
+    # ── Next meeting ──
+    nxt = facts.get("next_meeting")
+    if nxt:
+        s, e = nxt["start"], nxt["end"]
+        if s == e:
+            when = f"{e.day} {e:%b %Y}"
+        elif s.month == e.month:
+            when = f"{s.day}&ndash;{e.day} {e:%b %Y}"
+        else:
+            when = f"{s.day} {s:%b} &ndash; {e.day} {e:%b %Y}"
+        days = (e - date.today()).days
+        if s > date.today():
+            next_sub = f"Decision in {days} day{'s' if days != 1 else ''}"
+        elif days >= 0:
+            next_sub = "Meeting in session"
+        else:
+            next_sub = "Decision awaited in data"
+        next_value = f'<span class="dx-date">{when}</span>'
+    else:
+        next_value, next_sub = dash, ""
+
+    return (
+        '<div class="dx">'
+        + group("Policy decision", [
+            cell("Repo rate", rate_value, rate_sub),
+            cell("Status", status_value, status_sub),
+        ])
+        + group("Sentinel reading", [
+            cell("Stance score", score_value, score_sub),
+            cell("Change", chg_value, chg_sub),
+        ])
+        + group(f"RBI projections{' &middot; ' + proj_fy if proj_fy else ''}", [
+            cell("CPI inflation", cpi_value, cpi_sub),
+            cell("Real GDP growth", gdp_value, gdp_sub),
+        ])
+        + group("Next meeting", [
+            cell("MPC dates", next_value, next_sub),
+        ])
+        + '</div>'
+    )
+
+
+_DIMENSIONS = {
+    # key: (label, what -1 / +1 mean, reading when the score rises, when it falls)
+    "inflation_stance":   ("Inflation concern", "−1 unconcerned · +1 alarmed",
+                           "more alarmed", "less concerned"),
+    "growth_stance":      ("Growth assessment", "−1 worried about growth · +1 confident",
+                           "more confident", "more concerned"),
+    "liquidity_stance":   ("Liquidity stance", "−1 easy liquidity · +1 tight",
+                           "tighter", "easier"),
+    "rate_guidance":      ("Rate guidance", "−1 cuts ahead · +1 hikes ahead",
+                           "tilting toward hikes", "tilting toward cuts"),
+    "fx_external_stance": ("External stance", "−1 tolerant of rupee weakness · +1 defensive",
+                           "more defensive", "more tolerant"),
+}
+_ORDINAL = {1: "1st", 2: "2nd", 3: "3rd"}
+
+
+def _signed(x: float) -> str:
+    """+0.42 / −0.02 with a true minus sign."""
+    return f"{x:+.2f}".replace("-", "&minus;")
+
+
+def _weighted_dimensions(signals: dict) -> dict:
+    """Sub-dimension scores combined with the composite's document weights."""
+    out = {}
+    for dim in _DIMENSIONS:
+        parts = [
+            (_DOC_WEIGHTS[t], sig[dim]) for t, sig in signals.items()
+            if t in _DOC_WEIGHTS and sig.get(dim) is not None
+        ]
+        if parts:
+            total = sum(w for w, _ in parts)
+            out[dim] = sum(w * v for w, v in parts) / total
+    return out
+
+
+def _takeaways_html(brief: dict) -> str:
+    """
+    Key takeaways for the cycle, built only from stored data so every
+    meeting gets the same six lines without another model call:
+    the decision, the tone against it, what moved, the MPC's projections,
+    the analyst's bottom line, and one verbatim line from the most
+    emphatic document.
+    """
+    facts = brief.get("facts") or {}
+    prev_facts = brief.get("previous_facts") or {}
+    prev_label = (
+        datetime.strptime(brief["previous_cycle"], "%Y-%m-%d").strftime("%B")
+        if brief.get("previous_cycle") else None
+    )
+    rows = []
+
+    # Decision
+    rate, action = brief.get("repo_rate_pct"), (brief.get("rate_action") or "").lower()
+    streak = brief.get("decision_streak") or 0
+    stated = facts.get("stated_stance")
+    if rate is not None and action:
+        if action == "hold":
+            lead = f"Repo rate held at <b>{rate:.2f}%</b>"
+            if streak > 1:
+                lead += f" for a {_ORDINAL.get(streak, f'{streak}th')} straight meeting"
+        else:
+            bps = abs(int(brief.get("rate_change_bps") or 0))
+            lead = f'Repo rate {"raised" if action == "hike" else "cut"} {bps} bps to <b>{rate:.2f}%</b>'
+        if stated:
+            lead += f"; {stated} stance retained" if action == "hold" else f"; stance: {stated}"
+        rows.append(("Decision", lead + "."))
+
+    # Tone
+    score, prev = brief.get("composite_overall_score"), brief.get("previous_score")
+    if score is not None:
+        sdir = _stance_dir(score)
+        text = f'Language reads <b class="mpc-{sdir}">{sdir} ({score:+.2f})</b>'
+        if stated and stated != sdir:
+            text += f", firmer than the stated {stated} stance" if sdir == "hawkish" and stated in ("neutral", "accommodative") \
+                else f", at odds with the stated {stated} stance"
+        if prev is not None and prev_label:
+            verb = "up" if score > prev else ("down" if score < prev else "unchanged")
+            text += f"; {verb} from {prev:+.2f} in {prev_label}" if verb != "unchanged" else f"; unchanged from {prev_label}"
+        rows.append(("Tone", text + "."))
+
+    # What moved
+    cur_dims = _weighted_dimensions(brief.get("signals") or {})
+    old_dims = _weighted_dimensions(brief.get("previous_signals") or {})
+    moves = sorted(
+        ((d, old_dims[d], cur_dims[d]) for d in cur_dims if d in old_dims),
+        key=lambda m: -abs(m[2] - m[1]),
+    )
+    moves = [m for m in moves if abs(m[2] - m[1]) >= 0.10][:2]
+    if moves:
+        parts = []
+        for d, old, new in moves:
+            label, scale, up, down = _DIMENSIONS[d]
+            # The figures carry a hover note giving the sub-dimension's scale.
+            parts.append(
+                f'<b>{label if not parts else label.lower()}</b> '
+                f'<span class="mpc-tk-fig" title="{label}: {scale}">{_signed(old)} &rarr; {_signed(new)}</span> '
+                f'({up if new > old else down})'
+            )
+        rows.append(("Shift", " and ".join(parts) + (f" since {prev_label}." if prev_label else ".")))
+    elif old_dims:
+        rows.append(("Shift", "No sub-dimension moved by more than 0.10 since the previous meeting."))
+
+    # Projections
+    proj = []
+    for key, name in (("cpi", "CPI"), ("gdp", "GDP growth")):
+        cur, old = facts.get(key), prev_facts.get(key)
+        if not cur:
+            continue
+        fy = f'FY{cur["fy"][-2:]}'
+        if old and old["fy"] == cur["fy"] and round(cur["value"] - old["value"], 1):
+            verb = "raised" if cur["value"] > old["value"] else "trimmed"
+            proj.append(f'{fy} {name} {verb} to <b>{cur["value"]:.1f}%</b> from {old["value"]:.1f}%')
+        elif old and old["fy"] == cur["fy"]:
+            proj.append(f'{fy} {name} kept at <b>{cur["value"]:.1f}%</b>')
+        else:
+            proj.append(f'{fy} {name} projected at <b>{cur["value"]:.1f}%</b>')
+    if proj:
+        text = "; ".join(proj)
+        rows.append(("Outlook", text[0].upper() + text[1:] + "."))
+
+    # Implication: the opening sentence of the narrative's "Practical
+    # takeaway" paragraph, which the scoring prompt requires on every
+    # document and which states the analyst's bottom line first.
+    narrative = brief.get("composite_narrative") or ""
+    m = re.search(r"Practical takeaway:\*{0,2}\s*(.+)", narrative, re.S)
+    if m:
+        body = " ".join(m.group(1).replace("**", "").split())
+        # Split at a sentence end followed by a capital, so "5.25 per cent" and
+        # "Q3:2026-27" do not break the sentence early.
+        first = re.split(r"(?<=[.!?])\s+(?=[A-Z])", body, maxsplit=1)[0]
+        if first:
+            rows.append(("Implication", first))
+
+    # In their words: first key phrase of the document leaning furthest
+    # in the composite's direction
+    signals = brief.get("signals") or {}
+    if signals and score is not None:
+        doc_type, sig = max(
+            signals.items(),
+            key=lambda kv: (kv[1].get("overall_score") or 0) * (1 if score >= 0 else -1),
+        )
+        phrases = sig.get("key_phrases") or []
+        if phrases:
+            names = {DOC_MINUTES: "Minutes", DOC_RESOLUTION: "Resolution", DOC_GOVERNOR: "Governor&rsquo;s Statement"}
+            quote = phrases[0].strip().rstrip(".")
+            rows.append((
+                "In their words",
+                f'<q>{quote}</q> <span class="mpc-tk-src">&mdash; {names.get(doc_type, doc_type)}</span>',
+            ))
+
+    if not rows:
+        return ""
+    return (
+        '<ul class="mpc-tk">'
+        + "".join(
+            f'<li><span class="mpc-tk-label">{label}</span><span class="mpc-tk-text">{text}</span></li>'
+            for label, text in rows
+        )
+        + "</ul>"
+    )
+
+
 def _section(title: str) -> None:
     st.markdown(
         f'<div class="section-divider"></div>'
@@ -970,18 +1373,28 @@ with tab_rbi:
             "or trigger the RBI Sentinel workflow on GitHub Actions."
         )
     else:
-        _render_status_bar(date_label, "rbi_sentinel")
+        _render_status_bar(date_label, "rbi_sentinel", show_updated=False)
+        brief = get_latest_cycle_brief()
 
-        # ── Methodology Abstract & Deep Dive ──────────────────────────────────────
-        
-       # 1. The High-End Editorial Abstract (Institutional Callout Box)
+        # ── Header: title, one-line standfirst, latest meeting ──
+        _meeting_meta = ""
+        if brief:
+            _d = datetime.strptime(brief["meeting_date"], "%Y-%m-%d")
+            _meeting_meta = (
+                '<div class="rbi-head-meta">'
+                '<span class="rbi-head-meta-label">Latest MPC meeting</span>'
+                f'<span class="rbi-head-meta-value">{_d.day} {_d.strftime("%B %Y")}</span>'
+                '</div>'
+            )
         st.markdown(
-            '<div style="background-color: #F4F6F9; border-left: 3px solid #003366; padding: 0.8rem 1.2rem; margin-bottom: 1.0rem; border-radius: 0 4px 4px 0;">'
-            '<p style="font-family: \'Merriweather\', Georgia, serif; font-size: 0.90rem; font-style: italic; color: #111111; line-height: 1.6; margin: 0;">'
-            '<strong style="font-family: \'Inter\', sans-serif; font-style: normal; font-size: 0.80rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; margin-right: 0.3rem;">The RBI Sentinel</strong> '
-            "quantifies shifts in India's monetary policy by parsing all three classes of official MPC communication — the Monetary Policy Resolution, the MPC Meeting Minutes, and the Governor's Statement — through a domain-specific hybrid text-mining model. "
-            "It fuses a curated central-bank lexicon with a large language model to score each document on a bounded hawkish/dovish scale, producing both a per-document signal and a composite meeting score. All outputs are quantitative estimates intended for research purposes."
-            '</p>'
+            '<div class="rbi-head">'
+            '<div class="rbi-head-text">'
+            '<p class="rbi-head-title">The RBI Sentinel</p>'
+            '<p class="rbi-head-dek">Quantitative tracking of India&rsquo;s monetary policy stance '
+            'across all three classes of MPC communication: the Resolution, the Minutes '
+            'and the Governor&rsquo;s Statement.</p>'
+            '</div>'
+            f'{_meeting_meta}'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -991,66 +1404,86 @@ with tab_rbi:
             st.markdown(
                 "### Scoring Methodology\n\n"
                 "**Corpus**\n\n"
-                "The engine processes three official documents per Monetary Policy Committee (MPC) cycle: "
-                "the *Monetary Policy Resolution* (published on the rate-decision date), "
-                "the *MPC Meeting Minutes* (published approximately 14 days post-decision), "
-                "and the *Governor's Statement* (published on the rate-decision date alongside the Resolution). "
-                "This tripartite corpus captures the full communication spectrum: the formal committee decision, "
-                "the deliberative record of individual member views and dissents, and the Governor's personal "
-                "forward guidance — three analytically distinct signals that frequently diverge.\n\n"
-                "**Why Standard Lexicons Are Insufficient**\n\n"
+                "The engine reads three official documents for every Monetary Policy Committee (MPC) "
+                "decision: the *Monetary Policy Resolution* and the *Governor's Statement*, both published "
+                "on the decision date, and the *MPC Minutes*, published about 14 days later. Documents are "
+                "grouped by **policy cycle**, so Minutes released a fortnight after a meeting are scored "
+                "against the decision they record rather than as a separate event. The current corpus is "
+                "159 documents across 61 cycles, October 2016 to date, each scored from its full text — "
+                "no excerpt or summary is used.\n\n"
+                "**Why standard lexicons are insufficient**\n\n"
                 "Standard financial word-lists, including the widely cited Loughran-McDonald dictionary "
                 "(see [Loughran & McDonald, 2011](https://doi.org/10.1111/j.1540-6261.2010.01625.x)), "
-                "perform well on corporate filings but systematically fail on central bank transcripts. "
-                "Policymakers rely on deliberate linguistic hedging: a phrase such as "
-                "*\"remaining vigilant on inflation\"* conveys clear hawkish intent without a single term "
-                "appearing in any standard financial dictionary. This problem is well-documented in the "
-                "automated analysis of FOMC statements "
-                "(see [Lucca & Trebbi, 2009](https://www.nber.org/papers/w15367)), where context-sensitivity "
-                "and negation handling are shown to be prerequisites, not refinements.\n\n"
-                "**Two-Stage Hybrid Pipeline**\n\n"
-                "*Stage 1 — Domain Lexicon:* A bespoke lexicon of 30+ hawkish and 30+ dovish phrases, "
-                "each weighted to reflect diagnostic value in RBI communications. A 5-token negation window "
-                "reverses phrase polarity when a negation operator precedes a scored term (e.g., "
-                "*\"not concerned about inflation\"* scores dovish, not hawkish). The raw count score is "
-                "normalized via tanh(score / √word\\_count × 3) to correct for document length variance. "
-                "Weight in fusion: **10%**.\n\n"
-                "*Why the lexicon carries only 10%:* measured across the full 159-document "
-                "corpus, the lexicon's scores have a standard deviation of 0.263 against the "
-                "language model's 0.587 — the keyword counter is 2.2× narrower, because tanh "
-                "normalization compresses it toward zero. A heavier lexicon weight therefore does "
-                "not add information; it systematically drags confident readings toward the "
-                "midpoint. A document the model reads at −0.95 cannot be matched by an instrument "
-                "whose range stops near −0.64. The lexicon is retained as an independent "
-                "cross-check — it is the only component capable of catching an implausible model "
-                "output — but it no longer votes at a quarter of the total on a scale it cannot "
-                "reach.\n\n"
-                "*Stage 2 — LLM Semantic Parsing:* Each document is submitted to a large language model "
-                "under a structured prompt. Large language models substantially outperform lexicon-based "
-                "methods on nuanced, context-dependent financial text "
-                "(see [López-Lira & Tang, 2023](https://doi.org/10.2139/ssrn.4412788)). "
-                "The prompt returns a validated JSON payload containing six sub-dimension scores "
-                "(inflation stance, growth stance, liquidity stance, rate guidance, FX/external stance, "
-                "overall), a confidence estimate, a ranked list of pivotal phrases, and a two-paragraph "
-                "narrative summary, drawing on domain-adapted NLP methods for structured financial output "
-                "(see [Araci, 2019](https://arxiv.org/abs/1908.10063)). "
-                "Weight in fusion: **90%**.\n\n"
-                "*Conflict Detection:* When |lexicon score − LLM score| > 0.60, a conflict flag is raised "
-                "and the stored confidence is capped at 0.45. This is an automated data-quality "
-                "signal, not a review queue: the two stages disagree by more than 0.60 on roughly "
-                "9% of documents, and a sudden rise in that rate across many documents indicates "
-                "something upstream has changed — a revised prompt, a model substitution, or a "
-                "shift in how the source documents are written.\n\n"
-                "**Composite Meeting Score**\n\n"
-                "Individual document scores are aggregated into a per-meeting composite using a fixed "
-                "weighting scheme reflecting each document's informational hierarchy:\n\n"
+                "perform well on corporate filings but systematically fail on central bank communication. "
+                "Policymakers rely on deliberate hedging: *\"remaining vigilant on inflation\"* conveys "
+                "hawkish intent without a single term from a standard dictionary. The same problem is "
+                "documented for FOMC statements "
+                "(see [Lucca & Trebbi, 2009](https://www.nber.org/papers/w15367)), where context and "
+                "negation handling are prerequisites, not refinements.\n\n"
+                "**Stage 1 — Domain lexicon (10% of each document score)**\n\n"
+                "A bespoke RBI lexicon of 62 hawkish and 61 dovish phrases, each weighted by diagnostic "
+                "value. A 5-word negation window reverses a phrase's polarity when a negation precedes it "
+                "(*\"not concerned about inflation\"* scores dovish). The count is normalised by "
+                "tanh(score / √word\\_count × 3) so long and short documents are comparable.\n\n"
+                "*Why only 10%:* across the corpus the lexicon's scores have a standard deviation of 0.263 "
+                "against the language model's 0.587 — tanh normalisation compresses it toward zero. A "
+                "heavier weight would drag every confident reading toward the midpoint. It is kept as an "
+                "independent, fully deterministic cross-check on the model.\n\n"
+                "**Stage 2 — Claude Opus 5 (90% of each document score)**\n\n"
+                "Each document is read in full by **Claude Opus 5**, Anthropic's frontier Opus-class model, under "
+                "a structured prompt. Scoring a policy document is a judgement task rather than an "
+                "extraction task, and model choice changes the answer: in testing, Opus correctly read "
+                "*\"downside risks to growth\"* as dovish where a smaller model read it as marginally "
+                "hawkish. Large language models substantially outperform lexicon methods on nuanced "
+                "financial text (see [López-Lira & Tang, 2023](https://doi.org/10.2139/ssrn.4412788)). "
+                "Documents are sent whole — up to 32,000 tokens, which clears the longest Minutes — and "
+                "the model returns validated JSON: an overall score, five sub-dimension scores, a "
+                "confidence estimate, the 3–5 phrases that most influenced its reading, and a "
+                "two-paragraph narrative (*How to read this document* and *Practical takeaway*). "
+                "Every score in the current model version (`hybrid_v2`) was produced by Opus 5.\n\n"
+                "*Failure handling:* if the model cannot return a valid score after a re-prompt, the "
+                "document is left unscored. It is never silently replaced by a lexicon-only number.\n\n"
+                "*Conflict detection:* when |lexicon − model| > 0.60 the document is flagged and its stored "
+                "confidence capped at 0.45. This fires on about 9% of documents; a sudden rise across many "
+                "documents signals an upstream change — a revised prompt, a model substitution, or a shift "
+                "in how the RBI writes.\n\n"
+                "**Composite meeting score**\n\n"
+                "Document scores are combined into one score per policy cycle with fixed weights:\n\n"
                 "| Document | Weight | Rationale |\n"
                 "|---|---|---|\n"
-                "| MPC Minutes | 50% | Captures individual member deliberation and dissent votes |\n"
+                "| MPC Minutes | 50% | Individual member deliberation, reasoning and dissent |\n"
                 "| Monetary Policy Resolution | 35% | The formal committee decision statement |\n"
-                "| Governor's Statement | 15% | Governor's personal forward guidance overlay |\n\n"
-                "All scores are expressed on a bounded [−1.0, +1.0] scale. "
-                "−1.0 denotes maximum dovishness; +1.0 denotes maximum hawkishness.\n\n"
+                "| Governor's Statement | 15% | The Governor's forward-guidance overlay |\n\n"
+                "**Reading the scores**\n\n"
+                "Every score runs from **−1.0** to **+1.0**. The overall and composite scores measure "
+                "policy tone: −1 is maximally dovish (leaning toward cuts), +1 maximally hawkish (leaning "
+                "toward hikes), 0 balanced. A score near zero is not an absence of view; it often means the "
+                "committee is actively weighing competing risks. The five sub-dimensions each isolate one "
+                "part of the committee's reasoning:\n\n"
+                "| Sub-dimension | −1.0 means | +1.0 means |\n"
+                "|---|---|---|\n"
+                "| Inflation concern | Unconcerned about inflation | Alarmed about inflation |\n"
+                "| Growth assessment | Worried about India's growth | Confident about India's growth |\n"
+                "| Liquidity stance | Adding liquidity, easy conditions | Draining liquidity, tight conditions |\n"
+                "| Rate guidance | Signalling cuts ahead | Signalling hikes ahead |\n"
+                "| External stance | Tolerant of rupee weakness | Defensive of the rupee |\n\n"
+                "Growth assessment is read in the committee's own framing of the domestic economy (real GDP "
+                "and activity), not as a GDP number. A more confident growth reading leans hawkish in effect: "
+                "the less the economy needs support, the more room the MPC has to focus on inflation.\n\n"
+                "**Decision strip and key takeaways**\n\n"
+                "The repo rate, decision and rate history come from the Sentinel database. The RBI's stated "
+                "stance, its full-year CPI and real GDP projections, and the next meeting dates are read "
+                "directly from each Resolution's text by fixed patterns — no model is involved, and anything "
+                "that does not match is shown as a dash. The six takeaways are assembled from these facts, "
+                "the scores above and the model's own output: *Implication* is the opening line of the "
+                "Practical takeaway paragraph, and *In their words* is the lead pivotal phrase from the "
+                "document leaning furthest in the composite's direction. Every line regenerates "
+                "automatically for each new meeting.\n\n"
+                "**Limitations**\n\n"
+                "Scores for historical meetings were produced by a model whose training data post-dates "
+                "those meetings, so they may carry hindsight about what the RBI did next; live scores for "
+                "new meetings do not. All outputs are quantitative estimates intended for research, not "
+                "investment advice.\n\n"
                 "---\n\n"
                 "### Pipeline Architecture\n"
             )
@@ -1113,6 +1546,8 @@ with tab_rbi:
       <div class="arch-box"><b>Document Extractor</b><span>HTML (CSS selectors) + PDF (pdfplumber)</span></div>
       <div class="arch-arrow">→</div>
       <div class="arch-box"><b>Text Normalizer</b><span>Dedup + sentence splitting</span></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box"><b>Policy-Cycle Grouping</b><span>Minutes attached to their decision</span></div>
     </div>
   </div>
 
@@ -1122,11 +1557,11 @@ with tab_rbi:
     <div class="arch-label">Score</div>
     <div class="arch-content">
       <div class="arch-branch">
-        <div class="arch-box"><b>Domain Lexicon — 25%</b><span>30+ phrases · 5-token negation window</span></div>
-        <div class="arch-box"><b>LLM Semantic Parser — 75%</b><span>Claude API · 6 sub-dimensions · structured JSON</span></div>
+        <div class="arch-box"><b>Domain Lexicon — 10%</b><span>123 phrases · 5-word negation window</span></div>
+        <div class="arch-box"><b>Claude Opus 5 — 90%</b><span>Anthropic · full text · 5 sub-dimensions · JSON</span></div>
       </div>
       <div class="arch-arrow">→</div>
-      <div class="arch-box"><b>Score Fusion</b><span>0.25×lex + 0.75×llm · conflict flag: |Δ| &gt; 0.40</span></div>
+      <div class="arch-box"><b>Score Fusion</b><span>0.10×lexicon + 0.90×Opus · conflict flag: |Δ| &gt; 0.60</span></div>
     </div>
   </div>
 
@@ -1139,7 +1574,9 @@ with tab_rbi:
       <div class="arch-arrow">→</div>
       <div class="arch-box"><b>Composite Engine</b><span>Minutes 50% · Resolution 35% · Governor 15%</span></div>
       <div class="arch-arrow">→</div>
-      <div class="arch-box-db"><b>meeting_composites</b><span>SQLite — per-meeting aggregates</span></div>
+      <div class="arch-box-db"><b>meeting_composites</b><span>SQLite — per-cycle aggregates</span></div>
+      <div class="arch-arrow">+</div>
+      <div class="arch-box"><b>Fact Extractor</b><span>Projections · stated stance · next meeting</span></div>
     </div>
   </div>
 
@@ -1148,100 +1585,88 @@ with tab_rbi:
   <div class="arch-stage">
     <div class="arch-label">Visualise</div>
     <div class="arch-content">
-      <div class="arch-box"><b>Chart Generator</b><span>7 EconStyle matplotlib charts</span></div>
+      <div class="arch-box"><b>Chart Generator</b><span>EconStyle matplotlib charts</span></div>
       <div class="arch-arrow">→</div>
-      <div class="arch-box-dark"><b>Streamlit Dashboard</b><span>The RBI Sentinel Tab</span></div>
+      <div class="arch-box-dark"><b>Streamlit Dashboard</b><span>Decision strip · takeaways · charts</span></div>
     </div>
   </div>
 
 </div>
 """, unsafe_allow_html=True)
 
+        # ── Decision strip: the cycle's facts in one row, ahead of any chart ──
+        if brief:
+            st.markdown(_decision_strip_html(brief), unsafe_allow_html=True)
+
         # ── Hero: Stance Meter & AI Briefing (Side-by-Side) ──
         stance, charts = _pop_summary(charts, ["01_rbi_stance_meter"])
         if stance:
-            brief = get_latest_cycle_brief()
-
-            # ── Masthead: full-width institutional bar ──
-            if brief:
-                _d = datetime.strptime(brief["meeting_date"], "%Y-%m-%d")
-                _meeting_long = f'{_d.day} {_d.strftime("%B %Y")}'
-                _rate = brief.get("repo_rate_pct")
-                _action = (brief.get("rate_action") or "").lower()
-                _bps = brief.get("rate_change_bps")
-                if _action == "hold":
-                    _decision, _decision_cls = "Unchanged", "hold"
-                elif _action in ("hike", "cut") and _bps:
-                    _decision = f'{"Raised" if _action == "hike" else "Lowered"} {abs(int(_bps))} bps'
-                    _decision_cls = _action
-                else:
-                    _decision, _decision_cls = (_action.title() or "\u2014"), "hold"
-
-                st.markdown(
-                    """
-<div class="mpc-bar">
-  <span class="mpc-bar-title">Reserve Bank of India</span>
-  <span class="mpc-bar-rule"></span>
-  <span class="mpc-bar-sub">Monetary Policy Committee</span>
-</div>
-""",
-                    unsafe_allow_html=True,
-                )
-
             col_chart, col_text = st.columns([1.2, 1], gap="large")
 
             with col_chart:
                 st.image(str(stance), use_container_width=True)
-                insight = get_insight(stance.name)
-                if insight:
-                    with st.expander("How to read the Stance Meter"):
-                        st.markdown(insight)
 
-            with col_text:
-                # ── Key metrics container ──
-                if brief and brief.get("composite_overall_score") is not None:
-                    _sc = brief["composite_overall_score"]
-                    _dir = "hawkish" if _sc > 0.05 else ("dovish" if _sc < -0.05 else "neutral")
-                    _prev = brief.get("previous_score")
-                    if _prev is not None:
-                        _chg = _sc - _prev
-                        _arrow = "&uarr;" if _chg > 0 else ("&darr;" if _chg < 0 else "&middot;")
-                        _stance_line = (
-                            f'<span class="mpc-{_dir}">{_dir.title()}</span>'
-                            f'<span class="mpc-sep">&mdash;</span>'
-                            f'<span class="mpc-chg">{_arrow} {abs(_chg):.2f} vs previous cycle</span>'
+                # ── Source documents: one column per document, same row
+                #    structure in each, ordered by weight in the composite ──
+                if brief and brief.get("documents"):
+                    _names = {
+                        DOC_MINUTES: "Minutes",
+                        DOC_RESOLUTION: "Resolution",
+                        DOC_GOVERNOR: "Governor&rsquo;s Statement",
+                    }
+                    _doc_scores = {
+                        DOC_MINUTES: brief.get("minutes_score"),
+                        DOC_RESOLUTION: brief.get("resolution_score"),
+                        DOC_GOVERNOR: brief.get("governor_score"),
+                    }
+                    _rows = []
+                    for _doc in sorted(
+                        brief["documents"],
+                        key=lambda d: -_DOC_WEIGHTS.get(d["doc_type"], 0),
+                    ):
+                        _type = _doc["doc_type"]
+                        _dd = datetime.strptime(_doc["publication_date"], "%Y-%m-%d")
+                        _ds = _doc_scores.get(_type)
+                        if _ds is None:
+                            _score_html = '<span class="mpc-doc-score mpc-neutral">&mdash;</span>'
+                            _track_html = ""
+                        else:
+                            _ddir = "hawkish" if _ds > 0.05 else ("dovish" if _ds < -0.05 else "neutral")
+                            _score_html = (
+                                f'<span class="mpc-doc-score mpc-{_ddir}">{_ds:+.2f}'
+                                f'<span class="mpc-doc-dir">{_ddir.title()}</span></span>'
+                            )
+                            # Position on the bounded [-1, +1] scale, centre tick at 0.
+                            _pos = (max(-1.0, min(1.0, _ds)) + 1) * 50
+                            _track_html = (
+                                f'<span class="mpc-doc-track"><i class="mpc-dot-{_ddir}" '
+                                f'style="left:{_pos:.1f}%"></i></span>'
+                            )
+                        _weight = _DOC_WEIGHTS.get(_type)
+                        _weight_html = (
+                            f'<span class="mpc-doc-weight">{_weight:.0%} weight</span>'
+                            if _weight is not None else ""
                         )
-                    else:
-                        _stance_line = (
-                            f'<span class="mpc-{_dir}">{_dir.title()}</span>'
-                            f'<span class="mpc-sep">&mdash;</span>'
-                            f'<span class="mpc-chg">first scored cycle</span>'
+                        _rows.append(
+                            '<li>'
+                            '<span class="mpc-doc-top">'
+                            f'<a href="{_doc["source_url"]}" target="_blank" rel="noopener">'
+                            f'{_names.get(_type, _type)}</a>{_weight_html}'
+                            '</span>'
+                            f'{_score_html}{_track_html}'
+                            f'<span class="mpc-prov-meta">{_dd.day} {_dd.strftime("%b %Y")} '
+                            f'&middot; {_doc["word_count"]:,} words</span>'
+                            '</li>'
                         )
-
                     st.markdown(
-                        f"""
-<div class="mpc-metrics">
-  <div class="mpc-metrics-head">
-    <span class="mpc-metrics-eyebrow">Latest MPC meeting</span>
-    <span class="mpc-date">{_meeting_long}</span>
-  </div>
-  <div class="mpc-metrics-grid">
-    <div class="mpc-metric">
-      <span class="mpc-metric-label">Policy repo rate</span>
-      <span class="mpc-metric-value">{_rate:.2f}<span class="mpc-unit">%</span></span>
-      <span class="mpc-metric-delta mpc-d-{_decision_cls}">{_decision} since last meeting</span>
-    </div>
-    <div class="mpc-metric">
-      <span class="mpc-metric-label">Policy stance</span>
-      <span class="mpc-metric-value mpc-{_dir}">{_sc:+.2f}</span>
-      <span class="mpc-metric-delta">{_stance_line}</span>
-    </div>
-  </div>
-</div>
-""",
+                        '<div class="mpc-sources">'
+                        '<p class="mpc-sources-label">Source documents</p>'
+                        '<ul class="mpc-prov">' + "".join(_rows) + "</ul>"
+                        '</div>',
                         unsafe_allow_html=True,
                     )
 
+            with col_text:
                 # ── Executive summary ──
                 ai_summary = (brief or {}).get("composite_narrative")
                 if not ai_summary:
@@ -1265,37 +1690,10 @@ with tab_rbi:
   <p class="mpc-exec-title">Executive Summary</p>
   <p class="mpc-exec-sub">NLP-driven narrative synthesis of the current policy cycle</p>
 </div>
-<div class="mpc-exec-body"><p class="mpc-body">{clean_summary}</p></div>
+<div class="mpc-exec-body">{_takeaways_html(brief) if brief else ""}<p class="mpc-body">{clean_summary}</p></div>
 """,
                     unsafe_allow_html=True,
                 )
-
-                # ── Source documents ──
-                if brief and brief.get("documents"):
-                    _names = {
-                        "resolution": "Resolution",
-                        "minutes": "Minutes",
-                        "governor_statement": "Governor&rsquo;s Statement",
-                    }
-                    _rows = []
-                    for _doc in brief["documents"]:
-                        _dd = datetime.strptime(_doc["publication_date"], "%Y-%m-%d")
-                        _rows.append(
-                            f'<li><a href="{_doc["source_url"]}" target="_blank" rel="noopener">'
-                            f'{_names.get(_doc["doc_type"], _doc["doc_type"])}</a>'
-                            f'<span class="mpc-prov-meta">{_dd.day} {_dd.strftime("%b %Y")} '
-                            f'&middot; {_doc["word_count"]:,} words</span></li>'
-                        )
-                    st.markdown(
-                        '<div class="mpc-sources">'
-                        '<p class="mpc-sources-label">Source documents</p>'
-                        '<ul class="mpc-prov">' + "".join(_rows) + "</ul>"
-                        '<p class="mpc-prov-note">Published by the Reserve Bank of India '
-                        'at rbi.org.in. Scores are computed from the full text of each '
-                        'document; no summary or excerpt is used.</p>'
-                        '</div>',
-                        unsafe_allow_html=True,
-                    )
 
         # ── Sentiment Over Time (PRIMARY) ──
         trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])

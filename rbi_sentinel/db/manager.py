@@ -11,6 +11,7 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
+from rbi_sentinel.cleaners.policy_facts import extract_policy_facts
 from rbi_sentinel.config import DB_PATH, SCORING_MODEL_VERSION
 
 log = logging.getLogger("rbi_sentinel.db")
@@ -398,7 +399,7 @@ def get_latest_cycle_brief(
         # The cycle immediately before, for the change figure.
         prev = conn.execute(
             """
-            SELECT k.composite_overall_score
+            SELECT m.policy_cycle, k.composite_overall_score
             FROM meeting_composites k
             JOIN mpc_meetings m ON m.meeting_id = k.meeting_id
             WHERE k.scoring_model_version = ? AND m.policy_cycle < ?
@@ -408,6 +409,89 @@ def get_latest_cycle_brief(
             (model_version, brief["policy_cycle"]),
         ).fetchone()
         brief["previous_score"] = prev["composite_overall_score"] if prev else None
+        brief["previous_cycle"] = prev["policy_cycle"] if prev else None
+
+        # Projections, stated stance and next meeting, read from the
+        # Resolution text of this cycle and the one before it.
+        def _resolution_facts(policy_cycle: Optional[str]) -> dict:
+            text = None
+            if policy_cycle:
+                r = conn.execute(
+                    """
+                    SELECT d.raw_text
+                    FROM rbi_documents d
+                    JOIN mpc_meetings m ON m.meeting_id = d.meeting_id
+                    WHERE m.policy_cycle = ? AND d.doc_type = 'resolution'
+                      AND d.word_count > 0
+                    ORDER BY d.publication_date
+                    LIMIT 1
+                    """,
+                    (policy_cycle,),
+                ).fetchone()
+                text = r["raw_text"] if r else None
+            return extract_policy_facts(text)
+
+        brief["facts"] = _resolution_facts(brief["policy_cycle"])
+        brief["previous_facts"] = _resolution_facts(brief["previous_cycle"])
+
+        # The most recent rate change, for context under a hold.
+        move = conn.execute(
+            """
+            SELECT policy_cycle, rate_action, rate_change_bps
+            FROM mpc_meetings
+            WHERE meeting_date = policy_cycle
+              AND rate_action IN ('hike', 'cut')
+              AND policy_cycle <= ?
+            ORDER BY policy_cycle DESC
+            LIMIT 1
+            """,
+            (brief["policy_cycle"],),
+        ).fetchone()
+        brief["last_rate_move"] = dict(move) if move else None
+
+        # Consecutive meetings at the current decision, counting this one.
+        streak = 0
+        for r in conn.execute(
+            """
+            SELECT rate_action FROM mpc_meetings
+            WHERE meeting_date = policy_cycle AND policy_cycle <= ?
+            ORDER BY policy_cycle DESC
+            """,
+            (brief["policy_cycle"],),
+        ):
+            if (r["rate_action"] or "").lower() != (brief["rate_action"] or "").lower():
+                break
+            streak += 1
+        brief["decision_streak"] = streak
+
+        # Per-document sub-dimensions and key phrases, for the takeaways.
+        def _doc_signals(policy_cycle: Optional[str]) -> dict:
+            if not policy_cycle:
+                return {}
+            out = {}
+            for r in conn.execute(
+                """
+                SELECT d.doc_type, s.overall_score, s.inflation_stance,
+                       s.growth_stance, s.liquidity_stance, s.rate_guidance,
+                       s.fx_external_stance, s.key_phrases
+                FROM sentiment_scores s
+                JOIN rbi_documents d ON d.doc_id = s.doc_id
+                JOIN mpc_meetings m ON m.meeting_id = d.meeting_id
+                WHERE m.policy_cycle = ? AND s.scoring_model_version = ?
+                  AND d.source_kind = 'press_release'
+                """,
+                (policy_cycle, model_version),
+            ):
+                row = dict(r)
+                try:
+                    row["key_phrases"] = json.loads(row["key_phrases"] or "[]")
+                except (TypeError, ValueError):
+                    row["key_phrases"] = []
+                out[row.pop("doc_type")] = row
+            return out
+
+        brief["signals"] = _doc_signals(brief["policy_cycle"])
+        brief["previous_signals"] = _doc_signals(brief["previous_cycle"])
 
         # Source documents, for provenance.
         brief["documents"] = [
