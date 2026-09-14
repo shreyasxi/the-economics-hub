@@ -1,0 +1,121 @@
+name: RBI Sentinel
+
+# Unattended RBI Sentinel: fetch new MPC documents, score them with Claude Opus 5,
+# record the rate decision, log the live tone test, refresh charts, and commit.
+# Streamlit Cloud redeploys on the push.
+
+on:
+  schedule:
+    # Decision days only (the gate step skips all other days). RBI releases the
+    # Resolution at ~10:00 IST; four attempts give margin for GitHub's scheduler
+    # delays while staying well before the 17:00 IST G-sec close.
+    - cron: '15 5 * * 1-5'    # 10:45 IST
+    - cron: '15 6 * * 1-5'    # 11:45 IST
+    - cron: '45 7 * * 1-5'    # 13:15 IST
+    - cron: '15 9 * * 1-5'    # 14:45 IST
+    # Every weekday evening: Minutes (released ~17:00 IST), off-cycle meetings,
+    # and the 10-year close for the live log.
+    - cron: '45 12 * * 1-5'   # 18:15 IST
+  workflow_dispatch: {}
+
+concurrency:
+  group: rbi-sentinel          # never two runs writing the database at once
+  cancel-in-progress: false
+
+permissions:
+  contents: write              # commit the database, charts and live log
+  issues: write                # ask for a 10-year close when none can be fetched
+
+jobs:
+  rbi-sentinel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Decide whether to run
+        id: gate
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: python .github/scripts/rbi_should_run.py
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pipeline
+        id: pipeline
+        if: steps.gate.outputs.run == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONPATH: "."
+          RBI_NEEDS_INPUT_FILE: output/rbi_needs_input.md
+        run: |
+          set +e
+          python generate_rbi_sentinel.py --auto
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          # Fold the write-ahead log into the database file so git sees one file.
+          python -c "import sqlite3; c = sqlite3.connect('data/rbi_sentinel.db'); c.execute('PRAGMA wal_checkpoint(TRUNCATE)'); c.close()"
+          exit 0
+
+      - name: Commit and push changes
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/rbi_sentinel.db assets/rbi_sentinel
+          if [ -f data/rbi_live_log.csv ]; then git add data/rbi_live_log.csv; fi
+          if git diff --cached --quiet; then
+            echo "No data changed — nothing to commit."
+            exit 0
+          fi
+          git commit -m "data(rbi): automated update $(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M IST')"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            echo "Push attempt $attempt failed; retrying"
+            sleep $((attempt * 10))
+          done
+          echo "::error::Could not push after 3 attempts"
+          exit 1
+
+      - name: Ask for a 10-year close if one is missing
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const title = 'RBI Sentinel: 10-year G-sec close needed for the live test';
+            const path = 'output/rbi_needs_input.md';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', per_page: 100,
+            });
+            const existing = open.find(i => i.title === title);
+            if (fs.existsSync(path)) {
+              const body = fs.readFileSync(path, 'utf8');
+              if (existing) {
+                await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body });
+              } else {
+                await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body });
+              }
+            } else if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body: 'Close recorded — thank you. Closing.' });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, state: 'closed' });
+            }
+
+      - name: Fail the run if the pipeline reported problems
+        if: steps.gate.outputs.run == 'true' && steps.pipeline.outputs.code != '0'
+        run: |
+          echo "::error::RBI Sentinel pipeline finished with problems (exit ${{ steps.pipeline.outputs.code }}). See the 'Run pipeline' log."
+          exit 1

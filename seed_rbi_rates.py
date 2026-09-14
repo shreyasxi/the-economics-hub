@@ -2,7 +2,12 @@
 seed_rbi_rates.py
 
 Seeds repo_rate_pct, rate_action, and rate_change_bps into all mpc_meetings rows.
-Derived from RBI official rate history (Oct 2016 – Apr 2026).
+Derived from RBI official rate history (Oct 2016 – Aug 2026).
+
+Since September 2026 new decisions are recorded automatically: the pipeline
+reads each Resolution's rate decision (pipeline.run_record_decisions), and the
+RBI Sentinel GitHub workflow runs it on decision days. Keep this list for
+history and corrections — run it only if a decision was recorded wrongly.
 
 For each meeting date, the effective rate is the most recent decision at or
 before that date. Holds are inferred (any meeting not in the change list gets

@@ -584,6 +584,77 @@ def get_all_composites(
     return [dict(r) for r in rows]
 
 
+def get_live_resolution_scores(model_version: str = SCORING_MODEL_VERSION) -> Optional[dict]:
+    """
+    The newest cycle's Resolution score, when it was scored, and the previous
+    cycle's Resolution score and text — the inputs to the live tone log.
+    """
+    sql = """
+        SELECT m.policy_cycle, m.rate_action, m.rate_change_bps, d.source_url, d.raw_text,
+               s.overall_score, s.scored_at
+        FROM mpc_meetings m
+        JOIN rbi_documents d ON d.meeting_id = m.meeting_id
+         AND d.doc_type = 'resolution' AND d.source_kind = 'press_release' AND d.word_count > 0
+        JOIN sentiment_scores s ON s.doc_id = d.doc_id AND s.scoring_model_version = ?
+        WHERE m.meeting_date = m.policy_cycle
+        ORDER BY m.policy_cycle DESC
+        LIMIT 2
+    """
+    with _connect() as conn:
+        rows = conn.execute(sql, (model_version,)).fetchall()
+    if not rows:
+        return None
+    cur = rows[0]
+    prev = rows[1] if len(rows) > 1 else None
+    return {
+        "policy_cycle": cur["policy_cycle"], "rate_action": cur["rate_action"],
+        "rate_change_bps": cur["rate_change_bps"], "source_url": cur["source_url"],
+        "resolution_text": cur["raw_text"], "score": cur["overall_score"], "scored_at": cur["scored_at"],
+        "previous_score": prev["overall_score"] if prev else None,
+        "previous_resolution_text": prev["raw_text"] if prev else None,
+    }
+
+
+def latest_publication_date() -> Optional[str]:
+    """Newest publication_date of any stored document (YYYY-MM-DD)."""
+    with _connect() as conn:
+        row = conn.execute("SELECT MAX(publication_date) FROM rbi_documents").fetchone()
+    return row[0] if row else None
+
+
+def get_cycle_decisions() -> list[dict]:
+    """Every policy cycle, oldest first, with its stored decision and Resolution text."""
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT m.policy_cycle, m.meeting_id AS anchor_meeting_id,
+                   m.repo_rate_pct, m.rate_action, m.rate_change_bps, d.raw_text AS resolution_text
+            FROM mpc_meetings m
+            JOIN rbi_documents d ON d.meeting_id = m.meeting_id
+             AND d.doc_type = 'resolution' AND d.source_kind = 'press_release'
+             AND d.word_count > 0
+            WHERE m.meeting_date = m.policy_cycle
+            ORDER BY m.policy_cycle
+            """
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def set_rate_decision(
+    meeting_id: int, *, repo_rate_pct: float, rate_action: str, rate_change_bps: Optional[int],
+) -> None:
+    """Store a cycle's decision. Holds are stored with rate_change_bps NULL, as seed_rbi_rates.py does."""
+    with _connect() as conn:
+        conn.execute(
+            """
+            UPDATE mpc_meetings
+            SET repo_rate_pct = ?, rate_action = ?, rate_change_bps = ?, updated_at = datetime('now')
+            WHERE meeting_id = ?
+            """,
+            (repo_rate_pct, rate_action, None if rate_action == "hold" else rate_change_bps, meeting_id),
+        )
+
+
 def chart_data_fingerprint(
     model_version: str = SCORING_MODEL_VERSION,
 ) -> str:

@@ -9,7 +9,7 @@ import logging
 import shutil
 import sqlite3
 from collections import Counter
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -59,6 +59,11 @@ def _import_charts():
 
 # ── Stage 1: Fetch ──────────────────────────────────────────────────────────────
 
+# Incremental discovery re-reads this far behind the newest stored document, so a
+# late-listed press release or a revised date is still picked up.
+DISCOVERY_MARGIN_DAYS = 45
+
+
 def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
     """
     Discover and cache all RBI MPC documents using the master fetcher.
@@ -81,8 +86,13 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
 
     fetcher = MasterFetcher()
 
-    # Step 1: Discover all document links
-    all_docs = fetcher.discover_all_documents()
+    # Step 1: Discover document links — only recent pages on incremental runs
+    stop_before = None
+    if incremental:
+        latest = db.latest_publication_date()
+        if latest:
+            stop_before = date.fromisoformat(latest) - timedelta(days=DISCOVERY_MARGIN_DAYS)
+    all_docs = fetcher.discover_all_documents(stop_before=stop_before)
 
     if not all_docs:
         log.warning(
@@ -183,18 +193,21 @@ def run_extract_text() -> None:
         log.info("Every fetched document already has text")
         return
 
-    log.info("%d document(s) awaiting extraction", len(pending))
+    # Historical rows whose cache file is not on this machine are RBI's advance
+    # schedule notices (no body text; cached on the machine that built the
+    # database, and the cache is git-ignored). They can never be extracted
+    # here, so they are counted once rather than warned about on every run.
+    available = [d for d in pending if Path(d["cache_path"]).exists()]
+    absent = len(pending) - len(available)
+    if absent:
+        log.info("%d historical document(s) without a local cache file skipped", absent)
+    if not available:
+        return
+    log.info("%d document(s) awaiting extraction", len(available))
     extracted = failed = 0
 
-    for doc in pending:
+    for doc in available:
         cache_path = Path(doc["cache_path"])
-        if not cache_path.exists():
-            log.warning(
-                "Cache file missing for %s %s: %s",
-                doc["doc_type"], doc["publication_date"], cache_path,
-            )
-            failed += 1
-            continue
 
         raw_bytes = cache_path.read_bytes()
         if doc.get("source_format") == "pdf":
@@ -232,6 +245,21 @@ def run_extract_text() -> None:
     log.info("Extraction complete: %d extracted, %d failed", extracted, failed)
 
 
+# ── Stage 1c: Policy cycles ─────────────────────────────────────────────────────
+
+def run_assign_cycles() -> None:
+    """
+    Classify documents by source and attach every meeting row to its policy
+    cycle. Idempotent. Must run after text extraction (a cycle is anchored on
+    a Resolution with text) and before scoring (only press releases are scored).
+    Without it a newly fetched meeting has no cycle, no composite, and never
+    reaches the dashboard.
+    """
+    from rbi_sentinel.db.migrate_policy_cycle import migrate
+    log.info("=== POLICY CYCLE ASSIGNMENT ===")
+    migrate(dry_run=False)
+
+
 # ── Stage 2: Clean + Score ──────────────────────────────────────────────────────
 
 def run_clean_and_score(
@@ -239,9 +267,10 @@ def run_clean_and_score(
     full_rescore: bool = False,
     dry_run: bool = False,
     review_mode: bool = False,
-) -> None:
+) -> tuple[int, int]:
     """
     Clean raw text from cached documents and score with hybrid scorer.
+    Returns (documents scored, documents that could not be scored).
     If full_rescore=True, re-score all documents (regardless of existing scores).
     If review_mode=True, print narratives to stdout without writing to DB.
     """
@@ -272,11 +301,14 @@ def run_clean_and_score(
         docs_to_score = [
             d for d in db.get_documents_without_scores()
             if d.get("source_kind") == "press_release"
+            # Same historical schedule notices as in run_extract_text: no text
+            # stored and no cache file here, so there is nothing to score.
+            and (d.get("raw_text") or (d.get("cache_path") and Path(d["cache_path"]).exists()))
         ]
 
     if not docs_to_score:
         log.info("No documents pending scoring")
-        return
+        return 0, 0
 
     log.info("%d documents to score", len(docs_to_score))
 
@@ -396,6 +428,7 @@ def run_clean_and_score(
         )
     else:
         log.info("Score stage complete: %d document(s) scored", scored)
+    return scored, scoring_failures
 
 
 # ── Stage 2b: Compute Composites ────────────────────────────────────────────────
@@ -469,6 +502,64 @@ def run_compute_composites() -> None:
     for n in sorted(doc_counts):
         log.info("  %d cycle(s) built from %d document(s)", doc_counts[n], n)
     log.info("Composite computation complete")
+
+
+# ── Stage 2c: Rate decisions ────────────────────────────────────────────────────
+
+def run_record_decisions() -> tuple[int, int, int]:
+    """
+    Record each cycle's repo rate decision from its Resolution text, so a new
+    meeting no longer needs seed_rbi_rates.py edited by hand.
+
+    Only fills cycles with no recorded decision. Where one exists and the text
+    disagrees, it logs an error and leaves the stored value alone — a human
+    decides which is right. Verified against all 61 decisions from Oct 2016 to
+    Aug 2026: rate, action and size match exactly, including when each meeting
+    is chained on the previous extracted rate.
+    Returns (recorded, conflicts, unreadable).
+    """
+    from rbi_sentinel.cleaners.policy_facts import complete_rate_decision, extract_policy_facts
+
+    log.info("=== RATE DECISIONS ===")
+    recorded = conflicts = unreadable = 0
+    previous_rate = None
+    for cycle in db.get_cycle_decisions():
+        facts = extract_policy_facts(cycle["resolution_text"])
+        found = complete_rate_decision(facts["rate_decision"], previous_rate)
+        stored = cycle["repo_rate_pct"] is not None and cycle["rate_action"] is not None
+
+        if stored:
+            if found and (abs(found["repo_rate_pct"] - cycle["repo_rate_pct"]) > 1e-9
+                          or found["rate_action"] != cycle["rate_action"]):
+                conflicts += 1
+                log.error(
+                    "Rate decision conflict for %s: stored %.2f%% %s, Resolution text says %.2f%% %s — "
+                    "stored value kept; check the Resolution",
+                    cycle["policy_cycle"], cycle["repo_rate_pct"], cycle["rate_action"],
+                    found["repo_rate_pct"], found["rate_action"],
+                )
+            previous_rate = cycle["repo_rate_pct"]
+            continue
+
+        if not found:
+            unreadable += 1
+            log.error(
+                "Could not read the rate decision for %s from its Resolution — "
+                "record it with seed_rbi_rates.py", cycle["policy_cycle"],
+            )
+            continue
+
+        db.set_rate_decision(cycle["anchor_meeting_id"], **found)
+        recorded += 1
+        previous_rate = found["repo_rate_pct"]
+        log.info(
+            "Recorded %s: %s, repo rate %.2f%% (%+d bps)",
+            cycle["policy_cycle"], found["rate_action"], found["repo_rate_pct"],
+            found["rate_change_bps"] or 0,
+        )
+
+    log.info("Rate decisions: %d recorded, %d conflict(s), %d unreadable", recorded, conflicts, unreadable)
+    return recorded, conflicts, unreadable
 
 
 # ── Stage 3: Charts ─────────────────────────────────────────────────────────────

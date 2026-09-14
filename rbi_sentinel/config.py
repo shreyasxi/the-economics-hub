@@ -11,7 +11,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 CACHE_DIR = DATA_DIR / "rbi_sentinel_cache"
-DB_PATH = DATA_DIR / "rbi_sentinel.db"
+import os as _os
+# RBI_SENTINEL_DB points the whole pipeline at another database file — used to
+# test automated runs on a copy instead of the committed database.
+DB_PATH = Path(_os.environ["RBI_SENTINEL_DB"]) if _os.environ.get("RBI_SENTINEL_DB") else DATA_DIR / "rbi_sentinel.db"
 LOG_PATH = PROJECT_ROOT / "logs" / "rbi_sentinel.log"
 OUTPUT_DIR = PROJECT_ROOT / "output" / "rbi_sentinel"
 ASSETS_DIR = PROJECT_ROOT / "assets" / "rbi_sentinel"

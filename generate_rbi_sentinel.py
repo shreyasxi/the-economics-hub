@@ -10,6 +10,8 @@ Usage:
     python generate_rbi_sentinel.py --dry-run       # Fetch + clean only, no DB/chart writes
     python generate_rbi_sentinel.py --review-mode   # Print narratives to stdout, no writes
     python generate_rbi_sentinel.py --mode newsletter
+    python generate_rbi_sentinel.py --auto          # Unattended run (GitHub Actions): everything,
+                                                    # plus the live tone log; exits 1 if anything needs attention
 """
 
 import argparse
@@ -73,6 +75,11 @@ def parse_args() -> argparse.Namespace:
         help="Chart title mode (default: dashboard)",
     )
     parser.add_argument(
+        "--auto",
+        action="store_true",
+        help="Unattended incremental run: fetch, score, record decisions, live log, refresh charts if stale",
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="Enable debug logging",
@@ -95,10 +102,16 @@ def main() -> None:
     init_db()
 
     from rbi_sentinel.pipeline import (
-        run_fetch,
+        refresh_charts_if_stale,
+        run_assign_cycles,
         run_clean_and_score,
+        run_extract_text,
+        run_fetch,
         run_generate_charts,
+        run_record_decisions,
     )
+
+    problems: list[str] = []
 
     if not args.charts_only:
         # ── Stage 1: Fetch ────────────────────────────────────────────────────
@@ -107,20 +120,50 @@ def main() -> None:
             dry_run=args.dry_run,
         )
 
-        # ── Stage 2: Clean + Score ────────────────────────────────────────────
-        if not args.dry_run:
-            run_clean_and_score(
+        if args.dry_run:
+            log.info("Dry-run: skipping extraction, scoring and decisions")
+        else:
+            # ── Stage 1b–1c: text, then policy cycles ─────────────────────────
+            # Without these a newly fetched meeting is never classified as a
+            # press release (so never scored) and never assigned a cycle.
+            run_extract_text()
+            run_assign_cycles()
+
+            # ── Stage 2: Clean + Score (composites recomputed inside) ─────────
+            scored, failed = run_clean_and_score(
                 full_rescore=args.full,
                 dry_run=False,
                 review_mode=args.review_mode,
             )
-        elif args.dry_run:
-            log.info("Dry-run: skipping score stage")
+            if failed:
+                problems.append(f"{failed} document(s) could not be scored")
+
+            # ── Stage 2c: Rate decisions from the Resolution text ─────────────
+            if not args.review_mode:
+                _, conflicts, unreadable = run_record_decisions()
+                if conflicts:
+                    problems.append(f"{conflicts} rate decision conflict(s)")
+                if unreadable:
+                    problems.append(f"{unreadable} rate decision(s) could not be read")
+
+    # ── Live test log (automated runs only) ────────────────────────────────────
+    if args.auto and not args.dry_run:
+        from rbi_sentinel import live_log
+        live_log.record_decision_day_tone()
+        waiting = live_log.record_market_closes()
+        if waiting:
+            log.warning("10-year close still needed for: %s", ", ".join(waiting))
 
     # ── Stage 3: Charts ────────────────────────────────────────────────────────
     if not args.dry_run and not args.review_mode:
-        run_generate_charts(mode=args.mode)
+        if args.auto:
+            refresh_charts_if_stale(mode=args.mode)
+        else:
+            run_generate_charts(mode=args.mode)
 
+    if problems:
+        log.error("=== RBI SENTINEL PIPELINE FINISHED WITH PROBLEMS: %s ===", "; ".join(problems))
+        sys.exit(1)
     log.info("=== RBI SENTINEL PIPELINE COMPLETE ===")
 
 

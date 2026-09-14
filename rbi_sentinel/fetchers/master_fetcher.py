@@ -182,7 +182,7 @@ class MasterFetcher:
 
     # ── Discovery ─────────────────────────────────────────────────────────────
 
-    def discover_all_documents(self) -> list[dict]:
+    def discover_all_documents(self, stop_before: Optional["date"] = None) -> list[dict]:
         """
         Paginate through the RBI search results and return all MPC document records
         published on or after October 1, 2016.
@@ -195,6 +195,11 @@ class MasterFetcher:
             "source_url": str,        BS_PressReleaseDisplay.aspx?prid=XXXXX
             "title": str,             h3 text
         }
+
+        stop_before: results are listed newest first, so once a page reaches
+        documents published before this date every later page is older still.
+        Incremental runs pass (latest known publication − a margin) and read one
+        or two pages instead of the full archive back to 2016 (~4.5 minutes).
         """
         log.info("Starting discovery from: %s", SEARCH_URL)
         documents: list[dict] = []
@@ -222,6 +227,11 @@ class MasterFetcher:
 
             if hit_cutoff:
                 log.info("Hit MPC cutoff date (Oct 2016) — stopping pagination")
+                break
+            if stop_before and page_docs and all(
+                datetime.strptime(d["publication_date"], "%Y-%m-%d").date() < stop_before for d in page_docs
+            ):
+                log.info("Page %d is entirely older than %s — stopping pagination", page_num, stop_before)
                 break
 
             # ── Find next page link ────────────────────────────────────────────
