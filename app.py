@@ -1793,6 +1793,18 @@ with tab_rbi:
                 with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
+        # ── Tone and the bond market ──
+        # A static research chart (research/make_tone_yield_chart.py); it is not
+        # part of the automated pipeline's month folders.
+        _tone_chart = PROJECT_ROOT / "assets" / "rbi_research" / "07_rbi_tone_vs_10y.png"
+        if _tone_chart.exists():
+            _section("Tone and the Bond Market")
+            st.image(str(_tone_chart), use_container_width=True)
+            insight = get_insight(_tone_chart.name)
+            if insight:
+                with st.expander("ℹ️ Chart Insights & Testing Method"):
+                    st.markdown(insight)
+
         # ── Governor Signal Analysis ──
         gov_divergence, charts = _pop_summary(charts, ["07_rbi_governor_divergence"])
 

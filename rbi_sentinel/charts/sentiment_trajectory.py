@@ -61,7 +61,7 @@ def generate(
 
     fig, (ax, ax_dec) = plt.subplots(
         2, 1, figsize=(EconStyle.SIZE_WIDE[0], EconStyle.SIZE_WIDE[1] + 0.75),
-        sharex=True, gridspec_kw={"height_ratios": [6.2, 0.75], "hspace": 0.06},
+        sharex=True, gridspec_kw={"height_ratios": [6.2, 0.75], "hspace": 0.16},
     )
     fig.patch.set_facecolor(EconStyle.BACKGROUND)
     ax.set_facecolor(EconStyle.BACKGROUND)
@@ -138,9 +138,9 @@ def generate(
                markersize=6.5 if a != "hold" else 5, label=st["label"])
         for a, st in _DECISION_STYLE.items()
     ]
-    # Key inside the strip's own white space, right-aligned above its line, so it
-    # reads as part of the strip rather than the score panel.
-    ax_dec.legend(handles=decision_handles, loc="lower right", bbox_to_anchor=(1.0, 0.52),
+    # Key in the gap between the two panels, right-aligned directly above the
+    # strip, so it reads as the strip's key and never covers a decision dot.
+    ax_dec.legend(handles=decision_handles, loc="lower right", bbox_to_anchor=(1.0, 1.02),
                   ncol=3, fontsize=7.5, frameon=True, facecolor=EconStyle.BACKGROUND,
                   edgecolor="none", framealpha=1.0, handletextpad=0.2, columnspacing=1.1,
                   borderpad=0.15, borderaxespad=0.0)

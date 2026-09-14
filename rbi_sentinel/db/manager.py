@@ -615,6 +615,13 @@ def get_live_resolution_scores(model_version: str = SCORING_MODEL_VERSION) -> Op
     }
 
 
+def meeting_ids_in_cycles() -> set[int]:
+    """Meeting rows attached to an MPC policy cycle — the only ones whose documents are scored."""
+    with _connect() as conn:
+        rows = conn.execute("SELECT meeting_id FROM mpc_meetings WHERE policy_cycle IS NOT NULL").fetchall()
+    return {r[0] for r in rows}
+
+
 def latest_publication_date() -> Optional[str]:
     """Newest publication_date of any stored document (YYYY-MM-DD)."""
     with _connect() as conn:

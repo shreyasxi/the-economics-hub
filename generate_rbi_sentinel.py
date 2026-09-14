@@ -135,10 +135,12 @@ def main() -> None:
             run_assign_cycles()
 
             # ── Stage 2: Clean + Score (composites recomputed inside) ─────────
+            from rbi_sentinel.pipeline import MAX_DOCUMENTS_PER_AUTO_RUN
             scored, failed = run_clean_and_score(
                 full_rescore=args.full,
                 dry_run=False,
                 review_mode=args.review_mode,
+                max_documents=MAX_DOCUMENTS_PER_AUTO_RUN if args.auto else None,
             )
             if failed:
                 problems.append(f"{failed} document(s) could not be scored")

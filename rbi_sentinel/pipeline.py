@@ -39,6 +39,16 @@ log = logging.getLogger("rbi_sentinel.pipeline")
 # not a document-level one, and continuing just burns wall-clock time.
 MAX_CONSECUTIVE_SCORING_FAILURES = 5
 
+# ── Spend guards: every Claude call goes through run_clean_and_score ───────────
+# A document is sent to the model only if it belongs to an MPC policy cycle and
+# is at least this long. The shortest genuine documents scored 2016–2026 are
+# 839 (Resolution), 1,719 (Governor's Statement) and 3,185 (Minutes) words;
+# RBI's pre-meeting schedule notices and one-paragraph releases fall far short.
+MIN_WORDS_TO_SCORE = {DOC_RESOLUTION: 500, DOC_GOVERNOR: 1000, DOC_MINUTES: 2000}
+# An automated run never needs more than this: a decision day brings the
+# Resolution and Governor's Statement, Minutes day brings one document.
+MAX_DOCUMENTS_PER_AUTO_RUN = 4
+
 
 # ── Chart imports (lazy) ────────────────────────────────────────────────────────
 
@@ -271,10 +281,15 @@ def run_clean_and_score(
     full_rescore: bool = False,
     dry_run: bool = False,
     review_mode: bool = False,
+    max_documents: Optional[int] = None,
 ) -> tuple[int, int]:
     """
     Clean raw text from cached documents and score with hybrid scorer.
     Returns (documents scored, documents that could not be scored).
+
+    max_documents: if more documents than this are pending, score none and
+    report them all as unscored — used by automated runs so an unexpected
+    backlog can never turn into an unplanned API bill.
     If full_rescore=True, re-score all documents (regardless of existing scores).
     If review_mode=True, print narratives to stdout without writing to DB.
     """
@@ -310,9 +325,27 @@ def run_clean_and_score(
             and (d.get("raw_text") or (d.get("cache_path") and Path(d["cache_path"]).exists()))
         ]
 
+    # Spend guard 1: only documents attached to an MPC policy cycle
+    in_cycle = db.meeting_ids_in_cycles()
+    outside = [d for d in docs_to_score if d["meeting_id"] not in in_cycle]
+    for d in outside:
+        log.warning("Not scoring %s %s: not attached to any MPC decision", d["doc_type"], d["publication_date"])
+    docs_to_score = [d for d in docs_to_score if d["meeting_id"] in in_cycle]
+
     if not docs_to_score:
         log.info("No documents pending scoring")
         return 0, 0
+
+    # Spend guard 3: an unexpected backlog is reported, never scored
+    if max_documents is not None and len(docs_to_score) > max_documents:
+        log.error(
+            "Refusing to score %d documents in one automated run (limit %d): %s. "
+            "Nothing was sent to the model. Check these are genuine MPC documents, "
+            "then score them with a manual run.",
+            len(docs_to_score), max_documents,
+            ", ".join(f"{d['doc_type']} {d['publication_date']}" for d in docs_to_score),
+        )
+        return 0, len(docs_to_score)
 
     log.info("%d documents to score", len(docs_to_score))
 
@@ -350,6 +383,15 @@ def run_clean_and_score(
 
         # Normalize
         norm = text_normalizer.normalize(raw_text)
+
+        # Spend guard 2: too short to be a real MPC document
+        min_words = MIN_WORDS_TO_SCORE.get(doc_type, 500)
+        if norm["word_count"] < min_words:
+            log.warning(
+                "Not scoring %s %s: %d words, below the %d-word minimum for this document type",
+                doc_type, publication_date, norm["word_count"], min_words,
+            )
+            continue
 
         if dry_run:
             log.info(

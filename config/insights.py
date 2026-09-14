@@ -470,6 +470,20 @@ Resolution, the committee's official statement is understating internal pressure
 be underpricing the risk of a hawkish surprise at the next meeting.
 """,
 
+    "rbi_tone_vs_10y": """\
+**How to read this chart:** Each dot on the left is one MPC decision since December 2016. Across is the change in the Resolution's tone score from the previous meeting (−1 most dovish to +1 most hawkish); up is the change in the 10-year G-sec yield from the previous day's close to the close on decision day. The Resolution is released during bond-market hours, so that day's close already reflects it. Filled dots are holds; hollow dots are hikes (red) and cuts (blue). The panel on the right runs exactly the same test on other markets: a bar outside the shaded band is statistically significant. Why the 10-year yield matters: it is India's benchmark long-term interest rate. It sets the base cost of government borrowing, anchors the pricing of corporate bonds, bank loans and home loans, and feeds into the discount rate used to value equities, so it is the main channel through which a shift in the RBI's message reaches the wider economy and investors' portfolios.
+
+**Findings:** Changes in the Resolution's tone line up with 10-year G-sec moves on decision day, historically about 5 bps per typical shift. Testing on new meetings is under way. In numbers: +15.7 bps per unit of tone change (t = 4.0), after controlling for the rate decision itself and any change in the stated stance. Tone raises the share of the day's move explained from 18% to 37%. The Resolution carries the signal; the Governor's Statement adds nothing beyond it. The level of tone does not move yields — only the change does, which is how a policy surprise behaves.
+
+**Other financial markets:** The same question was put to the Nifty 50, Bank Nifty, USD/INR, gold in rupees and India VIX, and to 91-day and 364-day T-bill yields, over three windows: decision day, the day after the Minutes are released, and the following one and three months. Each was tested with the Resolution, the Governor's Statement and the full composite separately, and corrected for running many tests at once. Equities, the rupee, gold and volatility show no relationship in any window. An apparent link to future T-bill yields disappeared once their normal pull back toward the repo rate was accounted for.
+
+**How robust the bond result is:** It holds excluding 2020, excluding the three off-cycle meetings, before and after 2022, and with any single meeting removed (t stays above 3.5). On 5,000 sets of random non-meeting days, a result this strong appeared 0.02% of the time, and yields show nothing in the five days before a meeting.
+
+**What it does not show:** This is not a forecast of where yields go next, and it is not investment advice. The effect comes entirely from the language model's reading of the text — a simple keyword count shows nothing — and every historical meeting predates the model's training cutoff, so hindsight cannot be fully ruled out. Only meetings scored live, before the market closes, can settle that.
+
+*Data: RBI Sentinel Resolution scores; 10-year G-sec yield, Investing.com (checked against FBIL weekly); Nifty 50, Bank Nifty, USD/INR, gold and India VIX, Yahoo Finance. 60 decisions, December 2016 – August 2026. Regressions use Newey–West standard errors.*
+""",
+
     "rbi_sentiment_trajectory": """\
 **How to read this chart:** Each point is one MPC meeting's tone score, from −1 (most dovish) to +1 \
 (most hawkish), read separately from the three documents: the Policy Statement (the Resolution, \
