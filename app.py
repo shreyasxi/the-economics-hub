@@ -27,7 +27,7 @@ from utils.chart_loader import (
     get_folder_mtime,
     is_pipeline_admin,
 )
-from config.insights import get_insight
+import config.insights as _insights
 
 from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
 import rbi_sentinel.cleaners.policy_facts as _policy_facts
@@ -36,6 +36,21 @@ from rbi_sentinel.db.manager import get_latest_composite
 from rbi_sentinel.sentiment.score_normalizer import _DOC_WEIGHTS
 
 PROJECT_ROOT = Path(__file__).resolve().parent
+
+
+def get_insight(filename: str) -> str | None:
+    """
+    Chart insight text, always from the current config/insights.py.
+
+    Streamlit Cloud re-runs app.py after a push without re-importing modules,
+    so a cached config.insights lacks any chart text added since and the
+    chart's expander silently disappears. Reload when the file has changed.
+    """
+    mtime = Path(_insights.__file__).stat().st_mtime
+    if getattr(_insights, "_loaded_mtime", None) != mtime:
+        importlib.reload(_insights)
+        _insights._loaded_mtime = mtime
+    return _insights.get_insight(filename)
 
 # ---------------------------------------------------------------------------
 # Page configuration — must be the first Streamlit call
