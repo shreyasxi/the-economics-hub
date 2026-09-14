@@ -1804,16 +1804,6 @@ with tab_rbi:
                 with st.expander("ℹ️ Chart Insights"):
                     st.markdown(insight)
 
-        # ── Meeting History ──
-        timeline, charts = _pop_summary(charts, ["06_rbi_meeting_timeline"])
-        if timeline:
-            _section("Meeting History")
-            st.image(str(timeline), use_container_width=True)
-            insight = get_insight(timeline.name)
-            if insight:
-                with st.expander("ℹ️ Chart Insights"):
-                    st.markdown(insight)
-
         # ── Catch-all ──
         if charts:
             _section("Other")

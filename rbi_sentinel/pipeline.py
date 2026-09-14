@@ -49,11 +49,10 @@ def _import_charts():
         doc_comparison,
         subdimension_radar,
         rate_and_sentiment,
-        meeting_timeline,
     )
     return (
         stance_meter, sentiment_trajectory, doc_comparison,
-        subdimension_radar, rate_and_sentiment, meeting_timeline,
+        subdimension_radar, rate_and_sentiment,
     )
 
 
@@ -568,17 +567,21 @@ def run_generate_charts(
     output_dir: Optional[Path] = None,
     mode: str = "dashboard",
 ) -> None:
-    """Generate all 6 charts from DB data."""
+    """Generate the RBI charts from DB data into a clean month folder."""
     log.info("=== CHART GENERATION (mode=%s) ===", mode)
 
     today = date.today().strftime("%Y-%m")
     if output_dir is None:
         output_dir = OUTPUT_DIR / today
     output_dir.mkdir(parents=True, exist_ok=True)
+    # Start clean: a retired chart left in the folder would otherwise be
+    # published again and shown by the dashboard's catch-all section.
+    for old in output_dir.glob("*.png"):
+        old.unlink()
 
     (
         stance_meter_mod, trajectory_mod, comparison_mod,
-        radar_mod, rate_mod, timeline_mod,
+        radar_mod, rate_mod,
     ) = _import_charts()
 
     composites = db.get_all_composites()
@@ -660,12 +663,9 @@ def run_generate_charts(
         mode=mode,
     )
 
-    # Chart 06: Meeting Timeline
-    timeline_mod.generate(
-        composites=composites,
-        output_path=output_dir / "06_rbi_meeting_timeline.png",
-        mode=mode,
-    )
+    # Chart 06 (Meeting History) was merged into chart 02 in Sep 2026: its bar
+    # panel repeated the trajectory's scores, and its decision dots now run as
+    # a strip beneath the trajectory on the same time axis.
 
     # Chart 07 (Governor vs. Committee Divergence) was removed in Sep 2026.
     # It plotted governor_score - composite_overall_score, but the governor
@@ -691,6 +691,11 @@ def _publish_charts(output_dir: Path) -> None:
     """
     target = ASSETS_DIR / output_dir.name
     target.mkdir(parents=True, exist_ok=True)
+    produced = {png.name for png in output_dir.glob("*.png")}
+    for stale in target.glob("*.png"):
+        if stale.name not in produced:
+            stale.unlink()
+            log.info("Removed retired chart %s from %s", stale.name, target)
     for png in sorted(output_dir.glob("*.png")):
         shutil.copy2(png, target / png.name)
     stamp = db.chart_data_fingerprint()

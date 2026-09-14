@@ -471,21 +471,19 @@ be underpricing the risk of a hawkish surprise at the next meeting.
 """,
 
     "rbi_sentiment_trajectory": """\
-**How to read this chart:** Each point represents an MPC meeting's composite sentiment score, \
-derived separately from the official Policy Resolution (published on meeting day) and the MPC \
-Minutes (published ~14 days later). The horizontal zero line is the "Neutral" threshold. \
-Sustained above-zero readings indicate a hawkish regime; sustained negative readings indicate \
-a dovish or accommodative regime. Background shading identifies regime zones. Vertical hairlines \
-mark each MPC meeting date.
+**How to read this chart:** Each point is one MPC meeting's tone score, from −1 (most dovish) to +1 \
+(most hawkish), read separately from the three documents: the Policy Statement (the Resolution, \
+published on decision day), the MPC Minutes (about two weeks later) and the Governor's Statement \
+(decision day, in the corpus from August 2020). Red shading marks hawkish territory, blue dovish. \
+The strip beneath is the decision taken at each meeting — red for a hike, blue for a cut, grey for \
+a hold — on the same time axis, so every dot sits under its meeting.
 
-**Practical takeaway:** The Minutes line is the more analytically valuable of the two series. \
-The official Resolution is often drafted for public communication clarity and may soften language \
-relative to the actual committee debate captured in the Minutes. A persistent gap between the two \
-lines — Minutes systematically more dovish than the Resolution — often signals that the \
-committee's internal consensus is less hawkish than its public posture, and rate-cut expectations \
-should be brought forward. Conversely, Minutes suddenly turning more hawkish than the Resolution \
-is the early warning signal for a regime shift: the committee is building a case for tightening \
-that has not yet been communicated publicly.
+**Practical takeaway:** Tone moves with the policy cycle: hawkish through the 2018 and 2022–23 \
+tightening, dovish through the 2019–20 and 2025 easing. The strip shows where tone and action part \
+company — the long run of grey holds through 2023–24 came with persistently hawkish language, and \
+the holds of 2026 with tone climbing back above neutral. The three documents usually agree; when \
+the Minutes diverge from the Policy Statement, they show how the committee's debate differed from \
+its published decision.
 """,
 
     "rbi_resolution_vs_minutes": """\
@@ -536,20 +534,6 @@ October 2016 — regressions with robust standard errors and out-of-sample forec
 the composite did not predict the next rate decision beyond what the RBI's own stated stance \
 already signals. Read a gap between tone and policy, such as a hawkish score during a hold, as \
 evidence of how the committee is framing its pause rather than as a forecast of the next move.
-""",
-
-    "rbi_meeting_timeline": """\
-**How to read this chart:** Each dot represents one MPC meeting, spanning the full history of the \
-committee from its inception in October 2016. Color encodes the rate decision at that meeting: \
-green = rate cut, red = rate hike, gray = hold. The sentiment bar strip above the timeline shows \
-the composite score direction for each meeting.
-
-**Practical takeaway:** This chart is most useful for regime identification — scanning for \
-structural breaks rather than meeting-by-meeting analysis. A cluster of gray holds with a gradually \
-rising sentiment strip is the classic tightening-preparation pattern that precedes an eventual hike \
-cycle. A long red-dot sequence followed by the first gray dot with a rapidly improving (less \
-negative) sentiment strip marks the inflection point of easing cycle exhaustion. Use this chart to \
-place the current MPC meeting in its full historical context before interpreting near-term signals.
 """,
 
     "rbi_governor_divergence": """\

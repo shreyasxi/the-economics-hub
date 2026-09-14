@@ -40,14 +40,15 @@ def test_published_charts_match_database():
     )
 
 
-def test_all_six_charts_published():
+def test_exactly_the_current_charts_published():
+    """All five current charts, and no retired one (06 was merged into 02 in Sep 2026)."""
     folder = latest_published_charts()
     expected = {
         "01_rbi_stance_meter.png", "02_rbi_sentiment_trajectory.png",
         "03_rbi_resolution_vs_minutes.png", "04_rbi_subdimension_radar.png",
-        "05_rbi_rate_and_sentiment.png", "06_rbi_meeting_timeline.png",
+        "05_rbi_rate_and_sentiment.png",
     }
-    assert expected <= {p.name for p in folder.glob("*.png")}
+    assert {p.name for p in folder.glob("*.png")} == expected
 
 
 if __name__ == "__main__":
