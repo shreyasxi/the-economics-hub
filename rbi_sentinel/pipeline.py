@@ -63,7 +63,7 @@ def _import_charts():
 DISCOVERY_MARGIN_DAYS = 45
 
 
-def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
+def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> int:
     """
     Discover and cache all RBI MPC documents using the master fetcher.
 
@@ -75,6 +75,10 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
 
     If incremental=True, skip documents whose cache file already exists.
     If dry_run=True, only run discovery and log -- no DB writes or downloads.
+
+    Returns the number of documents discovered. The first results page always
+    lists recent MPC documents, so 0 means rbi.org.in was unreachable or its
+    layout changed — the caller must treat that as a failure, not "nothing new".
     """
     from rbi_sentinel.fetchers.master_fetcher import MasterFetcher
 
@@ -98,7 +102,7 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
             "Discovery returned 0 documents. "
             "Check network access to rbi.org.in and inspect logs/rbi_sentinel.log."
         )
-        return
+        return 0
 
     type_counts = Counter(d["doc_type"] for d in all_docs)
     log.info(
@@ -114,7 +118,7 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
                 doc["doc_type"], doc["publication_date"], doc["title"][:70],
             )
         log.info("[dry-run] Fetch stage complete -- no DB writes, no downloads")
-        return
+        return len(all_docs)
 
     # Step 2 & 3: Upsert meeting + document, fetch content
     fetched = 0
@@ -164,6 +168,7 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> None:
         "Fetch stage complete: fetched=%d, skipped=%d, failed=%d",
         fetched, skipped, failed,
     )
+    return len(all_docs)
 
 
 # ── Stage 1b: Extract text (free) ───────────────────────────────────────────────

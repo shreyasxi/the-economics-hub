@@ -115,10 +115,15 @@ def main() -> None:
 
     if not args.charts_only:
         # ── Stage 1: Fetch ────────────────────────────────────────────────────
-        run_fetch(
+        discovered = run_fetch(
             incremental=not args.full,
             dry_run=args.dry_run,
         )
+        if discovered == 0:
+            # Not "nothing new": the first results page always lists recent MPC
+            # documents. Zero means the site was unreachable or its layout changed,
+            # and a run that carried on would report success while seeing nothing.
+            problems.append("discovery found no documents on rbi.org.in (unreachable or layout changed)")
 
         if args.dry_run:
             log.info("Dry-run: skipping extraction, scoring and decisions")
