@@ -75,7 +75,8 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/rbi_sentinel.db assets/rbi_sentinel
+          python .github/scripts/prune_assets.py rbi_sentinel   # keep the last 4 months of charts
+          git add -A data/rbi_sentinel.db assets/rbi_sentinel
           if [ -f data/rbi_live_log.csv ]; then git add data/rbi_live_log.csv; fi
           if git diff --cached --quiet; then
             echo "No data changed — nothing to commit."

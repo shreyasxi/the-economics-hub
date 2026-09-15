@@ -46,7 +46,7 @@ jobs:
           ls "assets/weekly/$DATE_FOLDER/"
 
       - name: Keep only the last 4 weeks in assets/
-        run: python .github/scripts/prune_weekly_assets.py
+        run: python .github/scripts/prune_assets.py weekly
 
       - name: Update README showcase charts
         run: |

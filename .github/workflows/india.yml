@@ -101,6 +101,9 @@ jobs:
           echo "Charts in assets/india/$MONTH_FOLDER/:"
           ls "assets/india/$MONTH_FOLDER/"
 
+      - name: Keep only the last 4 months in assets/
+        run: python .github/scripts/prune_assets.py india
+
       - name: Update README showcase charts
         run: |
           mkdir -p assets/readme_showcase
@@ -113,7 +116,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/india/ assets/readme_showcase/
+          git add -A assets/india/ assets/readme_showcase/
           git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
           git push
