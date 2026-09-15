@@ -662,6 +662,25 @@ def set_rate_decision(
         )
 
 
+def fill_cycle_rates(policy_cycle: str, repo_rate_pct: float) -> int:
+    """
+    Give the cycle's later rows (Minutes day and other documents after the
+    decision) the rate set on decision day, with action 'hold' and no change,
+    as rbi_sentinel/seed_rates.py does. Only fills rows that have no rate.
+    Returns the number of rows filled.
+    """
+    with _connect() as conn:
+        cur = conn.execute(
+            """
+            UPDATE mpc_meetings
+            SET repo_rate_pct = ?, rate_action = 'hold', rate_change_bps = NULL, updated_at = datetime('now')
+            WHERE policy_cycle = ? AND meeting_date > policy_cycle AND repo_rate_pct IS NULL
+            """,
+            (repo_rate_pct, policy_cycle),
+        )
+        return cur.rowcount
+
+
 def chart_data_fingerprint(
     model_version: str = SCORING_MODEL_VERSION,
 ) -> str:

@@ -557,6 +557,9 @@ def run_record_decisions() -> tuple[int, int, int]:
     Record each cycle's repo rate decision from its Resolution text, so a new
     meeting no longer needs rbi_sentinel/seed_rates.py edited by hand.
 
+    Also copies the decision-day rate into the cycle's later rows (Minutes day),
+    matching seed_rates.py, so the stored data does not depend on which wrote it.
+
     Only fills cycles with no recorded decision. Where one exists and the text
     disagrees, it logs an error and leaves the stored value alone — a human
     decides which is right. Verified against all 61 decisions from Oct 2016 to
@@ -567,7 +570,7 @@ def run_record_decisions() -> tuple[int, int, int]:
     from rbi_sentinel.cleaners.policy_facts import complete_rate_decision, extract_policy_facts
 
     log.info("=== RATE DECISIONS ===")
-    recorded = conflicts = unreadable = 0
+    recorded = conflicts = unreadable = filled = 0
     previous_rate = None
     for cycle in db.get_cycle_decisions():
         facts = extract_policy_facts(cycle["resolution_text"])
@@ -585,6 +588,7 @@ def run_record_decisions() -> tuple[int, int, int]:
                     found["repo_rate_pct"], found["rate_action"],
                 )
             previous_rate = cycle["repo_rate_pct"]
+            filled += db.fill_cycle_rates(cycle["policy_cycle"], cycle["repo_rate_pct"])
             continue
 
         if not found:
@@ -596,6 +600,7 @@ def run_record_decisions() -> tuple[int, int, int]:
             continue
 
         db.set_rate_decision(cycle["anchor_meeting_id"], **found)
+        filled += db.fill_cycle_rates(cycle["policy_cycle"], found["repo_rate_pct"])
         recorded += 1
         previous_rate = found["repo_rate_pct"]
         log.info(
@@ -604,6 +609,8 @@ def run_record_decisions() -> tuple[int, int, int]:
             found["rate_change_bps"] or 0,
         )
 
+    if filled:
+        log.info("Filled the decision-day rate into %d later row(s) of their cycles", filled)
     log.info("Rate decisions: %d recorded, %d conflict(s), %d unreadable", recorded, conflicts, unreadable)
     return recorded, conflicts, unreadable
 
