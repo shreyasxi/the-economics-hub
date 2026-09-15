@@ -1,0 +1,6 @@
+# CAG monthly accounts typed from the CGA web page while the updated workbook is unavailable.
+# One row per month: YEAR-TO-DATE actuals ("Actuals up to <month>") in Rs CRORE, no thousands separators.
+# month: Mar-26, Apr-26 ... for actuals; BE or RE for budget rows (BE needs capital_expenditure,
+# revenue_expenditure and gdp = nominal GDP in Rs crore). A row in data/cag_monthly_accounts.xlsx for the same
+# fy and month takes precedence. generate_india.py checks every value and stops if one looks wrong.
+fy,month,corporation_tax,income_tax,securities_transaction_tax,cgst,igst,utgst,customs,union_excise,devolution_to_states,revenue_expenditure,interest_payments,major_subsidies,capital_expenditure,fiscal_deficit,gdp,source

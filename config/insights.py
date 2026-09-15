@@ -207,6 +207,12 @@ CHART_INSIGHTS: dict[str, str] = {
 
     # ── WEEKLY: ENERGY & AGRICULTURE ────────────────────────────────────────
 
+    "em_vix": """\
+**How to read this chart:** VXEEM is the CBOE's measure of the volatility options traders expect over the next 30 days in the iShares MSCI Emerging Markets ETF (EEM), quoted in annualised percentage points. The purple line is the daily close over the past three years; the dashed grey line is its 52-week average, and the shaded areas mark stretches when expected volatility sat above that average. As a rule of thumb, a reading of 20 implies a typical one-month move in EEM of about ±5.8% (20 divided by the square root of 12).
+
+**Practical takeaway:** Spikes in VXEEM mark episodes when investors pay up to protect emerging-market portfolios, typically around global risk-off events, a sharp rise in the US dollar or a jump in US yields. Such episodes often coincide with foreign portfolio outflows from emerging markets, India included (see the FPI chart on the India tab). A single spike that fades quickly points to a short-lived shock; a sustained stretch above the 52-week average points to a higher-volatility regime. Comparing VXEEM with the US VIX on the Volatility charts separates stress specific to emerging markets from a global sell-off.
+""",
+
     "brent_wti_spread": """\
 **How to read this chart:** The Brent crude oil price minus WTI crude oil price, shown as a 5-day smoothed spread over 2 years. A positive spread (Brent premium) is the norm — Brent is the international benchmark reflecting seaborne crude supply from the North Sea, OPEC, and West Africa, while WTI is the US domestic benchmark. A widening Brent premium signals either geopolitical risk in international supply routes (Middle East, Russia) or a US supply surplus (Permian Basin oversupply, storage build at Cushing, Oklahoma).
 

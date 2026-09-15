@@ -27,6 +27,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from data.india_db_manager import ensure_columns
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_ROOT / "data" / "india_macro.db"
 
@@ -36,7 +38,7 @@ MONTH_RE = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 class Field:
     """One manually entered series: its CLI flag, DB column, and sane bounds."""
 
-    def __init__(self, flag, column, unit, low, high, source, help_text):
+    def __init__(self, flag, column, unit, low, high, source, help_text, min_magnitude=None):
         self.flag = flag
         self.column = column
         self.unit = unit
@@ -44,6 +46,9 @@ class Field:
         self.high = high
         self.source = source
         self.help_text = help_text
+        # Smallest plausible absolute value: catches a figure typed in the wrong
+        # unit (lakh crore instead of crore) that would still sit inside low–high.
+        self.min_magnitude = min_magnitude
 
     @property
     def dest(self):
@@ -75,6 +80,11 @@ FIELDS = [
     # directly in its monthly release, so that number is taken at source.
     Field("--iip", "india_iip_yoy", "% YoY", -30, 30, "mospi",
           "IIP %% YoY as stated by MoSPI/PIB, e.g. 4.8 (~12th, with CPI)"),
+    # FPI flows are taken from NSDL rather than the RBI workbook: NSDL publishes
+    # the month's total within days, RBI's net portfolio series 2–3 months late.
+    Field("--fpi", "india_fpi_net_inr_cr", "Rs crore", -300000, 300000, "nsdl",
+          "FPI net investment for the month, TOTAL of all segments, in Rs CRORE "
+          "as NSDL publishes it, e.g. -34574 (NSDL, 1st)", min_magnitude=50),
 ]
 BY_DEST = {f.dest: f for f in FIELDS}
 
@@ -91,6 +101,7 @@ def connect():
                  f"Run: python data/fetchers/india_fetcher.py --append")
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    ensure_columns(conn)          # an older database may predate a newer field
     return conn
 
 
@@ -125,6 +136,11 @@ def cmd_set(args):
             errors.append(
                 f"  {field.flag} {value} is outside {field.low}–{field.high} "
                 f"({field.unit}). {field.help_text}"
+            )
+        elif field.min_magnitude and 0 < abs(value) < field.min_magnitude:
+            errors.append(
+                f"  {field.flag} {value} is too small for {field.unit} — was it typed in "
+                f"a larger unit? {field.help_text}"
             )
     if errors:
         sys.exit("Refusing to write — values look wrong:\n" + "\n".join(errors))
@@ -163,6 +179,9 @@ def cmd_set(args):
         flags[field.column] = f"manual:{field.source}:{stamp}"
     if COMPOSITE_COLUMN in updates:
         flags[COMPOSITE_COLUMN] = f"derived:pmi_weighted:{stamp}"
+
+    if existing is not None:              # show the stored value for derived columns too
+        before = {column: existing[column] for column in updates}
 
     print(f"\n  {month}")
     print(f"  {'column':<28} {'before':>10}  {'after':>10}")

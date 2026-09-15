@@ -33,6 +33,7 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 import io
 from pathlib import Path
@@ -131,6 +132,8 @@ def load_india_data(csv_path=DEFAULT_CSV, months=None):
             if not df.empty:
                 df["date"] = pd.to_datetime(df["month"])
                 df = df.drop(columns=["month", "source_flags", "fetched_at"], errors="ignore")
+                if "india_fpi_net_inr_cr" in df.columns:          # NSDL, Rs crore -> Rs lakh crore
+                    df["india_fpi_nsdl_lcr"] = df["india_fpi_net_inr_cr"] / CRORE_PER_LAKH_CRORE
                 df = df.sort_values("date").reset_index(drop=True)
                 if months:
                     cutoff = df["date"].max() - pd.DateOffset(months=months)
@@ -207,6 +210,175 @@ def crore_to_lakh_crore(value):
     return value / CRORE_PER_LAKH_CRORE
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# CAG manual rows — a stop-gap while the CGA website does not publish the
+# updated workbook. Figures are typed from CGA's monthly accounts web page into
+# data/cag_manual_accounts.csv and merged with the workbook here. Every value is
+# checked; a row that fails stops the run rather than publishing a wrong chart.
+# ─────────────────────────────────────────────────────────────────────────────
+CAG_MANUAL = Path(__file__).parent / "data" / "cag_manual_accounts.csv"
+
+# csv column -> workbook column (the workbook's own spelling, typo included)
+CAG_MANUAL_FIELDS = {
+    "corporation_tax": "Corporation Tax",
+    "income_tax": "Income Tax",
+    "securities_transaction_tax": "Securities Transcation Tax",
+    "cgst": "CGST",
+    "igst": "IGST",
+    "utgst": "UTGST",
+    "customs": "Customs",
+    "union_excise": "Union Excise",
+    "devolution_to_states": "Devolution to State",
+    "revenue_expenditure": "Revenue Expenditure",
+    "interest_payments": "Interest Payments",
+    "major_subsidies": "Major Subsidies",
+    "capital_expenditure": "Capital Expenditure",
+    "fiscal_deficit": "Fiscal Deficit",
+}
+# Plausible range in Rs CRORE for a year-to-date figure. Wide on purpose: they
+# exist to catch a value typed in lakh crore (1,000x too small) or with extra digits.
+_CAG_BOUNDS = {
+    "igst": (-300_000, 300_000),
+    "utgst": (0, 50_000),
+    "fiscal_deficit": (-1_000_000, 3_000_000),
+    "securities_transaction_tax": (0, 200_000),
+}
+_CAG_DEFAULT_BOUNDS = (1_000, 8_000_000)
+_FISCAL_MONTHS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
+
+
+class CagManualError(ValueError):
+    """A manual CAG row failed its checks: the run stops instead of publishing it."""
+
+
+def _fiscal_sort_key(fy, month):
+    """Order rows by financial year, then Apr..Mar."""
+    return (str(fy), _FISCAL_MONTHS.index(str(month).split("-")[0]) if str(month)[:3] in _FISCAL_MONTHS else 99)
+
+
+def read_cag_manual(path=CAG_MANUAL):
+    """
+    Validated manual rows as (actual_rows, budget_rows, gdp_rows) DataFrames in
+    the workbook's column names. Raises ValueError listing every problem found.
+    """
+    empty = (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+    if not path.exists():
+        return empty
+    raw = pd.read_csv(path, dtype=str, comment="#").fillna("")
+    raw = raw[raw["fy"].str.strip() != ""]
+    if raw.empty:
+        return empty
+
+    problems, actual, budget, gdp = [], [], [], []
+    for i, r in raw.iterrows():
+        where = f"line {i + 2} ({r['fy']} {r['month']})"
+        fy, month = r["fy"].strip(), r["month"].strip()
+        if not re.fullmatch(r"\d{4}-\d{2}", fy) or int(fy[-2:]) != (int(fy[2:4]) + 1) % 100:
+            problems.append(f"{where}: fy must look like 2026-27")
+            continue
+        values = {}
+        for key in list(CAG_MANUAL_FIELDS) + ["gdp"]:
+            text = r.get(key, "").replace(",", "").strip()
+            if text == "":
+                continue
+            try:
+                values[key] = float(text)
+            except ValueError:
+                problems.append(f"{where}: {key} is not a number: {r[key]!r}")
+
+        if month in ("BE", "RE"):
+            for key in ("capital_expenditure", "revenue_expenditure"):
+                if key not in values:
+                    problems.append(f"{where}: a {month} row needs {key}")
+            if month == "BE" and "gdp" not in values:
+                problems.append(f"{where}: the BE row needs gdp (nominal GDP in Rs crore)")
+            if "gdp" in values and not (10_000_000 <= values["gdp"] <= 100_000_000):
+                problems.append(f"{where}: gdp {values['gdp']:,.0f} is not in Rs crore "
+                                "(expected 1,00,00,000 to 10,00,00,000)")
+            budget.append({"FY": fy, "Month": month,
+                           **{CAG_MANUAL_FIELDS[k]: v for k, v in values.items() if k in CAG_MANUAL_FIELDS}})
+            if "gdp" in values:
+                gdp.append({"FY": fy, "GDP": values["gdp"]})
+            continue
+
+        m = re.fullmatch(r"([A-Z][a-z]{2})-(\d{2})", month)
+        if not m or m.group(1) not in _FISCAL_MONTHS:
+            problems.append(f"{where}: month must look like Jul-26, BE or RE")
+            continue
+        expected_year = fy[2:4] if _FISCAL_MONTHS.index(m.group(1)) <= 8 else fy[-2:]
+        if m.group(2) != expected_year:
+            problems.append(f"{where}: {month} does not fall in financial year {fy}")
+        for key in CAG_MANUAL_FIELDS:
+            if key not in values:
+                problems.append(f"{where}: {key} is missing")
+                continue
+            lo, hi = _CAG_BOUNDS.get(key, _CAG_DEFAULT_BOUNDS)
+            if not lo <= values[key] <= hi:
+                problems.append(f"{where}: {key} {values[key]:,.0f} is outside {lo:,}–{hi:,} Rs crore "
+                                "(typed in lakh crore, or a digit too many?)")
+        actual.append({"FY": fy, "Month": month,
+                       **{CAG_MANUAL_FIELDS[k]: v for k, v in values.items() if k in CAG_MANUAL_FIELDS}})
+
+    if problems:
+        raise CagManualError("data/cag_manual_accounts.csv has problems:\n  " + "\n  ".join(problems))
+    return pd.DataFrame(actual), pd.DataFrame(budget), pd.DataFrame(gdp)
+
+
+def load_cag_tables(cag_path=DEFAULT_CAG, manual_path=CAG_MANUAL):
+    """
+    (actual, budget, gdp) tables: the workbook's sheets plus validated manual rows.
+    A workbook row wins over a manual row for the same FY and month, so a newer
+    official workbook supersedes the stop-gap automatically.
+    """
+    xlsx = pd.ExcelFile(cag_path)
+    df_actual = pd.read_excel(xlsx, sheet_name='actual').dropna(subset=['FY', 'Month'])
+    df_bere = pd.read_excel(xlsx, sheet_name='BERE')
+    df_gdp = pd.read_excel(xlsx, sheet_name='GDP')
+    man_actual, man_budget, man_gdp = read_cag_manual(manual_path)
+
+    def merge(book, manual, keys):
+        if manual.empty:
+            return book
+        have = set(map(tuple, book[keys].astype(str).values))
+        new = manual[[tuple(map(str, k)) not in have for k in manual[keys].values]]
+        superseded = len(manual) - len(new)
+        if superseded:
+            print(f"   Note: {superseded} manual CAG row(s) superseded by the workbook — they can be deleted")
+        return pd.concat([book, new], ignore_index=True)
+
+    if not man_actual.empty:
+        man_actual = man_actual.assign(_manual=True)
+    df_actual = merge(df_actual, man_actual, ['FY', 'Month'])
+    df_actual = df_actual.iloc[sorted(range(len(df_actual)),
+                                      key=lambda i: _fiscal_sort_key(df_actual['FY'].iloc[i], df_actual['Month'].iloc[i]))]
+    df_actual = df_actual.reset_index(drop=True)
+    df_bere = merge(df_bere, man_budget, ['FY', 'Month'])
+    df_gdp = merge(df_gdp, man_gdp, ['FY'])
+
+    # A typed year-to-date spending figure cannot be below the month before it.
+    # (Checked for manual rows only: the official history has the odd restatement.)
+    if '_manual' in df_actual.columns:
+        manual = df_actual['_manual'].eq(True)
+        for i in df_actual.index[manual]:
+            if i == 0 or df_actual.at[i - 1, 'FY'] != df_actual.at[i, 'FY']:
+                continue
+            for col in ('Revenue Expenditure', 'Capital Expenditure', 'Interest Payments'):
+                if df_actual.at[i, col] < df_actual.at[i - 1, col]:
+                    raise CagManualError(
+                        f"CAG {col} falls year-to-date at {df_actual.at[i, 'FY']} {df_actual.at[i, 'Month']} "
+                        f"({df_actual.at[i - 1, col]:,.0f} → {df_actual.at[i, col]:,.0f}) — check the manual rows")
+        df_actual = df_actual.drop(columns='_manual')
+
+    # The latest financial year needs its Budget Estimate and GDP, or the
+    # "% of BE" and "% of GDP" figures cannot be drawn.
+    latest_fy = df_actual['FY'].iloc[-1]
+    if df_bere[(df_bere['FY'] == latest_fy) & (df_bere['Month'] == 'BE')].empty:
+        raise CagManualError(f"CAG {latest_fy} has monthly rows but no BE row — add it to data/cag_manual_accounts.csv")
+    if df_gdp[df_gdp['FY'] == latest_fy].empty:
+        raise CagManualError(f"CAG {latest_fy} has no GDP — add gdp to its BE row in data/cag_manual_accounts.csv")
+    return df_actual, df_bere, df_gdp
+
+
 def load_cag_data(cag_path=DEFAULT_CAG):
     """
     Load CAG Monthly Accounts Dashboard data.
@@ -214,17 +386,17 @@ def load_cag_data(cag_path=DEFAULT_CAG):
     """
     if not cag_path.exists():
         print(f"   ⚠ CAG file not found: {cag_path}")
-        return None, None
-    
+        return None, None, None
+
     try:
-        xlsx = pd.ExcelFile(cag_path)
-        
-        # Load actual data (cumulative YTD)
-        df_actual = pd.read_excel(xlsx, sheet_name='actual')
-        df_actual = df_actual.dropna(subset=['FY', 'Month'])
-        
-        # Load budget estimates
-        df_bere = pd.read_excel(xlsx, sheet_name='BERE')
+        df_actual, df_bere, df_gdp = load_cag_tables(cag_path)
+    except CagManualError:
+        raise                          # a bad manual figure stops the run
+    except Exception as e:
+        print(f"   ⚠ Error loading CAG data: {e}")
+        return None, None, None
+
+    try:
         
         # Get current FY
         current_fy = df_actual['FY'].iloc[-1]
@@ -316,8 +488,7 @@ def load_cag_data(cag_path=DEFAULT_CAG):
         if fiscal_deficit_monthly is not None and fiscal_deficit_prev_monthly is not None:
             fiscal_deficit_mom = (fiscal_deficit_monthly - fiscal_deficit_prev_monthly) / CRORE_PER_LAKH_CRORE
         
-        # Load GDP data for % of GDP calculations
-        df_gdp = pd.read_excel(xlsx, sheet_name='GDP')
+        # GDP for % of GDP calculations
         gdp_row = df_gdp[df_gdp['FY'] == current_fy]
         gdp = gdp_row['GDP'].values[0] if len(gdp_row) > 0 else None
         
@@ -627,17 +798,41 @@ def chart_nifty_it_trend(output_dir):
 # CHART: FOREIGN PORTFOLIO FLOWS (MONTHLY)
 # ═══════════════════════════════════════════
 
+def fpi_series(df):
+    """
+    The FPI series to publish, never a mix of the two:
+      NSDL net investment (Rs lakh crore), entered monthly with
+        python -m data.india_manual_entry set YYYY-MM --fpi <Rs crore>
+      otherwise RBI's net portfolio investment (US$ bn) from the DBIE workbook.
+    """
+    if "india_fpi_nsdl_lcr" in df.columns and df["india_fpi_nsdl_lcr"].notna().any():
+        return {
+            "col": "india_fpi_nsdl_lcr", "unit": "₹L Cr", "axis": "Net FPI Flows (₹ Lakh Crore)",
+            "subtitle": "Monthly net FPI investment in India (₹ lakh crore) — last 24 months",
+            "source": "NSDL (FPI net investment, all segments)",
+            "fmt": lambda v: f"{'−' if v < 0 else ''}₹{abs(v):.2f}L Cr",
+        }
+    return {
+        "col": "india_fpi_flows", "unit": "$B", "axis": "Net FPI Flows ($B)",
+        "subtitle": "Monthly net portfolio investment into India ($B) — last 24 months",
+        "source": "RBI DBIE (Net Portfolio Investment)",
+        "fmt": lambda v: f"{'−' if v < 0 else ''}${abs(v):.1f}B",
+    }
+
+
 def chart_fpi_flows(df, output_dir):
     """
-    Monthly net portfolio investment (USD billion), from the RBI DBIE workbook
-    via india_fetcher.py --append. RBI publishes it about two to three months late.
+    Monthly net FPI flows, last 24 months: NSDL figures when entered, otherwise
+    RBI's net portfolio investment (see fpi_series).
     """
-    if "india_fpi_flows" not in df.columns or not df["india_fpi_flows"].notna().any():
+    series = fpi_series(df)
+    col = series["col"]
+    if col not in df.columns or not df[col].notna().any():
         print("   ⚠ Skipping FPI Flows — no monthly data found")
         return None
 
     # Drop empty rows and get the last 24 months
-    df_fpi = df.dropna(subset=["india_fpi_flows"]).tail(24).copy()
+    df_fpi = df.dropna(subset=[col]).tail(24).copy()
     
     if df_fpi.empty:
         return None
@@ -645,7 +840,7 @@ def chart_fpi_flows(df, output_dir):
     fig, ax = EconStyle.create_figure(size="wide")
     
     dates = df_fpi["date"].tolist()
-    vals = df_fpi["india_fpi_flows"].values
+    vals = df_fpi[col].values
 
     # Subtle horizontal grid
     ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
@@ -669,23 +864,21 @@ def chart_fpi_flows(df, output_dir):
 
     # Labels & Formatting
     _format_date_axis(ax, len(dates))
-    ax.set_ylabel("Net FPI Flows ($B)", fontsize=EconStyle.FONT_SIZE_AXIS)
+    ax.set_ylabel(series["axis"], fontsize=EconStyle.FONT_SIZE_AXIS)
 
     # Calculate Cumulative 24M for the floating badge
-    cum_flow = df_fpi["india_fpi_flows"].sum()
-    sign = "+" if cum_flow >= 0 else "−"
+    cum_flow = df_fpi[col].sum()
     
     # Custom floating badge in the top right
     bbox_props = dict(boxstyle="round,pad=0.4", fc="white", ec="#0F172A", lw=1.5)
-    ax.text(0.98, 1.05, f"24M Cumulative: {sign}${abs(cum_flow):.1f}B", 
+    ax.text(0.98, 1.05, f"24M Cumulative: {'+' if cum_flow >= 0 else ''}{series['fmt'](cum_flow)}", 
             transform=ax.transAxes, fontsize=10, fontweight='bold', 
             color="#0F172A", ha="right", va="bottom", bbox=bbox_props)
 
-    EconStyle.set_title(ax, "Foreign Portfolio Flows",
-                        "Monthly net portfolio investment into India ($B) — last 24 months")
+    EconStyle.set_title(ax, "Foreign Portfolio Flows", series["subtitle"])
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI DBIE (Net Portfolio Investment)")
+    EconStyle.add_source(fig, series["source"])
 
     fp = output_dir / "03_india_fpi_monthly.png"
     EconStyle.save_chart(fig, fp)
@@ -730,7 +923,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
         ]),
         ("CREDIT & FLOWS", [
             ("Bank Credit Growth", "india_bank_credit_yoy", "% YoY", lambda v: f"{v:.1f}%"),
-            ("Net FPI Flows", "india_fpi_flows", "$B", lambda v: f"${v:.1f}B"),
+            ("Net FPI Flows", fpi_series(df)["col"], fpi_series(df)["unit"], fpi_series(df)["fmt"]),
         ]),
         ("LABOUR", [
             ("Unemployment (PLFS)", "india_unemployment", "%", lambda v: f"{v:.1f}%"),
@@ -1786,10 +1979,9 @@ def chart_fiscal_deficit_gdp(cag_path, output_dir):
     FT-style bar chart with consolidation targets.
     """
     try:
-        xlsx = pd.ExcelFile(cag_path)
-        df_actual = pd.read_excel(xlsx, sheet_name='actual')
-        df_actual = df_actual.dropna(subset=['FY', 'Month'])
-        df_gdp = pd.read_excel(xlsx, sheet_name='GDP')
+        df_actual, _, df_gdp = load_cag_tables(cag_path)
+    except CagManualError:
+        raise
     except Exception as e:
         print(f"   ⚠ Skipping Fiscal Deficit % GDP — {e}")
         return None
@@ -1929,7 +2121,10 @@ def main():
     # ── Load data ──────────────────────────────────────────────────────────────
     df = load_india_data(args.csv, args.months)
     df_weekly = load_forex_weekly()
-    cag_data, df_monthly, df_prev_monthly = load_cag_data(args.cag)
+    try:
+        cag_data, df_monthly, df_prev_monthly = load_cag_data(args.cag)
+    except CagManualError as e:
+        sys.exit(f"❌ {e}")
 
     # ── Activity & PMI charts ──────────────────────────────────────────────────
     print(f"\n   Generating charts...")

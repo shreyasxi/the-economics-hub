@@ -53,6 +53,10 @@ CREATE TABLE IF NOT EXISTS india_monthly (
     india_exports_usd_bn    REAL,               -- Merchandise exports USD bn
     india_imports_usd_bn    REAL,               -- Merchandise imports USD bn
     india_trade_deficit_usd_bn REAL,            -- Trade deficit USD bn (derived)
+    india_fpi_flows         REAL,               -- RBI net portfolio investment USD bn (DBIE; fallback)
+
+    -- MANUAL: NSDL
+    india_fpi_net_inr_cr    REAL,               -- FPI net investment, all segments, ₹ crore (NSDL)
 
     -- Audit
     source_flags            TEXT,               -- JSON: {"cpi_yoy": "fred", ...}
@@ -86,11 +90,32 @@ def _connect() -> sqlite3.Connection:
     return conn
 
 
+# Columns added after the table was first created. CREATE TABLE IF NOT EXISTS
+# never alters an existing table, so each is added here when missing.
+_ADDED_COLUMNS = {
+    "india_monthly": {
+        "india_fpi_flows": "REAL",
+        "india_fpi_net_inr_cr": "REAL",
+    },
+}
+
+
+def ensure_columns(conn: sqlite3.Connection) -> None:
+    """Add any column from _ADDED_COLUMNS that an older database lacks."""
+    for table, columns in _ADDED_COLUMNS.items():
+        present = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+        for name, kind in columns.items():
+            if name not in present:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {kind}")
+                log.info("Added column %s.%s", table, name)
+
+
 def init_db() -> None:
     """Create tables if they do not exist. Safe to call on every pipeline run."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with _connect() as conn:
         conn.executescript(_SCHEMA)
+        ensure_columns(conn)
     log.info("India macro DB initialised at %s", DB_PATH)
 
 
