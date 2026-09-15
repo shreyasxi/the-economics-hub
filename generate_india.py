@@ -1652,23 +1652,25 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     
     ax2 = ax.twinx()
     ax2.plot(x[valid_idx], ratio[valid_idx], color='#000000', linewidth=2, 
-            marker='o', markersize=4, label='Capex Share %', zorder=10)
+            marker='o', markersize=4, label='Capex share (right axis)', zorder=10)
     ax2.set_ylabel('Capex as % of Total Expenditure', fontsize=9, color='#333333')
     ax2.set_ylim(0, 50)
     ax2.tick_params(axis='y', colors='#333333')
     
-    # Target line
-    ax2.axhline(y=25, color='#059669', linewidth=1.5, linestyle='--', alpha=0.7, zorder=6)
-    ax2.text(len(months)-1, 26, '25% reference', fontsize=8, color='#059669', ha='right')
+    # Reference level (not an official target), named in the legend rather than
+    # on the plot, where it collided with the share line
+    ax2.axhline(y=25, color='#059669', linewidth=1.5, linestyle='--', alpha=0.7, zorder=6,
+                label='25% reference')
     
     ax.set_xticks(x)
     ax.set_xticklabels(months, fontsize=9)
     ax.set_ylabel('₹ Lakh Crore', fontsize=EconStyle.FONT_SIZE_AXIS)
     
     # Legend at top-right, inline with subtitle
-    handles, labels = ax.get_legend_handles_labels()
-    ax.legend(handles=handles, loc='lower right', bbox_to_anchor=(1.0, 1.02),
-              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+    handles, _ = ax.get_legend_handles_labels()
+    handles2, _ = ax2.get_legend_handles_labels()
+    ax.legend(handles=handles + handles2, loc='lower right', bbox_to_anchor=(1.0, 1.02),
+              ncol=2, frameon=False, fontsize=8.5, handletextpad=0.4, borderaxespad=0)
     
     EconStyle.set_title(ax, "Expenditure Quality",
                         f"Capital vs Revenue Expenditure — FY{cag_data['fy'][-2:]}")

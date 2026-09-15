@@ -6,3 +6,8 @@
 # A row in data/cag_monthly_accounts.xlsx for the same fy and month takes precedence. generate_india.py checks every value.
 fy,month,revenue_expenditure,interest_payments,major_subsidies,capital_expenditure,fiscal_deficit,gdp,source
 2025-26,Mar-26,3836032,1242575,453854.15,1069119,1519169,,CGA provisional accounts 2025-26 web page (entered 2026-09-15)
+2026-27,Apr-26,385151,109562,,189831,362303,,CGA monthly accounts web page (entered by user 2026-09-15)
+2026-27,May-26,630020,181461,,251003,162354,,CGA monthly accounts web page (entered by user 2026-09-15)
+2026-27,Jun-26,1016818,346414,,340258,307833,,CGA monthly accounts web page (entered by user 2026-09-15)
+2026-27,Jul-26,1311218,426566,,450635,455144,,CGA monthly accounts web page (entered by user 2026-09-15); FD and total expenditure match CGA press reports of 31 Aug 2026
+2026-27,BE,4125494,1403972,,1221821,1695768,39300000,Budget at a Glance 2026-27 (via PRS Union Budget Analysis); GDP = Rs 393 lakh crore (KPMG budget note; rounded)
