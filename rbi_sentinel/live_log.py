@@ -170,10 +170,14 @@ def record_market_closes(today: Optional[date] = None) -> list[str]:
         NEEDS_INPUT_PATH.write_text(
             "The RBI Sentinel live test needs the benchmark 10-year G-sec closing yield for:\n\n"
             + "".join(f"- **{d}** — and the close on the previous trading day\n" for d in waiting)
-            + "\nAdd one line per date to `data/rbi_live_market.csv` and commit it:\n\n"
+            + "\n**Where to find it:** Investing.com → India 10-Year Bond Yield → Historical Data "
+            "(the \"Price\" column), or the FBIL/CCIL benchmark page.\n\n"
+            "**Where to put it:** on GitHub open `data/rbi_live_market.csv` → pencil icon (Edit) → "
+            "add one line per date below the header → Commit changes:\n\n"
             "```\ndecision_date,previous_close,close,source\n"
             + "".join(f"{d},<previous day close>,<decision day close>,<where it came from>\n" for d in waiting)
-            + "```\n\nThe next scheduled run fills the log and closes this issue.\n",
+            + "```\n\nFormat example (made-up numbers): `2026-10-07,6.512,6.548,Investing.com`\n\n"
+            "The next evening run (18:15 IST, weekdays) fills the log and closes this issue.\n",
             encoding="utf-8",
         )
         log.warning("Live log: 10-year close needed for %s — see %s", ", ".join(waiting), NEEDS_INPUT_PATH)

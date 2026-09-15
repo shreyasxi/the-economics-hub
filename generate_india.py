@@ -19,7 +19,7 @@ Data sources:
   - Manufacturing PMI:   S&P Global (1st biz day of month)
   - Services PMI:        S&P Global (3rd biz day of month)
   - GST Revenue:         PIB / Finance Ministry (1st of month, ₹ Lakh Cr)
-  - See docs/india_manual_reminders.md for exact URLs and entry workflow
+  - See docs/project_reminders.md for exact URLs and entry workflow
 
   CAG EXCEL (data/cag_monthly_accounts.xlsx):
   - Fiscal Deficit, Capital Expenditure, Net Tax Revenue, etc.

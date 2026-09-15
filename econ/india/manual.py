@@ -14,7 +14,7 @@ Partial months are fine — set what has been released and come back for the
 rest. Every write is range-checked, records its source in source_flags, and
 prints the before/after so a fat-fingered decimal is visible immediately.
 
-Sources and the monthly release calendar: docs/india_manual_reminders.md
+Sources and the monthly release calendar: docs/project_reminders.md
 """
 
 from __future__ import annotations
@@ -223,7 +223,7 @@ def cmd_status(args):
     if gaps:
         newest = rows[0]["month"]
         print(f"  e.g.  python -m econ.india.manual set {newest} --mfg-pmi 57.2")
-    print("  Release calendar and source URLs: docs/india_manual_reminders.md")
+    print("  Release calendar and source URLs: docs/project_reminders.md")
 
 
 # ── show ────────────────────────────────────────────────────────────────────
@@ -253,7 +253,7 @@ def main(argv=None):
         prog="python -m econ.india.manual",
         description="Enter the India series that have no API.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="Sources and release dates: docs/india_manual_reminders.md",
+        epilog="Sources and release dates: docs/project_reminders.md",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

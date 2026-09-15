@@ -107,7 +107,8 @@ jobs:
               if (existing) {
                 await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body });
               } else {
-                await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body });
+                // Assigning the owner guarantees an email under GitHub's default notification settings.
+                await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body, assignees: [context.repo.owner] });
               }
             } else if (existing) {
               await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body: 'Close recorded — thank you. Closing.' });

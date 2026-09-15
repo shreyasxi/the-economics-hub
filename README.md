@@ -85,7 +85,7 @@ economics_hub/
 │   └── readme_showcase/         # Static-named flagship charts (always current)
 ├── output/                      # Local generation output (git-ignored)
 ├── rbi_sentinel/                # RBI Sentinel package (sentiment analysis)
-└── docs/                        # project_context.md, instructions.md, operational docs
+└── docs/                        # project_context.md, project_reminders.md (local only)
 ```
 
 ---
