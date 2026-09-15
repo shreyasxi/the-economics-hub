@@ -15,8 +15,8 @@ An automated Python pipeline tracking Global Equities, Forex, Sovereign Bonds, C
 | **Market Snapshot** | **Macro Pulse** |
 |:---:|:---:|
 | <img src="assets/readme_showcase/weekly_summary_table.png" width="100%"> | <img src="assets/readme_showcase/macro_table.png" width="100%"> |
-| **Sectoral Rotations** | **Monthly Capex** |
-| <img src="assets/readme_showcase/weekly_sector_rotation.png" width="100%"> | <img src="assets/readme_showcase/india_monthly_capex.png" width="100%"> |
+| **Sectoral Rotations** | **Fiscal Deficit** |
+| <img src="assets/readme_showcase/weekly_sector_rotation.png" width="100%"> | <img src="assets/readme_showcase/india_fiscal_deficit_gdp.png" width="100%"> |
 | **Expenditure Quality** | **US Housing Market** |
 | <img src="assets/readme_showcase/india_expenditure_quality.png" width="100%"> | <img src="assets/readme_showcase/macro_housing.png" width="100%"> |
 
@@ -61,7 +61,7 @@ economics_hub/
 ├── app.py                       # Streamlit 4-tab dashboard
 ├── generate_weekly.py           # Weekly global dashboard (~32 charts, every Saturday via CI)
 ├── generate_macro.py            # Monthly macro pulse (9–11 charts, via CI)
-├── generate_india.py            # India macro dashboard (16 charts, Saturdays via CI + manual)
+├── generate_india.py            # India macro dashboard (14 charts, Saturdays via CI + manual)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
 ├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
@@ -112,7 +112,7 @@ python generate_macro.py
 ```
 
 ### 3. India Macro Dashboard
-Generates 16 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
+Generates 14 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
 ```bash
 python -m data.india_manual_entry status
 python generate_india.py

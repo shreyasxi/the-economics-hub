@@ -108,7 +108,7 @@ jobs:
         run: |
           mkdir -p assets/readme_showcase
           MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
-          cp "output/india/$MONTH_FOLDER/10_india_monthly_capex.png" "assets/readme_showcase/india_monthly_capex.png"
+          cp "output/india/$MONTH_FOLDER/11_india_fiscal_deficit_gdp.png" "assets/readme_showcase/india_fiscal_deficit_gdp.png"
           cp "output/india/$MONTH_FOLDER/07_india_expenditure_quality.png" "assets/readme_showcase/india_expenditure_quality.png"
           echo "README showcase updated from $MONTH_FOLDER"
 

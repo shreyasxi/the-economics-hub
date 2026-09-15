@@ -15,11 +15,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from generate_india import CagManualError, DEFAULT_CAG, load_cag_tables
 
-HEADER = ("fy,month,corporation_tax,income_tax,securities_transaction_tax,cgst,igst,utgst,customs,"
-          "union_excise,devolution_to_states,revenue_expenditure,interest_payments,major_subsidies,"
+HEADER = ("fy,month,revenue_expenditure,interest_payments,major_subsidies,"
           "capital_expenditure,fiscal_deficit,gdp,source\n")
 # Test inputs only: shaped like a year-to-date row, not real figures.
-ROW = "{fy},{month},900000,1050000,55000,960000,-5000,7000,262000,300000,1390000,{rev},1150000,420000,{capex},{fd},,test\n"
+ROW = "{fy},{month},{rev},1150000,420000,{capex},{fd},,test\n"
 
 
 def _tables(body: str):
@@ -38,9 +37,13 @@ def _fails(body: str, needle: str) -> None:
     raise AssertionError(f"accepted a row that should fail ({needle})")
 
 
-def test_empty_file_leaves_workbook_unchanged():
+def test_workbook_alone_ends_in_february():
     actual, _, _ = _tables("")
     assert actual["Month"].iloc[-1] == "Feb-26"
+
+
+def test_missing_required_figure_is_refused():
+    _fails("2025-26,Mar-26,3400000,,,1050000,,,test\n", "fiscal_deficit is missing")
 
 
 def test_new_month_is_appended_in_order():

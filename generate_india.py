@@ -218,30 +218,20 @@ def crore_to_lakh_crore(value):
 # ─────────────────────────────────────────────────────────────────────────────
 CAG_MANUAL = Path(__file__).parent / "data" / "cag_manual_accounts.csv"
 
-# csv column -> workbook column (the workbook's own spelling, typo included)
+# csv column -> workbook column. Only what the fiscal charts draw: CGA's web
+# page no longer gives tax revenue by head, so those columns are not collected.
 CAG_MANUAL_FIELDS = {
-    "corporation_tax": "Corporation Tax",
-    "income_tax": "Income Tax",
-    "securities_transaction_tax": "Securities Transcation Tax",
-    "cgst": "CGST",
-    "igst": "IGST",
-    "utgst": "UTGST",
-    "customs": "Customs",
-    "union_excise": "Union Excise",
-    "devolution_to_states": "Devolution to State",
     "revenue_expenditure": "Revenue Expenditure",
     "interest_payments": "Interest Payments",
     "major_subsidies": "Major Subsidies",
     "capital_expenditure": "Capital Expenditure",
     "fiscal_deficit": "Fiscal Deficit",
 }
+CAG_REQUIRED = ("revenue_expenditure", "capital_expenditure", "fiscal_deficit")
 # Plausible range in Rs CRORE for a year-to-date figure. Wide on purpose: they
 # exist to catch a value typed in lakh crore (1,000x too small) or with extra digits.
 _CAG_BOUNDS = {
-    "igst": (-300_000, 300_000),
-    "utgst": (0, 50_000),
     "fiscal_deficit": (-1_000_000, 3_000_000),
-    "securities_transaction_tax": (0, 200_000),
 }
 _CAG_DEFAULT_BOUNDS = (1_000, 8_000_000)
 _FISCAL_MONTHS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
@@ -308,10 +298,10 @@ def read_cag_manual(path=CAG_MANUAL):
         expected_year = fy[2:4] if _FISCAL_MONTHS.index(m.group(1)) <= 8 else fy[-2:]
         if m.group(2) != expected_year:
             problems.append(f"{where}: {month} does not fall in financial year {fy}")
-        for key in CAG_MANUAL_FIELDS:
+        for key in CAG_REQUIRED:
             if key not in values:
                 problems.append(f"{where}: {key} is missing")
-                continue
+        for key in [k for k in CAG_MANUAL_FIELDS if k in values]:
             lo, hi = _CAG_BOUNDS.get(key, _CAG_DEFAULT_BOUNDS)
             if not lo <= values[key] <= hi:
                 problems.append(f"{where}: {key} {values[key]:,.0f} is outside {lo:,}–{hi:,} Rs crore "
@@ -363,7 +353,7 @@ def load_cag_tables(cag_path=DEFAULT_CAG, manual_path=CAG_MANUAL):
             if i == 0 or df_actual.at[i - 1, 'FY'] != df_actual.at[i, 'FY']:
                 continue
             for col in ('Revenue Expenditure', 'Capital Expenditure', 'Interest Payments'):
-                if df_actual.at[i, col] < df_actual.at[i - 1, col]:
+                if pd.notna(df_actual.at[i, col]) and df_actual.at[i, col] < df_actual.at[i - 1, col]:
                     raise CagManualError(
                         f"CAG {col} falls year-to-date at {df_actual.at[i, 'FY']} {df_actual.at[i, 'Month']} "
                         f"({df_actual.at[i - 1, col]:,.0f} → {df_actual.at[i, col]:,.0f}) — check the manual rows")
@@ -455,19 +445,6 @@ def load_cag_data(cag_path=DEFAULT_CAG):
             capex_prev_monthly = None
             fiscal_deficit_prev_monthly = None
         
-        # Calculate Net Tax Revenue
-        gross_tax = (
-            latest.get('Corporation Tax', 0) + 
-            latest.get('Income Tax', 0) + 
-            latest.get('CGST', 0) + 
-            latest.get('IGST', 0) + 
-            latest.get('UTGST', 0) +
-            latest.get('Customs', 0) + 
-            latest.get('Union Excise', 0) +
-            latest.get('Securities Transcation Tax', 0)
-        )
-        net_tax_ytd = gross_tax - latest.get('Devolution to State', 0)
-        
         # % of BE achieved
         capex_pct_be = (capex_ytd / be_capex * 100) if be_capex else None
         
@@ -507,8 +484,6 @@ def load_cag_data(cag_path=DEFAULT_CAG):
             'fiscal_deficit_pct_gdp': fiscal_deficit_pct_gdp,  # % of GDP
             'capex_ytd': capex_ytd / CRORE_PER_LAKH_CRORE,
             'revenue_exp_ytd': revenue_exp_ytd / CRORE_PER_LAKH_CRORE,
-            'net_tax_ytd': net_tax_ytd / CRORE_PER_LAKH_CRORE,
-            'gross_tax_ytd': gross_tax / CRORE_PER_LAKH_CRORE,
             # Monthly values (₹ Lakh Cr)
             'capex_monthly': capex_monthly / CRORE_PER_LAKH_CRORE if capex_monthly else None,
             'fiscal_deficit_monthly': fiscal_deficit_monthly / CRORE_PER_LAKH_CRORE if fiscal_deficit_monthly else None,
@@ -519,12 +494,6 @@ def load_cag_data(cag_path=DEFAULT_CAG):
             'capex_pct_be': capex_pct_be,
             'be_capex': be_capex / CRORE_PER_LAKH_CRORE if be_capex else None,
             'be_revenue_exp': be_revenue_exp / CRORE_PER_LAKH_CRORE if be_revenue_exp else None,
-            # Tax breakdown (₹ Lakh Cr)
-            'corp_tax_ytd': latest.get('Corporation Tax', 0) / CRORE_PER_LAKH_CRORE,
-            'income_tax_ytd': latest.get('Income Tax', 0) / CRORE_PER_LAKH_CRORE,
-            'gst_ytd': (latest.get('CGST', 0) + latest.get('IGST', 0) + latest.get('UTGST', 0)) / CRORE_PER_LAKH_CRORE,
-            'customs_ytd': latest.get('Customs', 0) / CRORE_PER_LAKH_CRORE,
-            'excise_ytd': latest.get('Union Excise', 0) / CRORE_PER_LAKH_CRORE,
             # Expenditure breakdown
             'interest_ytd': latest.get('Interest Payments', 0) / CRORE_PER_LAKH_CRORE,
             'subsidies_ytd': latest.get('Major Subsidies', 0) / CRORE_PER_LAKH_CRORE,
@@ -1690,7 +1659,7 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     
     # Target line
     ax2.axhline(y=25, color='#059669', linewidth=1.5, linestyle='--', alpha=0.7, zorder=6)
-    ax2.text(len(months)-1, 26, 'Target: 25%', fontsize=8, color='#059669', ha='right')
+    ax2.text(len(months)-1, 26, '25% reference', fontsize=8, color='#059669', ha='right')
     
     ax.set_xticks(x)
     ax.set_xticklabels(months, fontsize=9)
@@ -1710,77 +1679,6 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     fp = output_dir / "07_india_expenditure_quality.png"
     EconStyle.save_chart(fig, fp)
     print(f"   ✓ Expenditure Quality Chart")
-    return fp
-
-
-# ═══════════════════════════════════════════
-# CHART 8: TAX REVENUE COMPOSITION (WATERFALL)
-# ═══════════════════════════════════════════
-
-def chart_tax_composition(cag_data, output_dir):
-    """
-    FT-style waterfall showing tax revenue composition.
-    """
-    if cag_data is None:
-        print("   ⚠ Skipping Tax Composition — no CAG data")
-        return None
-    
-    fig, ax = EconStyle.create_figure(size="wide")
-    
-    # Tax components
-    components = [
-        ('Corporation\nTax', cag_data['corp_tax_ytd'], C_CORP_TAX),
-        ('Income\nTax', cag_data['income_tax_ytd'], C_INCOME_TAX),
-        ('GST', cag_data['gst_ytd'], C_GST_TAX),
-        ('Customs', cag_data['customs_ytd'], C_CUSTOMS),
-        ('Excise', cag_data['excise_ytd'], '#6B7280'),
-    ]
-    
-    names = [c[0] for c in components]
-    values = [c[1] for c in components]
-    colors = [c[2] for c in components]
-    
-    # Subtle gridlines BEHIND bars
-    ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-    ax.set_axisbelow(True)
-    
-    # Horizontal bar chart
-    y_pos = np.arange(len(names))
-    bars = ax.barh(y_pos, values, color=colors, alpha=0.85, edgecolor='white', linewidth=0.5, height=0.6, zorder=3)
-    
-    # Add value labels
-    _lbl_off = max(values) * 0.02
-    for i, (bar, val) in enumerate(zip(bars, values)):
-        ax.text(val + _lbl_off, bar.get_y() + bar.get_height()/2, 
-               f'₹{val:.2f}L Cr', va='center', fontsize=10, fontweight='bold', color=colors[i])
-    
-    # Percentage labels
-    total = sum(values)
-    for i, (bar, val) in enumerate(zip(bars, values)):
-        pct = val / total * 100
-        ax.text(val/2, bar.get_y() + bar.get_height()/2,
-               f'{pct:.0f}%', va='center', ha='center', fontsize=10, 
-               fontweight='bold', color='white')
-    
-    ax.set_yticks(y_pos)
-    ax.set_yticklabels(names, fontsize=10)
-    ax.set_xlabel('₹ Lakh Crore', fontsize=EconStyle.FONT_SIZE_AXIS)
-    ax.invert_yaxis()
-    
-    # Add total annotation
-    ax.text(0.98, 0.02, f"Gross Tax: ₹{cag_data['gross_tax_ytd']:.2f}L Cr\nNet (post devolution): ₹{cag_data['net_tax_ytd']:.2f}L Cr",
-            transform=ax.transAxes, fontsize=10, ha='right', va='bottom',
-            bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor='#E5E7EB'))
-    
-    EconStyle.set_title(ax, "Union Tax Revenue Composition",
-                        f"YTD through {cag_data['latest_month']} — FY{cag_data['fy'][-2:]}")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "CAG Monthly Accounts Dashboard")
-    
-    fp = output_dir / "08_india_tax_composition.png"
-    EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Tax Revenue Composition")
     return fp
 
 
@@ -1840,8 +1738,8 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
     # Budget target line
     if cag_data['be_capex']:
         ax1.axhline(y=cag_data['be_capex'], color='#059669', linewidth=1.5, linestyle='--', zorder=3)
-        ax1.text(11, cag_data['be_capex'] * 1.02, f"BE: ₹{cag_data['be_capex']:.2f}L Cr", 
-                fontsize=8, color='#059669')
+        ax1.text(5.5, cag_data['be_capex'] * 0.985, f"Budget Estimate: ₹{cag_data['be_capex']:.2f}L Cr",
+                fontsize=8, color='#059669', ha='center', va='top')
     
     ax1.set_xticks(range(12))
     ax1.set_xticklabels(month_order, fontsize=8)
@@ -1897,79 +1795,6 @@ def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 10: MONTHLY FISCAL PULSE
-# ═══════════════════════════════════════════
-
-def chart_monthly_fiscal_pulse(cag_data, df_monthly, output_dir):
-    """
-    FT-style single chart showing monthly capex with year-on-year comparison.
-    """
-    if cag_data is None or df_monthly is None:
-        print("   ⚠ Skipping Monthly Fiscal Pulse — no CAG data")
-        return None
-    
-    fig, ax = EconStyle.create_figure(size="wide")
-    
-    months = df_monthly['Month'].str.split('-').str[0].tolist()
-    capex_monthly = (df_monthly['Capital Expenditure_monthly'] / CRORE_PER_LAKH_CRORE).values
-    
-    x = np.arange(len(months))
-    
-    # Subtle gridlines BEHIND bars (like FPI chart)
-    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-    ax.set_axisbelow(True)
-    
-    # Color bars based on performance vs target: red for below, blue for above
-    be_monthly_target = cag_data['be_capex'] / 12 if cag_data['be_capex'] else 0
-    colors = [C_CAPEX if c >= be_monthly_target else '#B91C1C' for c in capex_monthly]
-    
-    bars = ax.bar(x, capex_monthly, color=colors, alpha=0.85, edgecolor='white', 
-                 linewidth=0.5, width=0.7, zorder=3)
-    
-    # Add value labels
-    for i, (bar, val) in enumerate(zip(bars, capex_monthly)):
-        if not np.isnan(val) and val > 0:
-            ax.text(bar.get_x() + bar.get_width()/2, val + np.nanmax(capex_monthly) * 0.02,
-                   f'₹{val:.2f}L', ha='center', va='bottom', fontsize=8, 
-                   fontweight='bold', color='#1F2937', zorder=5)
-    
-    # Monthly target line
-    if be_monthly_target > 0:
-        target_line = ax.axhline(y=be_monthly_target, color='#DC2626', linewidth=2, linestyle='--',
-                  label=f'Monthly Target (₹{be_monthly_target:.2f}L Cr)', zorder=4)
-    
-    # 3-month moving average
-    ma3 = pd.Series(capex_monthly).rolling(3, min_periods=1).mean().values
-    ma_line, = ax.plot(x, ma3, color='#000000', linewidth=2, marker='o', markersize=4,
-           label='3M Moving Avg', zorder=5)
-    
-    ax.set_xticks(x)
-    ax.set_xticklabels(months, fontsize=9)
-    ax.set_ylabel('₹ Lakh Crore', fontsize=EconStyle.FONT_SIZE_AXIS)
-    
-    # Legend at top-right, inline with subtitle (like inflation chart)
-    ax.legend(loc='lower right', bbox_to_anchor=(1.0, 1.02),
-              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
-    
-    # YTD annotation
-    ax.text(0.98, 0.95, f"YTD: ₹{cag_data['capex_ytd']:.2f}L Cr\n({cag_data['capex_pct_be']:.1f}% of BE)",
-            transform=ax.transAxes, fontsize=10, fontweight='bold',
-            color=C_CAPEX, ha='right', va='top',
-            bbox=dict(boxstyle='round,pad=0.4', facecolor='white', edgecolor=C_CAPEX), zorder=10)
-    
-    EconStyle.set_title(ax, "Monthly Capital Expenditure",
-                        f"Government Capex Spending — FY{cag_data['fy'][-2:]}")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, f"CAG Monthly Accounts | Data through {cag_data['latest_month']}")
-    
-    fp = output_dir / "10_india_monthly_capex.png"
-    EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Monthly Fiscal Pulse")
-    return fp
-
-
-# ═══════════════════════════════════════════
 # CHART 11: FISCAL DEFICIT % OF GDP (HISTORICAL)
 # ═══════════════════════════════════════════
 
@@ -1979,7 +1804,7 @@ def chart_fiscal_deficit_gdp(cag_path, output_dir):
     FT-style bar chart with consolidation targets.
     """
     try:
-        df_actual, _, df_gdp = load_cag_tables(cag_path)
+        df_actual, df_bere, df_gdp = load_cag_tables(cag_path)
     except CagManualError:
         raise
     except Exception as e:
@@ -2051,9 +1876,20 @@ def chart_fiscal_deficit_gdp(cag_path, output_dir):
                label, ha='center', va='bottom', fontsize=9, 
                fontweight='bold', color='#1F2937' if full else '#991B1B', zorder=5)
     
-    # Target lines
-    ax.axhline(y=4.5, color='#059669', linewidth=1.5, linestyle='--', 
-              alpha=0.8, zorder=2, label='FY26 Target: 4.5%')
+    # Target lines. The latest year's budget target comes from its BE fiscal
+    # deficit when one is recorded; otherwise the FY26 glide-path goal (below
+    # 4.5% of GDP) is drawn only while FY26 is the latest year.
+    latest_fy = df_actual['FY'].iloc[-1]
+    be = df_bere[(df_bere['FY'] == latest_fy) & (df_bere['Month'] == 'BE')]
+    gdp_latest = df_gdp.loc[df_gdp['FY'] == latest_fy, 'GDP']
+    be_deficit = be['Fiscal Deficit'].iloc[0] if 'Fiscal Deficit' in be.columns and len(be) else None
+    if be_deficit is not None and pd.notna(be_deficit) and len(gdp_latest):
+        target = be_deficit / gdp_latest.iloc[0] * 100
+        ax.axhline(y=target, color='#059669', linewidth=1.5, linestyle='--',
+                   alpha=0.8, zorder=2, label=f"FY{latest_fy[-2:]} Budget: {target:.1f}%")
+    elif latest_fy == '2025-26':
+        ax.axhline(y=4.5, color='#059669', linewidth=1.5, linestyle='--',
+                   alpha=0.8, zorder=2, label='FY26 Target: 4.5%')
     ax.axhline(y=3.0, color='#0369A1', linewidth=1.5, linestyle=':', 
               alpha=0.6, zorder=2, label='FRBM Target: 3.0%')
     
@@ -2082,8 +1918,9 @@ def chart_fiscal_deficit_gdp(cag_path, output_dir):
     # Source and footnote (properly spaced)
     fig.text(0.02, 0.025, "Source: CAG Monthly Accounts",
             fontsize=8, color='#666666')
-    fig.text(0.02, 0.005, f"* FY26 shows Apr–{current_fy_month.split('-')[0]} YTD only",
-            fontsize=7, color='#666666', style='italic')
+    if current_fy_month:                      # the latest year is still in progress
+        fig.text(0.02, 0.005, f"* FY{current_fy[-2:]} shows Apr–{current_fy_month.split('-')[0]} YTD only",
+                 fontsize=7, color='#666666', style='italic')
     fig.text(0.98, 0.015, EconStyle.WATERMARK_TEXT,
             fontsize=10, fontweight='bold', color='#1A1A1A', ha='right')
     
@@ -2150,14 +1987,13 @@ def main():
 
     # ── Fiscal charts (from CAG) — FROZEN, no changes ─────────────────────────
     if cag_data:
+        # Tax composition and monthly capex were retired in Sep 2026: CGA no longer
+        # publishes tax by head, and monthly capex repeated the two charts below.
         chart_expenditure_quality(cag_data, df_monthly, output_dir)
-        chart_tax_composition(cag_data, output_dir)
         chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir)
-        chart_monthly_fiscal_pulse(cag_data, df_monthly, output_dir)
         chart_fiscal_deficit_gdp(args.cag, output_dir)
 
-    non_cag_count = 11  # charts 01–06 + 12–17 (chart 03/credit removed, 6 new)
-    chart_count = non_cag_count + (5 if cag_data else 0)
+    chart_count = len(list(output_dir.glob("*.png")))
     print(f"\n India Dashboard complete! {chart_count} charts saved to:")
     print(f"   {output_dir}")
 
@@ -2165,7 +2001,6 @@ def main():
         print(f"\n Fiscal Summary ({cag_data['fy']} through {cag_data['latest_month']}):")
         print(f"   Capex YTD: {cag_data['capex_ytd']:.2f} Lakh Cr ({cag_data['capex_pct_be']:.1f}% of BE)")
         print(f"   Fiscal Deficit YTD: {cag_data['fiscal_deficit_ytd']:.2f} Lakh Cr")
-        print(f"   Net Tax Revenue YTD: {cag_data['net_tax_ytd']:.2f} Lakh Cr")
 
 
 if __name__ == "__main__":
