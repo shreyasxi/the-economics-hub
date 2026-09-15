@@ -234,6 +234,20 @@ _CAG_BOUNDS = {
     "fiscal_deficit": (-1_000_000, 3_000_000),
 }
 _CAG_DEFAULT_BOUNDS = (1_000, 8_000_000)
+
+# The "Sources of financing the deficit" page, Rs crore year to date: external
+# financing plus the domestic total, and the domestic rows (a) to (i). Rows (h)
+# surplus cash and (i) ways and means advances are not shown every month, so
+# they may be blank; the two identities below prove a blank row is zero.
+CAG_FINANCING_DOMESTIC = (
+    "fin_market_borrowings", "fin_small_savings_securities", "fin_state_provident_funds",
+    "fin_special_deposits", "fin_nssf", "fin_others", "fin_cash_balance",
+    "fin_surplus_cash", "fin_wma",
+)
+CAG_FINANCING_FIELDS = ("fin_external", "fin_domestic") + CAG_FINANCING_DOMESTIC
+_CAG_FINANCING_OPTIONAL = ("fin_surplus_cash", "fin_wma")
+_CAG_FINANCING_BOUND = 3_000_000   # |Rs crore|: catches a digit too many
+_CAG_FINANCING_TOLERANCE = 1.0     # Rs crore: the page rounds rows to paise and the deficit to a crore
 _FISCAL_MONTHS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
 
 
@@ -246,12 +260,33 @@ def _fiscal_sort_key(fy, month):
     return (str(fy), _FISCAL_MONTHS.index(str(month).split("-")[0]) if str(month)[:3] in _FISCAL_MONTHS else 99)
 
 
+def _financing_problems(where, values):
+    """Check one row's financing figures against each other and the fiscal deficit."""
+    missing = [k for k in CAG_FINANCING_FIELDS if k not in values and k not in _CAG_FINANCING_OPTIONAL]
+    if missing:
+        return [f"{where}: financing is incomplete, missing {', '.join(missing)}"]
+    problems = [f"{where}: {k} {values[k]:,.0f} is outside ±{_CAG_FINANCING_BOUND:,} Rs crore (a digit too many?)"
+                for k in CAG_FINANCING_FIELDS if k in values and abs(values[k]) > _CAG_FINANCING_BOUND]
+    domestic = sum(values.get(k, 0.0) for k in CAG_FINANCING_DOMESTIC)
+    if abs(domestic - values["fin_domestic"]) > _CAG_FINANCING_TOLERANCE:
+        problems.append(f"{where}: domestic financing rows add up to {domestic:,.2f}, not the domestic total "
+                        f"{values['fin_domestic']:,.2f}; a row is mistyped or missing")
+    total = values["fin_external"] + values["fin_domestic"]
+    if "fiscal_deficit" not in values:
+        problems.append(f"{where}: financing needs the fiscal_deficit on the same row")
+    elif abs(total - values["fiscal_deficit"]) > _CAG_FINANCING_TOLERANCE:
+        problems.append(f"{where}: external + domestic financing is {total:,.2f}, not the fiscal deficit "
+                        f"{values['fiscal_deficit']:,.0f}")
+    return problems
+
+
 def read_cag_manual(path=CAG_MANUAL):
     """
-    Validated manual rows as (actual_rows, budget_rows, gdp_rows) DataFrames in
-    the workbook's column names. Raises ValueError listing every problem found.
+    Validated manual rows as (actual_rows, budget_rows, gdp_rows, financing_rows)
+    DataFrames. The first three use the workbook's column names; financing_rows
+    has FY, Month and the fin_* columns. Raises CagManualError listing every problem.
     """
-    empty = (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+    empty = (pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
     if not path.exists():
         return empty
     raw = pd.read_csv(path, dtype=str, comment="#").fillna("")
@@ -259,7 +294,7 @@ def read_cag_manual(path=CAG_MANUAL):
     if raw.empty:
         return empty
 
-    problems, actual, budget, gdp = [], [], [], []
+    problems, actual, budget, gdp, financing = [], [], [], [], []
     for i, r in raw.iterrows():
         where = f"line {i + 2} ({r['fy']} {r['month']})"
         fy, month = r["fy"].strip(), r["month"].strip()
@@ -267,7 +302,7 @@ def read_cag_manual(path=CAG_MANUAL):
             problems.append(f"{where}: fy must look like 2026-27")
             continue
         values = {}
-        for key in list(CAG_MANUAL_FIELDS) + ["gdp"]:
+        for key in list(CAG_MANUAL_FIELDS) + ["gdp"] + list(CAG_FINANCING_FIELDS):
             text = r.get(key, "").replace(",", "").strip()
             if text == "":
                 continue
@@ -275,6 +310,11 @@ def read_cag_manual(path=CAG_MANUAL):
                 values[key] = float(text)
             except ValueError:
                 problems.append(f"{where}: {key} is not a number: {r[key]!r}")
+
+        if any(k in values for k in CAG_FINANCING_FIELDS):
+            problems.extend(_financing_problems(where, values))
+            financing.append({"FY": fy, "Month": month,
+                              **{k: values.get(k, np.nan) for k in CAG_FINANCING_FIELDS}})
 
         if month in ("BE", "RE"):
             for key in ("capital_expenditure", "revenue_expenditure"):
@@ -311,7 +351,7 @@ def read_cag_manual(path=CAG_MANUAL):
 
     if problems:
         raise CagManualError("data/cag_manual_accounts.csv has problems:\n  " + "\n  ".join(problems))
-    return pd.DataFrame(actual), pd.DataFrame(budget), pd.DataFrame(gdp)
+    return pd.DataFrame(actual), pd.DataFrame(budget), pd.DataFrame(gdp), pd.DataFrame(financing)
 
 
 def load_cag_tables(cag_path=DEFAULT_CAG, manual_path=CAG_MANUAL):
@@ -324,7 +364,7 @@ def load_cag_tables(cag_path=DEFAULT_CAG, manual_path=CAG_MANUAL):
     df_actual = pd.read_excel(xlsx, sheet_name='actual').dropna(subset=['FY', 'Month'])
     df_bere = pd.read_excel(xlsx, sheet_name='BERE')
     df_gdp = pd.read_excel(xlsx, sheet_name='GDP')
-    man_actual, man_budget, man_gdp = read_cag_manual(manual_path)
+    man_actual, man_budget, man_gdp, _ = read_cag_manual(manual_path)
 
     def merge(book, manual, keys):
         if manual.empty:
@@ -367,6 +407,15 @@ def load_cag_tables(cag_path=DEFAULT_CAG, manual_path=CAG_MANUAL):
     if df_gdp[df_gdp['FY'] == latest_fy].empty:
         raise CagManualError(f"CAG {latest_fy} has no GDP — add gdp to its BE row in data/cag_manual_accounts.csv")
     return df_actual, df_bere, df_gdp
+
+
+def load_cag_financing(manual_path=CAG_MANUAL):
+    """
+    Checked financing rows (FY, Month, fin_* in Rs crore) from the manual CSV.
+    The workbook has no financing page, so these rows stay in use even after a
+    newer workbook supersedes the same month's other figures.
+    """
+    return read_cag_manual(manual_path)[3]
 
 
 def load_cag_data(cag_path=DEFAULT_CAG):
@@ -1639,41 +1688,58 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     bars2 = ax.bar(x + width/2, rev_exp, width, label='Revenue Expenditure',
                    color=C_REVENUE_EXP, alpha=0.9, edgecolor='white', linewidth=0.5, zorder=5)
     
-    # Add value labels on capex bars only
-    _lbl_off = np.nanmax(np.concatenate([capex, rev_exp])) * 0.02
-    for i, c in enumerate(capex):
-        if not np.isnan(c) and c > 0:
-            ax.text(x[i] - width/2, c + _lbl_off, f'₹{c:.2f}L', ha='center', va='bottom',
-                   fontsize=7, color=C_CAPEX, fontweight='bold', zorder=10)
-    
+    # The capex Budget Estimate spread evenly over twelve months: capex bars above
+    # the line are running ahead of the pace that spends the full budget.
+    pace = cag_data['be_capex'] / 12 if cag_data.get('be_capex') else None
+    if pace:
+        ax.axhline(y=pace, color=C_CAPEX, linewidth=1.5, linestyle=':', zorder=6,
+                   label=f"Capex Budget ÷ 12 (₹{pace:.2f}L a month)")
+
     # Capex ratio line (secondary insight)
     valid_idx = ~np.isnan(capex) & ~np.isnan(rev_exp) & (rev_exp > 0)
     ratio = np.where(valid_idx, capex / (capex + rev_exp) * 100, np.nan)
-    
+
     ax2 = ax.twinx()
-    ax2.plot(x[valid_idx], ratio[valid_idx], color='#000000', linewidth=2, 
+    ax2.plot(x[valid_idx], ratio[valid_idx], color='#000000', linewidth=2,
             marker='o', markersize=4, label='Capex share (right axis)', zorder=10)
     ax2.set_ylabel('Capex as % of Total Expenditure', fontsize=9, color='#333333')
-    ax2.set_ylim(0, 50)
+    # Headroom on both axes keeps a clear band at the top for the legend
+    ax2.set_ylim(0, max(50, np.nanmax(ratio) * 1.4) if valid_idx.any() else 50)
     ax2.tick_params(axis='y', colors='#333333')
-    
+
     # Reference level (not an official target), named in the legend rather than
     # on the plot, where it collided with the share line
     ax2.axhline(y=25, color='#059669', linewidth=1.5, linestyle='--', alpha=0.7, zorder=6,
                 label='25% reference')
-    
+
+    # Value labels on the capex bars. They are drawn on the top axes with a white
+    # backing, so the reference lines pass behind them rather than through them.
+    _lbl_off = np.nanmax(np.concatenate([capex, rev_exp])) * 0.02
+    for i, c in enumerate(capex):
+        if not np.isnan(c) and c > 0:
+            ax2.text(x[i] - width/2, c + _lbl_off, f'₹{c:.2f}L', transform=ax.transData,
+                     ha='center', va='bottom', fontsize=7, color=C_CAPEX, fontweight='bold', zorder=12,
+                     bbox=dict(boxstyle='round,pad=0.12', facecolor='white', edgecolor='none'))
+
     ax.set_xticks(x)
     ax.set_xticklabels(months, fontsize=9)
     ax.set_ylabel('₹ Lakh Crore', fontsize=EconStyle.FONT_SIZE_AXIS)
-    
-    # Legend at top-right, inline with subtitle
-    handles, _ = ax.get_legend_handles_labels()
+    ax.set_ylim(0, np.nanmax(np.concatenate([capex, rev_exp, [pace or 0]])) * 1.3)
+
+    # Legend in the clear top band, on the top axes so the share line cannot cover
+    # it: left-axis items first, then right-axis items
+    handles, names = ax.get_legend_handles_labels()
+    handles = [handles[i] for i in sorted(range(len(names)), key=lambda i: names[i].startswith('Capex Budget'))]
     handles2, _ = ax2.get_legend_handles_labels()
-    ax.legend(handles=handles + handles2, loc='lower right', bbox_to_anchor=(1.0, 1.02),
-              ncol=2, frameon=False, fontsize=8.5, handletextpad=0.4, borderaxespad=0)
-    
-    EconStyle.set_title(ax, "Expenditure Quality",
-                        f"Capital vs Revenue Expenditure — FY{cag_data['fy'][-2:]}")
+    ax2.legend(handles=handles + handles2, loc='upper left', ncol=3, frameon=False, fontsize=8.5,
+               handletextpad=0.4, columnspacing=1.2, borderaxespad=0.4).set_zorder(20)
+
+    if cag_data.get('capex_pct_be') is not None:
+        ax.text(0.98, 1.05, f"Capex to {cag_data['latest_month']}: {cag_data['capex_pct_be']:.1f}% of Budget",
+                transform=ax.transAxes, fontsize=10, fontweight='bold', color="#0F172A", ha="right",
+                va="bottom", bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="#0F172A", lw=1.5))
+    subtitle = f"Capital vs Revenue Expenditure — FY{cag_data['fy'][-2:]}"
+    EconStyle.set_title(ax, "Expenditure Quality", subtitle)
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
     EconStyle.add_source(fig, f"CAG Monthly Accounts | Data through {cag_data['latest_month']}")
@@ -1685,114 +1751,110 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 9: FISCAL CONSOLIDATION TRACKER
+# CHART 9: DEFICIT FINANCING
 # ═══════════════════════════════════════════
 
-def chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir):
+# (legend label, colour, fin_* columns added together). Securities against small
+# savings (b) and the NSSF line (e) both record borrowing from small savings;
+# amounts can shift between the two within the year while their sum stays smooth.
+FINANCING_GROUPS = (
+    ("Market borrowings", "#1E3A8A", ("fin_market_borrowings",)),
+    ("Small savings", "#0F766E", ("fin_small_savings_securities", "fin_nssf")),
+    ("Other domestic", "#9CA3AF", ("fin_state_provident_funds", "fin_special_deposits", "fin_others")),
+    ("Cash drawn down (+) / built up (−)", "#F59E0B", ("fin_cash_balance", "fin_surplus_cash", "fin_wma")),
+    ("External", "#7C3AED", ("fin_external",)),
+)
+
+
+def chart_deficit_financing(output_dir, manual_path=CAG_MANUAL):
     """
-    FT-style fiscal consolidation tracker: Current FY vs Previous FY trajectory.
+    How the central government's fiscal deficit is financed: the year-to-date
+    sources at each month of the latest financial year with financing rows,
+    beside the full-year Budget Estimate.
     """
-    if cag_data is None or df_monthly is None:
-        print("   ⚠ Skipping Fiscal Tracker — no CAG data")
+    fin = load_cag_financing(manual_path)
+    if fin.empty:
+        print("   ⚠ Skipping Deficit Financing — no financing rows in data/cag_manual_accounts.csv")
         return None
-    
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
-    fig.patch.set_facecolor(EconStyle.BACKGROUND)
-    
-    for ax in axes:
-        ax.set_facecolor(EconStyle.BACKGROUND)
-        # Subtle gridlines
-        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-        ax.set_axisbelow(True)
-    
-    month_order = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar']
-    
-    # Current FY
-    df_curr = df_monthly.copy()
-    df_curr['month_name'] = df_curr['Month'].str.split('-').str[0]
-    df_curr['month_idx'] = df_curr['month_name'].map({m: i for i, m in enumerate(month_order)})
-    df_curr = df_curr.sort_values('month_idx')
-    
-    x_curr = df_curr['month_idx'].values
-    capex_curr = (df_curr['Capital Expenditure'] / CRORE_PER_LAKH_CRORE).values
-    deficit_curr = (df_curr['Fiscal Deficit'] / CRORE_PER_LAKH_CRORE).values
-    
-    # Previous FY (if available)
-    if df_prev_monthly is not None:
-        df_prev = df_prev_monthly.copy()
-        df_prev['month_name'] = df_prev['Month'].str.split('-').str[0]
-        df_prev['month_idx'] = df_prev['month_name'].map({m: i for i, m in enumerate(month_order)})
-        df_prev = df_prev.sort_values('month_idx')
-        
-        x_prev = df_prev['month_idx'].values
-        capex_prev = (df_prev['Capital Expenditure'] / CRORE_PER_LAKH_CRORE).values
-        deficit_prev = (df_prev['Fiscal Deficit'] / CRORE_PER_LAKH_CRORE).values
-    
-    # LEFT: Capex YTD Progress
-    ax1 = axes[0]
-    if df_prev_monthly is not None:
-        ax1.plot(x_prev, capex_prev, color='#9CA3AF', linewidth=2, linestyle='--',
-                label=f"FY{cag_data['prev_fy'][-2:]}", marker='o', markersize=3, zorder=4)
-    ax1.plot(x_curr, capex_curr, color=C_CAPEX, linewidth=2.5,
-            label=f"FY{cag_data['fy'][-2:]}", marker='o', markersize=4, zorder=5)
-    ax1.fill_between(x_curr, 0, capex_curr, color=C_CAPEX, alpha=0.1, zorder=2)
-    
-    # Budget target line
-    if cag_data['be_capex']:
-        ax1.axhline(y=cag_data['be_capex'], color='#059669', linewidth=1.5, linestyle='--', zorder=3)
-        ax1.text(5.5, cag_data['be_capex'] * 0.985, f"Budget Estimate: ₹{cag_data['be_capex']:.2f}L Cr",
-                fontsize=8, color='#059669', ha='center', va='top')
-    
-    ax1.set_xticks(range(12))
-    ax1.set_xticklabels(month_order, fontsize=8)
-    ax1.set_ylabel('₹ Lakh Crore (Cumulative)', fontsize=9)
-    ax1.set_title('Capital Expenditure YTD', fontsize=12, fontweight='bold', pad=8)
-    ax1.legend(loc='upper left', frameon=True, facecolor='white', fontsize=9)
-    ax1.set_xlim(-0.5, 11.5)
-    
-    # End label
-    ax1.annotate(f"₹{capex_curr[-1]:.2f}L Cr\n({cag_data['capex_pct_be']:.0f}% of BE)",
-                xy=(x_curr[-1], capex_curr[-1]), xytext=(10, 0), textcoords='offset points',
-                fontsize=9, fontweight='bold', color=C_CAPEX,
-                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor=C_CAPEX))
-    
-    # RIGHT: Fiscal Deficit YTD
-    ax2 = axes[1]
-    if df_prev_monthly is not None:
-        ax2.plot(x_prev, deficit_prev, color='#9CA3AF', linewidth=2, linestyle='--',
-                label=f"FY{cag_data['prev_fy'][-2:]}", marker='o', markersize=3, zorder=4)
-    ax2.plot(x_curr, deficit_curr, color=C_FISCAL_DEF, linewidth=2.5,
-            label=f"FY{cag_data['fy'][-2:]}", marker='o', markersize=4, zorder=5)
-    ax2.fill_between(x_curr, 0, deficit_curr, color=C_FISCAL_DEF, alpha=0.1, zorder=2)
-    
-    ax2.set_xticks(range(12))
-    ax2.set_xticklabels(month_order, fontsize=8)
-    ax2.set_ylabel('₹ Lakh Crore (Cumulative)', fontsize=9)
-    ax2.set_title('Fiscal Deficit YTD', fontsize=12, fontweight='bold', pad=8)
-    ax2.legend(loc='upper left', frameon=True, facecolor='white', fontsize=9)
-    ax2.set_xlim(-0.5, 11.5)
-    
-    # End label
-    ax2.annotate(f"₹{deficit_curr[-1]:.2f}L Cr",
-                xy=(x_curr[-1], deficit_curr[-1]), xytext=(10, 0), textcoords='offset points',
-                fontsize=9, fontweight='bold', color=C_FISCAL_DEF,
-                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor=C_FISCAL_DEF))
-    
-    # Tight suptitle with less padding
-    fig.suptitle(f"Fiscal Consolidation Tracker — FY{cag_data['fy'][-2:]} vs FY{cag_data['prev_fy'][-2:]}",
-                fontsize=14, fontweight='bold', y=0.98)
-    
-    plt.tight_layout(rect=[0.02, 0.06, 0.98, 0.96])
-    
-    fig.text(0.02, 0.02, f"Source: CAG Monthly Accounts | Data through {cag_data['latest_month']}",
-            fontsize=8, color="#666666")
-    fig.text(0.98, 0.02, EconStyle.WATERMARK_TEXT,
-        fontproperties=EconStyle._get_masthead_font(),
-        fontsize=13, color="#1A1A1A", ha="right")
-    
-    fp = output_dir / "09_india_fiscal_tracker.png"
+
+    fy = fin["FY"].max()
+    rows = fin[fin["FY"] == fy]
+    months = rows[~rows["Month"].isin(["BE", "RE"])]
+    if months.empty:
+        print(f"   ⚠ Skipping Deficit Financing — {fy} has no monthly financing rows")
+        return None
+    months = months.iloc[sorted(range(len(months)), key=lambda i: _fiscal_sort_key(fy, months["Month"].iloc[i]))]
+    budget = rows[rows["Month"] == "BE"]
+    table = pd.concat([months, budget], ignore_index=True)
+    has_budget = not budget.empty
+
+    # A blank row (h) or (i) counts as zero: the load checks proved the other
+    # rows already add up to the domestic total.
+    parts = {label: table[list(cols)].fillna(0).sum(axis=1).to_numpy() / CRORE_PER_LAKH_CRORE
+             for label, _, cols in FINANCING_GROUPS}
+    deficit = (table["fin_external"] + table["fin_domestic"]).to_numpy() / CRORE_PER_LAKH_CRORE
+
+    crowded = len(table) > 7                          # later in the year: narrower slots
+    x = np.arange(len(table), dtype=float)
+    if has_budget:
+        x[-1] += 0.9 if crowded else 0.5              # set the full-year bar apart
+    width = 0.6
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+    ax.xaxis.grid(False)
+    ax.set_axisbelow(True)
+
+    # Sources that finance the deficit stack up from zero; sources that absorb
+    # money (a cash build-up, net repayments) stack down from it.
+    up, down = np.zeros(len(table)), np.zeros(len(table))
+    for label, colour, _ in FINANCING_GROUPS:
+        v = parts[label]
+        ax.bar(x, v, width, bottom=np.where(v >= 0, up, down), color=colour, label=label,
+               edgecolor='white', linewidth=0.6, zorder=3)
+        up += np.clip(v, 0, None)
+        down += np.clip(v, None, 0)
+    ax.axhline(0, color='#000000', linewidth=1.0, zorder=4)
+
+    ax.scatter(x, deficit, marker='D', s=40, color='#000000', edgecolor='white', linewidth=0.8,
+               zorder=6, label='Fiscal deficit (net of all sources)')
+    # Value labels sit beside each marker; once the year has more bars than fit,
+    # only the latest month and the Budget keep theirs.
+    labelled = range(len(x) - (2 if has_budget else 1), len(x)) if crowded else range(len(x))
+    for i in labelled:
+        ax.text(x[i] + width / 2 + 0.05, deficit[i], f"₹{deficit[i]:.2f}L", ha='left', va='center',
+                fontsize=8, fontweight='bold', color='#000000', zorder=7)
+
+    labels = [m.split('-')[0] for m in months['Month']]
+    if has_budget:
+        labels.append('Budget\n(full year)')
+        ax.axvline((x[-2] + x[-1]) / 2, color='#9CA3AF', linewidth=0.8, linestyle=':', zorder=1)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=9)
+    ax.set_xlim(x[0] - 0.6, x[-1] + (1.4 if crowded else 0.95))   # room for the last value label
+    ax.set_ylim(min(down.min(), 0) * 1.3, up.max() * 1.15)
+    ax.set_ylabel('₹ Lakh Crore', fontsize=EconStyle.FONT_SIZE_AXIS)
+
+    handles, names = ax.get_legend_handles_labels()
+    order = sorted(range(len(names)), key=lambda i: names[i].startswith('Fiscal deficit'))  # marker last
+    ax.legend([handles[i] for i in order], [names[i] for i in order], loc='upper left', ncol=2,
+              frameon=False, fontsize=8, handletextpad=0.4, columnspacing=1.2, borderaxespad=0.3)
+
+    if has_budget:
+        share = deficit[-2] / deficit[-1] * 100
+        ax.text(0.98, 1.05, f"Deficit to {months['Month'].iloc[-1]}: {share:.1f}% of Budget",
+                transform=ax.transAxes, fontsize=10, fontweight='bold', color="#0F172A", ha="right",
+                va="bottom", bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="#0F172A", lw=1.5))
+
+    EconStyle.set_title(ax, "Deficit Financing",
+                        f"How the FY{fy[-2:]} fiscal deficit is financed, year to date and in the Budget")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, f"CGA Monthly Accounts (sources of financing) | Data through {months['Month'].iloc[-1]}")
+
+    fp = output_dir / "09_india_deficit_financing.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Fiscal Consolidation Tracker")
+    print(f"   ✓ Deficit Financing")
     return fp
 
 
@@ -1990,9 +2052,11 @@ def main():
     # ── Fiscal charts (from CAG) — FROZEN, no changes ─────────────────────────
     if cag_data:
         # Tax composition and monthly capex were retired in Sep 2026: CGA no longer
-        # publishes tax by head, and monthly capex repeated the two charts below.
+        # publishes tax by head, and monthly capex repeated the other charts. The
+        # consolidation tracker gave way to deficit financing: capex against its
+        # Budget moved into Expenditure Quality, and the deficit target is on chart 11.
         chart_expenditure_quality(cag_data, df_monthly, output_dir)
-        chart_fiscal_tracker(cag_data, df_monthly, df_prev_monthly, output_dir)
+        chart_deficit_financing(output_dir)
         chart_fiscal_deficit_gdp(args.cag, output_dir)
 
     chart_count = len(list(output_dir.glob("*.png")))

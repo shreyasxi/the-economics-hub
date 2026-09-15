@@ -3,11 +3,15 @@
 # no thousands separators. Required: revenue_expenditure, capital_expenditure, fiscal_deficit. Optional: interest_payments,
 # major_subsidies. month: Mar-26, Apr-26 ... for actuals; BE or RE for budget rows (a BE row needs capital_expenditure,
 # revenue_expenditure and gdp = nominal GDP in Rs crore; its fiscal_deficit sets the chart's budget target line).
-# A row in data/cag_monthly_accounts.xlsx for the same fy and month takes precedence. generate_india.py checks every value.
-fy,month,revenue_expenditure,interest_payments,major_subsidies,capital_expenditure,fiscal_deficit,gdp,source
-2025-26,Mar-26,3836032,1242575,453854.15,1069119,1519169,,CGA provisional accounts 2025-26 web page (entered 2026-09-15)
-2026-27,Apr-26,385151,109562,,189831,362303,,CGA monthly accounts web page (entered by user 2026-09-15)
-2026-27,May-26,630020,181461,,251003,162354,,CGA monthly accounts web page (entered by user 2026-09-15)
-2026-27,Jun-26,1016818,346414,,340258,307833,,CGA monthly accounts web page (entered by user 2026-09-15)
-2026-27,Jul-26,1311218,426566,,450635,455144,,CGA monthly accounts web page (entered by user 2026-09-15); FD and total expenditure match CGA press reports of 31 Aug 2026
-2026-27,BE,4125494,1403972,,1221821,1695768,39300000,Budget at a Glance 2026-27 (via PRS Union Budget Analysis); GDP = Rs 393 lakh crore (KPMG budget note; rounded)
+# fin_* columns: the "Sources of financing the deficit" page (optional, all or none; negatives with a minus sign).
+# fin_external + fin_domestic must equal fiscal_deficit, and rows (a) market_borrowings to (i) wma must add up to
+# fin_domestic, both within Rs 1 crore. fin_surplus_cash (h) and fin_wma (i) may be blank when the page has no such row.
+# A row in data/cag_monthly_accounts.xlsx for the same fy and month takes precedence for the other columns; the workbook
+# has no financing page, so fin_* always come from here. generate_india.py checks every value.
+fy,month,revenue_expenditure,interest_payments,major_subsidies,capital_expenditure,fiscal_deficit,gdp,fin_external,fin_domestic,fin_market_borrowings,fin_small_savings_securities,fin_state_provident_funds,fin_special_deposits,fin_nssf,fin_others,fin_cash_balance,fin_surplus_cash,fin_wma,source
+2025-26,Mar-26,3836032,1242575,453854.15,1069119,1519169,,,,,,,,,,,,,CGA provisional accounts 2025-26 web page (entered 2026-09-15)
+2026-27,Apr-26,385151,109562,,189831,362303,,1940.59,360362.01,-5129.17,-36628.19,1872.48,-167.24,83463.95,150493.26,5407.92,161049,0,CGA monthly accounts web page incl. sources of financing (entered by user 2026-09-15)
+2026-27,May-26,630020,181461,,251003,162354,,3348.24,159006.11,117846.5,-50663.52,-679.92,315.66,142360.69,81017.21,5407.49,-136598,0,CGA monthly accounts web page incl. sources of financing (entered by user 2026-09-15)
+2026-27,Jun-26,1016818,346414,,340258,307833,,4140.73,303692.48,239058.15,-67597.13,-2633.66,1830.96,212654.7,100637.5,5407.96,-185666,0,CGA monthly accounts web page incl. sources of financing (entered by user 2026-09-15)
+2026-27,Jul-26,1311218,426566,,450635,455144,,4506.67,450637.15,348505.11,66595.3,-4985.36,1639.75,115989,145800.49,5317.86,-228225,0,CGA monthly accounts web page incl. sources of financing (entered by user 2026-09-15); FD and total expenditure match CGA press reports of 31 Aug 2026
+2026-27,BE,4125494,1403972,,1221821,1695768,39300000,15385.08,1680382.63,1303209.79,386772.36,3500,0,0,-45801.48,32701.96,,,Budget at a Glance 2026-27 (via PRS Union Budget Analysis); GDP = Rs 393 lakh crore (KPMG budget note; rounded); financing = BE column of the CGA sources of financing page (rows h and i not shown)

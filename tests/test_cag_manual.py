@@ -13,12 +13,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from generate_india import CagManualError, DEFAULT_CAG, load_cag_tables
+from generate_india import CagManualError, DEFAULT_CAG, load_cag_financing, load_cag_tables
 
 HEADER = ("fy,month,revenue_expenditure,interest_payments,major_subsidies,"
           "capital_expenditure,fiscal_deficit,gdp,source\n")
 # Test inputs only: shaped like a year-to-date row, not real figures.
 ROW = "{fy},{month},{rev},1150000,420000,{capex},{fd},,test\n"
+
+FIN_HEADER = ("fy,month,revenue_expenditure,capital_expenditure,fiscal_deficit,gdp,fin_external,fin_domestic,"
+              "fin_market_borrowings,fin_small_savings_securities,fin_state_provident_funds,fin_special_deposits,"
+              "fin_nssf,fin_others,fin_cash_balance,fin_surplus_cash,fin_wma,source\n")
+# Test inputs only. With mb=200000 and wma=0 the domestic rows add up to the
+# domestic total 300000, and external 5000 + domestic equals the deficit 305000.
+FIN_ROW = "2026-27,Apr-26,400000,150000,{fd},,5000,300000,{mb},40000,1000,0,60000,50000,5000,-56000,{wma},test\n"
 
 
 def _tables(body: str):
@@ -28,9 +35,16 @@ def _tables(body: str):
         return load_cag_tables(DEFAULT_CAG, path)
 
 
-def _fails(body: str, needle: str) -> None:
+def _financing(body: str):
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "manual.csv"
+        path.write_text(FIN_HEADER + body, encoding="utf-8")
+        return load_cag_financing(path)
+
+
+def _fails(body: str, needle: str, load=_tables) -> None:
     try:
-        _tables(body)
+        load(body)
     except CagManualError as e:
         assert needle in str(e), f"expected {needle!r} in: {e}"
         return
@@ -71,6 +85,28 @@ def test_workbook_row_wins_over_manual_duplicate():
     actual, _, _ = _tables(ROW.format(fy="2025-26", month="Feb-26", rev=3115270, capex=999999, fd=1300000))
     feb = actual[(actual["FY"] == "2025-26") & (actual["Month"] == "Feb-26")]
     assert len(feb) == 1 and feb["Capital Expenditure"].iloc[0] == 929322
+
+
+def test_financing_that_adds_up_is_accepted():
+    fin = _financing(FIN_ROW.format(fd=305000, mb=200000, wma=0))
+    assert len(fin) == 1 and fin["fin_market_borrowings"].iloc[0] == 200000
+
+
+def test_blank_row_below_cash_balance_is_allowed():
+    fin = _financing(FIN_ROW.format(fd=305000, mb=200000, wma=""))
+    assert fin["fin_wma"].isna().iloc[0]
+
+
+def test_financing_that_misses_the_deficit_is_refused():
+    _fails(FIN_ROW.format(fd=315000, mb=200000, wma=0), "not the fiscal deficit", load=_financing)
+
+
+def test_mistyped_domestic_row_is_refused():
+    _fails(FIN_ROW.format(fd=305000, mb=20000, wma=0), "domestic financing rows add up", load=_financing)
+
+
+def test_incomplete_financing_is_refused():
+    _fails(FIN_ROW.format(fd=305000, mb="", wma=0), "financing is incomplete", load=_financing)
 
 
 if __name__ == "__main__":
