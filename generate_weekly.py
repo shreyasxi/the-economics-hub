@@ -6,12 +6,14 @@ Run this script every Friday/Saturday to generate the full
 weekly dashboard. Produces all charts.
 
 Usage:
-    python generate_weekly.py              # Live data (requires API keys)
-    python generate_weekly.py --mock       # Mock data (for testing)
+    python generate_weekly.py              # Live data (requires FRED_API_KEY)
     python generate_weekly.py --preview    # Lower DPI for quick preview
 
+There is no mock-data mode: if a data source or the API key is missing, the
+run fails instead of publishing invented numbers.
+
 The script:
-1. Fetches data (live or mock)
+1. Fetches live data
 2. Calculates weekly changes
 3. Generates all dashboard charts
 4. Saves everything to output/weekly/YYYY-MM-DD/
@@ -88,17 +90,6 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             # ── EDIT for each Substack issue ──────────────────────────────
             "The VIX Term Structure Signals a Contained Shock",
             "The 30-day VIX rising above the 3-month VIX suggests markets view the shock as a short-term event",
-        ),
-    },
-    "nifty_it_trend": {
-        "dashboard": (
-            "NIFTY IT Index — Trailing 12 Months",
-            "NSE IT sector benchmark index level",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "India's IT Sector Feels the AI Threat",
-            "Sector benchmark continues to hit 12-month lows as investors confront AI's threat to India's IT export model",
         ),
     },
     "fx_weekly": {
@@ -353,157 +344,6 @@ def get_output_dir():
     return out_dir
 
 
-def generate_with_mock_data(output_dir, mode="dashboard"):
-    """Generate full dashboard using mock data."""
-    from data.mock_data import (
-        get_mock_weekly_changes,
-        get_mock_equity_data,
-        get_mock_fx_data,
-        get_mock_yield_data,
-        get_mock_yield_trend,
-        get_mock_commodity_data,
-    )
-    
-    print("📊 Generating Economics Hub Weekly Dashboard (Mock Data)")
-    print(f"   Output: {output_dir}\n")
-    
-    weekly = get_mock_weekly_changes()
-    
-    # ─────────────────────────────────────────
-    # 1. EQUITIES
-    # ─────────────────────────────────────────
-    print("   [1/8] Equities — Weekly Bar Chart")
-    eq = weekly["equities"]
-    chart = WeeklyBarChart(
-        names=eq["names"],
-        values=eq["values"],
-        color_keys=eq["color_keys"],
-    )
-    chart.render(
-        title="Global Equities",
-        subtitle="Weekly percentage change  ·  " + datetime.now().strftime("%d %b %Y"),
-        source="Yahoo Finance",
-    )
-    chart.save(output_dir / "01_equities_weekly.png")
-    
-    print("   [2/8] Equities — 12-Month Trends")
-    equity_data = get_mock_equity_data()
-    trend = TrendLineChart()
-    for key in ["sp500", "nifty50", "ftse100"]:
-        d = equity_data[key]
-        trend.add_series(d["name"], d["dates"], d["values"], color_key=d["color_key"])
-    trend.render(
-        title="Major Indices — Trailing 12 Months",
-        subtitle="Indexed to 100 at start  ·  S&P 500, Nifty 50, FTSE 100",
-        source="Yahoo Finance",
-        normalize=True,
-        ylabel="Indexed (start = 100)",
-    )
-    trend.save(output_dir / "02_equities_trend.png")
-    
-    # ─────────────────────────────────────────
-    # 2. FOREIGN EXCHANGE
-    # ─────────────────────────────────────────
-    
-    print("   [4/8] FX — 12-Month Trends")
-    fx_data = get_mock_fx_data()
-    trend = TrendLineChart()
-    for key in ["dxy", "eurusd", "gbpusd", "usdinr"]:
-        d = fx_data[key]
-        trend.add_series(d["name"], d["dates"], d["values"], color_key=d["color_key"])
-    trend.render(
-        title="Key FX Rates — Trailing 12 Months",
-        subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, USD/INR",
-        source="Yahoo Finance",
-        normalize=True,
-        ylabel="Indexed (start = 100)",
-    )
-    trend.save(output_dir / "04_fx_trend.png")
-    
-    # ─────────────────────────────────────────
-    # 3. GOVERNMENT BOND YIELDS
-    # ─────────────────────────────────────────
-    
-    print("   [6/8] Yields — US Treasury Yield Curve")
-    yc_data = get_mock_yield_data()
-    yc = YieldCurveChart()
-    yc.add_curve("7 Feb 2026", yc_data["tenors"], yc_data["current"], style="current")
-    yc.add_curve("10 Jan 2026", yc_data["tenors"], yc_data["4w_ago"], style="4w_ago")
-    yc.add_curve("7 Feb 2025", yc_data["tenors"], yc_data["52w_ago"], style="52w_ago")
-    _t, _s = WEEKLY_TITLES["yield_curve"][mode]
-    yc.render(title=_t, subtitle=_s, source="FRED")
-    yc.save(output_dir / "06_yield_curve.png")
-
-    # ─────────────────────────────────────────
-    # 4. COMMODITIES
-    # ─────────────────────────────────────────
-    print("   [7/8] Commodities — Weekly Bar Chart")
-    cm = weekly["commodities"]
-    chart = WeeklyBarChart(
-        names=cm["names"],
-        values=cm["values"],
-        color_keys=cm["color_keys"],
-    )
-    chart.render(
-        title="Commodities",
-        subtitle="Weekly percentage change  ·  " + datetime.now().strftime("%d %b %Y"),
-        source="Yahoo Finance",
-    )
-    chart.save(output_dir / "07_commodities_weekly.png")
-    
-    print("   [8/8] Commodities — 12-Month Trends")
-    commodity_data = get_mock_commodity_data()
-    trend = TrendLineChart()
-    for key in ["brent", "gold", "copper"]:
-        d = commodity_data[key]
-        trend.add_series(d["name"], d["dates"], d["values"], color_key=d["color_key"])
-    trend.render(
-        title="Key Commodities — Trailing 12 Months",
-        subtitle="Indexed to 100 at start  ·  Brent Crude, Gold, Copper",
-        source="Yahoo Finance",
-        normalize=True,
-        ylabel="Indexed (start = 100)",
-    )
-    trend.save(output_dir / "08_commodities_trend.png")
-    
-    # ─────────────────────────────────────────
-    # SUMMARY TABLE
-    # ─────────────────────────────────────────
-    print("   [+] Summary Table")
-    table = SummaryTable()
-    
-    # Equities
-    eq_levels = [6142, 7632, 4587, 23412, 38920, 3095]
-    eq_ytds =   ["+4.8%", "+2.1%", "+5.2%", "-1.3%", "+6.4%", "-2.8%"]
-    for name, val, level, ytd, ck in zip(eq["names"], eq["values"], eq_levels, eq_ytds, eq["color_keys"]):
-        table.add_row(name, level, EconStyle.format_change_label(val, "pct"), ytd, "equities")
-    
-    # FX
-    fx_levels = [104.2, 1.082, 1.268, 84.12, 147.3, 0.875]
-    fx_ytds =   ["+1.2%", "-0.8%", "+0.3%", "+1.8%", "-2.1%", "-0.5%"]
-    for name, val, level, ytd, ck in zip(fx["names"], fx["values"], fx_levels, fx_ytds, fx["color_keys"]):
-        table.add_row(name, level, EconStyle.format_change_label(val, "pct"), ytd, "fx")
-    
-    # Yields
-    yd_levels = [4.35, 4.38, 4.55, 2.55, 4.45, 7.05]
-    yd_ytds =   ["+15bps", "+25bps", "+18bps", "+12bps", "+22bps", "-10bps"]
-    for name, val, level, ytd, ck in zip(yd["names"], yd["values"], yd_levels, yd_ytds, yd["color_keys"]):
-        table.add_row(name, f"{level:.2f}%", EconStyle.format_change_label(val, "abs"), ytd, "yields")
-    
-    # Commodities
-    cm_levels = [78.40, 74.20, 2890, 31.50, 4.18, 2.65]
-    cm_ytds =   ["-5.2%", "-5.8%", "+8.1%", "+12.3%", "+7.5%", "-15.2%"]
-    for name, val, level, ytd, ck in zip(cm["names"], cm["values"], cm_levels, cm_ytds, cm["color_keys"]):
-        table.add_row(name, level, EconStyle.format_change_label(val, "pct"), ytd, "commodities")
-    
-    table.render(
-        title="Market Snapshot",
-        subtitle=f"Week ending {datetime.now().strftime('%d %B %Y')}",
-        source="Yahoo Finance, FRED",
-    )
-    table.save(output_dir / "00_summary_table.png")
-        
-
 def generate_with_live_data(output_dir, mode="dashboard"):
     """Generate dashboard with live API data from yfinance + FRED."""
     import pandas as pd
@@ -513,13 +353,11 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     from data.fetchers.fred_fetcher import FredFetcher
     from config.settings import INDICATORS, FRED_API_KEY
 
-    if FRED_API_KEY == "YOUR_FRED_API_KEY":
-        print("⚠  FRED API key not set!")
-        print("   Open config/settings.py and replace YOUR_FRED_API_KEY")
-        print("   Get a free key at: https://fred.stlouisfed.org/docs/api/api_key.html")
-        print("   Falling back to mock data...\n")
-        generate_with_mock_data(output_dir)
-        return
+    if not FRED_API_KEY or FRED_API_KEY == "YOUR_FRED_API_KEY":
+        sys.exit(
+            "FRED_API_KEY is not set. Add it to .env locally or to the GitHub Actions secrets.\n"
+            "Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html"
+        )
 
     print("📊 Generating Economics Hub Weekly Dashboard (LIVE DATA)")
     print(f"   Output: {output_dir}\n")
@@ -1012,70 +850,6 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ Sector rotation failed: {e}")
         
-    # ── CUSTOM NARRATIVE CHART: NIFTY IT INDEX 1-YEAR TREND (ECONSTYLE BRANDED) ──
-    print("   [Custom] Generating NIFTY IT 1-Year Trend...")
-    try:
-        import matplotlib.pyplot as plt
-        import matplotlib.dates as mdates
-        
-        custom_series = yf_fetcher.get_close_series("^CNXIT", period="1y")
-        
-        if not custom_series.empty:
-            dates = custom_series.index.to_pydatetime()
-            vals = custom_series.values
-            
-            # Use YOUR custom styling framework for the figure
-            fig, ax = EconStyle.create_figure(size="wide")
-            
-            # Plot the line (using your official India color if defined, otherwise a deep red)
-            ax.plot(dates, vals, color="#B91C1C", linewidth=2.5, solid_capstyle="round")
-            # Add a subtle shadow for depth (standard in your other charts)
-            ax.plot(dates, vals, color="#B91C1C", linewidth=3.7, alpha=0.07, solid_capstyle="round")
-            
-            # THE Y-AXIS FIX: Force it to crop tightly around the data
-            min_val = min(vals)
-            max_val = max(vals)
-            padding = (max_val - min_val) * 0.1
-            ax.set_ylim(min_val - padding, max_val + padding)
-            
-            # Date formatting
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.set_ylabel("Index Level", fontsize=EconStyle.FONT_SIZE_AXIS)
-            
-            # Highlight the selloff at the very end
-            if len(dates) > 5:
-                ax.axvspan(dates[-6], dates[-1], color='#DC2626', alpha=0.1)
-                # Add an end label for maximum impact
-                ax.annotate(
-                    f"{vals[-1]:,.0f}",
-                    xy=(dates[-1], vals[-1]),
-                    xytext=(8, 0), textcoords="offset points",
-                    fontsize=9, fontweight="bold", color="#B91C1C",
-                    fontfamily=EconStyle.FONT_FAMILY,
-                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.85),
-                    zorder=10
-                )
-
-            # Apply YOUR custom titles, rules, and sources
-            _t, _s = WEEKLY_TITLES["nifty_it_trend"][mode]
-            EconStyle.set_title(ax, _t, _s)
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (NSE)")
-            
-            # Save using your custom saver
-            chart_path = output_dir / "10c_nifty_it_trend_custom.png"
-            EconStyle.save_chart(fig, chart_path)
-            
-            print(f"      ✓ Saved Custom NIFTY IT chart (Perfectly branded)")
-        else:
-            print("   ⚠ Custom chart data returned empty.")
-            
-    except Exception as e:
-        print(f"   ⚠ Custom chart generation failed: {e}")
-
     # ── 8. REAL WAGE GROWTH ──
     print("   [12/12] US Real Wage Growth (Data only for Summary Table)")
     real_wage_latest = None
@@ -1693,50 +1467,48 @@ def generate_with_live_data(output_dir, mode="dashboard"):
                            fontweight="bold", color=color_usd)
 
             ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            
             ax1.spines['top'].set_visible(False)
             ax2.spines['top'].set_visible(False)
-            
-            # ── DYNAMIC END-OF-LINE LABELS WITH CROSS-AXIS COLLISION AVOIDANCE ──
+
+            # ── END-OF-LINE LABELS, SPACED SO NONE OVERLAP ACROSS THE TWO AXES ──
             last_date = em_hy_bps.index[-1].to_pydatetime()
-            val_hy = em_hy_bps.values[-1]
-            val_corp = em_corp_bps.values[-1]
-            val_usd = usd_em.values[-1]
+            labels = [  # (axis, text, value, colour)
+                (ax1, "EM HY Spread", em_hy_bps.values[-1], color_hy),
+                (ax1, "EM Corp Spread", em_corp_bps.values[-1], color_corp),
+                (ax2, "USD Index", usd_em.values[-1], color_usd),
+            ]
+            # Put every label on a shared 0-1 height scale, push neighbours apart,
+            # then draw it just right of the line ends (x in data, y in axes units).
+            def _height(ax, v):
+                lo, hi = ax.get_ylim()
+                return (v - lo) / (hi - lo)
+            order = sorted(range(len(labels)), key=lambda i: _height(labels[i][0], labels[i][2]))
+            heights = [_height(labels[i][0], labels[i][2]) for i in order]
+            min_gap = 0.065
+            for k in range(1, len(heights)):
+                heights[k] = max(heights[k], heights[k - 1] + min_gap)
+            overflow = heights[-1] - 0.98
+            if overflow > 0:
+                heights = [h - overflow for h in heights]
+            import matplotlib.transforms as mtransforms
+            label_tf = mtransforms.offset_copy(
+                mtransforms.blended_transform_factory(ax1.transData, ax1.transAxes),
+                fig=fig, x=8, units="points",
+            )
+            for h, i in zip(heights, order):
+                _, text, _, colour = labels[i]
+                ax1.text(mdates.date2num(last_date), h, text, transform=label_tf,
+                         va="center", ha="left", fontsize=10, fontweight="bold",
+                         color=colour, clip_on=False)
 
-            # 1. Convert actual values to a 0-to-1 physical scale to detect cross-axis collisions
-            y1_min, y1_max = ax1.get_ylim()
-            y2_min, y2_max = ax2.get_ylim()
-            
-            norm_hy = (val_hy - y1_min) / (y1_max - y1_min)
-            norm_corp = (val_corp - y1_min) / (y1_max - y1_min)
-            norm_usd = (val_usd - y2_min) / (y2_max - y2_min)
-
-            offset_hy, offset_corp, offset_usd = 0, 0, 0
-            
-            # 2. The Repeller: If HY and USD lines are occupying the same physical space
-            if abs(norm_hy - norm_usd) < 0.05:
-                if norm_hy >= norm_usd:
-                    offset_hy, offset_usd = 10, -10
-                else:
-                    offset_hy, offset_usd = -10, 10
-
-            # 3. Draw the Labels using the computed offsets
-            ax1.annotate("EM HY Spread", xy=(last_date, val_hy), xytext=(8, offset_hy), 
-                         textcoords="offset points", va="center", ha="left", 
-                         fontsize=10, fontweight="bold", color=color_hy)
-                         
-            ax1.annotate("EM Corp Spread", xy=(last_date, val_corp), xytext=(8, offset_corp), 
-                         textcoords="offset points", va="center", ha="left", 
-                         fontsize=10, fontweight="bold", color=color_corp)
-
-            ax2.annotate("USD Index", xy=(last_date, val_usd), xytext=(8, offset_usd), 
-                         textcoords="offset points", va="center", ha="left", 
-                         fontsize=10, fontweight="bold", color=color_usd)
-
-            # Expand right side for text breathing room
-            ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.18)
+            # Room on the right for the labels, but date ticks only where there is data:
+            # every January and July, so the labels never collide.
+            x0, x1 = ax1.get_xlim()
+            ax1.set_xlim(x0, x1 + (x1 - x0) * 0.18)
+            first_date = min(em_hy_bps.index[0], em_corp_bps.index[0], usd_em.index[0])
+            months = pd.date_range(first_date, em_hy_bps.index[-1], freq="MS")
+            ax1.set_xticks([d.to_pydatetime() for d in months if d.month in (1, 7)])
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
 
             _t, _s = WEEKLY_TITLES["em_stress_monitor"][mode]
             EconStyle.set_title(ax1, _t, _s)
@@ -2172,7 +1944,6 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Economics Hub Weekly Dashboard")
-    parser.add_argument("--mock", action="store_true", help="Use mock data for testing")
     parser.add_argument("--preview", action="store_true", help="Generate at lower DPI")
     parser.add_argument(
         "--mode",
@@ -2187,16 +1958,7 @@ def main():
 
     output_dir = get_output_dir()
 
-    if args.mock:
-        generate_with_mock_data(output_dir, mode=args.mode)
-    else:
-        try:
-            generate_with_live_data(output_dir, mode=args.mode)
-        except ImportError as e:
-            print(f"⚠ {e}")
-            print("   Falling back to mock data. Install dependencies:")
-            print("   pip install yfinance fredapi")
-            generate_with_mock_data(output_dir, mode=args.mode)
+    generate_with_live_data(output_dir, mode=args.mode)
 
 
 if __name__ == "__main__":

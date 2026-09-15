@@ -563,13 +563,74 @@ def chart_gst(df, output_dir):
 
 
 # ═══════════════════════════════════════════
+# CHART: NIFTY IT INDEX (TRAILING 12 MONTHS)
+# ═══════════════════════════════════════════
+
+def chart_nifty_it_trend(output_dir):
+    """
+    NIFTY IT index level over the trailing 12 months (Yahoo Finance, ^CNXIT).
+    Moved from the Weekly Markets dashboard in Sep 2026; the India workflow
+    runs every Saturday, so the series stays weekly-fresh.
+    """
+    from data.fetchers.yfinance_fetcher import YFinanceFetcher
+
+    try:
+        series = YFinanceFetcher().get_close_series("^CNXIT", period="1y")
+    except Exception as e:
+        print(f"   ⚠ Skipping NIFTY IT — fetch failed: {e}")
+        return None
+    if series is None or series.empty:
+        print("   ⚠ Skipping NIFTY IT — no data returned")
+        return None
+
+    dates = series.index.to_pydatetime()
+    vals = series.values
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    ax.plot(dates, vals, color="#B91C1C", linewidth=2.5, solid_capstyle="round")
+    ax.plot(dates, vals, color="#B91C1C", linewidth=3.7, alpha=0.07, solid_capstyle="round")
+
+    # Crop the y-axis tightly around the data
+    padding = (vals.max() - vals.min()) * 0.1
+    ax.set_ylim(vals.min() - padding, vals.max() + padding)
+
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
+    ax.set_ylabel("Index Level", fontsize=EconStyle.FONT_SIZE_AXIS)
+
+    # Latest week shaded, with the last close labelled
+    if len(dates) > 5:
+        ax.axvspan(dates[-6], dates[-1], color="#DC2626", alpha=0.1)
+        ax.annotate(
+            f"{vals[-1]:,.0f}",
+            xy=(dates[-1], vals[-1]),
+            xytext=(8, 0), textcoords="offset points",
+            fontsize=9, fontweight="bold", color="#B91C1C",
+            fontfamily=EconStyle.FONT_FAMILY,
+            bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.85),
+            zorder=10,
+        )
+
+    EconStyle.set_title(ax, "NIFTY IT Index — Trailing 12 Months", "NSE IT sector benchmark index level")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "Yahoo Finance (NSE)")
+
+    fp = output_dir / "04_india_nifty_it_trend.png"
+    EconStyle.save_chart(fig, fp)
+    print("   ✓ NIFTY IT (12 months)")
+    return fp
+
+
+# ═══════════════════════════════════════════
 # CHART: FOREIGN PORTFOLIO FLOWS (MONTHLY)
 # ═══════════════════════════════════════════
 
 def chart_fpi_flows(df, output_dir):
     """
-    Monthly Net FPI Flows (USD Billion) — Bar chart.
-    Replaces the weekly version for better historical data availability.
+    Monthly net portfolio investment (USD billion), from the RBI DBIE workbook
+    via india_fetcher.py --append. RBI publishes it about two to three months late.
     """
     if "india_fpi_flows" not in df.columns or not df["india_fpi_flows"].notna().any():
         print("   ⚠ Skipping FPI Flows — no monthly data found")
@@ -612,19 +673,19 @@ def chart_fpi_flows(df, output_dir):
 
     # Calculate Cumulative 24M for the floating badge
     cum_flow = df_fpi["india_fpi_flows"].sum()
-    sign = "+" if cum_flow >= 0 else ""
+    sign = "+" if cum_flow >= 0 else "−"
     
     # Custom floating badge in the top right
     bbox_props = dict(boxstyle="round,pad=0.4", fc="white", ec="#0F172A", lw=1.5)
-    ax.text(0.98, 1.05, f"24M Cumulative: ${sign}{cum_flow:.1f}B", 
+    ax.text(0.98, 1.05, f"24M Cumulative: {sign}${abs(cum_flow):.1f}B", 
             transform=ax.transAxes, fontsize=10, fontweight='bold', 
             color="#0F172A", ha="right", va="bottom", bbox=bbox_props)
 
     EconStyle.set_title(ax, "Foreign Portfolio Flows",
-                        "Monthly Net FPI/FII Flows into India ($B) — Last 24 Months")
+                        "Monthly net portfolio investment into India ($B) — last 24 months")
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "NSDL / RBI DBIE")
+    EconStyle.add_source(fig, "RBI DBIE (Net Portfolio Investment)")
 
     fp = output_dir / "03_india_fpi_monthly.png"
     EconStyle.save_chart(fig, fp)
@@ -649,7 +710,6 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
 
     # Determine CAG availability
     has_cag = cag_data is not None
-    cag_month = cag_data['latest_month'] if has_cag else None
 
     # ═══════════════════════════════════════════
     # DEFINE TABLE STRUCTURE
@@ -899,13 +959,13 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     # ═══════════════════════════════════════════
     footer_y = y - row_h/2 - 0.25  # Reduced from 0.40
 
-    source_text = "Source: S&P Global, RBI DBIE, FRED, MoSPI, PIB, CAG, NSDL"
+    source_text = "Source: S&P Global, RBI DBIE, FRED, MoSPI, PIB, CAG"
     ax.text(0.5, footer_y, source_text,
             fontsize=8, color="#666666", ha="left", va="bottom")
     
     if has_cag:
         footer_y -= 0.15
-        ax.text(0.5, footer_y, f"* Latest ({cag_month}) Fiscal data",
+        ax.text(0.5, footer_y, "* Latest fiscal data",
                 fontsize=7, color="#666666", ha="left", va="bottom", style='italic')
     
     ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT,
@@ -1876,6 +1936,7 @@ def main():
     chart_pmi(df, output_dir)
     chart_gst(df, output_dir)
     chart_fpi_flows(df, output_dir)
+    chart_nifty_it_trend(output_dir)
     chart_inflation_bar(df, output_dir)
 
     # ── Summary table (integrates CAG fiscal + weekly forex) ───────────────────

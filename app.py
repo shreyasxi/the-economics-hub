@@ -1218,21 +1218,21 @@ with tab_weekly:
             _section("Equities")
             _render_grid(equities)
 
-        # 2. Fixed Income & Credit
-        rates_kws = ["yield", "credit_spreads", "bond_etf"]
-        rates = [c for c in charts if any(k in c.name for k in rates_kws)]
-        charts = [c for c in charts if c not in rates]
-        if rates:
-            _section("Fixed Income & Credit")
-            _render_grid(rates)
-            
-        # 3. Commodities
+        # 2. Commodities
         commo_kws = ["commodities", "brent", "wti", "agri", "oil", "gold", "copper"]
         commo = [c for c in charts if any(k in c.name for k in commo_kws) and "btc" not in c.name]
         charts = [c for c in charts if c not in commo]
         if commo:
             _section("Commodities")
             _render_grid(commo)
+
+        # 3. Fixed Income & Credit
+        rates_kws = ["yield", "credit_spreads", "bond_etf"]
+        rates = [c for c in charts if any(k in c.name for k in rates_kws)]
+        charts = [c for c in charts if c not in rates]
+        if rates:
+            _section("Fixed Income & Credit")
+            _render_grid(rates)
 
         # 4. Inflation Signals
         inflation_kws = ["breakeven", "real_yield"]
@@ -1267,7 +1267,7 @@ with tab_weekly:
 
 
         # 8. Emerging Markets
-        em_kws = ["em_fx", "em_equity", "india_vs_em", "nifty", "stress_monitor"]
+        em_kws = ["em_fx", "em_equity", "india_vs_em", "stress_monitor"]
         em = [c for c in charts if any(k in c.name for k in em_kws)]
         charts = [c for c in charts if c not in em]
         if em:
@@ -1351,8 +1351,7 @@ with tab_india:
 
     if not charts:
         st.warning(
-            "No India charts found. Update **data/india_manual.csv** and "
-            "**data/cag_monthly_accounts.xlsx**, then run **generate_india.py** "
+            "No India charts found. Run **generate_india.py** locally "
             "or trigger the India Dashboard workflow on GitHub Actions."
         )
     else:
@@ -1405,8 +1404,8 @@ with tab_india:
             _section("External Sector")
             _render_grid(external)
 
-        # 5. Capital Flows
-        flows_kws = ["flows", "fii", "fpi", "portfolio"]
+        # 5. Capital Flows (FPI flows, and the NIFTY IT index moved here from Weekly Markets)
+        flows_kws = ["flows", "fii", "fpi", "portfolio", "nifty"]
         flows = [c for c in charts if any(k in c.name for k in flows_kws)]
         charts = [c for c in charts if c not in flows]
         if flows:

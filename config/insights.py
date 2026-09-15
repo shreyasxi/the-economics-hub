@@ -105,12 +105,6 @@ CHART_INSIGHTS: dict[str, str] = {
 **Practical takeaway:** PSU Bank leadership alongside Metal/Infra outperformance typically signals a government capex cycle — budget-driven infrastructure spending flowing into state-owned enterprises. FMCG outperforming cyclicals in India reflects rural demand recovery or urban consumption caution. When Realty and Auto underperform simultaneously, it often precedes an RBI tightening cycle concern. Compare this chart to the S&P sector rotation chart to distinguish India-idiosyncratic drivers from global sector rotation patterns that happen to flow through Indian indices.
 """,
 
-    "nifty_it_trend_custom": """\
-**How to read this chart:** The NIFTY IT Index level over the trailing 12 months, with the most recent period highlighted. As the benchmark for India's IT services export economy — dominated by TCS, Infosys, Wipro, HCL, and Tech Mahindra — this index is simultaneously a proxy for global IT spending (demand-side) and INR/USD rate dynamics (supply-side). A 5–7% depreciation in the rupee adds roughly 2–3 percentage points to NIFTY IT earnings in rupee terms.
-
-**Practical takeaway:** The NIFTY IT index is structurally sensitive to three forces: US corporate IT budget cycles (which lead the index by 2–3 quarters), generative AI disruption risk (a structural negative for traditional offshore services), and the INR/USD rate (a natural hedge that buffers dollar-denominated revenue). Watch for divergence between NIFTY IT and US tech (QQQ/XLK) — when Indian IT underperforms US tech for more than a quarter, it typically signals AI disruption concerns rather than cycle weakness. The sector has historically traded at a premium to the broader NIFTY 50 — a narrowing premium is a structural warning sign.
-""",
-
     # ── WEEKLY: LABOUR & WAGES ──────────────────────────────────────────────
 
     "labour_market": """\
@@ -329,10 +323,16 @@ CHART_INSIGHTS: dict[str, str] = {
 **Practical takeaway:** Bank credit growth is a coincident indicator of the capex and consumption cycles. When credit to industry accelerates alongside credit to services and retail, it signals a broad-based expansion — the ideal macro backdrop. Watch for composition: retail credit (personal loans, home loans) expanding faster than industrial credit can signal consumer-led growth masking weak private sector investment — a less durable combination. RBI's credit data also captures the shadow of monetary policy: credit growth decelerating after rate hikes confirms the transmission mechanism is working. A divergence — where market rates rise but credit growth stays elevated — often signals that corporates are front-loading borrowing before higher rates bite, a pattern that precedes credit quality deterioration 3–6 months later.
 """,
 
-    "india_fpi": """\
-**How to read this chart:** Weekly net FII/FPI (Foreign Institutional/Portfolio Investor) cash-market flows into India, sourced from NSE via jugaad-data. Each bar represents a single trading day's net buying or selling by foreign institutions (₹ Crore, converted to USD bn). The 4-week rolling moving average cuts through daily noise to reveal the underlying flow trend. The 52-week cumulative annotation at top-right shows whether the overall year has been a net inflow or outflow period — the single most important number for understanding foreign ownership trends.
+    "india_nifty_it_trend": """\
+**How to read this chart:** The NIFTY IT Index level over the trailing 12 months, with the latest week shaded. As the benchmark for India's IT services export economy — dominated by TCS, Infosys, Wipro, HCL, and Tech Mahindra — this index is simultaneously a proxy for global IT spending (demand-side) and INR/USD rate dynamics (supply-side). A 5–7% depreciation in the rupee adds roughly 2–3 percentage points to NIFTY IT earnings in rupee terms.
 
-**Practical takeaway:** Weekly FPI data is significantly more actionable than monthly aggregates because it reveals intra-month reversals that monthly averages mask. Three consecutive weeks of outflows exceeding $500M each are historically associated with 2–4% NIFTY underperformance in the following 4 weeks. The key asymmetry: inflows tend to be gradual and persistent (weeks of steady accumulation), while outflows can be sharp and concentrated (a single week of panic selling can erase a month of inflows). Foreign flows are structurally driven by India's weight in EM benchmarks (MSCI EM, FTSE EM) — MSCI weight increases have historically preceded 3–6 months of sustained inflows regardless of the macro backdrop. For timing, note that September–October typically sees FPI outflows as global fund managers rebalance ahead of Q3 earnings seasons in the US and Europe.
+**Practical takeaway:** The NIFTY IT index is structurally sensitive to three forces: US corporate IT budget cycles (which lead the index by 2–3 quarters), generative AI disruption risk (a structural negative for traditional offshore services), and the INR/USD rate (a natural hedge that buffers dollar-denominated revenue). Watch for divergence between NIFTY IT and US tech (QQQ/XLK) — when Indian IT underperforms US tech for more than a quarter, it typically signals AI disruption concerns rather than cycle weakness. The sector has historically traded at a premium to the broader NIFTY 50 — a narrowing premium is a structural warning sign.
+""",
+
+    "india_fpi_monthly": """\
+**How to read this chart:** Each bar is one month's net portfolio investment into India in US$ billion: foreign investors' purchases of Indian equities and debt minus their sales, as reported by the RBI. Green bars are net inflows, red bars net outflows. The badge shows the cumulative total for the 24 months on the chart. The RBI publishes this series about two to three months after the month ends and revises recent months, so the latest bars can change.
+
+**Practical takeaway:** Portfolio flows are the most volatile part of India's capital account. Sustained outflows put pressure on the rupee and on liquidity in Indian markets, and have typically coincided with periods of global risk aversion or a strong US dollar; sustained inflows ease both. A run of outflows while the trade deficit widens is the combination most likely to weaken the rupee and draw RBI intervention, visible in the forex reserves chart.
 """,
 
     "india_inflation_bar": """\

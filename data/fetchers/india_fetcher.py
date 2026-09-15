@@ -41,6 +41,7 @@ _ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(_ROOT))
 
 from data.india_db_manager import (
+    DB_PATH,
     init_db,
     seed_from_csv,
     upsert_monthly,
@@ -90,6 +91,7 @@ DEFAULT_CSV = _ROOT / "data" / "india_manual.csv"
 #     python -m data.india_manual_entry set 2026-02 --iip 4.8
 _MONTHLY_COLS = {
     "period":     1,
+    "net_portfolio": 13,  # Net Portfolio Investment (USD Million) — the monthly FPI chart
     "exports":    17,   # Foreign Trade Exports Total (USD Million)
     "imports":    18,   # Foreign Trade Imports Total (USD Million)
     "trade_bal":  19,   # Foreign Trade Balance Total (USD Million, negative = deficit)
@@ -318,6 +320,7 @@ _SANITY_BOUNDS = {
     "india_imports_usd_bn":       (5, 160),
     "india_trade_deficit_usd_bn": (-40, 80),
     "india_cpi_yoy":              (-5, 25),
+    "india_fpi_flows":            (-40, 40),
 }
 
 
@@ -342,8 +345,10 @@ def _reject_implausible(month: str, row: dict) -> dict:
 
 def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
     """
-    Parse Monthly sheet: IIP YoY, Exports, Imports, Trade Deficit.
-    FPI is NOT extracted here — it comes from jugaad-data (weekly).
+    Parse Monthly sheet: Exports, Imports, Trade Deficit and Net Portfolio
+    Investment (the monthly FPI flows chart, USD bn). RBI publishes portfolio
+    flows with a lag of about two to three months and revises recent months,
+    so every run rewrites them from the latest workbook.
     """
     try:
         df = pd.read_excel(source, sheet_name="Monthly", header=None)
@@ -360,6 +365,16 @@ def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
         return pd.to_numeric(data.iloc[:, _MONTHLY_COLS[key]], errors="coerce")
 
     exports  = (_col("exports")   / 1000).round(4)
+    # Guard against RBI moving columns (as happened to IIP in 2026): only read
+    # portfolio flows if the header still says so.
+    fpi_header = str(df.iloc[3, _MONTHLY_COLS["net_portfolio"]])
+    if "portfolio" in fpi_header.lower():
+        fpi = (_col("net_portfolio") / 1000).round(4)
+    else:
+        log.error("REJECTED FPI: Monthly column %d is %r, not Net Portfolio Investment. "
+                  "Find the column in the workbook and update _MONTHLY_COLS.",
+                  _MONTHLY_COLS["net_portfolio"], fpi_header)
+        fpi = None
     imports  = (_col("imports")   / 1000).round(4)
     deficit  = (-_col("trade_bal") / 1000).round(4)
 
@@ -372,6 +387,8 @@ def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
             row["india_imports_usd_bn"] = float(imports.iloc[i])
         if pd.notna(deficit.iloc[i]):
             row["india_trade_deficit_usd_bn"] = float(deficit.iloc[i])
+        if fpi is not None and pd.notna(fpi.iloc[i]):
+            row["india_fpi_flows"] = float(fpi.iloc[i])
         if row:
             row["_sources"] = {k: "dbie_excel_monthly" for k in row}
             results[month] = _reject_implausible(month, row)
@@ -497,6 +514,16 @@ def fetch_dbie_all(dry_run: bool = False) -> tuple[dict[str, dict], dict[str, di
 # ORCHESTRATOR
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def _existing_flags(month: str) -> dict:
+    """Stored source_flags for a month, or {} if none."""
+    with sqlite3.connect(DB_PATH) as conn:
+        row = conn.execute("SELECT source_flags FROM india_monthly WHERE month = ?", (month,)).fetchone()
+    try:
+        return json.loads(row[0]) if row and row[0] else {}
+    except (ValueError, TypeError):
+        return {}
+
+
 def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     """
     Fetch latest data from all sources and upsert into india_macro.db.
@@ -504,7 +531,7 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
       Source 1 (FRED)      — monthly CPI YoY series
       Source 2a (jugaad)   — repo rate diagnostic (not written to DB)
       Source 2b (jugaad)   — weekly FPI net flows → india_weekly.fpi_net_flows_usd_bn
-      Source 3 (DBIE Excel)— monthly IIP/Trade/Credit/M3 + weekly forex reserves
+      Source 3 (DBIE Excel)— monthly trade, FPI (net portfolio), credit, M3 + weekly forex reserves
     """
     init_db()
 
@@ -522,7 +549,9 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     # ── Write monthly data ────────────────────────────────────────────────────
     if not dry_run:
         for month, row in monthly_data.items():
-            source_flags = row.get("_sources", {})
+            # Merge provenance: keep flags for hand-entered columns (PMI, CPI, IIP…)
+            source_flags = _existing_flags(month)
+            source_flags.update(row.get("_sources", {}))
             clean_row = {k: v for k, v in row.items() if not k.startswith("_")}
             clean_row["source_flags"] = json.dumps(source_flags)
             upsert_monthly(month, clean_row)
