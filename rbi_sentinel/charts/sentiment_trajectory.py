@@ -17,7 +17,7 @@ import matplotlib.dates as mdates
 import pandas as pd
 from matplotlib.lines import Line2D
 
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 
 log = logging.getLogger("rbi_sentinel.charts.sentiment_trajectory")
 

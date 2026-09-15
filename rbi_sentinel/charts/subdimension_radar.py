@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
 
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 
 log = logging.getLogger("rbi_sentinel.charts.subdimension_radar")
 

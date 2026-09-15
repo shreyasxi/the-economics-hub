@@ -120,7 +120,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
-    from style.economics_hub_style import EconStyle
+    from charts.style import EconStyle
 except ImportError:
     # Fallback styling if running standalone
     class EconStyle:

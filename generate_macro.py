@@ -28,7 +28,7 @@ import pandas as pd
 import yfinance as yf
 import matplotlib.image as mpimg
 
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 from data.fetchers.fred_fetcher import FredFetcher
 from config.settings import FRED_API_KEY
 from config.macro_settings import MACRO_INDICATORS, MACRO_TABLE_SECTIONS, MANUAL_DATA

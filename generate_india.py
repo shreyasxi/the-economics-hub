@@ -52,7 +52,7 @@ import matplotlib.patches as mpatches
 
 # ── Project imports ──
 sys.path.insert(0, str(Path(__file__).parent))
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 
 
 # ═══════════════════════════════════════════

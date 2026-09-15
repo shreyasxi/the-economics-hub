@@ -15,7 +15,7 @@ import os as _os
 # RBI_SENTINEL_DB points the whole pipeline at another database file — used to
 # test automated runs on a copy instead of the committed database.
 DB_PATH = Path(_os.environ["RBI_SENTINEL_DB"]) if _os.environ.get("RBI_SENTINEL_DB") else DATA_DIR / "rbi_sentinel.db"
-LOG_PATH = PROJECT_ROOT / "logs" / "rbi_sentinel.log"
+LOG_PATH = PROJECT_ROOT / "output" / "logs" / "rbi_sentinel.log"
 OUTPUT_DIR = PROJECT_ROOT / "output" / "rbi_sentinel"
 ASSETS_DIR = PROJECT_ROOT / "assets" / "rbi_sentinel"
 

@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from rbi_sentinel.sentiment.score_normalizer import score_to_label
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 
 log = logging.getLogger("rbi_sentinel.charts.stance_meter")
 

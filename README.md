@@ -58,34 +58,41 @@ source ~/.bashrc
 
 ```
 economics_hub/
-├── generate_weekly.py           # Weekly global dashboard (~27 charts, runs every Saturday via CI)
-├── generate_macro.py            # Monthly macro pulse (9–11 charts, runs 2nd Saturday via CI)
-├── generate_india.py            # India macro dashboard (15 charts, manual dispatch)
-├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (7 charts, manual local only)
-├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 ├── app.py                       # Streamlit 4-tab dashboard
+├── generate_weekly.py           # Weekly global dashboard (~33 charts, every Saturday via CI)
+├── generate_macro.py            # Monthly macro pulse (9–11 charts, via CI)
+├── generate_india.py            # India macro dashboard (15 charts, Saturdays via CI + manual)
+├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
+├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
+├── charts/
+│   ├── style.py                 # EconStyle — all visual constants and chart methods
+│   ├── loader.py                # Finds the latest published charts for the dashboard
+│   └── templates/               # Reusable chart template classes
 ├── config/
 │   ├── settings.py              # Weekly indicators (Yahoo Finance + FRED tickers)
 │   ├── macro_settings.py        # Monthly macro indicators (FRED + manual data)
-│   └── insights.py              # Chart insights text (34 charts covered)
-├── style/
-│   └── economics_hub_style.py   # EconStyle — all visual constants and chart methods
+│   └── insights.py              # Chart explanations shown under each chart
 ├── data/
-│   ├── fetchers/                # yfinance + FRED + india_fetcher data fetchers
-│   ├── india_manual.csv         # Manually maintained India monthly data (PMI, GST)
-│   ├── india_macro.db           # Auto-populated India SQLite database
-│   └── cag_monthly_accounts.xlsx # India CAG fiscal data
-├── charts/templates/            # Reusable chart template classes
+│   ├── fetchers/                # yfinance, FRED and India data fetchers
+│   ├── india_manual_entry.py    # CLI for monthly India figures (PMI, GST, CPI, IIP)
+│   ├── india_macro.db           # India SQLite database
+│   ├── cag_monthly_accounts.xlsx # India CAG fiscal data
+│   └── rbi_sentinel.db          # RBI MPC documents, scores and rate decisions
+├── rbi_sentinel/                # RBI Sentinel package (fetch, score, charts)
+│   ├── research/                # Research charts drawn outside the pipeline
+│   └── seed_rates.py            # Repo-rate history corrections
+├── tests/
 ├── assets/                      # Git-tracked PNGs served by Streamlit Cloud
-│   ├── weekly/YYYY-MM-DD/
+│   ├── weekly/YYYY-MM-DD/       # Last 4 weeks kept
 │   ├── macro/YYYY-MM/
 │   ├── india/YYYY-MM/
 │   ├── rbi_sentinel/YYYY-MM/
+│   ├── rbi_research/
+│   ├── brand/                   # Logo
 │   └── readme_showcase/         # Static-named flagship charts (always current)
 ├── output/                      # Local generation output (git-ignored)
-├── rbi_sentinel/                # RBI Sentinel package (sentiment analysis)
-└── docs/                        # project_context.md, project_reminders.md (local only)
+└── .github/                     # GitHub Actions workflows and helper scripts
 ```
 
 ---
@@ -93,7 +100,7 @@ economics_hub/
 ## Usage
 
 ### 1. Weekly Global Dashboard
-Generates ~27 charts (Equities, FX, Yields, Commodities, Cross-Asset) — runs automatically every Saturday via GitHub Actions.
+Generates ~33 charts (Equities, FX, Yields, Commodities, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions.
 ```bash
 python generate_weekly.py
 ```
@@ -105,13 +112,14 @@ python generate_macro.py
 ```
 
 ### 3. India Macro Dashboard
-Generates 15 India-specific charts (FPI, GST, Fiscal, Credit, Trade). Update `data/india_manual.csv` and `data/cag_monthly_accounts.xlsx` first, then trigger via GitHub Actions.
+Generates 15 India-specific charts (FPI, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
 ```bash
+python -m data.india_manual_entry status
 python generate_india.py
 ```
 
 ### 4. Reserve Bank of India Policy Related Charts
-Generates sentiment analysis and related charts in the RBI sentinel section. 
+Scores the tone of RBI Monetary Policy Committee documents and charts it against rate decisions — runs automatically via GitHub Actions (needs an `ANTHROPIC_API_KEY`).
 ```bash
 python generate_rbi_sentinel.py
 ```

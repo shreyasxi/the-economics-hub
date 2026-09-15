@@ -16,7 +16,7 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
 import pandas as pd
 
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 
 log = logging.getLogger("rbi_sentinel.charts.rate_and_sentiment")
 

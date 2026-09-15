@@ -87,7 +87,7 @@ DEFAULT_CSV = _ROOT / "data" / "india_manual.csv"
 # making every 2026 year-on-year comparison span a discontinuity.
 # No other column in the workbook carries the official series either.
 # IIP is therefore entered from the MoSPI release instead:
-#     python -m econ.india.manual set 2026-02 --iip 4.8
+#     python -m data.india_manual_entry set 2026-02 --iip 4.8
 _MONTHLY_COLS = {
     "period":     1,
     "exports":    17,   # Foreign Trade Exports Total (USD Million)

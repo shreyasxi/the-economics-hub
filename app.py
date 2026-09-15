@@ -21,7 +21,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from utils.chart_loader import (
+from charts.loader import (
     clean_title,
     get_charts,
     get_folder_mtime,
@@ -58,7 +58,7 @@ def get_insight(filename: str) -> str | None:
 
 st.set_page_config(
     page_title="The Economics Hub",
-    page_icon="charts/Econhub_logo.jpg",  # <-- Replaced the emoji with your file path
+    page_icon=str(PROJECT_ROOT / "assets" / "brand" / "econhub_logo.jpg"),
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -687,7 +687,7 @@ st.markdown(
 with st.sidebar:
     # ── 1. Logo & Masthead ─────────────────────────────────────────────────────
     # (Once you make your logo transparent, save it as a PNG and update the filename here if needed!)
-    logo_path = PROJECT_ROOT / "charts" / "Econhub_logo.jpg" 
+    logo_path = PROJECT_ROOT / "assets" / "brand" / "econhub_logo.jpg" 
     if logo_path.exists():
         st.markdown('<div class="sb-logo-wrap">', unsafe_allow_html=True)
         st.image(str(logo_path), use_container_width=True)
@@ -1809,7 +1809,7 @@ with tab_rbi:
                     st.markdown(insight)
 
         # ── Tone and the bond market ──
-        # A static research chart (research/make_tone_yield_chart.py); it is not
+        # A static research chart (rbi_sentinel/research/tone_vs_10y_chart.py); it is not
         # part of the automated pipeline's month folders.
         _tone_chart = PROJECT_ROOT / "assets" / "rbi_research" / "07_rbi_tone_vs_10y.png"
         if _tone_chart.exists():

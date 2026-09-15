@@ -16,7 +16,6 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-manual_india_update.py
 
 # ── Virtual Environment ──
 .venv/
@@ -26,9 +25,6 @@ env/
 # ── Output (generated charts — don't bloat the repo) ──
 output/
 docs/
-instructions.md
-project_context.md
-RBI_SENTINEL_DOCS.md
 
 # ── OS Files ──
 .DS_Store
@@ -46,7 +42,6 @@ Desktop.ini
 
 # ── RBI Sentinel — local data, cache, logs ──
 data/rbi_sentinel_cache/
-logs/
 
 # Ignore SQLite temp files
 *.db-shm

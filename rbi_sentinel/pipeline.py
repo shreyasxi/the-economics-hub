@@ -110,7 +110,7 @@ def run_fetch(*, incremental: bool = True, dry_run: bool = False) -> int:
     if not all_docs:
         log.warning(
             "Discovery returned 0 documents. "
-            "Check network access to rbi.org.in and inspect logs/rbi_sentinel.log."
+            "Check network access to rbi.org.in and inspect output/logs/rbi_sentinel.log."
         )
         return 0
 
@@ -555,7 +555,7 @@ def run_compute_composites() -> None:
 def run_record_decisions() -> tuple[int, int, int]:
     """
     Record each cycle's repo rate decision from its Resolution text, so a new
-    meeting no longer needs seed_rbi_rates.py edited by hand.
+    meeting no longer needs rbi_sentinel/seed_rates.py edited by hand.
 
     Only fills cycles with no recorded decision. Where one exists and the text
     disagrees, it logs an error and leaves the stored value alone — a human
@@ -591,7 +591,7 @@ def run_record_decisions() -> tuple[int, int, int]:
             unreadable += 1
             log.error(
                 "Could not read the rate decision for %s from its Resolution — "
-                "record it with seed_rbi_rates.py", cycle["policy_cycle"],
+                "record it with python -m rbi_sentinel.seed_rates", cycle["policy_cycle"],
             )
             continue
 

@@ -3,7 +3,7 @@ Rate decision extraction regression test.
 
 The automated RBI Sentinel workflow records each new repo rate decision by
 reading the Resolution text, replacing the hand-edited list in
-seed_rbi_rates.py. This test pins the extractor to every decision since the
+rbi_sentinel/seed_rates.py. This test pins the extractor to every decision since the
 MPC began: rate, action and size must match the recorded history exactly, both
 when each meeting is completed from the true previous rate and when it is
 chained on the extractor's own previous output (as the pipeline does).

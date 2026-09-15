@@ -26,7 +26,7 @@ from datetime import datetime
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 from charts.templates.weekly_bar import WeeklyBarChart
 from charts.templates.trend_line import TrendLineChart
 from charts.templates.yield_curve import YieldCurveChart

@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from rbi_sentinel.config import COMPARISON_CHART_MEETINGS
-from style.economics_hub_style import EconStyle
+from charts.style import EconStyle
 
 log = logging.getLogger("rbi_sentinel.charts.doc_comparison")
 

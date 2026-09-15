@@ -650,7 +650,7 @@ def get_cycle_decisions() -> list[dict]:
 def set_rate_decision(
     meeting_id: int, *, repo_rate_pct: float, rate_action: str, rate_change_bps: Optional[int],
 ) -> None:
-    """Store a cycle's decision. Holds are stored with rate_change_bps NULL, as seed_rbi_rates.py does."""
+    """Store a cycle's decision. Holds are stored with rate_change_bps NULL, as rbi_sentinel/seed_rates.py does."""
     with _connect() as conn:
         conn.execute(
             """
