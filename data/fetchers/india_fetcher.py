@@ -279,6 +279,51 @@ def fetch_weekly_fpi_jugaad(dry_run: bool = False) -> dict[str, dict]:
         return {}
 
 
+_NSE_ALL_INDICES_URL = "https://www.nseindia.com/api/allIndices"
+
+def fetch_nifty_sector_weekly(index_names: list[str]) -> dict[str, dict]:
+    """
+    Weekly % change for NSE sector indices, from NSE's allIndices snapshot.
+
+    Yahoo Finance stopped updating most ^CNX* sector indices after 17 Jul 2026
+    (it returns only the live quote, so there is no week-ago close). NSE's own
+    feed carries the last value and the close one week ago for every index.
+
+    Raises if NSE is unreachable or any requested index is missing, so the
+    chart is never drawn with a silently shortened sector list.
+    Returns { index_name: {"last", "week_ago", "week_ago_date", "change_pct"} }
+    """
+    import requests
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
+        "Accept": "application/json",
+        "Referer": "https://www.nseindia.com/",
+    }
+    s = requests.Session()
+    s.get("https://www.nseindia.com/", headers=headers, timeout=15)  # sets cookies
+    resp = s.get(_NSE_ALL_INDICES_URL, headers=headers, timeout=15)
+    resp.raise_for_status()
+    rows = {r["index"]: r for r in resp.json()["data"]}
+
+    missing = [n for n in index_names if n not in rows or not rows[n].get("oneWeekAgoVal")]
+    if missing:
+        raise ValueError(f"NSE allIndices has no week-ago value for: {', '.join(missing)}")
+
+    out = {}
+    for name in index_names:
+        r = rows[name]
+        last, week_ago = float(r["last"]), float(r["oneWeekAgoVal"])
+        out[name] = {
+            "last": last,
+            "week_ago": week_ago,
+            "week_ago_date": r.get("oneWeekAgo"),
+            "change_pct": round((last / week_ago - 1) * 100, 2),
+        }
+    return out
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # SOURCE 3: RBI DBIE — Local Excel File (manual drop)
 # ═══════════════════════════════════════════════════════════════════════════════

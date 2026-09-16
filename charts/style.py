@@ -54,6 +54,17 @@ class EconStyle:
         "#e377c2",  # Pink
     ]
 
+    # Line palette for the redesigned line charts (World tab). Checked with the
+    # dataviz palette validator on white: lightness, chroma, colour-blind
+    # separation and contrast pass. Fixed order, never cycled.
+    LINE_BLUE        = "#1F5596"
+    LINE_TEAL        = "#0B8F82"
+    LINE_ORANGE      = "#C8620A"
+    LINE_MAROON      = "#9B1C31"   # second panel of two-panel charts (claims, excess CAPE yield)
+    LINE_RUPEE       = "#EA8412"   # India's saffron, deepened for a line; light on white, so always labelled
+    INK              = "#1A1A1A"   # label values
+    INK_MUTED        = "#4B5563"   # label names, reference lines
+
     # Specific Mappings
     REGION_COLORS = {
         "us":               "#003366",  # Navy

@@ -298,10 +298,11 @@ INDICATORS = {
         "color_key": "special_black",
     },
     
+    # FRED rather than Yahoo: ^VIX3M stopped updating on Yahoo after 17 Jul 2026
     "vix3m": {
         "name": "VIX 3-Month",
-        "ticker": "^VIX3M",
-        "source": "yfinance",
+        "series": "VXVCLS",
+        "source": "fred",
         "change_type": "abs",
         "unit": "index",
         "category": "volatility",

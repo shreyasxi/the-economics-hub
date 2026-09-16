@@ -147,15 +147,26 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "The Gundlach indicator: falling Copper/Gold ratio has historically led lower bond yields",
         ),
     },
-    "spy_tlt_ratio": {
+    "stock_bond_correlation": {
         "dashboard": (
-            "SPY/TLT Risk Appetite Ratio",
-            "Equities vs. long-duration Treasuries  ·  rising = risk-on, falling = flight to safety",
+            "Are Bonds Still Hedging Equities?",
+            "60-day rolling correlation of S&P 500 and long Treasury daily returns  ·  below zero = bonds cushion equity falls",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "The Risk-On / Risk-Off Switch Just Flipped",
-            "SPY/TLT ratio breaking below its 52-week range signals institutional rotation to safety",
+            "Are Bonds Still Hedging Equities?",
+            "60-day rolling correlation of S&P 500 and long Treasury daily returns  ·  below zero = bonds cushion equity falls",
+        ),
+    },
+    "defensives_cyclicals": {
+        "dashboard": (
+            "Defensive vs. Cyclical Sectors",
+            "Staples, utilities and healthcare against discretionary, technology and industrials  ·  rising = money moving to safety",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Investors Are Rotating Into Defensives",
+            "Staples, utilities and healthcare against discretionary, technology and industrials  ·  rising = money moving to safety",
         ),
     },
     "risk_appetite_ratio": {
@@ -257,15 +268,37 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "INDA's 12-month outperformance vs. EEM, China, and Korea is widening structurally",
         ),
     },
-    "brent_wti_spread": {
+    "crude_oil_curve": {
         "dashboard": (
-            "Brent–WTI Crude Spread",
-            "International vs. US crude oil price differential  ·  $/barrel  ·  5-day smooth",
+            "The Crude Oil Futures Curve",
+            "WTI price for each delivery month  ·  falling curve = supply tight now  ·  rising = glut",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "The Geopolitical Risk Premium in Oil Is Back",
-            "Brent-WTI spread widening signals Middle East supply disruption fears re-entering the market",
+            "Oil Traders Are Paying a Premium for Barrels Today",
+            "The futures curve has swung into steep backwardation as prompt supply tightens",
+        ),
+    },
+    "gold_real_rates": {
+        "dashboard": (
+            "Gold Has Broken Free of Real Interest Rates",
+            "A ten-year path, one step per quarter  ·  10-year TIPS real yield against the gold price",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Rule That No Longer Governs Gold",
+            "Gold once fell whenever real yields rose; since 2022 the two have climbed together",
+        ),
+    },
+    "commodities_breadth": {
+        "dashboard": (
+            "How Broad Is the Commodity Rally?",
+            "Share of 13 major commodities trading above their own 200-day average",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Commodity Rally Is Narrower Than It Looks",
+            "Energy is carrying the complex while precious metals roll over",
         ),
     },
     "agri_weekly": {
@@ -337,10 +370,21 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
 }
 
 def get_output_dir():
-    """Create and return the output directory for this week."""
+    """
+    Create and return the output directory for this week.
+
+    Any PNG left by an earlier run on the same day is removed first. The run
+    redraws the complete set every time, so anything surviving from a previous
+    run is a chart that no longer exists — and charts/loader.py serves the
+    newest folder across assets/ and output/, so a stale file keeps appearing
+    on the dashboard (under "Other", once its keywords stop matching a section)
+    long after the code that drew it was deleted.
+    """
     date_str = datetime.now().strftime("%Y-%m-%d")
     out_dir = PROJECT_ROOT / "output" / "weekly" / date_str
     out_dir.mkdir(parents=True, exist_ok=True)
+    for stale in out_dir.glob("*.png"):
+        stale.unlink()
     return out_dir
 
 
@@ -719,7 +763,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             trend.add_series("VIX 3-Month", vix3m_dates, vix3m_vals, color_key="pink")
             
             _t, _s = WEEKLY_TITLES["vix_trend"][mode]
-            trend.render(title=_t, subtitle=_s, source="Yahoo Finance (CBOE)", ylabel="VIX Level")
+            trend.render(title=_t, subtitle=_s, source="Yahoo Finance (VIX), FRED (VIX 3-Month, VXVCLS)", ylabel="VIX Level")
             trend.save(output_dir / "09_vix_trend.png")
     except Exception as e:
         print(f"   ⚠ VIX chart failed: {e}")
@@ -814,26 +858,23 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # ── 7.NIFTY SECTOR ROTATION ──
     print("   [11/12] NIFTY Sector Rotation")
     try:
+        # Sourced from NSE directly: Yahoo stopped updating most ^CNX* sector
+        # indices in Jul 2026, which silently cut the chart to three sectors.
+        from data.fetchers.india_fetcher import fetch_nifty_sector_weekly
         NIFTY_SECTORS = {
-            "^NSEBANK": "Bank Nifty",
-            "^CNXIT": "IT",
-            "^CNXAUTO": "Auto",
-            "^CNXFMCG": "FMCG",
-            "^CNXPHARMA": "Pharma",
-            "^CNXMETAL": "Metal",
-            "^CNXREALTY": "Realty",
-            "^CNXENERGY": "Energy",
-            "^CNXPSUBANK": "PSU Bank",
-            "^CNXINFRA": "Infra"
+            "NIFTY BANK": "Bank Nifty",
+            "NIFTY IT": "IT",
+            "NIFTY AUTO": "Auto",
+            "NIFTY FMCG": "FMCG",
+            "NIFTY PHARMA": "Pharma",
+            "NIFTY METAL": "Metal",
+            "NIFTY REALTY": "Realty",
+            "NIFTY ENERGY": "Energy",
+            "NIFTY PSU BANK": "PSU Bank",
+            "NIFTY INFRASTRUCTURE": "Infra",
         }
-        sector_data = []
-        for ticker, name in NIFTY_SECTORS.items():
-            try:
-                result = yf_fetcher.weekly_change(ticker)
-                if result:
-                    sector_data.append((name, result["change_pct"]))
-            except Exception:
-                pass
+        nse = fetch_nifty_sector_weekly(list(NIFTY_SECTORS))
+        sector_data = [(label, nse[idx]["change_pct"]) for idx, label in NIFTY_SECTORS.items()]
 
         if sector_data:
             # Sort by performance (best to worst)
@@ -845,7 +886,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             chart = WeeklyBarChart(names=s_names, values=s_values, color_keys=["us"] * len(s_names))
             chart.render(title="NIFTY Sector Rotation",
                          subtitle=f"Weekly performance by sector  ·  {date_label}",
-                         source="Yahoo Finance (NSE)")
+                         source="NSE (allIndices)")
             chart.save(output_dir / "10b_india_sector_rotation.png")
     except Exception as e:
         print(f"   ⚠ Sector rotation failed: {e}")
@@ -1094,40 +1135,100 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ Copper/Gold ratio failed: {e}")
 
-    # ── 15. SPY/TLT RATIO ──
-    print("   [15] SPY/TLT Risk Appetite Ratio (2-Year Trend)")
+    # ── 15. STOCK-BOND CORRELATION ──
+    # Replaced the SPY/TLT ratio, which only ever rose: because TLT is driven
+    # by long rates, the ratio climbed whenever yields rose, even in an equity
+    # selloff. Their correlation asks the question that ratio was gesturing at
+    # — whether bonds still hedge equities at all.
+    print("   [15] Stock-Bond Correlation (60-Day Rolling)")
     try:
-        spy_s = yf_fetcher.get_close_series("SPY", period="2y")
-        tlt_s = yf_fetcher.get_close_series("TLT", period="2y")
+        spy_s = yf_fetcher.get_close_series("SPY", period="3y")
+        tlt_s = yf_fetcher.get_close_series("TLT", period="3y")
+        both = pd.concat({"spy": spy_s, "tlt": tlt_s}, axis=1).dropna()
 
-        if len(spy_s) > 50 and len(tlt_s) > 50:
-            ratio_s = (spy_s / tlt_s).dropna()
-            r52_high = ratio_s.rolling(252).max()
-            r52_low  = ratio_s.rolling(252).min()
+        if len(both) > 200:
+            returns = both.pct_change().dropna()
+            corr_s = returns["spy"].rolling(60).corr(returns["tlt"]).dropna()
 
             fig, ax = EconStyle.create_figure(size="wide")
-            color_line = "#003366"
-            r_dates = ratio_s.index.to_pydatetime()
+            c_dates = corr_s.index.to_pydatetime()
+            zeros = [0.0] * len(corr_s)
+            ax.fill_between(c_dates, corr_s.values, zeros, where=(corr_s.values > 0),
+                            color="#9B1C31", alpha=0.16, interpolate=True)
+            ax.fill_between(c_dates, corr_s.values, zeros, where=(corr_s.values <= 0),
+                            color="#0B8F82", alpha=0.16, interpolate=True)
+            ax.plot(c_dates, corr_s.values, color="#003366", linewidth=2.5, zorder=4)
+            ax.axhline(0, color="#1A1A1A", linewidth=1.1, zorder=5)
 
-            ax.fill_between(r_dates, r52_high.values, r52_low.values,
-                            color="#003366", alpha=0.08, label="52-Week Range")
-            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="SPY/TLT Ratio")
+            latest = float(corr_s.iloc[-1])
+            ax.annotate(f"{latest:+.2f}".replace("-", "−"), xy=(c_dates[-1], latest),
+                        xytext=(8, 0), textcoords="offset points", va="center", ha="left",
+                        fontsize=11, fontweight="bold", color="#003366", annotation_clip=False)
+            ax.annotate("Bonds and equities fall together", xy=(0.012, 0.95), xycoords="axes fraction",
+                        ha="left", va="top", fontsize=9.5, fontweight="bold", color="#9B1C31")
+            ax.annotate("Bonds hedge equities", xy=(0.012, 0.05), xycoords="axes fraction",
+                        ha="left", va="bottom", fontsize=9.5, fontweight="bold", color="#0B8F82")
 
-            ax.set_ylabel("SPY / TLT Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.set_ylabel("Correlation of daily returns", fontsize=EconStyle.FONT_SIZE_AXIS,
+                          fontweight="bold", color="#1C1C1E")
+            ax.set_ylim(-1.0, 1.0)
             ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
             ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
             for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-            ax.legend(frameon=False, fontsize=10)
 
-            _t, _s = WEEKLY_TITLES["spy_tlt_ratio"][mode]
+            _t, _s = WEEKLY_TITLES["stock_bond_correlation"][mode]
             EconStyle.set_title(ax, _t, _s)
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (SPDR ETFs)")
-            EconStyle.save_chart(fig, output_dir / "15_spy_tlt_ratio.png")
+            EconStyle.add_source(fig, "Yahoo Finance (SPY, TLT daily returns)")
+            EconStyle.save_chart(fig, output_dir / "15_stock_bond_correlation.png")
     except Exception as e:
-        print(f"   ⚠ SPY/TLT ratio failed: {e}")
+        print(f"   ⚠ Stock-bond correlation failed: {e}")
+
+    # ── 15b. DEFENSIVES VS CYCLICALS ──
+    # Risk appetite read from where money actually sits inside the index, which
+    # no rate move can distort. Complements SPHB/SPLV rather than repeating it.
+    print("   [15b] Defensives vs Cyclicals (2-Year Trend)")
+    try:
+        DEFENSIVE = {"XLP": "Staples", "XLU": "Utilities", "XLV": "Healthcare"}
+        CYCLICAL = {"XLY": "Discretionary", "XLK": "Technology", "XLI": "Industrials"}
+        legs = {t: yf_fetcher.get_close_series(t, period="2y") for t in {**DEFENSIVE, **CYCLICAL}}
+        missing = [t for t, s in legs.items() if s is None or len(s) < 50]
+        if missing:
+            raise ValueError(f"no price history for {', '.join(missing)}")
+
+        prices = pd.concat(legs, axis=1).dropna()
+        rebased = prices / prices.iloc[0] * 100
+        ratio_s = (rebased[list(DEFENSIVE)].mean(axis=1) / rebased[list(CYCLICAL)].mean(axis=1) * 100).dropna()
+        mean_26w = ratio_s.rolling(130).mean()
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        r_dates = ratio_s.index.to_pydatetime()
+        ax.plot(r_dates, ratio_s.values, color="#C8620A", linewidth=2.5, label="Defensives / cyclicals")
+        ax.plot(mean_26w.index.to_pydatetime(), mean_26w.values, color="#6B7280",
+                linewidth=1.5, linestyle="--", label="26-Week Mean")
+        ax.axhline(100, color="#1A1A1A", linewidth=1.1, zorder=5)
+
+        ax.annotate(f"{ratio_s.iloc[-1]:.1f}", xy=(r_dates[-1], float(ratio_s.iloc[-1])),
+                    xytext=(8, 0), textcoords="offset points", va="center", ha="left",
+                    fontsize=11, fontweight="bold", color="#C8620A", annotation_clip=False)
+        ax.set_ylabel("Index (both baskets = 100 two years ago)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+        ax.legend(frameon=False, fontsize=10, loc="upper left")
+
+        _t, _s = WEEKLY_TITLES["defensives_cyclicals"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Yahoo Finance (SPDR sector ETFs: XLP, XLU, XLV vs XLY, XLK, XLI)")
+        EconStyle.save_chart(fig, output_dir / "15b_defensives_cyclicals.png")
+    except Exception as e:
+        print(f"   ⚠ Defensives vs cyclicals failed: {e}")
 
     # ── 16. SPHB/SPLV RISK APPETITE ──
     print("   [16] SPHB/SPLV — High Beta vs Low Vol (2-Year Trend)")
@@ -1561,44 +1662,279 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ VXEEM chart failed: {e}")
 
-    # ── 23. BRENT–WTI SPREAD ──
-    print("   [23] Brent–WTI Spread (2-Year Trend)")
+    # ── 23. CRUDE OIL FUTURES CURVE ──
+    # Replaced the Brent–WTI spread, which was not a signal: Brent is waterborne
+    # and WTI is landlocked at Cushing, so Brent sits structurally above WTI and
+    # the spread spent ~90% of two years in a $2–5 band. The futures curve asks
+    # the question that spread could not: is physical crude tight right now?
+    # A falling curve (backwardation) means buyers pay up for prompt barrels;
+    # a rising curve (contango) means the market is paying to store a glut.
+    print("   [23] Crude Oil Futures Curve (WTI, NYMEX contract ladder)")
     try:
-        brent_s = yf_fetcher.get_close_series("BZ=F", period="2y")
-        wti2_s  = yf_fetcher.get_close_series("CL=F", period="2y")
+        import contextlib, io
 
-        if len(brent_s) > 50 and len(wti2_s) > 50:
-            spread_s = (brent_s - wti2_s).dropna().rolling(5).mean().dropna()
+        MONTH_CODES = "FGHJKMNQUVXZ"          # Jan..Dec, CME convention
+        today = datetime.now()
 
-            fig, ax = EconStyle.create_figure(size="wide")
-            color_pos = "#D97706"
-            color_neg = "#1D4ED8"
-            sp_dates = spread_s.index.to_pydatetime()
-            sp_vals  = spread_s.values
+        # Walk forward from the current month and keep every contract Yahoo
+        # still quotes. The front contract expires mid-month, so the nearest
+        # month is often already delisted — that is expected, not an error.
+        ladder = []
+        for i in range(18):
+            mm = today.month + i
+            yy = today.year + (mm - 1) // 12
+            mm = (mm - 1) % 12 + 1
+            ticker = f"CL{MONTH_CODES[mm - 1]}{str(yy)[-2:]}.NYM"
+            try:
+                # A delisted contract is the normal case here, not a fault, so
+                # the fetcher's warning is swallowed rather than logged.
+                with contextlib.redirect_stdout(io.StringIO()):
+                    s = yf_fetcher.get_close_series(ticker, period="3mo")
+                if s is None or len(s) < 20:
+                    continue
+                s.index = s.index.tz_localize(None)
+                ladder.append((f"{datetime(yy, mm, 1):%b '%y}", s))
+            except Exception:
+                continue
+            if len(ladder) >= 15:
+                break
 
-            ax.fill_between(sp_dates, sp_vals, 0,
-                            where=[v >= 0 for v in sp_vals], color=color_pos, alpha=0.3, label="Brent Premium")
-            ax.fill_between(sp_dates, sp_vals, 0,
-                            where=[v < 0  for v in sp_vals], color=color_neg, alpha=0.3, label="WTI Premium")
-            ax.plot(sp_dates, sp_vals, color="#1C1C1E", linewidth=1.8)
-            ax.axhline(0, color="#1C1C1E", linewidth=1.5)
+        if len(ladder) < 6:
+            raise ValueError(f"only {len(ladder)} live WTI contracts found")
+        print(f"        {len(ladder)} live contracts: {ladder[0][0]} to {ladder[-1][0]}")
 
-            ax.set_ylabel("Brent minus WTI ($/bbl)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                          fontweight="bold", color="#1C1C1E")
-            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-            ax.legend(frameon=False, fontsize=10)
+        labels  = [lab for lab, _ in ladder]
+        now_px  = [float(s.iloc[-1]) for _, s in ladder]
+        ago_ts  = ladder[0][1].index[-1] - pd.Timedelta(days=30)
+        ago_px  = [float(s.asof(ago_ts)) for _, s in ladder]
+        xs      = list(range(len(ladder)))
 
-            _t, _s = WEEKLY_TITLES["brent_wti_spread"][mode]
-            EconStyle.set_title(ax, _t, _s)
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (NYMEX · ICE)")
-            EconStyle.save_chart(fig, output_dir / "23_brent_wti_spread.png")
+        front, back = now_px[0], now_px[-1]
+        spread = front - back
+        backwardated = spread > 0
+        shade = "#0B8F82" if backwardated else "#C8620A"
+
+        fig, ax = EconStyle.create_figure(size="wide")
+
+        # The gap between the curve and the front-month price IS the signal, so
+        # draw it rather than asking the reader to subtract two points.
+        ax.fill_between(xs, now_px, front, color=shade, alpha=0.14, zorder=2)
+        ax.axhline(front, color="#6B7280", linewidth=1.1, linestyle=":", zorder=3)
+
+        l_ago, = ax.plot(xs, ago_px, color="#9AA3B0", linewidth=1.6, linestyle="--",
+                         marker="o", markersize=4, zorder=4, label="One month ago")
+        l_now, = ax.plot(xs, now_px, color="#1F5596", linewidth=2.5,
+                         marker="o", markersize=6, zorder=5, label="Today")
+
+        # Both end labels are pushed into the shaded band, away from the
+        # subtitle above the first point and the axis below the last.
+        ax.annotate(f"${front:,.0f}", xy=(xs[0], front), xytext=(18, -9),
+                    textcoords="offset points", ha="left", va="top",
+                    fontsize=11, fontweight="bold", color="#1F5596")
+        ax.annotate(f"${back:,.0f}", xy=(xs[-1], back), xytext=(-4, 11),
+                    textcoords="offset points", ha="right", va="bottom",
+                    fontsize=11, fontweight="bold", color="#1F5596")
+
+        verdict = (
+            f"Backwardation — the far contract is ${spread:,.0f} below the front month"
+            if backwardated else
+            f"Contango — the far contract is ${abs(spread):,.0f} above the front month"
+        )
+        # Anchored inside the shaded band rather than at a fixed corner, so the
+        # label follows the band if the curve flips into contango.
+        mid = len(xs) // 2
+        ax.annotate(verdict, xy=(xs[mid], (now_px[mid] + front) / 2), ha="center", va="center",
+                    fontsize=10.5, fontweight="bold", color=shade, zorder=6)
+
+        ax.set_xticks(xs)
+        ax.set_xticklabels(labels, fontsize=8.5, rotation=30, ha="right")
+        ax.set_ylabel("WTI futures price ($/barrel)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.set_xlabel("Delivery month", fontsize=EconStyle.FONT_SIZE_AXIS, color="#4B5563")
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.grid(False)
+        ax.margins(x=0.04)
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+        ax.legend(handles=[l_now, l_ago], frameon=False, fontsize=10, loc="upper right")
+
+        _t, _s = WEEKLY_TITLES["crude_oil_curve"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Yahoo Finance (NYMEX WTI monthly contracts)")
+        EconStyle.save_chart(fig, output_dir / "23_crude_oil_curve.png")
     except Exception as e:
-        print(f"   ⚠ Brent-WTI spread failed: {e}")
+        print(f"   ⚠ Crude oil futures curve failed: {e}")
+
+    # ── 23b. GOLD VS REAL YIELDS ──
+    # Gold's textbook anchor is the real yield: when inflation-protected
+    # Treasuries pay more, non-yielding gold should fall. That held tightly for
+    # decades and then stopped. Plotted as a path through time on one pair of
+    # axes (no second y-axis), the break is the shape of the line itself.
+    print("   [23b] Gold vs Real Yields (10-Year Path)")
+    try:
+        gold_s = yf_fetcher.get_close_series("GC=F", period="10y")
+        gold_s.index = gold_s.index.tz_localize(None)
+        ry_s = fred_fetcher.fetch_series("DFII10", period_years=10)
+        ry_s.index = ry_s.index.tz_localize(None)
+
+        joint = pd.concat({"gold": gold_s, "ry": ry_s}, axis=1).dropna()
+        # Quarterly, not monthly: real yields have been range-bound since 2023
+        # while gold doubled, so monthly points pile up as horizontal noise on
+        # a near-vertical path. Quarterly averages leave the shape and drop it.
+        monthly = joint.resample("QE").mean().dropna()
+
+        if len(monthly) < 20:
+            raise ValueError(f"only {len(monthly)} quarterly observations")
+
+        SPLIT = "2022-01-01"
+        old = monthly[monthly.index < SPLIT]
+        new = monthly[monthly.index >= SPLIT]
+        # One month of overlap so the two coloured segments join up.
+        bridge = pd.concat([old.tail(1), new])
+
+        corr_old = old.corr().iloc[0, 1]
+        corr_new = new.corr().iloc[0, 1]
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        ax.plot(old["ry"], old["gold"], color="#1F5596", linewidth=2.5,
+                solid_capstyle="round", zorder=4, label=f"2016–2021  (correlation {corr_old:+.2f})".replace("-", "−"))
+        ax.plot(bridge["ry"], bridge["gold"], color="#9B1C31", linewidth=2.5,
+                solid_capstyle="round", zorder=5, label=f"2022–today  (correlation {corr_new:+.2f})".replace("-", "−"))
+
+        start, end = monthly.iloc[0], monthly.iloc[-1]
+        ax.scatter([start["ry"]], [start["gold"]], s=70, color="#1F5596",
+                   edgecolors="white", linewidths=1.4, zorder=6)
+        ax.scatter([end["ry"]], [end["gold"]], s=140, color="#9B1C31",
+                   edgecolors="white", linewidths=1.6, zorder=7)
+
+        # Labelled by quarter, so the last point is not misread as a spot price.
+        def _q(ts):
+            return f"Q{ts.quarter} {ts.year}"
+
+        ax.annotate(_q(monthly.index[0]), xy=(start["ry"], start["gold"]),
+                    xytext=(10, -9), textcoords="offset points", ha="left", va="top",
+                    fontsize=9.5, fontweight="bold", color="#1F5596")
+        ax.annotate(f"{_q(monthly.index[-1])}\n${end['gold']:,.0f}",
+                    xy=(end["ry"], end["gold"]), xytext=(-6, -12), textcoords="offset points",
+                    ha="right", va="top", fontsize=10.5, fontweight="bold", color="#9B1C31")
+
+        # The pivot: gold's cheapest real-yield point, where the old rule ended.
+        trough = old["ry"].idxmin()
+        ax.annotate(_q(trough), xy=(old.loc[trough, "ry"], old.loc[trough, "gold"]),
+                    xytext=(10, -9), textcoords="offset points", ha="left", va="top",
+                    fontsize=9.5, fontweight="bold", color="#1F5596")
+
+        ax.axvline(0, color="#1A1A1A", linewidth=1.1, alpha=0.6, zorder=3)
+        ax.annotate("Real yields\nturn positive", xy=(0, 0.62), xycoords=("data", "axes fraction"),
+                    xytext=(7, 0), textcoords="offset points", ha="left", va="center",
+                    fontsize=9, color="#4B5563")
+
+        ax.set_xlabel("10-year US real yield, % (TIPS)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.set_ylabel("Gold price ($/ounce)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"${v:,.0f}"))
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:+.1f}%".replace("-", "−")))
+        ax.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        for sp in ['top', 'right']: ax.spines[sp].set_visible(False)
+        ax.legend(frameon=False, fontsize=10, loc="upper left")
+
+        _t, _s = WEEKLY_TITLES["gold_real_rates"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Yahoo Finance (COMEX gold) · FRED (DFII10)")
+        EconStyle.save_chart(fig, output_dir / "23b_gold_real_rates.png")
+    except Exception as e:
+        print(f"   ⚠ Gold vs real yields failed: {e}")
+
+    # ── 23c. COMMODITY BREADTH ──
+    # Whether a commodity move is a global demand impulse or one squeezed
+    # market. A headline index cannot separate the two; counting how many
+    # members are in their own uptrend can.
+    print("   [23c] Commodity Breadth (share above 200-day average)")
+    try:
+        BREADTH_BASKET = {
+            "BZ=F": "Brent", "CL=F": "WTI", "NG=F": "Natural gas",
+            "GC=F": "Gold", "SI=F": "Silver", "PL=F": "Platinum", "HG=F": "Copper",
+            "ZW=F": "Wheat", "ZC=F": "Corn", "ZS=F": "Soybeans",
+            "KC=F": "Coffee", "SB=F": "Sugar", "CC=F": "Cocoa",
+        }
+        # Four years of prices to show three years of breadth: the 200-day
+        # average needs a warm-up before the first reading means anything.
+        legs_b = {}
+        for ticker, name in BREADTH_BASKET.items():
+            s = yf_fetcher.get_close_series(ticker, period="4y")
+            if s is None or len(s) < 250:
+                raise ValueError(f"no usable history for {name} ({ticker})")
+            s.index = s.index.tz_localize(None)
+            legs_b[name] = s
+
+        px_b = pd.concat(legs_b, axis=1).ffill().dropna()
+        ma_b = px_b.rolling(200).mean()
+        # Drop the warm-up explicitly. `price > NaN` evaluates to False rather
+        # than NaN, so comparing first and dropping after would publish the
+        # warm-up as a genuine reading of zero.
+        ma_b = ma_b.dropna(how="any")
+        above = px_b.loc[ma_b.index] > ma_b
+        breadth = (above.mean(axis=1) * 100)
+
+        cutoff = breadth.index[-1] - pd.Timedelta(days=3 * 365)
+        breadth = breadth[breadth.index >= cutoff]
+        above = above.loc[breadth.index]
+        if len(breadth) < 400:
+            raise ValueError(f"only {len(breadth)} days of breadth after the 200-day warm-up")
+        n_members = above.shape[1]
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        b_dates = breadth.index.to_pydatetime()
+        fifty = [50.0] * len(breadth)
+        ax.fill_between(b_dates, breadth.values, fifty, where=(breadth.values >= 50),
+                        color="#0B8F82", alpha=0.16, interpolate=True, zorder=2)
+        ax.fill_between(b_dates, breadth.values, fifty, where=(breadth.values < 50),
+                        color="#9B1C31", alpha=0.16, interpolate=True, zorder=2)
+        ax.plot(b_dates, breadth.values, color="#C8620A", linewidth=2.5, zorder=5)
+        ax.axhline(50, color="#1A1A1A", linewidth=1.1, zorder=4)
+
+        latest_b = float(breadth.iloc[-1])
+        n_up = int(above.iloc[-1].sum())
+        ax.annotate(f"{latest_b:.0f}%", xy=(b_dates[-1], latest_b), xytext=(8, 0),
+                    textcoords="offset points", va="center", ha="left",
+                    fontsize=11, fontweight="bold", color="#C8620A", annotation_clip=False)
+
+        def _names(items, limit=9):
+            """Keep the caption on one line however the basket splits."""
+            if len(items) <= limit:
+                return ", ".join(items)
+            return ", ".join(items[:limit]) + f" and {len(items) - limit} more"
+
+        rising = [n for n in above.columns if above.iloc[-1][n]]
+        falling = [n for n in above.columns if not above.iloc[-1][n]]
+        ax.annotate(f"Now {n_up} of {n_members} above: " + _names(rising),
+                    xy=(0.012, 0.95), xycoords="axes fraction", ha="left", va="top",
+                    fontsize=9, fontweight="bold", color="#0B8F82")
+        ax.annotate(f"Below: " + _names(falling),
+                    xy=(0.012, 0.055), xycoords="axes fraction", ha="left", va="bottom",
+                    fontsize=9, fontweight="bold", color="#9B1C31")
+
+        ax.set_ylabel("Share above 200-day average (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.set_ylim(-2, 108)
+        ax.set_yticks([0, 25, 50, 75, 100])
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+
+        _t, _s = WEEKLY_TITLES["commodities_breadth"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Yahoo Finance (13 energy, metal and agricultural futures)")
+        EconStyle.save_chart(fig, output_dir / "23c_commodities_breadth.png")
+    except Exception as e:
+        print(f"   ⚠ Commodity breadth failed: {e}")
 
     # ── 24. AGRICULTURAL COMMODITIES ──
     print("   [24] Agricultural Commodities — Weekly Bar Chart")

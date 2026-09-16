@@ -53,7 +53,7 @@ jobs:
           mkdir -p assets/readme_showcase
           DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
           cp "output/weekly/$DATE_FOLDER/00_summary_table.png" "assets/readme_showcase/weekly_summary_table.png"
-          cp "output/weekly/$DATE_FOLDER/10_sector_rotation.png" "assets/readme_showcase/weekly_sector_rotation.png"
+          cp "output/weekly/$DATE_FOLDER/23_crude_oil_curve.png" "assets/readme_showcase/weekly_crude_curve.png"
           echo "README showcase updated from $DATE_FOLDER"
 
       - name: Commit and push charts

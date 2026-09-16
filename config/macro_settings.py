@@ -1,27 +1,30 @@
 """
-Economics Hub — Macro Pulse Configuration
-==========================================
-Indicator definitions for the monthly macro dashboard.
-All data from FRED unless noted. Run generate_macro.py
-on the 2nd Saturday of each month (after NFP + CPI release).
+Economics Hub — World tab: FRED series configuration
+====================================================
+The FRED series behind the World tab's United States section (inflation,
+labour, Fed balance sheet) and its Emerging Markets section (EM corporate
+dollar bond yields, the dollar against EM currencies and the rupee).
 
-Manual overrides (India unemployment etc.) go in MANUAL_DATA below.
+The six-economy scoreboard, central bank strip and calendar are configured
+in config/world_settings.py; the equity valuation spreadsheets in
+data/valuations.py.
+
+Series retired in Sep 2026 because Weekly Markets already charts them, or
+they carried little signal: HY/EM credit spreads, EMLC, NFCI, M2, 2s10s,
+10y–3m, 10Y real yield, mortgage rate, housing starts, Michigan sentiment,
+and (with the United States summary table and the Sahm rule chart) the Sahm
+rule. Eurozone and UK CPI/unemployment moved to the scoreboard (the FRED
+copies had stopped updating). The Emerging Markets section uses EM bond
+YIELDS and the EM dollar index against the rupee, so it does not repeat
+Weekly's EM stress monitor (spreads against the EM dollar index).
 """
 
-from datetime import datetime
-
 # ─────────────────────────────────────────────
-# MANUAL DATA OVERRIDES
+# INDICATORS
 # ─────────────────────────────────────────────
-# Update these each month with latest figures.
-MANUAL_DATA = {
-    # Empty for now since EMLC is automated!
-}
-
-
-# ─────────────────────────────────────────────
-# MACRO INDICATORS (FRED & YFINANCE)
-# ─────────────────────────────────────────────
+#   transform   level | yoy_pct | mom_abs  (YoY and MoM are matched by date)
+#   max_age     days since the latest observation date before the series
+#               counts as stopped; the run then fails instead of publishing it.
 MACRO_INDICATORS = {
 
     # ═══════════════════════════════════════════
@@ -34,8 +37,8 @@ MACRO_INDICATORS = {
         "transform": "yoy_pct",
         "unit": "% YoY",
         "group": "inflation",
-        "color": "#003366",      # Navy (US)
         "history_years": 3,
+        "max_age": 75,
     },
     "us_core_pce": {
         "series": "PCEPILFE",
@@ -44,8 +47,8 @@ MACRO_INDICATORS = {
         "transform": "yoy_pct",
         "unit": "% YoY",
         "group": "inflation",
-        "color": "#1f77b4",      # Blue
         "history_years": 3,
+        "max_age": 100,
     },
     "us_inflation_exp": {
         "series": "T5YIFR",
@@ -54,28 +57,8 @@ MACRO_INDICATORS = {
         "transform": "level",
         "unit": "%",
         "group": "inflation",
-        "color": "#ff7f0e",      # Orange
         "history_years": 3,
-    },
-    "ez_cpi_yoy": {
-        "series": "CP0000EZ19M086NEST",
-        "name": "Eurozone CPI",
-        "frequency": "monthly",
-        "transform": "yoy_pct",
-        "unit": "% YoY",
-        "group": "inflation_intl",
-        "color": "#008080",      # Teal (Europe)
-        "history_years": 3,
-    },
-    "uk_cpi_yoy": {
-        "series": "GBRCPIALLMINMEI",
-        "name": "UK CPI",
-        "frequency": "monthly",
-        "transform": "yoy_pct",
-        "unit": "% YoY",
-        "group": "inflation_intl",
-        "color": "#2ca02c",      # Green
-        "history_years": 3,
+        "max_age": 10,
     },
 
     # ═══════════════════════════════════════════
@@ -88,174 +71,28 @@ MACRO_INDICATORS = {
         "transform": "level",
         "unit": "%",
         "group": "labour",
-        "color": "#003366",
         "history_years": 3,
+        "max_age": 75,
     },
     "us_claims": {
         "series": "ICSA",
         "name": "Initial Jobless Claims",
         "frequency": "weekly",
         "transform": "level",
-        "unit": "K",             # Will divide by 1000 for display
+        "unit": "K",             # divided by 1000 for display
         "group": "labour",
-        "color": "#d62728",      # Red
         "history_years": 3,
+        "max_age": 21,
     },
     "us_payrolls": {
         "series": "PAYEMS",
         "name": "Non-Farm Payrolls",
         "frequency": "monthly",
-        "transform": "mom_abs",  # Month-over-month absolute change (in thousands)
+        "transform": "mom_abs",  # month-over-month change in jobs (thousands); the labour chart's badge
         "unit": "K jobs",
         "group": "labour",
-        "color": "#1f77b4",
         "history_years": 3,
-    },
-    "ez_unemployment": {
-        "series": "LRHUTTTTEZM156S",
-        "name": "Eurozone Unemployment",
-        "frequency": "monthly",
-        "transform": "level",
-        "unit": "%",
-        "group": "labour_intl",
-        "color": "#008080",
-        "history_years": 3,
-    },
-    "uk_unemployment": {
-        "series": "LRHUTTTTGBM156S",
-        "name": "UK Unemployment",
-        "frequency": "monthly",
-        "transform": "level",
-        "unit": "%",
-        "group": "labour_intl",
-        "color": "#2ca02c",
-        "history_years": 3,
-    },
-
-    # ═══════════════════════════════════════════
-    # FINANCIAL CONDITIONS & CREDIT
-    # ═══════════════════════════════════════════
-    "nfci": {
-        "series": "NFCI",
-        "name": "Chicago Fed NFCI",
-        "frequency": "weekly",
-        "transform": "level",
-        "unit": "index",
-        "group": "financial_conditions",
-        "color": "#000000",      # Black
-        "history_years": 3,
-    },
-    "hy_spread": {
-        "series": "BAMLH0A0HYM2",
-        "name": "US HY Credit Spread",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "bps",
-        "group": "financial_conditions",
-        "color": "#d62728",      # Red
-        "history_years": 3,
-    },
-
-    # ═══════════════════════════════════════════
-    # EMERGING MARKETS
-    # ═══════════════════════════════════════════
-    "em_hy_spread": {
-        "series": "BAMLEMHBHYCRPIOAS",
-        "name": "EM HY Credit Spread",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "bps",
-        "group": "emerging_markets",
-        "color": "#FF9933",      # Saffron/EM color
-        "history_years": 3,
-    },
-    "em_corp_spread": {
-        "series": "BAMLEMCBPIOAS",
-        "name": "EM Corporate Spread",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "bps",
-        "group": "emerging_markets",
-        "color": "#CC0066",      # Magenta
-        "history_years": 3,
-    },
-    "em_usd_index": {
-        "series": "DTWEXEMEGS",
-        "name": "USD Index (vs EM)",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "index",
-        "group": "emerging_markets",
-        "color": "#003366",
-        "history_years": 3,
-    },
-    "em_lc_bonds": {
-        "ticker": "EMLC",         # Automates via yfinance
-        "name": "EM Local Currency Bonds",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "USD",
-        "group": "emerging_markets",
-        "color": "#003366",
-        "history_years": 3,
-    },
-
-    # ═══════════════════════════════════════════
-    # MONEY & RATES
-    # ═══════════════════════════════════════════
-    "m2_yoy": {
-        "series": "M2SL",
-        "name": "M2 Money Supply",
-        "frequency": "monthly",
-        "transform": "yoy_pct",
-        "unit": "% YoY",
-        "group": "money",
-        "color": "#003366",
-        "history_years": 3,
-    },
-    "spread_2s10s": {
-        "series": "T10Y2Y",
-        "name": "2s10s Spread",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "pp",
-        "group": "money",
-        "color": "#d62728",
-        "history_years": 3,
-    },
-    "real_yield_10y": {
-        "series": "DFII10",
-        "name": "10Y Real Yield (TIPS)",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "%",
-        "group": "money",
-        "color": "#ff7f0e",
-        "history_years": 3,
-    },
-    "spread_10y3m": {
-        "series": "T10Y3M",
-        "name": "10Y–3M Spread",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "pp",
-        "group": "money",
-        "color": "#9467bd",
-        "history_years": 3,
-    },
-
-    # ═══════════════════════════════════════════
-    # RECESSION INDICATORS
-    # ═══════════════════════════════════════════
-    "sahm_rule": {
-        "series": "SAHMREALTIME",
-        "name": "Sahm Rule Indicator",
-        "frequency": "monthly",
-        "transform": "level",
-        "unit": "pp",
-        "group": "recession",
-        "color": "#B91C1C",
-        "history_years": 5,
+        "max_age": 75,
     },
 
     # ═══════════════════════════════════════════
@@ -268,169 +105,89 @@ MACRO_INDICATORS = {
         "transform": "level",
         "unit": "$B",
         "group": "balance_sheet",
-        "color": "#003366",
         "history_years": 6,
+        "max_age": 21,
     },
 
     # ═══════════════════════════════════════════
-    # HOUSING MARKET
+    # EMERGING MARKETS
     # ═══════════════════════════════════════════
-    "mortgage_30y": {
-        "series": "MORTGAGE30US",
-        "name": "30Y Fixed Mortgage Rate",
-        "frequency": "weekly",
+    # ICE BofA indices: FRED carries only the last three years. The H.10 series
+    # (EM dollar index, USD/INR) are published weekly, on Mondays.
+    "em_hy_yield": {
+        "series": "BAMLEMHBHYCRPIEY",
+        "name": "EM High Yield Corporate Bond Yield",
+        "frequency": "daily",
         "transform": "level",
         "unit": "%",
-        "group": "housing",
-        "color": "#B91C1C",
-        "history_years": 5,
+        "group": "emerging_markets",
+        "history_years": 3,
+        "max_age": 10,
     },
-    "housing_starts": {
-        "series": "HOUST",
-        "name": "Housing Starts",
-        "frequency": "monthly",
+    "em_ig_yield": {
+        "series": "BAMLEMIBHGCRPIEY",
+        "name": "EM Investment Grade Corporate Bond Yield",
+        "frequency": "daily",
         "transform": "level",
-        "unit": "K units",
-        "group": "housing",
-        "color": "#003366",
-        "history_years": 5,
+        "unit": "%",
+        "group": "emerging_markets",
+        "history_years": 3,
+        "max_age": 10,
     },
-
-    # ═══════════════════════════════════════════
-    # CONSUMER SENTIMENT
-    # ═══════════════════════════════════════════
-    "consumer_sentiment": {
-        "series": "UMCSENT",
-        "name": "Michigan Consumer Sentiment",
-        "frequency": "monthly",
+    "us_10y": {
+        "series": "DGS10",
+        "name": "US 10-Year Treasury Yield",
+        "frequency": "daily",
         "transform": "level",
-        "unit": "index",
-        "group": "consumer",
-        "color": "#003366",
-        "history_years": 5,
+        "unit": "%",
+        "group": "emerging_markets",
+        "history_years": 3,
+        "max_age": 10,
     },
-    "consumer_expectations": {
-        "series": "UMCSENT1",
-        "name": "Consumer Expectations Index",
-        "frequency": "monthly",
+    "em_usd_index": {
+        "series": "DTWEXEMEGS",
+        "name": "Dollar Index vs EM Currencies",
+        "frequency": "daily",
         "transform": "level",
         "unit": "index",
-        "group": "consumer",
-        "color": "#FF9933",
-        "history_years": 5,
+        "group": "emerging_markets",
+        "history_years": 3,
+        "max_age": 16,
+    },
+    "usd_inr": {
+        "series": "DEXINUS",
+        "name": "Rupees per US Dollar",
+        "frequency": "daily",
+        "transform": "level",
+        "unit": "INR",
+        "group": "emerging_markets",
+        "history_years": 3,
+        "max_age": 16,
     },
 }
 
-
-# ─────────────────────────────────────────────
-# CHART DEFINITIONS
-# ─────────────────────────────────────────────
-MACRO_CHARTS = {
-    "inflation": {
-        "title": "Inflation Dashboard",
-        "panels": [
-            {
-                "subtitle": "United States",
-                "indicators": ["us_cpi_yoy", "us_core_pce", "us_inflation_exp"],
-                "ylabel": "Rate (%)",
-            },
-            {
-                "subtitle": "Eurozone · UK",
-                "indicators": ["ez_cpi_yoy", "uk_cpi_yoy"],
-                "ylabel": "CPI YoY (%)",
-            },
-        ],
-    },
-    "labour": {
-        "title": "Labour Market Pulse",
-        "primary": {
-            "indicators": ["us_unemployment"],
-            "ylabel": "Unemployment Rate (%)",
-        },
-        "secondary": {
-            "indicators": ["us_claims"],
-            "ylabel": "Initial Claims (4wk MA, K)",
-        },
-    },
-    "financial_conditions": {
-        "title": "Financial Conditions & Credit Stress",
-        "primary": {
-            "indicators": ["nfci"],
-            "ylabel": "NFCI (0 = avg conditions)",
-        },
-        "secondary": {
-            "indicators": ["hy_spread"],
-            "ylabel": "HY OAS (bps)",
-        },
-    },
-    "emerging_markets": {
-        "title": "Emerging Markets Stress Monitor",
-        "primary": {
-            "indicators": ["em_hy_spread", "em_corp_spread"],
-            "ylabel": "Credit Spread (bps)",
-        },
-        "secondary": {
-            "indicators": ["em_usd_index"],
-            "ylabel": "USD Index",
-        },
-    },
-    "money": {
-        "title": "Money, Rates & the Yield Curve Signal",
-        "indicators": ["m2_yoy", "spread_2s10s", "real_yield_10y"],
-        "ylabel": "Rate / Spread (%)",
-    },
+# The other emerging-market currencies in the Fed's EME dollar index that FRED
+# quotes daily. The dollar chart shows the index, the rupee and whichever of
+# these has moved furthest each way, so the comparison set has to be wide;
+# every one is quoted as local currency per dollar, so a rise is a weaker
+# currency. Added to MACRO_INDICATORS below so each gets the same freshness
+# check as everything else: a series FRED retires fails the run.
+EM_FX_PEERS = {
+    "usd_brl": ("DEXBZUS", "Brazilian real"),
+    "usd_mxn": ("DEXMXUS", "Mexican peso"),
+    "usd_zar": ("DEXSFUS", "South African rand"),
+    "usd_krw": ("DEXKOUS", "South Korean won"),
+    "usd_cny": ("DEXCHUS", "Chinese yuan"),
+    "usd_thb": ("DEXTHUS", "Thai baht"),
+    "usd_myr": ("DEXMAUS", "Malaysian ringgit"),
+    "usd_twd": ("DEXTAUS", "Taiwan dollar"),
+    "usd_sgd": ("DEXSIUS", "Singapore dollar"),
 }
 
-
-# ─────────────────────────────────────────────
-# MACRO TABLE SECTIONS
-# ─────────────────────────────────────────────
-MACRO_TABLE_SECTIONS = [
-    {
-        "section": "INFLATION",
-        "color": "#B91C1C",
-        "rows": ["us_cpi_yoy", "us_core_pce", "us_inflation_exp",
-                 "ez_cpi_yoy", "uk_cpi_yoy"],
-    },
-    {
-        "section": "LABOUR MARKET",
-        "color": "#0F172A",
-        "rows": ["us_unemployment", "us_payrolls", "us_claims",
-                 "ez_unemployment", "uk_unemployment"],
-    },
-    {
-        "section": "FINANCIAL CONDITIONS",
-        "color": "#059669",
-        "rows": ["nfci", "hy_spread"],
-    },
-    {
-        "section": "EMERGING MARKETS",
-        "color": "#FF9933",
-        "rows": ["em_hy_spread", "em_corp_spread", "em_usd_index", "em_lc_bonds"],
-    },
-    {
-        "section": "MONEY & RATES",
-        "color": "#7C3AED",
-        "rows": ["m2_yoy", "spread_2s10s", "spread_10y3m", "real_yield_10y"],
-    },
-    {
-        "section": "RECESSION WATCH",
-        "color": "#B91C1C",
-        "rows": ["sahm_rule"],
-    },
-    {
-        "section": "FED POLICY",
-        "color": "#003366",
-        "rows": ["fed_balance_sheet"],
-    },
-    {
-        "section": "HOUSING MARKET",
-        "color": "#059669",
-        "rows": ["mortgage_30y", "housing_starts"],
-    },
-    {
-        "section": "CONSUMER",
-        "color": "#0F172A",
-        "rows": ["consumer_sentiment"],
-    },
-]
+MACRO_INDICATORS.update({
+    key: {
+        "series": series, "name": name, "frequency": "daily", "transform": "level",
+        "unit": "FX", "group": "emerging_markets", "history_years": 3, "max_age": 16,
+    }
+    for key, (series, name) in EM_FX_PEERS.items()
+})

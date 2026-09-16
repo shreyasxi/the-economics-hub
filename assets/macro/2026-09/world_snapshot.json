@@ -1,0 +1,525 @@
+{
+ "generated_at": "2026-09-16 14:11",
+ "as_of": "2026-09-16",
+ "central_banks": [
+  {
+   "id": "fed",
+   "status": "ok",
+   "rate": 3.75,
+   "display": "3.50–3.75",
+   "as_of": "2026-09-15",
+   "last_move": {
+    "date": "2025-12-11",
+    "bps": -25
+   }
+  },
+  {
+   "id": "ecb",
+   "status": "ok",
+   "rate": 2.25,
+   "display": "2.25",
+   "as_of": "2026-09-15",
+   "last_move": {
+    "date": "2026-06-17",
+    "bps": 25
+   }
+  },
+  {
+   "id": "boe",
+   "status": "ok",
+   "rate": 3.75,
+   "display": "3.75",
+   "as_of": "2026-09-07",
+   "last_move": {
+    "date": "2025-12-18",
+    "bps": -25
+   }
+  },
+  {
+   "id": "boj",
+   "status": "ok",
+   "rate": 1.0,
+   "display": "1.00",
+   "as_of": "2026-09-08",
+   "last_move": {
+    "date": "2026-06-17",
+    "bps": 25
+   }
+  },
+  {
+   "id": "pboc",
+   "status": "ok",
+   "rate": 3.0,
+   "display": "3.00",
+   "as_of": "2026-09-08",
+   "last_move": {
+    "date": "2025-05-20",
+    "bps": -10
+   }
+  }
+ ],
+ "scoreboard": [
+  {
+   "country": "US",
+   "label": "United States",
+   "cells": {
+    "mfg_pmi": {
+     "source": "manual",
+     "manual": true,
+     "change": 0.0,
+     "value": 53.9,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "cpi_yoy": {
+     "source": "FRED CPIAUCSL (BLS)",
+     "manual": false,
+     "change": 0.05,
+     "value": 3.353,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "unemployment": {
+     "source": "FRED UNRATE (BLS)",
+     "manual": false,
+     "change": 0.0,
+     "value": 4.1,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "ten_year": {
+     "source": "FRED DGS10",
+     "manual": false,
+     "change": 0.25,
+     "value": 4.97,
+     "period": "2026-09-14",
+     "status": "ok"
+    },
+    "policy_rate": {
+     "source": "FRED DFEDTARL/DFEDTARU",
+     "manual": false,
+     "value": 3.75,
+     "period": "2026-09-15",
+     "display": "3.50–3.75",
+     "status": "ok"
+    },
+    "fx_ytd": {
+     "source": "Yahoo Finance DX-Y.NYB (DXY)",
+     "manual": false,
+     "value": 1.368,
+     "period": "2026-09-16",
+     "status": "ok",
+     "label": "DXY"
+    }
+   }
+  },
+  {
+   "country": "EA",
+   "label": "Euro area",
+   "cells": {
+    "mfg_pmi": {
+     "source": "manual",
+     "manual": true,
+     "change": 0.9,
+     "value": 52.8,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "cpi_yoy": {
+     "source": "Eurostat prc_hicp_minr (HICP)",
+     "manual": false,
+     "change": 0.4,
+     "value": 3.3,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "unemployment": {
+     "source": "Eurostat une_rt_m",
+     "manual": false,
+     "change": 0.0,
+     "value": 6.4,
+     "period": "2026-07",
+     "status": "ok"
+    },
+    "ten_year": {
+     "source": "Deutsche Bundesbank (German Bund)",
+     "manual": false,
+     "change": 0.3,
+     "value": 3.58,
+     "period": "2026-09-15",
+     "status": "ok"
+    },
+    "policy_rate": {
+     "source": "FRED ECBDFR (deposit facility rate)",
+     "manual": false,
+     "value": 2.25,
+     "period": "2026-09-15",
+     "status": "ok"
+    },
+    "fx_ytd": {
+     "source": "Yahoo Finance EURUSD=X",
+     "manual": false,
+     "value": -1.691,
+     "period": "2026-09-16",
+     "status": "ok",
+     "label": "vs USD"
+    }
+   }
+  },
+  {
+   "country": "UK",
+   "label": "United Kingdom",
+   "cells": {
+    "mfg_pmi": {
+     "source": "manual",
+     "manual": true,
+     "change": -0.2,
+     "value": 51.7,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "cpi_yoy": {
+     "source": "OECD Prices (ONS CPI)",
+     "manual": false,
+     "change": 0.3,
+     "value": 3.1,
+     "period": "2026-07",
+     "status": "ok"
+    },
+    "unemployment": {
+     "source": "OECD Labour Force Statistics (ONS)",
+     "manual": false,
+     "change": 0.0,
+     "value": 4.9,
+     "period": "2026-05",
+     "status": "ok"
+    },
+    "ten_year": {
+     "source": "Bank of England IUDMNPY (par yield)",
+     "manual": false,
+     "change": 0.327,
+     "value": 5.37,
+     "period": "2026-09-14",
+     "status": "ok"
+    },
+    "policy_rate": {
+     "source": "BIS central bank policy rates (Bank Rate)",
+     "manual": false,
+     "value": 3.75,
+     "period": "2026-09-07",
+     "status": "ok"
+    },
+    "fx_ytd": {
+     "source": "Yahoo Finance GBPUSD=X",
+     "manual": false,
+     "value": 0.034,
+     "period": "2026-09-16",
+     "status": "ok",
+     "label": "vs USD"
+    }
+   }
+  },
+  {
+   "country": "JP",
+   "label": "Japan",
+   "cells": {
+    "mfg_pmi": {
+     "source": "manual",
+     "manual": true,
+     "change": 0.4,
+     "value": 54.9,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "cpi_yoy": {
+     "source": "manual",
+     "manual": true,
+     "change": 0.3,
+     "value": 1.9,
+     "period": "2026-07",
+     "status": "ok"
+    },
+    "unemployment": {
+     "source": "OECD Labour Force Statistics",
+     "manual": false,
+     "change": -0.1,
+     "value": 2.4,
+     "period": "2026-07",
+     "status": "ok"
+    },
+    "ten_year": {
+     "source": "Ministry of Finance Japan (JGB)",
+     "manual": false,
+     "change": 0.094,
+     "value": 3.028,
+     "period": "2026-09-15",
+     "status": "ok"
+    },
+    "policy_rate": {
+     "source": "BIS central bank policy rates",
+     "manual": false,
+     "value": 1.0,
+     "period": "2026-09-08",
+     "status": "ok"
+    },
+    "fx_ytd": {
+     "source": "Yahoo Finance JPY=X",
+     "manual": false,
+     "value": 0.905,
+     "period": "2026-09-16",
+     "status": "ok",
+     "label": "vs USD"
+    }
+   }
+  },
+  {
+   "country": "CN",
+   "label": "China",
+   "cells": {
+    "mfg_pmi": {
+     "source": "manual",
+     "manual": true,
+     "change": 0.6,
+     "value": 51.5,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "cpi_yoy": {
+     "source": "OECD Prices (NBS CPI)",
+     "manual": false,
+     "change": 0.3,
+     "value": 0.8,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "unemployment": {
+     "source": "manual",
+     "manual": true,
+     "change": 0.1,
+     "value": 5.3,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "ten_year": {
+     "source": "manual",
+     "manual": true,
+     "change": null,
+     "value": 1.68,
+     "period": "2026-09",
+     "status": "ok"
+    },
+    "policy_rate": {
+     "source": "BIS central bank policy rates (1Y LPR)",
+     "manual": false,
+     "value": 3.0,
+     "period": "2026-09-08",
+     "status": "ok"
+    },
+    "fx_ytd": {
+     "source": "Yahoo Finance CNY=X",
+     "manual": false,
+     "value": 4.329,
+     "period": "2026-09-16",
+     "status": "ok",
+     "label": "vs USD"
+    }
+   }
+  },
+  {
+   "country": "IN",
+   "label": "India",
+   "cells": {
+    "mfg_pmi": {
+     "source": "India database (S&P Global, entered monthly)",
+     "manual": false,
+     "change": -0.7,
+     "value": 52.8,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "cpi_yoy": {
+     "source": "India database (MoSPI, entered monthly)",
+     "manual": false,
+     "change": 0.37,
+     "value": 4.82,
+     "period": "2026-08",
+     "status": "ok"
+    },
+    "unemployment": {
+     "source": "India database (PLFS, entered monthly)",
+     "manual": false,
+     "change": -0.4,
+     "value": 5.1,
+     "period": "2026-07",
+     "status": "ok"
+    },
+    "ten_year": {
+     "source": "RBI DBIE workbook (FBIL 10-year G-Sec)",
+     "manual": false,
+     "change": 0.19,
+     "value": 6.98,
+     "period": "2026-09-04",
+     "status": "ok"
+    },
+    "policy_rate": {
+     "source": "RBI Sentinel database (MPC Resolution)",
+     "manual": false,
+     "value": 5.25,
+     "period": "2026-08-05",
+     "status": "ok"
+    },
+    "fx_ytd": {
+     "source": "Yahoo Finance INR=X",
+     "manual": false,
+     "value": -6.461,
+     "period": "2026-09-16",
+     "status": "ok",
+     "label": "vs USD"
+    }
+   }
+  }
+ ],
+ "regime": [
+  {
+   "country": "US",
+   "growth_change": 0.25,
+   "inflation_change": -0.814,
+   "cli_period": "2026-08",
+   "cpi_period": "2026-08",
+   "label": "Goldilocks",
+   "previous": {
+    "growth_change": 0.278,
+    "inflation_change": -0.475
+   }
+  },
+  {
+   "country": "EA",
+   "growth_change": 0.251,
+   "inflation_change": 0.1,
+   "cli_period": "2026-08",
+   "cpi_period": "2026-08",
+   "label": "Overheating",
+   "previous": {
+    "growth_change": 0.118,
+    "inflation_change": -0.1
+   }
+  },
+  {
+   "country": "UK",
+   "growth_change": 0.506,
+   "inflation_change": 0.1,
+   "cli_period": "2026-08",
+   "cpi_period": "2026-07",
+   "label": "Overheating",
+   "previous": {
+    "growth_change": 0.303,
+    "inflation_change": -0.6
+   }
+  },
+  {
+   "country": "JP",
+   "growth_change": 0.081,
+   "inflation_change": 0.5,
+   "cli_period": "2026-08",
+   "cpi_period": "2026-07",
+   "label": "Overheating"
+  },
+  {
+   "country": "CN",
+   "growth_change": -0.46,
+   "inflation_change": -0.4,
+   "cli_period": "2026-08",
+   "cpi_period": "2026-08",
+   "label": "Slowdown",
+   "previous": {
+    "growth_change": -0.462,
+    "inflation_change": -0.7
+   }
+  },
+  {
+   "country": "IN",
+   "growth_change": 0.411,
+   "inflation_change": 0.89,
+   "cli_period": "2026-08",
+   "cpi_period": "2026-08",
+   "label": "Overheating",
+   "previous": {
+    "growth_change": 0.402,
+    "inflation_change": 0.97
+   }
+  }
+ ],
+ "calendar": [
+  {
+   "date": "2026-09-30",
+   "label": "US GDP",
+   "kind": "data"
+  },
+  {
+   "date": "2026-09-30",
+   "label": "US PCE inflation",
+   "kind": "data"
+  },
+  {
+   "date": "2026-10-02",
+   "label": "US jobs report",
+   "kind": "data"
+  },
+  {
+   "date": "2026-10-14",
+   "label": "US CPI",
+   "kind": "data"
+  },
+  {
+   "date": "2026-10-29",
+   "label": "US GDP",
+   "kind": "data"
+  },
+  {
+   "date": "2026-10-29",
+   "label": "US PCE inflation",
+   "kind": "data"
+  },
+  {
+   "date": "2026-11-06",
+   "label": "US jobs report",
+   "kind": "data"
+  },
+  {
+   "date": "2026-11-10",
+   "label": "US CPI",
+   "kind": "data"
+  },
+  {
+   "date": "2026-11-25",
+   "label": "US GDP",
+   "kind": "data"
+  },
+  {
+   "date": "2026-11-25",
+   "label": "US PCE inflation",
+   "kind": "data"
+  },
+  {
+   "date": "2026-12-04",
+   "label": "US jobs report",
+   "kind": "data"
+  },
+  {
+   "date": "2026-12-10",
+   "label": "US CPI",
+   "kind": "data"
+  },
+  {
+   "date": "2026-12-23",
+   "label": "US GDP",
+   "kind": "data"
+  },
+  {
+   "date": "2026-12-23",
+   "label": "US PCE inflation",
+   "kind": "data"
+  }
+ ],
+ "problems": []
+}

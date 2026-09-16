@@ -2,8 +2,8 @@
 The Economics Hub — Streamlit Dashboard
 Author: Shreyas Urgunde  |  shreyasxi.github.io
 
-Three-tab publication dashboard:
-  Weekly Markets  · Macro Pulse  · India Dashboard
+Four-tab publication dashboard:
+  Weekly Markets  · World  · India  · RBI Sentinel
 
 Charts are served from assets/ (git-tracked, deployed) with a local
 fallback to output/ for development. Pipeline controls are gated
@@ -16,7 +16,7 @@ import importlib
 import re
 import subprocess
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import streamlit as st
@@ -24,10 +24,10 @@ import streamlit as st
 from charts.loader import (
     clean_title,
     get_charts,
-    get_folder_mtime,
     is_pipeline_admin,
 )
 import config.insights as _insights
+import config.world_settings as _world_settings
 
 from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
 import rbi_sentinel.cleaners.policy_facts as _policy_facts
@@ -363,6 +363,107 @@ st.markdown(
         .mpc-prov li:first-child { border-top: none; }
     }
 
+    /* ═══ World tab ═══════════════════════════════════════════════════ */
+
+    /* ── Panel eyebrow: small caps label over each HTML panel ── */
+    .w-eyebrow {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
+        text-transform: uppercase; color: #0A1F3D; margin: 0 0 0.6rem 0;
+    }
+    .w-foot {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.72rem; color: #6B7380; line-height: 1.5; margin: 0.55rem 0 0 0;
+    }
+    /* Eyebrow with the tab header's heavy navy rule beneath it */
+    .w-eyebrow.is-ruled { padding-bottom: 0.55rem; border-bottom: 2px solid #0A1F3D; }
+
+    /* ── Central bank strip: same card and figures as the RBI decision
+       strip, one column per bank; colour only on hike/cut. ── */
+    .wcb {
+        display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+        column-gap: 1.6rem; row-gap: 1.3rem;
+        background: #FCFCFD; border: 1px solid #E8EBF0; border-radius: 12px;
+        box-shadow: 0 8px 26px -20px rgba(10,31,61,0.16);
+        padding: 1.1rem 1.5rem 1.2rem 1.5rem; margin: 0.3rem 0 1.8rem 0;
+    }
+    .wcb-tile { display: flex; flex-direction: column; gap: 0.28rem; min-width: 0; }
+    .wcb-tile.is-india { border-left: 3px solid #FF9933; padding-left: 0.8rem; }
+    .wcb-bank {
+        line-height: 1.2;
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 1.05rem; font-weight: 800; letter-spacing: 0.01em;
+        color: #0A1F3D; margin: 0 0 0.1rem 0;
+    }
+    .wcb-rate {
+        font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+        font-size: clamp(1.25rem, 1.45vw, 1.6rem); font-weight: 600; letter-spacing: -0.025em;
+        line-height: 1.1; color: #0A1F3D; white-space: nowrap; margin: 0.1rem 0 0 0;
+        font-variant-numeric: tabular-nums lining-nums;
+    }
+    .wcb-label, .wcb-sub, .wcb-next {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.73rem; line-height: 1.35; margin: 0; color: #6B7380;
+        font-variant-numeric: tabular-nums;
+    }
+    .wcb-label { font-size: 0.64rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #7A828F; }
+    .wcb-next { color: #24282F; font-weight: 600; }
+    @media (max-width: 1200px) { .wcb { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 640px)  { .wcb { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 1rem; } }
+
+    /* ── Calendar: date column + event, spacing not rules ── */
+    .wcal { list-style: none; margin: 0; padding: 0; }
+    .wcal li {
+        display: grid; grid-template-columns: 5.6rem minmax(0, 1fr);
+        column-gap: 0.8rem; align-items: baseline;
+        padding: 0.42rem 0; border-bottom: 1px solid #ECEFF3;
+    }
+    .wcal li:last-child { border-bottom: none; }
+    .wcal-date {
+        font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 700;
+        color: #0A1F3D; font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .wcal-what { font-family: 'Inter', sans-serif; font-size: 0.86rem; color: #24282F; }
+    .wcal-what small { color: #7A828F; font-size: 0.74rem; margin-left: 0.35rem; }
+    .wcal-cb .wcal-what { font-weight: 600; color: #0A1F3D; }
+    .wcal-in .wcal-what { color: #B35C00; }
+
+    /* ── Scoreboard ── */
+    .wsb-wrap { overflow-x: auto; margin: 0.2rem 0 0 0; }
+    .wsb {
+        width: 100%; min-width: 760px; border-collapse: collapse;
+        font-family: 'Inter', -apple-system, sans-serif; background: #FFFFFF;
+        border-top: 2px solid #0A1F3D; border-bottom: 1px solid #D5DAE1;
+    }
+    /* Column titles: white on navy, as large as the economy names beside them */
+    .wsb thead th {
+        font-size: 0.9rem; font-weight: 700; letter-spacing: 0.01em;
+        color: #FFFFFF; background: #0A1F3D; text-align: right;
+        padding: 0.7rem 0.8rem; white-space: nowrap;
+    }
+    .wsb th:first-child, .wsb tbody th { text-align: left; }
+    .wsb tbody th {
+        font-size: 0.9rem; font-weight: 700; letter-spacing: 0;
+        color: #0A1F3D; padding: 0.55rem 0.8rem; border-bottom: 1px solid #ECEFF3;
+        white-space: nowrap;
+    }
+    .wsb tr.is-india th, .wsb tr.is-india td { background: rgba(255,153,51,0.06); }
+    .wsb td {
+        text-align: right; padding: 0.55rem 0.8rem; border-bottom: 1px solid #ECEFF3;
+        vertical-align: top; white-space: nowrap;
+    }
+    .wsb-v {
+        display: block; font-size: 1.02rem; font-weight: 600; color: #0A1F3D;
+        font-variant-numeric: tabular-nums lining-nums; letter-spacing: -0.01em;
+    }
+    .wsb-m { display: block; font-size: 0.7rem; color: #7A828F; font-variant-numeric: tabular-nums; margin-top: 0.1rem; }
+    .wsb-good { color: #1E7B45; font-weight: 600; }
+    .wsb-bad  { color: #A61B29; font-weight: 600; }
+    .wsb-flat { color: #7A828F; }
+    .wsb-na { color: #B4BAC3; font-size: 0.78rem; font-style: italic; }
+    .wsb-stale .wsb-v { color: #9AA2AD; }
+    .wsb-flag { color: #B35C00; font-weight: 600; }
+
     /* ── Centered Section Divider ── */
     .section-divider {
         height: 2px; /* This controls the thickness */
@@ -409,27 +510,48 @@ st.markdown(
         margin-top: 0.5rem;
         margin-bottom: 2.5rem;
     }
-    /* ── Substack Callout Box (Institutional Upgrade) ── */
-    .substack-box {
-        background-color: #F4F6F9; /* Ice-grey to match the RBI/India abstract */
-        border-left: 3px solid #003366; /* Signature Navy border */
-        padding: 0.40rem 0.85rem;
-        margin-top: 0.5rem;
+    /* ── Substack call-to-action: navy button, external-link arrow ── */
+    a.substack-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin-top: 0.4rem;
         margin-bottom: 0.8rem;
-        display: inline-block; 
-        border-radius: 0 3px 3px 0; 
-        transition: all 0.2s ease;
-    }
-    
-    .substack-box a {
-        color: #003366 !important; 
+        padding: 0.62rem 1.1rem 0.62rem 1.25rem;
+        background: #003366;
+        border: 1px solid #003366;
+        border-radius: 6px;
+        box-shadow: 0 1px 2px rgba(0, 31, 63, 0.12), 0 4px 12px rgba(0, 31, 63, 0.10);
+        color: #FFFFFF !important;
         font-family: 'Inter', sans-serif;
-        font-weight: 700 !important;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        text-decoration: underline !important; /* Forces the underline to always show */
+        text-decoration: none !important;
+        transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
+    a.substack-cta:hover {
+        background: #00264D;
+        box-shadow: 0 2px 4px rgba(0, 31, 63, 0.16), 0 10px 24px rgba(0, 31, 63, 0.18);
+        transform: translateY(-1px);
+        color: #FFFFFF !important;
+    }
+    a.substack-cta:focus-visible {
+        outline: 2px solid #FF6719;
+        outline-offset: 3px;
+    }
+    .substack-cta__label {
+        font-size: 0.86rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        line-height: 1;
+        color: #FFFFFF;
+    }
+    .substack-cta__arrow {
+        display: block;
+        width: 0.9rem;
+        height: 0.9rem;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+    a.substack-cta:hover .substack-cta__arrow { transform: translate(2px, -2px); }
     
     /* ── Section headers — Inter 800, all-caps, navy ── */
     .section-header {
@@ -441,23 +563,6 @@ st.markdown(
         color: #003366;
         margin-top: 3.5rem;
         margin-bottom: 0.6rem;
-    }
-
-    /* ── Status bar ── */
-    .status-label {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.80rem;
-        font-weight: 600;
-        color: #003366;
-        letter-spacing: 0.01em;
-    }
-    .status-mtime {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.73rem;
-        font-weight: 400;
-        font-style: italic;
-        color: #888888;
-        text-align: right;
     }
 
     
@@ -665,6 +770,67 @@ st.markdown(
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
+    /* ── Chart insight expanders ─────────────────────────────────────────
+       A quiet toggle under each chart, never a card: the chart is the point
+       and the note is one click away. No box and no fill — a hairline rule
+       and a small navy label, legible but recessive, opening onto body text
+       set for reading. (The 1px transparent border stays: Streamlit measures
+       it when it animates the panel open.) */
+    [data-testid="stMain"] [data-testid="stExpander"] {
+        background: transparent;
+        border: 1px solid transparent;
+        border-top: 1px solid #DCE2E9;
+        border-radius: 0;
+        box-shadow: none;
+        margin-top: 0.35rem;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] details,
+    [data-testid="stMain"] [data-testid="stExpander"] summary,
+    [data-testid="stMain"] [data-testid="stExpander"] summary:hover {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary {
+        padding: 0.42rem 0 0.42rem 0.1rem;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.73rem !important;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #33415A !important;
+        margin: 0;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary [data-testid="stIconMaterial"] {
+        font-size: 1.1rem !important;
+        width: 1.1rem; height: 1.1rem;
+        color: #5E6B7E;
+        margin-right: 0.3rem !important;
+    }
+    [data-testid="stMain"] [data-testid="stExpander"] summary:hover p,
+    [data-testid="stMain"] [data-testid="stExpander"] summary:hover [data-testid="stIconMaterial"] {
+        color: #0A1F3D !important;
+    }
+    [data-testid="stMain"] [data-testid="stExpanderDetails"] {
+        padding: 0.2rem 0.5rem 0.4rem 1rem;
+        margin: 0 0 0.5rem 0.25rem;
+        border-left: 3px solid #C3CEDB;
+    }
+    [data-testid="stMain"] [data-testid="stExpanderDetails"] p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.68;
+        color: #26303F;
+        margin-bottom: 0.65rem;
+    }
+    [data-testid="stMain"] [data-testid="stExpanderDetails"] strong {
+        color: #0A1F3D;
+        font-weight: 700;
+    }
+
     /* ── Image captions ── */
     [data-testid="caption"] {
         font-family: 'Inter', sans-serif;
@@ -722,7 +888,7 @@ with st.sidebar:
     
     st.markdown(
         '<div class="sb-data-row"><span class="sb-data-label">Markets</span><span class="sb-data-val">Yahoo Finance</span></div>'
-        '<div class="sb-data-row"><span class="sb-data-label">Global Macro</span><span class="sb-data-val">FRED &middot; OECD</span></div>'
+        '<div class="sb-data-row"><span class="sb-data-label">World</span><span class="sb-data-val">FRED &middot; OECD &middot; BIS</span></div>'
         '<div class="sb-data-row"><span class="sb-data-label">India Macro</span><span class="sb-data-val">RBI &middot; MoSPI</span></div>'
         '<div class="sb-data-row"><span class="sb-data-label">NLP Engine</span><span class="sb-data-val">Anthropic Claude</span></div>',
         unsafe_allow_html=True
@@ -744,8 +910,8 @@ with st.sidebar:
         with st.expander("Run Generators", expanded=False):
             _GENERATORS = {
                 "Weekly Markets":  ("generate_weekly.py",       True),
-                "Macro Pulse":     ("generate_macro.py",        True),
-                "India Dashboard": ("generate_india.py",        False),
+                "World":           ("generate_macro.py",        True),
+                "India":           ("generate_india.py",        False),
                 "RBI Sentinel":    ("generate_rbi_sentinel.py", False),
             }
             for label, (script, has_mode) in _GENERATORS.items():
@@ -777,10 +943,13 @@ st.markdown(
     '<h1 class="insti-masthead">Global Macro & Cross-Asset Monitor</h1>'
     '<p class="insti-tagline">Maintained by Shreyas Urgunde</p>'
     '<div class="substack-center-container">'
-        '<div class="substack-box">'
-            '<a href="https://economicshub.substack.com/" target="_blank">'
-            'Subscribe on Substack ↗</a>'
-        '</div>'
+        '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
+            '<span class="substack-cta__label">Subscribe on Substack</span>'
+            '<svg class="substack-cta__arrow" viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" '
+                'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+                '<path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6"/>'
+            '</svg>'
+        '</a>'
     '</div>'
     '<div class="insti-rule"></div>',
     unsafe_allow_html=True,
@@ -790,43 +959,45 @@ st.markdown(
 # Tabs
 # ---------------------------------------------------------------------------
 
-tab_weekly, tab_macro, tab_india, tab_rbi = st.tabs(
-    ["Weekly Markets", "Macro Pulse", "India Dashboard", "RBI Sentinel"]
+tab_weekly, tab_world, tab_india, tab_rbi = st.tabs(
+    ["Weekly Markets", "World", "India", "RBI Sentinel"]
 )
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
-def _render_status_bar(date_label: str | None, subdir: str, show_updated: bool = True) -> None:
-    mtime = get_folder_mtime(subdir) if show_updated else None
-    col_label, col_mtime = st.columns([3, 1])
-    with col_label:
-        if date_label:
-            st.markdown(
-                f'<p class="status-label">{date_label}</p>',
-                unsafe_allow_html=True,
-            )
-    with col_mtime:
-        if mtime:
-            st.markdown(
-                f'<p class="status-mtime">Last updated: {mtime.strftime("%Y-%m-%d %H:%M")}</p>',
-                unsafe_allow_html=True,
-            )
+def _render_chart(chart_path: Path) -> None:
+    st.image(
+        str(chart_path),
+        caption=clean_title(chart_path.name),
+        use_container_width=True,
+    )
+    insight = get_insight(chart_path.name)
+    if insight:
+        with st.expander("Chart insights"):
+            st.markdown(insight)
 
 
-def _render_grid(charts: list[Path], cols: int = 2) -> None:
-    columns = st.columns(cols)
-    for i, chart_path in enumerate(charts):
-        with columns[i % cols]:
-            st.image(
-                str(chart_path),
-                caption=clean_title(chart_path.name),
-                use_container_width=True,
-            )
-            insight = get_insight(chart_path.name)
-            if insight:
-                with st.expander("ℹ️ Chart Insights"):
-                    st.markdown(insight)
+def _render_grid(charts: list[Path], cols: int = 2, center_odd: bool = False) -> None:
+    """Charts in a grid; with center_odd, a last chart that would sit alone is centred instead of left in half a row."""
+    lone = charts[-1] if center_odd and cols == 2 and len(charts) % 2 == 1 else None
+    grid = charts[:-1] if lone else charts
+    if grid:
+        columns = st.columns(cols)
+        for i, chart_path in enumerate(grid):
+            with columns[i % cols]:
+                _render_chart(chart_path)
+    if lone:
+        _, col_mid, _ = st.columns([1, 2, 1])
+        with col_mid:
+            _render_chart(lone)
+
+
+def _render_wide(chart_path: Path) -> None:
+    """A multi-panel chart drawn wider than a grid cell so its panels stay legible."""
+    _, col_mid, _ = st.columns([1, 5, 1])
+    with col_mid:
+        _render_chart(chart_path)
     
 # Fields the RBI tab reads from the cycle brief beyond the original set.
 _BRIEF_KEYS = frozenset({
@@ -1193,6 +1364,222 @@ def _group(charts: list[Path], keyword: str) -> tuple[list[Path], list[Path]]:
     return matched, rest
 
 
+# ── World tab helpers ──────────────────────────────────────────────────────
+
+def _world_config():
+    """
+    config/world_settings.py, reloaded when the file changes: Streamlit Cloud
+    re-runs app.py after a push without re-importing modules, so a yearly
+    meeting-calendar update would otherwise not show until a reboot.
+    """
+    mtime = Path(_world_settings.__file__).stat().st_mtime
+    if getattr(_world_settings, "_loaded_mtime", None) != mtime:
+        importlib.reload(_world_settings)
+        _world_settings._loaded_mtime = mtime
+    return _world_settings
+
+
+def _load_world_snapshot(charts: list[Path]) -> dict | None:
+    """world_snapshot.json from the same folder as the World charts."""
+    if not charts:
+        return None
+    path = charts[0].parent / "world_snapshot.json"
+    if not path.exists():
+        return None
+    import json
+    with path.open() as fh:
+        return json.load(fh)
+
+
+def _fmt_day(d: date) -> str:
+    return f"{d.day} {d:%b %Y}"
+
+
+def _next_lpr_date(today: date) -> date:
+    """
+    Next Loan Prime Rate fixing: the 20th, moved to the Monday when it falls on
+    a weekend. Chinese public holidays can move it further, so the page says
+    "around".
+    """
+    def fixing(year: int, month: int) -> date:
+        d = date(year, month, 20)
+        return d + timedelta(days=(7 - d.weekday()) % 7) if d.weekday() >= 5 else d
+
+    this_month = fixing(today.year, today.month)
+    if this_month >= today:
+        return this_month
+    nxt = today.replace(day=1) + timedelta(days=32)
+    return fixing(nxt.year, nxt.month)
+
+
+def _next_meeting(meetings: list[str] | None) -> date | None:
+    today = date.today()
+    for m in meetings or []:
+        d = date.fromisoformat(m)
+        if d >= today:
+            return d
+    return None
+
+
+def _move_phrase(bps: int, when: date) -> str:
+    verb, cls = ("hike", "mpc-d-hike") if bps > 0 else ("cut", "mpc-d-cut")
+    return f'Last move: <b class="{cls}">{verb} {abs(bps)} bps</b>, {when:%b %Y}'
+
+
+def _central_bank_strip_html(snapshot: dict, brief: dict | None) -> str:
+    """Six tiles: rate, last move and next decision for each bank. Missing data renders as a dash."""
+    cfg = _world_config()
+    dash = '<span class="dx-missing">&mdash;</span>'
+    fetched = {b["id"]: b for b in snapshot.get("central_banks", [])}
+    tiles = []
+    for bank in cfg.CENTRAL_BANKS:
+        rate, move, nxt = dash, "", ""
+        if bank["id"] == "rbi":
+            if brief and brief.get("repo_rate_pct") is not None:
+                rate = f'{brief["repo_rate_pct"]:.2f}<span class="dx-unit">%</span>'
+                lm = brief.get("last_rate_move")
+                if lm and lm.get("rate_change_bps"):
+                    bps = int(lm["rate_change_bps"])
+                    bps = abs(bps) if lm.get("rate_action") == "hike" else -abs(bps)
+                    move = _move_phrase(bps, date.fromisoformat(lm["policy_cycle"]))
+                facts = brief.get("facts") or {}
+                nm = facts.get("next_meeting")
+                if nm and nm["end"] >= date.today():
+                    nxt = f'Next: {_fmt_day(nm["end"])}'
+        else:
+            b = fetched.get(bank["id"], {})
+            if b.get("status") == "ok":
+                rate = f'{b["display"]}<span class="dx-unit">%</span>'
+                if b.get("last_move"):
+                    move = _move_phrase(b["last_move"]["bps"], date.fromisoformat(b["last_move"]["date"]))
+            if bank["id"] == "pboc":
+                nxt = f"Next: around {_fmt_day(_next_lpr_date(date.today()))}"
+            else:
+                d = _next_meeting(bank["meetings"])
+                nxt = f"Next: {_fmt_day(d)}" if d else "Next date not yet published"
+        tiles.append(
+            f'<div class="wcb-tile{" is-india" if bank["id"] == "rbi" else ""}">'
+            f'<div class="wcb-bank" title="{bank["name"]}">{bank["short"]}</div>'
+            f'<div class="wcb-rate">{rate}</div>'
+            f'<div class="wcb-label">{bank["rate_label"]}</div>'
+            f'<div class="wcb-sub">{move or "&nbsp;"}</div>'
+            f'<div class="wcb-next">{nxt or "&nbsp;"}</div>'
+            '</div>'
+        )
+    return '<div class="wcb">' + "".join(tiles) + "</div>"
+
+
+def _calendar_html(snapshot: dict, brief: dict | None, days: int = 35) -> str:
+    """Central bank decisions and US data releases in the next `days` days."""
+    cfg = _world_config()
+    today, horizon = date.today(), date.today() + timedelta(days=days)
+    events: list[tuple[date, str, str, str]] = []
+    for bank in cfg.CENTRAL_BANKS:
+        for m in bank["meetings"] or []:
+            d = date.fromisoformat(m)
+            if today <= d <= horizon:
+                events.append((d, bank["meeting_label"], "", "wcal-cb"))
+    lpr = _next_lpr_date(today)
+    if lpr <= horizon:
+        events.append((lpr, "China loan prime rate", "around this date", "wcal-cb"))
+    if brief:
+        nm = (brief.get("facts") or {}).get("next_meeting")
+        if nm and today <= nm["end"] <= horizon:
+            events.append((nm["end"], "RBI MPC decision", "", "wcal-cb wcal-in"))
+    for e in snapshot.get("calendar", []):
+        d = date.fromisoformat(e["date"])
+        if today <= d <= horizon:
+            events.append((d, e["label"], "", ""))
+    if not events:
+        return '<p class="w-foot">No scheduled decisions or US releases in the next five weeks.</p>'
+    events.sort(key=lambda e: (e[0], "wcal-cb" not in e[3]))
+    items = "".join(
+        f'<li class="{cls}"><span class="wcal-date">{d:%a %d %b}</span>'
+        f'<span class="wcal-what">{label}{f"<small>{note}</small>" if note else ""}</span></li>'
+        for d, label, note, cls in events
+    )
+    return f'<ul class="wcal">{items}</ul>'
+
+
+def _scoreboard_html(snapshot: dict) -> str:
+    """Six economies by six indicators; each cell shows its own period and change."""
+    cfg = _world_config()
+    cols = cfg.SCOREBOARD_COLUMNS
+
+    def fmt_period(period: str, column: str, country: str) -> str:
+        if column == "fx_ytd":
+            return "DXY, year to date" if country == "US" else "year to date"
+        if column == "policy_rate" and country == "IN":
+            return f"{datetime.strptime(period, '%Y-%m-%d'):%b} MPC"
+        if len(period) == 7:
+            return datetime.strptime(period, "%Y-%m").strftime("%b")
+        return datetime.strptime(period, "%Y-%m-%d").strftime("%-d %b")
+
+    def cell_html(country: str, column: str, cell: dict) -> str:
+        title = f' title="{cell.get("source", "")}"'
+        status = cell.get("status")
+        if status == "awaiting":
+            return f'<td{title}><span class="wsb-na">awaiting entry</span></td>'
+        if status == "unavailable" or cell.get("value") is None:
+            return f'<td{title}><span class="wsb-na">source failed</span></td>'
+        v = cell["value"]
+        if column == "fx_ytd":
+            text = f"{v:+.1f}%"
+        elif column == "policy_rate":
+            text = f'{cell.get("display") or f"{v:.2f}"}%'
+        elif column == "ten_year":
+            text = f"{v:.2f}%"
+        elif column == "mfg_pmi":
+            text = f"{v:.1f}"
+        else:
+            text = f"{v:.1f}%"
+
+        meta = [fmt_period(cell["period"], column, country)]
+        ch = cell.get("change")
+        if ch is not None:
+            if column == "ten_year":
+                bps = round(ch * 100)
+                meta.append(f'<span class="wsb-flat">{bps:+d} bps / 1m</span>' if bps else '<span class="wsb-flat">unch 1m</span>')
+            else:
+                good = cols[column]["good"]
+                if abs(ch) < 0.05:
+                    meta.append('<span class="wsb-flat">unch</span>')
+                else:
+                    cls = "wsb-flat" if good is None else ("wsb-good" if (ch > 0) == (good == "up") else "wsb-bad")
+                    meta.append(f'<span class="{cls}">{"&#9650;" if ch > 0 else "&#9660;"} {abs(ch):.1f}</span>')
+        if column == "fx_ytd" and country != "US":
+            cls = "wsb-good" if v > 0 else "wsb-bad"
+            text = f'<span class="{cls}">{text}</span>'
+        stale = status == "stale"
+        if stale:
+            meta.append('<span class="wsb-flag">not updated</span>')
+        return (f'<td class="{"wsb-stale" if stale else ""}"{title}>'
+                f'<span class="wsb-v">{text}</span><span class="wsb-m">{" &middot; ".join(meta)}</span></td>')
+
+    head = "<th>Economy</th>" + "".join(f"<th>{c['label']}</th>" for c in cols.values())
+    body = ""
+    for row in snapshot.get("scoreboard", []):
+        cells = "".join(cell_html(row["country"], k, row["cells"][k]) for k in cols)
+        body += (f'<tr class="{"is-india" if row["country"] == "IN" else ""}">'
+                 f'<th scope="row">{row["label"]}</th>{cells}</tr>')
+    return f'<div class="wsb-wrap"><table class="wsb"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
+
+
+def _tab_header_html(title: str, dek: str, meta_label: str, meta_value: str) -> str:
+    return (
+        '<div class="rbi-head">'
+        '<div class="rbi-head-text">'
+        f'<p class="rbi-head-title">{title}</p>'
+        f'<p class="rbi-head-dek">{dek}</p>'
+        '</div>'
+        '<div class="rbi-head-meta">'
+        f'<span class="rbi-head-meta-label">{meta_label}</span>'
+        f'<span class="rbi-head-meta-value">{meta_value}</span>'
+        '</div>'
+        '</div>'
+    )
+
+
 # ── Weekly Markets tab ─────────────────────────────────────────────────────
 
 with tab_weekly:
@@ -1204,7 +1591,15 @@ with tab_weekly:
             "or trigger the Weekly Markets workflow on GitHub Actions."
         )
     else:
-        _render_status_bar(f"Week of {date_label}", "weekly")
+        st.markdown(
+            _tab_header_html(
+                "The Week in Markets",
+                "Weekly moves and the trends behind equities, bonds, currencies, commodities "
+                "and crypto across the major markets.",
+                "Last updated", _fmt_day(datetime.strptime(date_label, "%Y-%m-%d").date()),
+            ),
+            unsafe_allow_html=True,
+        )
 
         summary, charts = _pop_summary(charts, ["summary_table", "00_"])
         if summary:
@@ -1258,7 +1653,7 @@ with tab_weekly:
             _render_grid(volatility)
 
         # 7. Cross-Asset Risk & Breadth
-        risk_kws = ["spy_tlt", "risk_appetite", "breadth", "gold_spx", "copper_gold"]
+        risk_kws = ["stock_bond_correlation", "defensives_cyclicals", "risk_appetite", "breadth", "gold_spx", "copper_gold"]
         risk = [c for c in charts if any(k in c.name for k in risk_kws)]
         charts = [c for c in charts if c not in risk]
         if risk:
@@ -1288,55 +1683,100 @@ with tab_weekly:
             _render_grid(charts)
 
 
-# ── Macro Pulse tab ────────────────────────────────────────────────────────
+# ── World tab ──────────────────────────────────────────────────────────────
 
-with tab_macro:
+with tab_world:
     charts, date_label = get_charts("macro")
+    snapshot = _load_world_snapshot(charts)
 
-    if not charts:
+    if not charts or snapshot is None:
         st.warning(
-            "No macro charts found. Run **generate_macro.py** locally "
-            "or trigger the Macro Pulse workflow on GitHub Actions."
+            "No World data found. Run **generate_macro.py** locally "
+            "or trigger the World workflow on GitHub Actions."
         )
     else:
-        _render_status_bar(date_label, "macro")
+        _as_of = datetime.strptime(snapshot["generated_at"], "%Y-%m-%d %H:%M")
+        st.markdown(
+            _tab_header_html(
+                "The World Economy",
+                "Central banks, growth and inflation, equity valuations and country risk "
+                "across the world&rsquo;s major economies.",
+                "Data as of", _fmt_day(_as_of.date()),
+            ),
+            unsafe_allow_html=True,
+        )
+        if snapshot.get("problems"):
+            st.warning(
+                "This snapshot was built with source problems, so some figures may be missing:\n\n"
+                + "\n".join(f"- {p}" for p in snapshot["problems"])
+            )
+        world_brief = _load_cycle_brief()
 
-        summary, charts = _pop_summary(charts, ["macro_table", "00_"])
-        if summary:
-            _render_summary(summary)
+        # 1. Central banks
+        st.markdown('<p class="w-eyebrow">Central banks</p>', unsafe_allow_html=True)
+        st.markdown(_central_bank_strip_html(snapshot, world_brief), unsafe_allow_html=True)
 
-        # Inflation
-        inflation_charts, charts = _group(charts, "inflation")
-        if inflation_charts:
-            _section("Inflation")
-            _render_grid(inflation_charts)
+        # 2. Regime and calendar
+        regime, charts = _pop_summary(charts, ["world_regime"])
+        col_regime, col_cal = st.columns([3, 2], gap="large")
+        with col_regime:
+            st.markdown('<p class="w-eyebrow">Where each economy is heading</p>', unsafe_allow_html=True)
+            if regime:
+                st.image(str(regime), use_container_width=True)
+                _regime_insight = get_insight(regime.name)
+                if _regime_insight:
+                    with st.expander("Chart insights"):
+                        st.markdown(_regime_insight)
+        with col_cal:
+            st.markdown('<p class="w-eyebrow is-ruled">Coming up &middot; next five weeks</p>', unsafe_allow_html=True)
+            st.markdown(_calendar_html(snapshot, world_brief), unsafe_allow_html=True)
 
-        # Labour Market
-        labour_charts = [c for c in charts if any(k in c.name for k in ["labour", "labor", "sahm", "payroll"])]
-        charts = [c for c in charts if not any(k in c.name for k in ["labour", "labor", "sahm", "payroll"])]
-        if labour_charts:
-            _section("Labour Market")
-            _render_grid(labour_charts)
+        # 3. Scoreboard
+        _section("Six Economies at a Glance")
+        st.markdown(_scoreboard_html(snapshot), unsafe_allow_html=True)
+        st.markdown(
+            '<p class="w-foot">Change beside each figure is vs the previous month (10-year: vs a month earlier). '
+            'Green = better, red = worse: rising inflation or unemployment is red, a stronger currency against '
+            'the dollar is green. The US currency cell is the dollar index itself. Euro area 10-year = German Bund.</p>',
+            unsafe_allow_html=True,
+        )
 
-        # Financial Conditions
-        financial_charts = [c for c in charts if any(k in c.name for k in ["financial", "credit", "money", "balance_sheet", "yield_spread"])]
-        charts = [c for c in charts if not any(k in c.name for k in ["financial", "credit", "money", "balance_sheet", "yield_spread"])]
-        if financial_charts:
-            _section("Financial Conditions & Credit")
-            _render_grid(financial_charts)
+        # 4. United States
+        us_kws = ["inflation", "labour", "balance_sheet"]
+        us_charts = [c for c in charts if any(k in c.name for k in us_kws)]
+        charts = [c for c in charts if c not in us_charts]
+        if us_charts:
+            _section("United States")
+            _render_grid(us_charts, center_odd=True)
 
-        # Emerging Markets
-        em_charts, charts = _group(charts, "em")
-        if em_charts:
+        # 5. US equity valuations
+        valuations = [c for c in charts if any(k in c.name for k in ["macro_cape", "equity_risk_premium"])]
+        charts = [c for c in charts if c not in valuations]
+        if valuations:
+            _section("US Equity Valuations")
+            _render_grid(valuations, center_odd=True)
+
+        # 5b. Country risk (Damodaran's country and regional equity risk premiums)
+        country_risk = [c for c in charts if any(k in c.name for k in ["country_erp", "regional_erp", "ratings_vs_markets"])]
+        charts = [c for c in charts if c not in country_risk]
+        if country_risk:
+            _section("Country Risk")
+            _render_grid(country_risk, center_odd=True)
+
+        # 6. Emerging markets
+        em = [c for c in charts if "macro_em_" in c.name]
+        charts = [c for c in charts if c not in em]
+        if em:
             _section("Emerging Markets")
-            _render_grid(em_charts)
+            _render_grid(em, center_odd=True)
 
-        # Housing & Consumer
-        housing_charts = [c for c in charts if any(k in c.name for k in ["housing", "mortgage", "consumer", "sentiment"])]
-        charts = [c for c in charts if not any(k in c.name for k in ["housing", "mortgage", "consumer", "sentiment"])]
-        if housing_charts:
-            _section("Housing & Consumer")
-            _render_grid(housing_charts)
+        # 7. Global growth: one wide ranked chart of every OECD leading indicator
+        growth = [c for c in charts if "oecd_cli" in c.name]
+        charts = [c for c in charts if c not in growth]
+        if growth:
+            _section("Global Growth")
+            for chart_path in growth:
+                _render_wide(chart_path)
 
         # Catch-all
         if charts:
@@ -1344,7 +1784,7 @@ with tab_macro:
             _render_grid(charts)
 
 
-# ── India Dashboard tab ────────────────────────────────────────────────────
+# ── India tab ──────────────────────────────────────────────────────────────
 
 with tab_india:
     charts, date_label = get_charts("india")
@@ -1355,16 +1795,13 @@ with tab_india:
             "or trigger the India Dashboard workflow on GitHub Actions."
         )
     else:
-        _render_status_bar(date_label, "india")
-
-        # The Institutional Callout Box for India Data
         st.markdown(
-            '<div style="background-color: #F4F6F9; border-left: 3px solid #003366; padding: 0.8rem 1.2rem; margin-bottom: 1.0rem; border-radius: 0 4px 4px 0;">'
-            '<p style="font-family: \'Merriweather\', Georgia, serif; font-size: 0.90rem; font-style: italic; color: #111111; line-height: 1.6; margin: 0;">'
-            '<strong style="font-family: \'Inter\', sans-serif; font-style: normal; font-size: 0.80rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #111111; margin-right: 0.3rem;">Data Curation</strong> '
-            "This dashboard relies on manually curated macroeconomic datasets from the RBI, MoSPI, and CAG. Charts strictly reflect the most recent data commits pushed to the repository."
-            '</p>'
-            '</div>',
+            _tab_header_html(
+                "The Indian Economy",
+                "Growth, prices, money, trade, capital flows and public finances, from RBI, MoSPI, "
+                "NSDL and CAG data. Charts reflect the latest data committed to the repository.",
+                "Edition", datetime.strptime(date_label, "%Y-%m").strftime("%B %Y"),
+            ),
             unsafe_allow_html=True,
         )
 
@@ -1437,7 +1874,6 @@ with tab_rbi:
             "or trigger the RBI Sentinel workflow on GitHub Actions."
         )
     else:
-        _render_status_bar(date_label, "rbi_sentinel", show_updated=False)
         brief = _load_cycle_brief()
 
         # ── Header: title, one-line standfirst, latest meeting ──
@@ -1769,7 +2205,7 @@ with tab_rbi:
             st.image(str(trajectory), use_container_width=True)
             insight = get_insight(trajectory.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights"):
+                with st.expander("Chart insights"):
                     st.markdown(insight)
 
 
@@ -1784,7 +2220,7 @@ with tab_rbi:
             st.image(str(comparison), use_container_width=True)
             insight = get_insight(comparison.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights"):
+                with st.expander("Chart insights"):
                     st.markdown(insight)
 
         # Supporting chart (CENTERED)
@@ -1794,7 +2230,7 @@ with tab_rbi:
                 st.image(str(radar), use_container_width=True)
                 insight = get_insight(radar.name)
                 if insight:
-                    with st.expander("ℹ️ Chart Insights"):
+                    with st.expander("Chart insights"):
                         st.markdown(insight)
                         
         # ── Repo Rate vs Sentiment (PRIMARY) ──
@@ -1804,7 +2240,7 @@ with tab_rbi:
             st.image(str(rate_chart), use_container_width=True)
             insight = get_insight(rate_chart.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights"):
+                with st.expander("Chart insights"):
                     st.markdown(insight)
 
         # ── Tone and the bond market ──
@@ -1816,7 +2252,7 @@ with tab_rbi:
             st.image(str(_tone_chart), use_container_width=True)
             insight = get_insight(_tone_chart.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights & Testing Method"):
+                with st.expander("Chart insights and testing method"):
                     st.markdown(insight)
 
         # ── Governor Signal Analysis ──
@@ -1827,7 +2263,7 @@ with tab_rbi:
             st.image(str(gov_divergence), use_container_width=True)
             insight = get_insight(gov_divergence.name)
             if insight:
-                with st.expander("ℹ️ Chart Insights"):
+                with st.expander("Chart insights"):
                     st.markdown(insight)
 
         # ── Catch-all ──

@@ -1,16 +1,34 @@
 #!/usr/bin/env python3
 """
-Economics Hub — Monthly Macro Pulse Generator
-===============================================
-Run on the 2nd Saturday of each month (after NFP + CPI release).
-Generates 6 macro charts + summary table + DBnomics charts.
+Economics Hub — World tab generator ("The World Economy")
+==========================================================
+Runs every Saturday via GitHub Actions (macro.yml); output goes to
+output/macro/YYYY-MM/, so later runs in a month refresh the same edition.
+
+Writes:
+  world_snapshot.json       central bank rates, six-economy scoreboard,
+                            growth/inflation regime, US data calendar
+  01, 02, 07                US inflation, labour, Fed balance sheet
+  10_macro_world_regime     growth vs inflation momentum, six economies
+  11_macro_oecd_cli         OECD composite leading indicators, one panel per economy
+  14_macro_em_borrowing     EM corporate dollar bond yields vs the 10-year Treasury
+  15_macro_em_dollar        the dollar against EM currencies and the rupee
+  16_macro_cape             Shiller CAPE and excess CAPE yield since 1881
+  17_macro_equity_risk_premium  Damodaran's implied S&P 500 equity risk premium
+  18_macro_country_erp      G20 equity risk premiums: mature-market premium + country risk premium
+  19_macro_regional_erp     GDP-weighted equity risk premium by region, now vs a year earlier
+  20_macro_ratings_vs_markets  G20 country risk premium from ratings vs from CDS
+
+Any automatic source that fails or has stopped updating makes the run exit
+non-zero after writing what it could, so the workflow publishes nothing.
 """
 
 import sys
+import json
 import argparse
 import warnings
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 # Suppress harmless Matplotlib date locator warnings
 warnings.filterwarnings("ignore")
@@ -23,6 +41,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.patheffects as pe
+import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -31,7 +50,12 @@ import matplotlib.image as mpimg
 from charts.style import EconStyle
 from data.fetchers.fred_fetcher import FredFetcher
 from config.settings import FRED_API_KEY
-from config.macro_settings import MACRO_INDICATORS, MACRO_TABLE_SECTIONS, MANUAL_DATA
+from config.macro_settings import EM_FX_PEERS, MACRO_INDICATORS
+from config.world_settings import COUNTRIES, OECD_CLI_COUNTRIES
+from data.world_snapshot import build_snapshot, monthly, yoy_by_date
+from data.world_manual_entry import load_rows as load_world_manual_rows
+from data.valuations import fetch_country_risk, fetch_damodaran_erp, fetch_shiller
+from rbi_sentinel.config import DB_PATH as RBI_SENTINEL_DB
 
 import dbnomics
 
@@ -59,45 +83,23 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     "inflation": {
         "dashboard": (
             "US Inflation Metrics",
-            "Headline CPI vs. Core PCE vs. 5-Year Inflation Expectations",
+            "Headline CPI and core PCE, % year on year, vs. 5y5y forward inflation expectations (monthly average)",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "US Inflation Metrics",
-            "Headline CPI vs. Core PCE vs. 5-Year Inflation Expectations",
+            "Headline CPI and core PCE, % year on year, vs. 5y5y forward inflation expectations (monthly average)",
         ),
     },
     "labour": {
         "dashboard": (
-            "Labour Market Pulse",
-            "US Unemployment Rate vs. Initial Jobless Claims (4wk MA)",
+            "US Labour Market Indicators",
+            "US unemployment rate (monthly) and initial jobless claims (weekly, 4-week average)",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Labour Market Pulse",
-            "US Unemployment Rate vs. Initial Jobless Claims (4wk MA)",
-        ),
-    },
-    "financial_conditions": {
-        "dashboard": (
-            "Financial Conditions & Credit Stress",
-            "Chicago Fed NFCI vs. US High Yield Credit Spread",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "Financial Conditions & Credit Stress",
-            "Chicago Fed NFCI vs. US High Yield Credit Spread",
-        ),
-    },
-    "emerging_markets": {
-        "dashboard": (
-            "Emerging Markets Stress Monitor",
-            "EM High Yield & Corporate Spreads vs. USD Strength",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "Emerging Markets Stress Monitor",
-            "EM High Yield & Corporate Spreads vs. USD Strength",
+            "US Labour Market Indicators",
+            "US unemployment rate (monthly) and initial jobless claims (weekly, 4-week average)",
         ),
     },
     "agflation": {
@@ -111,28 +113,6 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Rising European gas and fertilizer input futures are signaling a severe, lagged spike in global food costs",
         ),
     },
-    "money_rates": {
-        "dashboard": (
-            "Money Supply, Yield Spreads & Real Rates",
-            "M2 YoY growth · 2s10s & 10y–3m spreads · 10Y TIPS real yield",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "Money Supply, Yield Spreads & Real Rates",
-            "M2 YoY growth · 2s10s & 10y–3m spreads · 10Y TIPS real yield",
-        ),
-    },
-    "sahm_rule": {
-        "dashboard": (
-            "Sahm Rule Recession Indicator",
-            "3-month average unemployment rate rise from prior 12-month low  ·  Threshold: 0.50 pp",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "Sahm Rule Recession Indicator",
-            "3-month average unemployment rate rise from prior 12-month low  ·  Threshold: 0.50 pp",
-        ),
-    },
     "fed_balance_sheet": {
         "dashboard": (
             "Federal Reserve Balance Sheet",
@@ -144,26 +124,107 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Total assets held by the Fed (WALCL)  ·  QE expansion and QT drawdown",
         ),
     },
-    "housing": {
+    "world_regime": {
         "dashboard": (
-            "US Housing Market",
-            "30-Year Fixed Mortgage Rate vs. Housing Starts",
+            "Growth vs. Inflation Momentum",
+            "3-month change in OECD leading indicator (points) vs. 3-month change in CPI inflation (pp)",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "US Housing Market",
-            "30-Year Fixed Mortgage Rate vs. Housing Starts",
+            "Growth vs. Inflation Momentum",
+            "3-month change in OECD leading indicator (points) vs. 3-month change in CPI inflation (pp)",
         ),
     },
-    "consumer_sentiment": {
+    "oecd_cli": {
         "dashboard": (
-            "US Consumer Sentiment",
-            "University of Michigan Consumer Sentiment Index",
+            "OECD Composite Leading Indicators",
+            "Amplitude-adjusted, 100 = long-term trend  ·  "
+            "phase = above or below trend, and rising or falling over three months",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "US Consumer Sentiment",
-            "University of Michigan Consumer Sentiment Index",
+            "OECD Composite Leading Indicators",
+            "Amplitude-adjusted, 100 = long-term trend  ·  "
+            "phase = above or below trend, and rising or falling over three months",
+        ),
+    },
+    "cape": {
+        "dashboard": (
+            "Shiller CAPE and Excess CAPE Yield",
+            "S&P 500 price over ten-year average real earnings, and its earnings yield minus the real 10-year bond yield, monthly",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Shiller CAPE and Excess CAPE Yield",
+            "S&P 500 price over ten-year average real earnings, and its earnings yield minus the real 10-year bond yield, monthly",
+        ),
+    },
+    "equity_risk_premium": {
+        "dashboard": (
+            "US Equity Risk Premium",
+            "Implied premium of expected S&P 500 returns over the 10-year Treasury yield, start of each month, %",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "US Equity Risk Premium",
+            "Implied premium of expected S&P 500 returns over the 10-year Treasury yield, start of each month, %",
+        ),
+    },
+    "country_erp": {
+        "dashboard": (
+            "Equity Risk Premiums Across the G20",
+            "Mature-market premium plus the country risk premium from each sovereign's Moody's rating, %",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Equity Risk Premiums Across the G20",
+            "Mature-market premium plus the country risk premium from each sovereign's Moody's rating, %",
+        ),
+    },
+    "regional_erp": {
+        "dashboard": (
+            "Equity Risk Premiums by Region",
+            "Each small dot is one country's total ERP  ·  the large dot is the region's "
+            "GDP-weighted average",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Equity Risk Premiums by Region",
+            "Each small dot is one country's total ERP  ·  the large dot is the region's "
+            "GDP-weighted average",
+        ),
+    },
+    "ratings_vs_markets": {
+        "dashboard": (
+            "Where Markets Disagree With the Rating Agencies",
+            "Country risk premium priced by CDS markets minus the premium implied by the Moody's rating, G20",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Where Markets Disagree With the Rating Agencies",
+            "Country risk premium priced by CDS markets minus the premium implied by the Moody's rating, G20",
+        ),
+    },
+    "em_borrowing": {
+        "dashboard": (
+            "Emerging-Market Dollar Borrowing Costs",
+            "Yield on EM companies' dollar bonds by credit rating vs. the 10-year US Treasury, %, weekly averages",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Emerging-Market Dollar Borrowing Costs",
+            "Yield on EM companies' dollar bonds by credit rating vs. the 10-year US Treasury, %, weekly averages",
+        ),
+    },
+    "em_dollar": {
+        "dashboard": (
+            "The Dollar vs. Emerging-Market Currencies",
+            "Weekly averages indexed to 100 three years ago  ·  up = the currency weakened against the dollar",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "The Dollar vs. Emerging-Market Currencies",
+            "Weekly averages indexed to 100 three years ago  ·  up = the currency weakened against the dollar",
         ),
     },
 }
@@ -233,20 +294,19 @@ class MacroDataEngine:
         years = ind.get("history_years", 3)
         cutoff = datetime.now() - timedelta(days=int(years * 365.25))
 
-        if transform == "level":
-            result = raw[raw.index >= cutoff]
-        elif transform == "yoy_pct":
-            result = raw.pct_change(periods=12) * 100 
-            result = result[result.index >= cutoff]
-        elif transform == "mom_pct":
-            result = raw.pct_change(periods=1) * 100
-            result = result[result.index >= cutoff]
+        # YoY and MoM are matched by calendar month, never by row count: FRED
+        # has no October 2025 CPI or unemployment (US shutdown), and counting
+        # rows across that gap published a 13-month change as US CPI YoY.
+        if transform == "yoy_pct":
+            result = yoy_by_date(raw)
         elif transform == "mom_abs":
-            result = raw.diff(periods=1)
-            result = result[result.index >= cutoff]
+            s = monthly(raw)
+            prior = s.copy()
+            prior.index = prior.index + pd.DateOffset(months=1)
+            result = s - prior.reindex(s.index)
         else:
-            result = raw[raw.index >= cutoff]
-        return result.dropna()
+            result = raw
+        return result[result.index >= cutoff].dropna()
 
     def get_latest(self, ind_id):
         series = self.get_transformed(ind_id)
@@ -260,6 +320,18 @@ class MacroDataEngine:
         latest = self.get_latest(ind_id)
         previous = self.get_previous(ind_id, 1)
         return latest - previous if latest is not None and previous is not None else None
+
+    def freshness_problem(self, ind_id):
+        """A message if the raw series is empty or its latest observation is older than max_age."""
+        ind = MACRO_INDICATORS[ind_id]
+        raw = self.fetch_raw(ind_id)
+        if raw.empty:
+            return f"{ind['name']} ({ind['series']}): no data"
+        age = (datetime.now() - raw.index[-1].to_pydatetime()).days
+        if age > ind["max_age"]:
+            return (f"{ind['name']} ({ind['series']}): latest observation {raw.index[-1]:%Y-%m-%d} "
+                    f"is {age} days old (limit {ind['max_age']}) — FRED may have stopped updating it")
+        return None
 
 def safe_fetch(provider, dataset, series_code, label=""):
     try:
@@ -278,33 +350,6 @@ def extract_series(df, value_col="value", date_col="period"):
     out[date_col] = pd.to_datetime(out[date_col], errors="coerce")
     out[value_col] = pd.to_numeric(out[value_col], errors="coerce")
     return out.dropna().set_index(date_col)[value_col]
-
-def fetch_macro_oecd_cli(output_dir, years=5):
-    print("\n   Fetching OECD Leading Indicators...")
-    cutoff = datetime.now() - pd.Timedelta(days=years * 365)
-    rows = []
-    all_countries = {**G7, **EMERGING_MARKETS}
-
-    for iso2, country_name in all_countries.items():
-        if iso2 not in OECD_CODES: continue
-        oecd_code = OECD_CODES[iso2]
-        row = {"country": country_name, "iso": iso2, "group": "G7" if iso2 in G7 else "EM"}
-
-        df = safe_fetch("OECD", "MEI", f"{oecd_code}.LOLITOAA.STSA.M", f"{iso2} CLI")
-        series = extract_series(df)
-        if len(series) > 0:
-            f = series[series.index >= cutoff]
-            if len(f) > 0:
-                row["cli_latest"] = round(float(f.iloc[-1]), 2)
-                row["cli_date"] = f.index[-1].strftime("%Y-%m")
-                if len(f) >= 4:
-                    row["cli_direction"] = "rising" if f.iloc[-1] > f.iloc[-4] else "falling"
-                row["cli_zone"] = "expansion" if f.iloc[-1] > 100 else "contraction"
-        rows.append(row)
-
-    df_out = pd.DataFrame(rows)
-    df_out.to_csv(output_dir / "oecd_cli.csv", index=False)
-    return df_out
 
 def fetch_macro_em_vulnerability(output_dir, years=5):
     print("\n   Fetching EM Vulnerability Data...")
@@ -366,366 +411,290 @@ def _add_end_label(ax, dates, values, name, color):
         path_effects=[pe.withStroke(linewidth=2.5, foreground=EconStyle.BACKGROUND)],
     )
 
+# ── Line charts: inflation, labour, emerging markets ─────────────────────────
+LINE_BLUE, LINE_TEAL, LINE_ORANGE = EconStyle.LINE_BLUE, EconStyle.LINE_TEAL, EconStyle.LINE_ORANGE
+LINE_MAROON = EconStyle.LINE_MAROON
+LINE_RUPEE, INK, INK_MUTED = EconStyle.LINE_RUPEE, EconStyle.INK, EconStyle.INK_MUTED
+
+
+def _pchip_edge_slope(h0, h1, d0, d1):
+    """End slope of a monotone cubic: three-point estimate, kept from overshooting (as in SciPy)."""
+    s = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1)
+    if np.sign(s) != np.sign(d0):
+        return 0.0
+    if np.sign(d0) != np.sign(d1) and abs(s) > 3 * abs(d0):
+        return 3 * d0
+    return s
+
+
+def monotone_curve(dates, values, per_segment=12):
+    """
+    A smooth line through monthly or weekly observations: a monotone cubic
+    (Fritsch-Butland, the method of SciPy's PchipInterpolator) on the real
+    time spacing. It passes through every observation and stays between each
+    pair of neighbours, so it rounds the corners of a straight-segment line
+    without inventing a peak, trough or level that is not in the data.
+    Returns (timestamps, values) to plot.
+    """
+    x = ((pd.DatetimeIndex(dates) - pd.Timestamp("1970-01-01")) / pd.Timedelta(seconds=1)).to_numpy(dtype=float)
+    y = np.asarray(values, dtype=float)
+    if len(y) < 3:
+        return pd.to_datetime(x, unit="s"), y
+    h = np.diff(x)
+    d = np.diff(y) / h
+    m = np.zeros(len(y))
+    w1, w2 = 2 * h[1:] + h[:-1], h[1:] + 2 * h[:-1]
+    same_direction = d[:-1] * d[1:] > 0          # a local peak, trough or flat stretch gets slope 0
+    with np.errstate(divide="ignore", invalid="ignore"):
+        m[1:-1] = np.where(same_direction, (w1 + w2) / (w1 / d[:-1] + w2 / d[1:]), 0.0)
+    m[0] = _pchip_edge_slope(h[0], h[1], d[0], d[1])
+    m[-1] = _pchip_edge_slope(h[-1], h[-2], d[-1], d[-2])
+
+    t = np.linspace(0.0, 1.0, per_segment, endpoint=False)
+    h00, h10, h01, h11 = 2 * t**3 - 3 * t**2 + 1, t**3 - 2 * t**2 + t, -2 * t**3 + 3 * t**2, t**3 - t**2
+    xs = (x[:-1, None] + h[:, None] * t).ravel()
+    ys = (h00 * y[:-1, None] + h10 * (h * m[:-1])[:, None]
+          + h01 * y[1:, None] + h11 * (h * m[1:])[:, None]).ravel()
+    return pd.to_datetime(np.append(xs, x[-1]), unit="s"), np.append(ys, y[-1])
+
+
+def weekly_average(series, today=None):
+    """
+    Mean of each complete Monday-to-Friday week, dated by its Friday. Weeks cut
+    by the start of the data or not yet over are dropped, so every point is a
+    full week of real observations.
+    """
+    s = series.dropna()
+    if s.empty:
+        return s
+    today = pd.Timestamp(today or date.today())
+    weekly = s.resample("W-FRI").mean().dropna()
+    starts_in_data = weekly.index - pd.Timedelta(days=4) >= s.index[0].normalize()
+    return weekly[starts_in_data & (weekly.index < today)]
+
+
+def complete_month_average(series, today=None):
+    """Mean of each calendar month that is fully inside the data and already over, dated the 1st."""
+    s = series.dropna()
+    if s.empty:
+        return s
+    today = pd.Timestamp(today or date.today())
+    monthly_mean = s.groupby(s.index.to_period("M")).mean()
+    monthly_mean.index = monthly_mean.index.to_timestamp()
+    # A month's first trading day can fall as late as the 4th (weekend plus a holiday).
+    first_full = monthly_mean.index[0] if s.index[0].day <= 4 else monthly_mean.index[0] + pd.DateOffset(months=1)
+    return monthly_mean[(monthly_mean.index >= first_full) & (monthly_mean.index < today.replace(day=1))]
+
+
+def _draw_line(ax, x, y, color, width=2.0, zorder=3, halo=True):
+    """A line with a thin white edge, so lines that cross stay distinct (off where a reference line runs along the data)."""
+    effects = [pe.Stroke(linewidth=width + 2.0, foreground="white"), pe.Normal()] if halo else None
+    ax.plot(x, y, color=color, linewidth=width, zorder=zorder,
+            solid_joinstyle="round", solid_capstyle="round", path_effects=effects)
+
+
+def _end_dot(ax, x, y, color, zorder=6, size=34):
+    ax.scatter([x], [y], s=size, color=color, edgecolors="white", linewidths=1.3, zorder=zorder)
+
+
+def _style_line_axes(ax, y_format, nbins=6):
+    """Horizontal grid, no y ticks or side spines, a black baseline and formatted y labels."""
+    ax.grid(axis="y", visible=True, color=EconStyle.GRID_COLOR, linewidth=0.5)
+    ax.grid(axis="x", visible=False)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right", "left"):
+        ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_visible(True)
+    ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
+    ax.spines["bottom"].set_linewidth(1.0)
+    ax.tick_params(axis="y", length=0, labelsize=EconStyle.FONT_SIZE_TICK, pad=4)
+    # No 2.5 steps: a 0.25 tick labelled to one decimal would print 3.75% as "3.8%".
+    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=nbins, steps=[1, 2, 5, 10]))
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(y_format))
+
+
+def _trim_yticks(ax, data_high):
+    """Drop gridlines above the data, leaving clear headroom for a panel title."""
+    lo, hi = ax.get_ylim()
+    ticks = ax.yaxis.get_major_locator().tick_values(lo, hi)
+    ax.set_yticks([t for t in ticks if lo <= t <= data_high + (hi - lo) * 0.02])
+
+
+def _time_axis(ax, start, end, right_margin=0.2):
+    """
+    Year labels inside the data — every year for spans up to five years, then
+    every 2, 5, 10 or 20 years — minor ticks between, and room on the right for end labels.
+    """
+    start, end = pd.Timestamp(start), pd.Timestamp(end)
+    span = end - start
+    ax.set_xlim(start - span * 0.01, end + span * right_margin)
+    span_years = span.days / 365.25
+    step, minor_step = next((s, m) for limit, s, m in [(5, 1, None), (12, 2, 1), (30, 5, 1), (70, 10, 5), (1e9, 20, 10)]
+                            if span_years <= limit)
+    in_data = lambda yr: start <= pd.Timestamp(yr, 1, 1) <= end
+    years = [pd.Timestamp(yr, 1, 1) for yr in range(start.year, end.year + 1) if yr % step == 0 and in_data(yr)]
+    ax.set_xticks(years)
+    ax.set_xticklabels([str(t.year) for t in years])
+    if minor_step is None:
+        minor = [q for q in pd.date_range(start.normalize(), end, freq="QS") if q.month != 1]
+    else:
+        minor = [pd.Timestamp(yr, 1, 1) for yr in range(start.year, end.year + 1)
+                 if yr % minor_step == 0 and yr % step != 0 and in_data(yr)]
+    ax.set_xticks(minor, minor=True)
+    ax.tick_params(axis="x", which="major", length=4, width=0.8, color=EconStyle.AXIS_COLOR,
+                   pad=4, labelsize=EconStyle.FONT_SIZE_TICK)
+    ax.tick_params(axis="x", which="minor", length=2.5, width=0.6, color=EconStyle.AXIS_COLOR)
+
+
+def _padded_ylim(ax, lows, highs, bottom=0.08, top=0.08):
+    lo, hi = min(lows), max(highs)
+    pad = (hi - lo) or abs(hi) or 1.0
+    ax.set_ylim(lo - pad * bottom, hi + pad * top)
+
+
+HEAVY_LINE = 2.5   # the Weekly tab's trend-line weight: visible at the dashboard's two-column size
+
+
+def _spread_labels_centred(values, min_gap):
+    """
+    Label positions at least `min_gap` apart. Labels that collide are spread
+    evenly around their own average, so each stays as close as possible to its
+    line's end instead of all being pushed upwards. Returns positions in input order.
+    """
+    def positions(cluster):
+        centre = sum(values[i] for i in cluster) / len(cluster)
+        return [centre + (j - (len(cluster) - 1) / 2) * min_gap for j in range(len(cluster))]
+
+    clusters = []
+    for i in sorted(range(len(values)), key=lambda k: values[k]):
+        clusters.append([i])
+        while len(clusters) > 1 and positions(clusters[-1])[0] - positions(clusters[-2])[-1] < min_gap - 1e-12:
+            clusters[-2:] = [clusters[-2] + clusters[-1]]
+    placed = {}
+    for cluster in clusters:
+        placed.update(zip(cluster, positions(cluster)))
+    return [placed[i] for i in range(len(values))]
+
+
+def _margin_labels(ax, items, x):
+    """
+    End labels in the Weekly tab's style: name and latest value in bold, in the
+    line's own colour, just right of the last observation. `items` are dicts
+    with y, name, value and color. Nudged apart so none overlap.
+    """
+    lo, hi = ax.get_ylim()
+    ys = _spread_labels_centred([it["y"] for it in items], (hi - lo) * 0.07)
+    for it, ly in zip(items, ys):
+        ax.annotate(f"{it['name']}  {it['value']}", xy=(x, ly), xytext=(10, 0), textcoords="offset points",
+                    va="center", ha="left", fontsize=9, fontweight="bold", color=it["color"], zorder=7,
+                    annotation_clip=False, path_effects=[pe.withStroke(linewidth=3, foreground="white")])
+
+
+def _value_label(ax, x, y, text, dy=0):
+    """The latest value beside a single line's end dot (dy points up, to clear a reference line)."""
+    ax.annotate(text, xy=(x, y), xytext=(8, dy), textcoords="offset points", va="center", ha="left",
+                fontsize=9, fontweight="bold", color=INK, zorder=7,
+                path_effects=[pe.withStroke(linewidth=3, foreground="white")])
+
+
+def _panel_title(ax, text, badge=None, note=None):
+    """A panel's name just inside its top edge, with an optional highlighted badge or muted note top right."""
+    ax.annotate(text, xy=(0, 1), xycoords="axes fraction", xytext=(0, -7), textcoords="offset points",
+                ha="left", va="top", fontsize=9, fontweight="bold", color=INK, zorder=8,
+                path_effects=[pe.withStroke(linewidth=3, foreground="white")])
+    if note:
+        ax.annotate(note, xy=(1, 1), xycoords="axes fraction", xytext=(0, -7), textcoords="offset points",
+                    ha="right", va="top", fontsize=8.5, color=INK_MUTED, zorder=8,
+                    path_effects=[pe.withStroke(linewidth=3, foreground="white")])
+    if badge:
+        ax.annotate(badge, xy=(1, 1), xycoords="axes fraction", xytext=(-4, -8), textcoords="offset points",
+                    ha="right", va="top", fontsize=9, fontweight="bold", color=EconStyle.REGION_COLORS["us"], zorder=8,
+                    bbox=dict(boxstyle="round,pad=0.45", facecolor="#E6EDF6", edgecolor="#B9CBE3", linewidth=0.8))
+
+
 def chart_inflation(engine, output_dir, mode="dashboard"):
+    """US headline CPI and core PCE inflation, market inflation expectations and the Fed's 2% target."""
+    cpi = engine.get_transformed("us_cpi_yoy")
+    pce = engine.get_transformed("us_core_pce")
+    # The daily 5y5y rate as averages of complete months, so all three lines are monthly.
+    expectations = complete_month_average(engine.get_transformed("us_inflation_exp"))
+    lines = [(s, name, color) for s, name, color in [
+        (cpi, "Headline CPI", LINE_BLUE), (pce, "Core PCE", LINE_TEAL), (expectations, "5y5y expectations", LINE_ORANGE),
+    ] if not s.empty]
+    if not lines:
+        raise ValueError("no US inflation series")
+
     EconStyle.apply_global_style()
-    fig, ax1 = EconStyle.create_figure(size="wide")
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
+    fig, ax = EconStyle.create_figure(size="wide")
+    start = min(s.index[0] for s, _, _ in lines)
+    end = max(s.index[-1] for s, _, _ in lines)
 
-    # 1. Harmonized Color Palette
-    # Deep Blue (Headline), Emerald Green (Core PCE), Amber (Expectations)
-    # These colors are distinct, colorblind-friendly, and don't clash.
-    custom_colors = {
-        "us_cpi_yoy": "#1E3A8A",       
-        "us_core_pce": "#059669",      
-        "us_inflation_exp": "#D97706"  
-    }
+    labels = []
+    for s, name, color in lines:
+        _draw_line(ax, *monotone_curve(s.index, s.values), color, width=HEAVY_LINE)
+        _end_dot(ax, s.index[-1], s.iloc[-1], color, size=58)
+        labels.append({"y": float(s.iloc[-1]), "name": name, "value": f"{s.iloc[-1]:.2f}%", "color": color})
+    ax.hlines(2.0, start, end, colors=INK_MUTED, linewidth=1.6, linestyles=(0, (4, 2.5)), zorder=2)
+    labels.append({"y": 2.0, "name": "Fed target", "value": "2%", "color": INK_MUTED})
 
-    first_date = None
+    _style_line_axes(ax, lambda v, _: f"{v:.1f}%")
+    _padded_ylim(ax, [s.min() for s, _, _ in lines] + [2.0], [s.max() for s, _, _ in lines])
+    _time_axis(ax, start, end, right_margin=0.24)
+    _margin_labels(ax, labels, end)
 
-    for ind_id in ["us_cpi_yoy", "us_core_pce", "us_inflation_exp"]:
-        if ind_id not in MACRO_INDICATORS: continue
-        ind = MACRO_INDICATORS[ind_id]
-        series = engine.get_transformed(ind_id)
-        if series.empty: continue
-        
-        dates, vals = series.index.to_pydatetime().tolist(), series.values
-        if first_date is None: first_date = dates[0]
-
-        # Override the global dict color with our custom harmonized palette
-        color = custom_colors.get(ind_id, ind.get("color", "#000000"))
-        
-        # 2. Add labels directly to the plot call for the legend
-        ax1.plot(dates, vals, color=color, linewidth=2.5, solid_capstyle="round", zorder=4, label=ind["name"])
-
-    # 3. Refined Target Line
-    # Softened from bright red to a neutral slate grey so it doesn't distract from the data
-    target_color = "#64748B"
-    ax1.axhline(y=2.0, color=target_color, linewidth=1.5, linestyle="--", alpha=0.8, zorder=2)
-    
-    if first_date:
-        # Move the target text slightly right of the y-axis so it doesn't clip
-        ax1.text(first_date, 2.05, " Fed 2% Target", fontsize=9, fontweight="bold", color=target_color, alpha=0.9, va="bottom")
-    
-    _style_axis(ax1, ylabel="YoY Rate (%)")
-    
-    # 4. Clean up spines
-    for spine in ["top", "right", "left"]: 
-        ax1.spines[spine].set_visible(False)
-    ax1.spines["bottom"].set_visible(True)
-    ax1.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
-    
-    # 5. Add a clean, boxed legend (Upper Right)
-    # The semi-transparent white facecolor ensures it stays readable even if a line crosses behind it
-    ax1.legend(loc="upper right", frameon=True, facecolor="white", edgecolor="#E5E7EB", 
-               framealpha=0.95, fontsize=10, borderpad=0.8, labelspacing=0.6)
-
-    # Note: Removed the hardcoded X-axis padding from the old code 
-    # since we no longer need to make room for labels on the right edge.
-
-    # Elite Narrative Titles
     _t, _s = MACRO_TITLES["inflation"][mode]
-    EconStyle.set_title(ax1, _t, _s)
-    EconStyle.add_top_rule(ax1)
-    
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "FRED")
+    EconStyle.add_source(fig, "FRED (BLS, BEA, Federal Reserve Bank of St. Louis)")
+    EconStyle.save_chart(fig, output_dir / "01_macro_inflation.png")
+    print("   ✓ US Inflation Metrics")
 
-    filepath = output_dir / "01_macro_inflation.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ US Inflation Dashboard")
 
 def chart_labour(engine, output_dir, mode="dashboard"):
-    EconStyle.apply_global_style()
-    fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
+    """US unemployment rate and initial jobless claims: two panels on one time axis, no second y-scale."""
     unemp = engine.get_transformed("us_unemployment")
-    if not unemp.empty:
-        dates, vals = unemp.index.to_pydatetime().tolist(), unemp.values
-        ax1.plot(dates, vals, color="#003366", linewidth=2, zorder=3, solid_capstyle="round")
-        _add_end_label(ax1, dates, vals, "Unemployment", "#003366")
-
-    ax1.set_ylabel("Unemployment Rate (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#003366", labelpad=6)
-    ax1.tick_params(axis="y", colors="#003366")
-
-    ax2 = ax1.twinx()
     claims = engine.get_transformed("us_claims")
-    if not claims.empty:
-        claims_4w = (claims.rolling(4).mean() / 1000).dropna()
-        dates_c, vals_c = claims_4w.index.to_pydatetime().tolist(), claims_4w.values
-        ax2.plot(dates_c, vals_c, color="#d62728", linewidth=1.5, linestyle="-", alpha=0.85, zorder=2, solid_capstyle="round")
-        _add_end_label(ax2, dates_c, vals_c, "Claims 4wk MA", "#d62728")
+    if unemp.empty or claims.empty:
+        raise ValueError("US unemployment rate or initial claims missing")
+    claims_4w = (claims.rolling(4).mean() / 1000).dropna()
+    start = min(unemp.index[0], claims_4w.index[0])
+    end = max(unemp.index[-1], claims_4w.index[-1])
 
-    ax2.set_ylabel("Initial Claims (K, 4wk MA)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#d62728", labelpad=6)
-    ax2.tick_params(axis="y", colors="#d62728")
-    ax2.spines["right"].set_visible(True)
-    ax2.spines["right"].set_color("#d62728")
+    EconStyle.apply_global_style()
+    fig, (ax_u, ax_c) = EconStyle.create_figure(size="wide", nrows=2, sharex=True)
 
-    nfp_latest = engine.get_latest("us_payrolls")
-    if nfp_latest is not None:
-        ax1.text(0.02, 0.95, f"Latest NFP: {nfp_latest:+,.0f}K", transform=ax1.transAxes, fontsize=10, fontweight="bold", color="#1f77b4", va="top", ha="left", bbox=dict(boxstyle="round,pad=0.3", facecolor="#E8F0FE", edgecolor="#1f77b4", linewidth=0.5))
+    _draw_line(ax_u, *monotone_curve(unemp.index, unemp.values), LINE_BLUE)
+    _end_dot(ax_u, unemp.index[-1], unemp.iloc[-1], LINE_BLUE)
+    _value_label(ax_u, unemp.index[-1], unemp.iloc[-1], f"{unemp.iloc[-1]:.1f}%")
+    payrolls = engine.get_transformed("us_payrolls")
+    payrolls_note = (f"Payrolls, {payrolls.index[-1]:%B}: {payrolls.iloc[-1]:+,.0f}K"
+                     if not payrolls.empty else None)
+    _panel_title(ax_u, "Unemployment rate", badge=payrolls_note)
 
-    _style_axis(ax1)
-    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
-    ax1.spines["bottom"].set_visible(True)
-    ax2.spines["top"].set_visible(False)
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
+    _draw_line(ax_c, *monotone_curve(claims_4w.index, claims_4w.values), LINE_MAROON)
+    _end_dot(ax_c, claims_4w.index[-1], claims_4w.iloc[-1], LINE_MAROON)
+    _value_label(ax_c, claims_4w.index[-1], claims_4w.iloc[-1], f"{claims_4w.iloc[-1]:,.0f}K")
+    _panel_title(ax_c, "Initial jobless claims, 4-week average")
+
+    _style_line_axes(ax_u, lambda v, _: f"{v:.1f}%", nbins=8)
+    _style_line_axes(ax_c, lambda v, _: f"{v:,.0f}K")
+    # Headroom above each line, with no gridlines in it, keeps the panel titles clear of the data.
+    _padded_ylim(ax_u, [unemp.min()], [unemp.max()], bottom=0.12, top=0.28)
+    _padded_ylim(ax_c, [claims_4w.min()], [claims_4w.max()], bottom=0.12, top=0.28)
+    _trim_yticks(ax_u, unemp.max())
+    _trim_yticks(ax_c, claims_4w.max())
+    _time_axis(ax_c, start, end, right_margin=0.07)
+    ax_u.tick_params(axis="x", which="both", length=0)
 
     _t, _s = MACRO_TITLES["labour"][mode]
-    EconStyle.set_title(ax1, _t, _s)
-    EconStyle.add_top_rule(ax1)
-    EconStyle.add_source(fig, "FRED (BLS)")
+    EconStyle.set_title(ax_u, _t, _s)
+    EconStyle.add_top_rule(ax_u)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "02_macro_labour.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Labour Market Pulse")
-
-def chart_financial_conditions(engine, output_dir, mode="dashboard"):
-    EconStyle.apply_global_style()
-    fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    nfci = engine.get_transformed("nfci")
-    if not nfci.empty:
-        dates, vals = nfci.index.to_pydatetime().tolist(), nfci.values
-        ax1.plot(dates, vals, color="#000000", linewidth=2, zorder=3, solid_capstyle="round")
-        _add_end_label(ax1, dates, vals, "NFCI", "#000000")
-
-        ax1.axhline(y=0, color="#A0A0A0", linewidth=0.8, linestyle="-", zorder=1)
-        ax1.fill_between(dates, vals, 0, where=[v > 0 for v in vals], alpha=0.08, color=EconStyle.NEGATIVE, zorder=0)
-        ax1.fill_between(dates, vals, 0, where=[v <= 0 for v in vals], alpha=0.05, color=EconStyle.POSITIVE, zorder=0)
-        
-        # Missing Glyph Fix: Removed Poppins incompatible arrow
-        ax1.text(0.02, 0.92, "< Tighter", transform=ax1.transAxes, fontsize=7, color=EconStyle.NEGATIVE, alpha=0.6)
-        ax1.text(0.02, 0.05, "< Looser", transform=ax1.transAxes, fontsize=7, color=EconStyle.POSITIVE, alpha=0.6)
-
-    ax1.set_ylabel("NFCI (0 = avg conditions)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#000000", labelpad=6)
-
-    ax2 = ax1.twinx()
-    hy = engine.get_transformed("hy_spread")
-    if not hy.empty:
-        dates_h, vals_h = hy.index.to_pydatetime().tolist(), hy.values * 100
-        ax2.plot(dates_h, vals_h, color="#d62728", linewidth=1.5, alpha=0.85, zorder=2, solid_capstyle="round")
-        _add_end_label(ax2, dates_h, vals_h, "HY Spread", "#d62728")
-
-    ax2.set_ylabel("HY OAS (bps)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#d62728", labelpad=6)
-    ax2.tick_params(axis="y", colors="#d62728")
-    ax2.spines["right"].set_visible(True)
-    ax2.spines["right"].set_color("#d62728")
-
-    _style_axis(ax1)
-    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
-    ax2.spines["top"].set_visible(False)
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
-
-    _t, _s = MACRO_TITLES["financial_conditions"][mode]
-    EconStyle.set_title(ax1, _t, _s)
-    EconStyle.add_top_rule(ax1)
-    EconStyle.add_source(fig, "FRED (Chicago Fed, ICE BofA)")
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "03_macro_financial.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Financial Conditions")
-
-def chart_emerging_markets(engine, output_dir, mode="dashboard"):
-    EconStyle.apply_global_style()
-    fig, ax1 = plt.subplots(figsize=EconStyle.SIZE_WIDE)
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    for ind_id in ["em_hy_spread", "em_corp_spread"]:
-        if ind_id not in MACRO_INDICATORS: continue
-        ind = MACRO_INDICATORS[ind_id]
-        series = engine.get_transformed(ind_id)
-        if series.empty: continue
-        dates, vals = series.index.to_pydatetime().tolist(), series.values * 100
-        ax1.plot(dates, vals, color=ind["color"], linewidth=2.2, solid_capstyle="round", zorder=3)
-        _add_end_label(ax1, dates, vals, ind["name"], ind["color"])
-
-    ax1.set_ylabel("Credit Spread (bps)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#000000", labelpad=6)
-
-    ax2 = ax1.twinx()
-    if "em_usd_index" in MACRO_INDICATORS:
-        usd = engine.get_transformed("em_usd_index")
-        if not usd.empty:
-            dates_u, vals_u = usd.index.to_pydatetime().tolist(), usd.values
-            ax2.plot(dates_u, vals_u, color="#003366", linewidth=1.5, linestyle="--", alpha=0.85, zorder=2, solid_capstyle="round")
-            _add_end_label(ax2, dates_u, vals_u, "USD vs EM", "#003366")
-
-    ax2.set_ylabel("USD Index (vs EM)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#003366", labelpad=6)
-    ax2.tick_params(axis="y", colors="#003366")
-    ax2.spines["right"].set_visible(True)
-    ax2.spines["right"].set_color("#003366")
-
-    _style_axis(ax1)
-    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
-    ax2.spines["top"].set_visible(False)
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.18)
-
-    _t, _s = MACRO_TITLES["emerging_markets"][mode]
-    EconStyle.set_title(ax1, _t, _s)
-    EconStyle.add_top_rule(ax1)
-    EconStyle.add_source(fig, "FRED (ICE BofA, Federal Reserve)")
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "04_macro_em.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Emerging Markets Stress Monitor")
-
-
-def chart_macro_table(engine, output_dir):
-    EconStyle.apply_global_style()
-    rows = []
-    
-    for section in MACRO_TABLE_SECTIONS:
-        for ind_id in section.get("rows", []):
-            ind = MACRO_INDICATORS[ind_id]
-            latest = engine.get_latest(ind_id)
-            change = engine.get_change(ind_id)
-            if latest is None: continue
-
-            if ind["transform"] == "mom_abs": latest_str = f"{latest:+,.0f}K"
-            elif "claims" in ind_id: latest_str = f"{latest/1000:,.0f}K"
-            elif "spread" in ind_id or "hy" in ind_id: latest_str = f"{latest*100:.0f} bps"
-            elif "usd_index" in ind_id: latest_str = f"{latest:.1f}"
-            elif ind.get("unit") == "USD": latest_str = f"{latest:.2f}"
-            # WALCL is published by FRED in MILLIONS of USD; the row is labelled $B.
-            # Without this the table printed 6,593,871 "$B" — a thousand-fold overstatement.
-            elif ind_id == "fed_balance_sheet": latest_str = f"{latest / 1000:,.0f}"
-            # An index level is not a percentage — respect the declared unit before
-            # falling through to the magnitude heuristics below.
-            elif ind.get("unit") == "index": latest_str = f"{latest:.2f}"
-            elif abs(latest) > 100: latest_str = f"{latest:,.0f}"
-            elif abs(latest) >= 1: latest_str = f"{latest:.2f}%"
-            else: latest_str = f"{latest:.2f}"
-
-            if change is not None:
-                if "claims" in ind_id:
-                    change_k = change / 1000
-                    change_str = "0.0" if abs(change_k) < 0.1 else f"{change_k:+.1f}"
-                elif "spread" in ind_id or "hy" in ind_id: change_str = f"{change*100:+.0f}"
-                elif ind_id == "fed_balance_sheet": change_str = f"{change / 1000:+,.1f}"
-                elif abs(change) < 0.005: change_str = "0.00"
-                else: change_str = f"{change:+.2f}"
-            else: change_str = "-"
-
-            rows.append({
-                "section": section["section"], "section_color": section["color"],
-                "name": ind["name"], "latest": latest_str, "change": change_str, "unit": ind.get("unit", "")
-            })
-
-        for manual_key in section.get("manual_rows", []):
-            if manual_key in MANUAL_DATA:
-                m = MANUAL_DATA[manual_key]
-                if "previous_value" in m and m["previous_value"] is not None:
-                    change_str = f"{(m['value'] - m['previous_value']):+.2f}"
-                else: change_str = "-"
-
-                if m["unit"] == "index": val_str = f"{m['value']:.1f}"
-                elif m["unit"] == "%": val_str = f"{m['value']:.1f}%"
-                else: val_str = f"{m['value']}"
-
-                rows.append({
-                    "section": section["section"], "section_color": section["color"],
-                    "name": m["name"], "latest": val_str, "change": change_str,
-                    "unit": m["unit"], "manual_source": m["source"], "manual_date": m["as_of"]
-                })
-
-    n = len(rows)
-    sections_seen = []
-    for r in rows:
-        if r["section"] not in sections_seen: sections_seen.append(r["section"])
-
-    row_h, sec_gap, header_block, footer_space = 0.25, 0.45, 1.4, 0.95
-    content_h = (0.65 * len(sections_seen)) + (row_h * n)
-    fig_h = header_block + content_h + footer_space
-
-    fig, ax = EconStyle.create_figure(size=(7.0, fig_h))
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, fig_h)
-    ax.axis("off")
-
-    cx = {"name": 0.5, "latest": 5.5, "change": 8.0, "unit": 9.5}
-    y = fig_h - 0.4
-    ax.text(0.5, y, "MACRO PULSE", fontsize=20, fontweight="bold", color="#000000", fontfamily="sans-serif", ha="left")
-    y -= 0.25
-    ax.text(0.5, y, datetime.now().strftime("%B %Y"), fontsize=10, color="#000000", ha="left")
-
-    y -= 0.5
-    for key, label in [("name", "INDICATOR"), ("latest", "LATEST"), ("change", "MoM CHG"), ("unit", "UNIT")]:
-        ax.text(cx[key], y, label, fontsize=9, fontweight="bold", color="#000000", ha="left" if key == "name" else "right", fontfamily="sans-serif")
-    y -= 0.15
-    ax.plot([0.5, 9.5], [y, y], color="#000000", linewidth=1.2)
-
-    cur_section = None
-    for row in rows:
-        if row["section"] != cur_section:
-            cur_section = row["section"]
-            y -= sec_gap
-            ax.add_patch(plt.Rectangle((0, y - 0.125), 10, 0.25, facecolor="#F1F5F9", edgecolor="none", zorder=0))
-            ax.text(cx["name"], y, cur_section, fontsize=9, fontweight="bold", color=row["section_color"], ha="left", va="center")
-            y -= 0.20
-        y -= row_h
-
-        name_display = row["name"] + (f"  ({row['manual_source']})" if "manual_source" in row else "")
-        ax.text(cx["name"], y, name_display, fontsize=10, fontweight="medium", color="#000000", ha="left", va="center")
-        ax.text(cx["latest"], y, row["latest"], fontsize=10, color="#334155", ha="right", va="center")
-
-        ch_col = "#065f46" if row["change"].startswith("+") else ("#991b1b" if row["change"].startswith("-") else "#64748b")
-        ax.text(cx["change"], y, row["change"], fontsize=10, fontweight="bold", color=ch_col, ha="right", va="center")
-        ax.text(cx["unit"], y, row["unit"], fontsize=9, color="#64748b", ha="right", va="center")
-        ax.plot([0.5, 9.5], [y - row_h/2, y - row_h/2], color="#e2e8f0", linewidth=0.8, linestyle=":")
-
-    footer_y = y - row_h/2 - 0.40
-    ax.text(0.5, footer_y, f"Source: FRED, OECD, ICE BofA, S&P Global", fontsize=8, color="#666666", ha="left", va="bottom")
-    ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT, fontproperties=EconStyle._get_masthead_font(), fontsize=13, color="#1A1A1A", ha="right", va="bottom")
-
-    EconStyle.finalize(fig, ax, source=None, tight=False)
-    filepath = output_dir / "00_macro_table.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Macro Summary Table")
-
-def chart_macro_cli(output_dir):
-    fpath = output_dir / "oecd_cli.csv"
-    if not fpath.exists(): return
-    df = pd.read_csv(fpath).dropna(subset=["cli_latest"]).sort_values("cli_latest", ascending=True)
-
-    fig, ax = EconStyle.create_figure(size=(10, 7))
-    for i, (_, row) in enumerate(zip(range(len(df)), df.itertuples())):
-        val, zone, direction = row.cli_latest, getattr(row, "cli_zone", ""), getattr(row, "cli_direction", "")
-        
-        if zone == "expansion" and direction == "rising": color, zone_label = COLOR_POSITIVE, "Expanding"
-        elif zone == "expansion" and direction == "falling": color, zone_label = "#B8860B", "Peaking"
-        elif zone == "contraction" and direction == "rising": color, zone_label = COLOR_G7, "Recovering"
-        elif zone == "contraction" and direction == "falling": color, zone_label = COLOR_NEGATIVE, "Downturn"
-        else: color, zone_label = COLOR_NEUTRAL, "N/A"
-
-        ax.scatter(val, i, s=140, color=color, zorder=5, edgecolors="white", linewidth=0.8)
-        arrow = " ^" if direction == "rising" else " v" if direction == "falling" else ""
-        ax.text(val + 0.15, i, f"{val:.1f}{arrow}  {zone_label}", va="center", ha="left", fontsize=8.5, fontweight="bold", color=color, fontfamily=EconStyle.FONT_FAMILY)
-
-    labels = [f"{r['country']} (EM)" if r.get("group") == "EM" else r['country'] for _, r in df.iterrows()]
-    ax.set_yticks(range(len(df)))
-    ax.set_yticklabels(labels, fontsize=9.5)
-    
-    ax.axvline(x=100, color="#000000", linewidth=1.5, zorder=2)
-    xlim = ax.get_xlim()
-    ax.axvspan(xlim[0], 100, color=COLOR_NEGATIVE, alpha=0.03, zorder=0)
-    ax.axvspan(100, xlim[1], color=COLOR_POSITIVE, alpha=0.03, zorder=0)
-
-    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
-
-    EconStyle.set_title(ax, "OECD Leading Indicators", "Composite Leading Indicator — Cycle Phase & Direction")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.06, 0.98, 0.96])
-    EconStyle.add_source(fig, "OECD Main Economic Indicators via DBnomics")
-    EconStyle.save_chart(fig, output_dir / "07_macro_oecd_cli.png")
-    print(f"   ✓ OECD Leading Indicators Dashboard")
+    fig.subplots_adjust(hspace=0.1)
+    EconStyle.add_source(fig, "FRED (BLS, US Department of Labor)")
+    EconStyle.save_chart(fig, output_dir / "02_macro_labour.png")
+    print("   ✓ US Labour Market Indicators")
 
 def chart_macro_em_vulnerability(output_dir):
     fpath = output_dir / "em_macro.csv"
@@ -933,112 +902,6 @@ def chart_hormuz_exposure(output_dir, mode="dashboard"):
 # MAIN PIPELINE
 # ═══════════════════════════════════════════════
 
-def chart_money_rates(engine, output_dir, mode="dashboard"):
-    """M2 YoY (bar) + 2s10s spread + 10y–3m spread + 10Y real yield."""
-    EconStyle.apply_global_style()
-    fig, ax1 = EconStyle.create_figure(size="wide")
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    # M2 YoY as bars on primary axis
-    m2 = engine.get_transformed("m2_yoy")
-    if not m2.empty:
-        dates_m2 = m2.index.to_pydatetime().tolist()
-        vals_m2 = m2.values
-        colors_m2 = [EconStyle.POSITIVE if v >= 0 else EconStyle.NEGATIVE for v in vals_m2]
-        ax1.bar(dates_m2, vals_m2, color=colors_m2, alpha=0.35, width=25, zorder=2, label="M2 YoY %")
-        ax1.axhline(0, color="#AAAAAA", linewidth=0.8, zorder=1)
-        _add_end_label(ax1, dates_m2, vals_m2, "M2 YoY", "#003366")
-
-    ax1.set_ylabel("M2 Growth (% YoY)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#003366", labelpad=6)
-    ax1.tick_params(axis="y", colors="#003366")
-
-    ax2 = ax1.twinx()
-    # 2s10s spread
-    s2s10 = engine.get_transformed("spread_2s10s")
-    if not s2s10.empty:
-        dates_s, vals_s = s2s10.index.to_pydatetime().tolist(), s2s10.values
-        ax2.plot(dates_s, vals_s, color="#d62728", linewidth=2, solid_capstyle="round", zorder=3)
-        ax2.fill_between(dates_s, vals_s, 0, where=[v < 0 for v in vals_s],
-                         alpha=0.08, color="#d62728", zorder=1)
-        _add_end_label(ax2, dates_s, vals_s, "2s10s", "#d62728")
-
-    # 10y–3m spread
-    s10y3m = engine.get_transformed("spread_10y3m")
-    if not s10y3m.empty:
-        dates_3m, vals_3m = s10y3m.index.to_pydatetime().tolist(), s10y3m.values
-        ax2.plot(dates_3m, vals_3m, color="#9467bd", linewidth=1.5, linestyle="--",
-                 alpha=0.85, solid_capstyle="round", zorder=3)
-        _add_end_label(ax2, dates_3m, vals_3m, "10y–3m", "#9467bd")
-
-    ax2.axhline(0, color="#CCCCCC", linewidth=0.8, linestyle="--", zorder=1)
-    ax2.set_ylabel("Yield Spread (pp)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#d62728", labelpad=6)
-    ax2.tick_params(axis="y", colors="#d62728")
-    ax2.spines["right"].set_visible(True)
-    ax2.spines["right"].set_color("#d62728")
-
-    _style_axis(ax1)
-    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
-    ax2.spines["top"].set_visible(False)
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
-
-    _t, _s = MACRO_TITLES["money_rates"][mode]
-    EconStyle.set_title(ax1, _t, _s)
-    EconStyle.add_top_rule(ax1)
-    EconStyle.add_source(fig, "FRED (Federal Reserve)")
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "05_macro_money.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Money, Rates & Yield Spreads")
-
-
-def chart_sahm_rule(engine, output_dir, mode="dashboard"):
-    """Sahm Rule recession indicator with 0.50 pp trigger threshold."""
-    EconStyle.apply_global_style()
-    fig, ax = EconStyle.create_figure(size="wide")
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    sahm = engine.get_transformed("sahm_rule")
-    if sahm.empty:
-        print("   ⚠ Sahm Rule data unavailable — skipping.")
-        return
-
-    dates, vals = sahm.index.to_pydatetime().tolist(), sahm.values
-
-    # Fill above 0.5 threshold (danger zone)
-    ax.fill_between(dates, vals, 0.5,
-                    where=[v >= 0.5 for v in vals],
-                    alpha=0.18, color="#B91C1C", zorder=1, label="Recession zone (≥ 0.50)")
-    ax.fill_between(dates, vals, 0,
-                    where=[v < 0.5 for v in vals],
-                    alpha=0.07, color="#059669", zorder=1)
-
-    ax.plot(dates, vals, color="#B91C1C", linewidth=2.5, solid_capstyle="round", zorder=3)
-    ax.axhline(0.5, color="#B91C1C", linewidth=1.5, linestyle="--", alpha=0.7, zorder=2)
-    ax.text(dates[1], 0.53, " Recession threshold (0.50 pp)",
-            fontsize=9, fontweight="bold", color="#B91C1C", alpha=0.85, va="bottom")
-    ax.axhline(0, color="#AAAAAA", linewidth=0.6, zorder=1)
-
-    _add_end_label(ax, dates, vals, "Sahm Rule", "#B91C1C")
-    _style_axis(ax, ylabel="Unemployment Rise from 12-Month Low (pp)")
-
-    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
-    ax.spines["bottom"].set_visible(True)
-    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.14)
-
-    _t, _s = MACRO_TITLES["sahm_rule"][mode]
-    EconStyle.set_title(ax, _t, _s)
-    EconStyle.add_top_rule(ax)
-    EconStyle.add_source(fig, "FRED (Claudia Sahm / BLS)")
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "06_macro_sahm.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Sahm Rule Recession Indicator")
-
-
 def chart_fed_balance_sheet(engine, output_dir, mode="dashboard"):
     """Federal Reserve total assets (WALCL) with QE/QT era shading."""
     EconStyle.apply_global_style()
@@ -1087,151 +950,657 @@ def chart_fed_balance_sheet(engine, output_dir, mode="dashboard"):
     print(f"   ✓ Fed Balance Sheet")
 
 
-def chart_housing(engine, output_dir, mode="dashboard"):
-    """30Y mortgage rate (primary) vs housing starts (secondary, dual axis)."""
+# ═══════════════════════════════════════════════
+# WORLD CHARTS
+# ═══════════════════════════════════════════════
+
+WORLD_LABEL = {cc: meta["label"] for cc, meta in COUNTRIES.items()}
+WORLD_LABEL["EA"] = "Euro area (big 4)"   # OECD CLI has no euro-area aggregate; G4E = DE, FR, IT, ES
+
+
+def _ticks_within_data(ax, last_date):
+    """Drop x ticks after the last observation (the right margin holds end labels, not future dates)."""
+    last = mdates.date2num(pd.Timestamp(last_date).to_pydatetime())
+    ax.set_xticks([t for t in ax.get_xticks() if t <= last + 1])
+
+
+def _spread_labels(values, min_gap):
+    """Nudge end-label y positions apart so they don't overlap; returns positions in input order."""
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    placed = {}
+    last = None
+    for i in order:
+        y = values[i] if last is None else max(values[i], last + min_gap)
+        placed[i], last = y, y
+    return [placed[i] for i in range(len(values))]
+
+
+def chart_world_regime(snapshot, output_dir, mode="dashboard"):
+    """Scatter: leading-indicator momentum (x) vs inflation momentum (y), with last month's position."""
+    points = snapshot["regime"]
+    if not points:
+        raise ValueError("no economy has both a leading indicator and CPI history")
     EconStyle.apply_global_style()
-    fig, ax1 = EconStyle.create_figure(size="wide")
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
+    fig, ax = EconStyle.create_figure(size=(9.5, 6.2))
 
-    mort = engine.get_transformed("mortgage_30y")
-    if not mort.empty:
-        dates_m, vals_m = mort.index.to_pydatetime().tolist(), mort.values
-        ax1.plot(dates_m, vals_m, color="#B91C1C", linewidth=2.5, solid_capstyle="round", zorder=3)
-        _add_end_label(ax1, dates_m, vals_m, "Mortgage 30Y", "#B91C1C")
+    xs = [p["growth_change"] for p in points] + [p["previous"]["growth_change"] for p in points if "previous" in p]
+    ys = [p["inflation_change"] for p in points] + [p["previous"]["inflation_change"] for p in points if "previous" in p]
+    xlim = max(0.3, max(abs(v) for v in xs) * 1.35)
+    ylim = max(0.3, max(abs(v) for v in ys) * 1.35)
+    ax.set_xlim(-xlim, xlim)
+    ax.set_ylim(-ylim, ylim)
+    ax.axhline(0, color="#000000", linewidth=0.9, zorder=1)
+    ax.axvline(0, color="#000000", linewidth=0.9, zorder=1)
 
-    ax1.set_ylabel("30Y Mortgage Rate (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#B91C1C", labelpad=6)
-    ax1.tick_params(axis="y", colors="#B91C1C")
+    corner = dict(fontsize=10, fontweight="bold", color="#9CA3AF", zorder=1)
+    ax.text(0.98, 0.97, "OVERHEATING", transform=ax.transAxes, ha="right", va="top", **corner)
+    ax.text(0.02, 0.97, "STAGFLATION", transform=ax.transAxes, ha="left", va="top", **corner)
+    ax.text(0.98, 0.03, "GOLDILOCKS", transform=ax.transAxes, ha="right", va="bottom", **corner)
+    ax.text(0.02, 0.03, "SLOWDOWN", transform=ax.transAxes, ha="left", va="bottom", **corner)
 
-    ax2 = ax1.twinx()
-    starts = engine.get_transformed("housing_starts")
-    if not starts.empty:
-        # Convert from thousands units to display
-        starts_k = starts / 1000
-        dates_s, vals_s = starts_k.index.to_pydatetime().tolist(), starts_k.values
-        ax2.bar(dates_s, vals_s, color="#003366", alpha=0.3, width=25, zorder=2)
-        ax2.plot(dates_s, vals_s, color="#003366", linewidth=1.5, solid_capstyle="round", zorder=3)
-        _add_end_label(ax2, dates_s, vals_s, "Starts", "#003366")
+    for p in points:
+        color = COUNTRIES[p["country"]]["color"]
+        x, y = p["growth_change"], p["inflation_change"]
+        if "previous" in p:
+            px, py = p["previous"]["growth_change"], p["previous"]["inflation_change"]
+            ax.annotate("", xy=(x, y), xytext=(px, py), zorder=2,
+                        arrowprops=dict(arrowstyle="-|>", color=color, alpha=0.45, linewidth=1.2, shrinkB=6))
+            ax.scatter(px, py, s=22, color=color, alpha=0.35, zorder=2, edgecolors="none")
+        ax.scatter(x, y, s=110, color=color, zorder=4, edgecolors="white", linewidth=1.5)
+        label = WORLD_LABEL[p["country"]] if p["country"] == "EA" else COUNTRIES[p["country"]]["label"]
+        ax.annotate(label, xy=(x, y), xytext=(8, 7), textcoords="offset points",
+                    fontsize=9.5, fontweight="bold", color="#111111", zorder=5,
+                    path_effects=[pe.withStroke(linewidth=3, foreground="white")])
 
-    ax2.set_ylabel("Housing Starts (M units, SAAR)", fontsize=EconStyle.FONT_SIZE_AXIS, color="#003366", labelpad=6)
-    ax2.tick_params(axis="y", colors="#003366")
-    ax2.spines["right"].set_visible(True)
-    ax2.spines["right"].set_color("#003366")
+    ax.grid(True, color=EconStyle.GRID_COLOR, linewidth=0.35)
+    ax.tick_params(length=0, labelsize=EconStyle.FONT_SIZE_TICK)
+    ax.set_xlabel("Leading indicator, change over 3 months (points)  \u2192 growth picking up",
+                  fontsize=EconStyle.FONT_SIZE_AXIS, labelpad=6)
+    ax.set_ylabel("CPI inflation, change over 3 months (pp)  \u2192 rising", fontsize=EconStyle.FONT_SIZE_AXIS, labelpad=6)
+    for spine in ["top", "right", "left", "bottom"]:
+        ax.spines[spine].set_visible(False)
 
-    _style_axis(ax1)
-    for spine in ["top", "left"]: ax1.spines[spine].set_visible(False)
-    ax2.spines["top"].set_visible(False)
-    ax1.set_xlim(ax1.get_xlim()[0], ax1.get_xlim()[1] + (ax1.get_xlim()[1] - ax1.get_xlim()[0]) * 0.16)
+    shown = {p["country"] for p in points}
+    missing = [COUNTRIES[c]["label"] for c in COUNTRIES if c not in shown]
+    notes = ["Faint dot = the same reading a month earlier. Euro area growth uses the OECD's Germany-France-Italy-Spain aggregate."]
+    if missing:
+        notes.append(f"Not shown (no CPI history yet): {', '.join(missing)}.")
+    fig.text(0.04, 0.055, "  ".join(notes), fontsize=7.5, color=EconStyle.TEXT_MUTED, ha="left", va="bottom")
 
-    _t, _s = MACRO_TITLES["housing"][mode]
-    EconStyle.set_title(ax1, _t, _s)
-    EconStyle.add_top_rule(ax1)
-    EconStyle.add_source(fig, "FRED (Freddie Mac PMMS, Census Bureau)")
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-
-    filepath = output_dir / "08_macro_housing.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Housing Market")
-
-
-def chart_consumer_sentiment(engine, output_dir, mode="dashboard"):
-    """University of Michigan Consumer Sentiment index — level with long-run trend."""
-    EconStyle.apply_global_style()
-    fig, ax = EconStyle.create_figure(size="wide")
-    fig.patch.set_linewidth(2)
-    fig.patch.set_edgecolor('#000000')
-
-    sent = engine.get_transformed("consumer_sentiment")
-    if sent.empty:
-        print("   ⚠ Consumer sentiment data unavailable — skipping.")
-        return
-
-    dates, vals = sent.index.to_pydatetime().tolist(), sent.values
-
-    # Long-run average reference line
-    long_run_avg = float(sent.mean())
-    ax.axhline(long_run_avg, color="#AAAAAA", linewidth=1.0, linestyle="--", alpha=0.7, zorder=1)
-    ax.text(dates[2], long_run_avg + 1.5,
-            f" Avg ({long_run_avg:.0f})", fontsize=9, color="#888888", va="bottom")
-
-    ax.fill_between(dates, vals, long_run_avg,
-                    where=[v < long_run_avg for v in vals],
-                    alpha=0.10, color="#B91C1C", zorder=1)
-    ax.fill_between(dates, vals, long_run_avg,
-                    where=[v >= long_run_avg for v in vals],
-                    alpha=0.06, color="#059669", zorder=1)
-
-    ax.plot(dates, vals, color="#003366", linewidth=2.5, solid_capstyle="round", zorder=3)
-    _add_end_label(ax, dates, vals, "Sentiment", "#003366")
-    _style_axis(ax, ylabel="Index Level")
-
-    for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
-    ax.spines["bottom"].set_visible(True)
-    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.12)
-
-    _t, _s = MACRO_TITLES["consumer_sentiment"][mode]
+    _t, _s = MACRO_TITLES["world_regime"][mode]
     EconStyle.set_title(ax, _t, _s)
     EconStyle.add_top_rule(ax)
-    EconStyle.add_source(fig, "FRED (University of Michigan)")
+    fig.tight_layout(rect=[0.02, 0.08, 0.98, 0.96])
+    EconStyle.add_source(fig, "OECD, FRED (BLS), Eurostat, MoSPI")
+    EconStyle.save_chart(fig, output_dir / "10_macro_world_regime.png")
+    print("   ✓ Growth vs Inflation Momentum")
+
+
+CLI_PHASE_COLORS = {"Expansion": "#1E7B45", "Recovery": "#0B8F82", "Downturn": "#C8620A", "Slowdown": "#A61B29"}
+
+
+def cli_phase(series, months=1):
+    """
+    The OECD's four business-cycle phases, from the leading indicator's level
+    (at or above 100 = above trend) and whether it has risen over the last
+    `months` months. The ranked chart asks for three, a window one month's
+    wobble cannot flip; a shorter series falls back to what it has.
+    """
+    back = min(months, len(series) - 1)
+    if back < 1:
+        raise ValueError("a leading indicator needs two observations before it has a direction")
+    level = float(series.iloc[-1])
+    rising = level > float(series.iloc[-1 - back])
+    if level >= 100:
+        return "Expansion" if rising else "Downturn"
+    return "Recovery" if rising else "Slowdown"
+
+
+def _figure_title(fig, title, subtitle):
+    """The EconStyle title block (title, subtitle, heavy rule) across a multi-panel figure. Returns the rule's y."""
+    h = fig.get_figheight()
+    y_title = 1 - 0.1 / h
+    y_subtitle = y_title - 0.36 / h
+    y_rule = y_subtitle - 0.27 / h
+    fig.text(0.02, y_title, title, fontproperties=EconStyle._get_font("bold"), fontsize=EconStyle.FONT_SIZE_TITLE,
+             color=EconStyle.TEXT_TITLE, ha="left", va="top")
+    fig.text(0.02, y_subtitle, subtitle, fontsize=EconStyle.FONT_SIZE_SUBTITLE, color=EconStyle.TEXT_SECONDARY,
+             ha="left", va="top")
+    fig.add_artist(plt.Line2D([0.02, 0.98], [y_rule, y_rule], color=EconStyle.RULE_HEAVY, linewidth=1.5,
+                              transform=fig.transFigure))
+    return y_rule
+
+
+def chart_oecd_cli(cli, output_dir, mode="dashboard"):
+    """
+    Every economy the OECD publishes a leading indicator for, ranked. The bar
+    is how far the indicator sits above or below its long-term trend; its
+    colour and the name beside it are the phase that level and direction put
+    the economy in, so the phase is never carried by colour alone.
+    """
+    missing = [name for area, name in OECD_CLI_COUNTRIES.items() if area not in cli or cli[area].empty]
+    if missing:
+        raise ValueError(f"no OECD leading indicator for {', '.join(missing)}")
+    rows = pd.DataFrame([
+        {"label": name, "level": float(cli[area].dropna().iloc[-1]),
+         "phase": cli_phase(cli[area].dropna(), months=3), "period": cli[area].dropna().index[-1]}
+        for area, name in OECD_CLI_COUNTRIES.items()
+    ]).sort_values(["level", "label"], ascending=[True, False]).reset_index(drop=True)
+    period = max(rows["period"])
+    dev = rows["level"] - 100
+    y = np.arange(len(rows))
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size=(11.5, 7.0))
+    ax.barh(y, dev, height=0.66, color=[CLI_PHASE_COLORS[p] for p in rows["phase"]],
+            edgecolor="white", linewidth=1.2, zorder=3)
+    ax.axvline(0, color=INK, linewidth=1.2, zorder=4)
+    for yi, (level, phase) in enumerate(zip(rows["level"], rows["phase"])):
+        right = level >= 100
+        ax.annotate(f"{level:.1f}", xy=(level - 100, yi), xytext=(6 if right else -6, 0),
+                    textcoords="offset points", va="center", ha="left" if right else "right",
+                    fontsize=9, fontweight="bold", color=INK)
+        ax.annotate(phase, xy=(1, yi), xycoords=("axes fraction", "data"), ha="right", va="center",
+                    fontsize=9, fontweight="bold", color=CLI_PHASE_COLORS[phase])
+    ax.annotate("Cycle phase", xy=(1, len(rows) - 0.5), xycoords=("axes fraction", "data"), ha="right",
+                va="bottom", fontsize=8, color=INK_MUTED)
+
+    _style_row_axes(ax, rows["label"], lambda v, _: f"{v + 100:.0f}")
+    ax.set_xlim(dev.min() - 0.35, dev.max() + (dev.max() - dev.min()) * 0.46)
+    ax.set_ylim(-0.7, len(rows) + 0.35)
+    # The right margin is there to hold the phase column, not more scale:
+    # keep gridlines and ticks inside the range the bars actually cover.
+    ax.set_xticks([t for t in ax.get_xticks() if dev.min() - 0.35 <= t <= dev.max() + 0.35])
+
+    _t, _s = MACRO_TITLES["oecd_cli"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, f"OECD Composite Leading Indicators, amplitude-adjusted ({period:%B %Y})")
+    EconStyle.save_chart(fig, output_dir / "11_macro_oecd_cli.png")
+    print("   ✓ OECD Composite Leading Indicators")
 
-    filepath = output_dir / "09_macro_consumer.png"
-    EconStyle.save_chart(fig, filepath)
-    print(f"   ✓ Consumer Sentiment")
 
+def chart_cape(shiller, output_dir, mode="dashboard"):
+    """Shiller CAPE and excess CAPE yield since 1881: two panels on one time axis, long-run averages dashed."""
+    cape = shiller["cape"].dropna()
+    ecy = shiller["excess_cape_yield"].dropna()
+    if cape.empty or ecy.empty:
+        raise ValueError("Shiller CAPE or excess CAPE yield missing")
+    start = min(cape.index[0], ecy.index[0])
+    end = max(cape.index[-1], ecy.index[-1])
+    minus = lambda text: text.replace("-", "−")
+
+    EconStyle.apply_global_style()
+    fig, (ax_c, ax_y) = EconStyle.create_figure(size="wide", nrows=2, sharex=True)
+    panels = [
+        (ax_c, cape, LINE_BLUE, "CAPE (cyclically adjusted P/E)", lambda v: f"{v:.1f}", lambda v, _: f"{v:.0f}"),
+        (ax_y, ecy, LINE_MAROON, "Excess CAPE yield, %", lambda v: minus(f"{v:.1f}%"), lambda v, _: minus(f"{v:.0f}%")),
+    ]
+    for ax, s, color, title, fmt_value, fmt_tick in panels:
+        average = float(s.mean())
+        if ax is ax_y:
+            ax.axhline(0, color=INK, linewidth=0.9, zorder=2)
+        ax.hlines(average, start, end, colors=INK_MUTED, linewidth=1.3, linestyles=(0, (4, 2.5)), zorder=2)
+        ax.plot(s.index, s.values, color=color, linewidth=2.0, zorder=3,
+                solid_joinstyle="round", solid_capstyle="round")
+        _end_dot(ax, s.index[-1], s.iloc[-1], color)
+        lo_, hi_ = s.min(), s.max()
+        near_zero = ax is ax_y and abs(float(s.iloc[-1])) < (hi_ - lo_) * 0.06
+        _value_label(ax, s.index[-1], s.iloc[-1], fmt_value(s.iloc[-1]), dy=9 if near_zero else 0)
+        _panel_title(ax, title, note=f"{s.index[-1]:%b %Y}  ·  dashed = average since {s.index[0]:%Y}: "
+                                     f"{fmt_value(average)}")
+        _style_line_axes(ax, fmt_tick)
+        _padded_ylim(ax, [s.min()], [s.max()], bottom=0.08, top=0.3)
+        _trim_yticks(ax, s.max())
+    peak_date = cape.idxmax()
+    ax_c.annotate(f"Record {cape.max():.1f}, {peak_date:%b %Y}", xy=(peak_date, cape.max()), xytext=(-8, 0),
+                  textcoords="offset points", ha="right", va="center", fontsize=8.5, color=INK_MUTED, zorder=6,
+                  path_effects=[pe.withStroke(linewidth=3, foreground="white")])
+    _time_axis(ax_y, start, end, right_margin=0.07)
+    ax_c.tick_params(axis="x", which="both", length=0)
+
+    _t, _s = MACRO_TITLES["cape"][mode]
+    EconStyle.set_title(ax_c, _t, _s)
+    EconStyle.add_top_rule(ax_c)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    fig.subplots_adjust(hspace=0.1)
+    EconStyle.add_source(fig, "Robert J. Shiller, shillerdata.com (latest month left out while provisional)")
+    EconStyle.save_chart(fig, output_dir / "16_macro_cape.png")
+    print("   ✓ Shiller CAPE and Excess CAPE Yield")
+
+
+def chart_equity_risk_premium(erp, output_dir, mode="dashboard"):
+    """Damodaran's implied S&P 500 equity risk premium, start of each month, with its average over the series."""
+    s = erp["erp"].dropna()
+    if len(s) < 24:
+        raise ValueError(f"only {len(s)} months of implied ERP")
+    average = float(s.mean())
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    ax.hlines(average, s.index[0], s.index[-1], colors=INK_MUTED, linewidth=1.6, linestyles=(0, (4, 2.5)), zorder=2)
+    _draw_line(ax, *monotone_curve(s.index, s.values), LINE_BLUE, width=HEAVY_LINE)
+    _end_dot(ax, s.index[-1], s.iloc[-1], LINE_BLUE, size=58)
+
+    _style_line_axes(ax, lambda v, _: f"{v:.0f}%" if float(v).is_integer() else f"{v:.1f}%")
+    _padded_ylim(ax, [s.min(), average], [s.max()])
+    _time_axis(ax, s.index[0], s.index[-1], right_margin=0.3)
+    _margin_labels(ax, [
+        {"y": float(s.iloc[-1]), "name": f"{s.index[-1]:%b %Y}", "value": f"{s.iloc[-1]:.2f}%", "color": LINE_BLUE},
+        {"y": average, "name": f"Average since {s.index[0]:%Y}", "value": f"{average:.2f}%", "color": INK_MUTED},
+    ], s.index[-1])
+
+    _t, _s = MACRO_TITLES["equity_risk_premium"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "Aswath Damodaran, NYU Stern (implied ERP, trailing 12-month cash yield)")
+    EconStyle.save_chart(fig, output_dir / "17_macro_equity_risk_premium.png")
+    print("   ✓ US Equity Risk Premium")
+
+
+# ── Country risk (Damodaran's January and July updates) ──────────────────────
+# G20 members as named in Damodaran's table. Russia is not in his rated table
+# (no sovereign rating; he scores it on PRS, a different method), so it is not shown.
+G20_COUNTRIES = {
+    "Argentina": "Argentina", "Australia": "Australia", "Brazil": "Brazil", "Canada": "Canada",
+    "China": "China", "France": "France", "Germany": "Germany", "India": "India", "Indonesia": "Indonesia",
+    "Italy": "Italy", "Japan": "Japan", "Korea": "South Korea", "Mexico": "Mexico",
+    "Saudi Arabia": "Saudi Arabia", "South Africa": "South Africa", "Turkey": "Turkey",
+    "United Kingdom": "United Kingdom", "United States": "United States",
+}
+REGION_LABELS = {"Central and South America": "Central & South America", "Australia & New Zealand": "Australia & NZ"}
+# Damodaran's regional averages table and his country table spell one region
+# differently; every other name matches. Regional spelling -> country spelling.
+REGION_MEMBERS = {"Eastern Europe": "Eastern Europe & Russia"}
+# Countries rated C sit near 31%, three times the next tier, and stretch the
+# regional chart until every other country is a smear. They are drawn at this
+# edge instead and named under the chart.
+ERP_AXIS_CAP = 20.0
+BASE_SEGMENT = "#C9D1DC"   # the mature-market premium is the same for every country, so it is drawn neutral
+RING = "#7B8594"
+
+
+def _g20_rows(countries):
+    missing = [name for name in G20_COUNTRIES if name not in countries.index]
+    if missing:
+        raise ValueError(f"G20 countries missing from Damodaran's rated table: {', '.join(missing)} — renamed?")
+    rows = countries.loc[list(G20_COUNTRIES)].copy()
+    rows["label"] = [G20_COUNTRIES[name] for name in rows.index]
+    return rows
+
+
+def _style_row_axes(ax, labels, x_format):
+    """Horizontal-row chart: category labels on the left, vertical grid, no ticks."""
+    ax.set_yticks(np.arange(len(labels)))
+    ax.set_yticklabels(labels, fontsize=9.5, color=INK)
+    ax.set_ylim(-0.7, len(labels) - 0.3)
+    ax.xaxis.set_major_locator(mticker.MaxNLocator(nbins=7, steps=[1, 2, 5, 10]))
+    ax.xaxis.set_major_formatter(mticker.FuncFormatter(x_format))
+    ax.grid(axis="x", visible=True, color=EconStyle.GRID_COLOR, linewidth=0.5)
+    ax.grid(axis="y", visible=False)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right", "bottom", "left"):
+        ax.spines[spine].set_visible(False)
+    ax.tick_params(axis="both", length=0, labelsize=EconStyle.FONT_SIZE_TICK)
+
+
+def _update_label(update):
+    return f"{update:%B %Y} update"
+
+
+def chart_country_erp(risk, output_dir, mode="dashboard"):
+    """G20 total equity risk premiums, split into the mature-market premium and each country's risk premium."""
+    latest = risk["latest"]
+    mature = latest["mature"]
+    rows = _g20_rows(latest["countries"]).sort_values(["erp", "label"], ascending=[True, False])
+    y = np.arange(len(rows))
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size=(9.5, 6.0))
+    ax.barh(y, mature, height=0.66, color=BASE_SEGMENT, edgecolor="white", linewidth=1.5, zorder=3,
+            label=f"Mature-market premium, {mature:.2f}%")
+    ax.barh(y, rows["crp"], left=mature, height=0.66, color=LINE_MAROON, edgecolor="white", linewidth=1.5, zorder=3,
+            label="Country risk premium")
+    for yi, erp in zip(y, rows["erp"]):
+        ax.annotate(f"{erp:.2f}%", xy=(erp, yi), xytext=(5, 0), textcoords="offset points", va="center", ha="left",
+                    fontsize=9, fontweight="bold", color=INK)
+    _style_row_axes(ax, rows["label"], lambda v, _: f"{v:.0f}%")
+    ax.set_xlim(0, rows["erp"].max() * 1.1)
+    ax.legend(loc="lower right", frameon=False, fontsize=9, handlelength=1.4, handleheight=1.1)
+
+    _t, _s = MACRO_TITLES["country_erp"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, f"Aswath Damodaran, NYU Stern (country risk premiums, {_update_label(latest['date'])}; "
+                              f"Russia, unrated, not shown)")
+    EconStyle.save_chart(fig, output_dir / "18_macro_country_erp.png")
+    print("   ✓ Equity Risk Premiums Across the G20")
+
+
+def _signed(value, digits=2):
+    return f"{'+' if value > 0 else chr(0x2212) if value < 0 else ''}{abs(value):.{digits}f}"
+
+
+def _swarm_offsets(values, min_gap, levels=(0.0, 0.17, -0.17, 0.30, -0.30)):
+    """
+    Vertical offsets that stop dots on one row from hiding each other: each
+    value takes the first level on which it clears its neighbours by min_gap.
+    Deterministic, so the same data always draws the same picture.
+    """
+    placed = {level: [] for level in levels}
+    offsets = []
+    for value in values:
+        for level in levels:
+            if all(abs(value - other) >= min_gap for other in placed[level]):
+                break
+        else:
+            level = min(levels, key=lambda lv: len(placed[lv]))
+        placed[level].append(value)
+        offsets.append(level)
+    return offsets
+
+
+def chart_regional_erp(risk, output_dir, mode="dashboard"):
+    """
+    Every rated country as a dot on its region's row, with the region's
+    GDP-weighted average marked. The average says where a region sits; the
+    spread of dots says whether that average is worth trusting, and where
+    inside a risky region the calmer places are.
+    """
+    now, before = risk["latest"]["regions"], risk["year_ago"]["regions"]
+    countries = risk["latest"]["countries"]
+    regions = [r for r in now.index if r != "Global"]
+    missing = [r for r in regions + ["Global"] if r not in before.index]
+    if missing:
+        raise ValueError(f"regions missing from the earlier update: {', '.join(missing)}")
+    members = {r: countries.loc[countries["region"] == REGION_MEMBERS.get(r, r), "erp"].dropna().sort_values()
+               for r in regions}
+    empty = [r for r, s in members.items() if s.empty]
+    if empty:
+        raise ValueError(f"no rated countries fall in {', '.join(empty)} — region names changed?")
+    order = sorted(regions, key=lambda r: now[r])
+    y = np.arange(len(order))
+    lo = min(s.min() for s in members.values())
+    span = ERP_AXIS_CAP - lo
+    off_scale = countries.loc[countries["erp"] > ERP_AXIS_CAP, "erp"].sort_values()
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size=(9.5, 6.0))
+    ax.axvline(now["Global"], color=INK_MUTED, linewidth=1.2, linestyle=(0, (4, 2.5)), zorder=1)
+    ax.annotate(f"Global average {now['Global']:.2f}%", xy=(now["Global"], 1), xycoords=("data", "axes fraction"),
+                xytext=(5, -2), textcoords="offset points", ha="left", va="top", fontsize=8.5, color=INK_MUTED)
+    for yi, region in zip(y, order):
+        values = members[region]
+        inside = values[values <= ERP_AXIS_CAP]
+        offsets = _swarm_offsets(inside, min_gap=span * 0.013)
+        ax.scatter(inside, yi + np.array(offsets), s=19, color=LINE_BLUE, alpha=0.5, edgecolors="none", zorder=3)
+        ax.scatter([now[region]], [yi], s=185, color=LINE_MAROON, alpha=0.85, edgecolors="white",
+                   linewidths=1.4, zorder=5)
+        change = now[region] - before[region]
+        ax.annotate(f"{now[region]:.2f}%", xy=(1, yi), xycoords=("axes fraction", "data"), xytext=(-62, 0),
+                    textcoords="offset points", ha="right", va="center", fontsize=9, fontweight="bold", color=INK)
+        ax.annotate(_signed(change), xy=(1, yi), xycoords=("axes fraction", "data"), ha="right", va="center",
+                    fontsize=9, fontweight="bold",
+                    color=LINE_TEAL if change < 0 else LINE_MAROON if change > 0 else INK_MUTED)
+    ax.annotate("Average", xy=(1, len(order) - 0.5), xycoords=("axes fraction", "data"), xytext=(-62, 0),
+                textcoords="offset points", ha="right", va="bottom", fontsize=8, color=INK_MUTED)
+    ax.annotate("Change", xy=(1, len(order) - 0.5), xycoords=("axes fraction", "data"), ha="right",
+                va="bottom", fontsize=8, color=INK_MUTED)
+    _style_row_axes(ax, [REGION_LABELS.get(r, r) for r in order], lambda v, _: f"{v:.0f}%")
+    ax.set_xlim(lo - span * 0.04, ERP_AXIS_CAP + span * 0.34)
+    ax.set_ylim(-0.75, len(order) + 0.2)
+    ax.set_xticks([t for t in ax.get_xticks() if lo - span * 0.04 <= t <= ERP_AXIS_CAP])
+
+    _t, _s = MACRO_TITLES["regional_erp"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    omitted = f"; {len(off_scale)} above {ERP_AXIS_CAP:.0f}% not shown" if len(off_scale) else ""
+    EconStyle.add_source(fig, f"Aswath Damodaran, NYU Stern ({len(countries)} rated countries, "
+                              f"{_update_label(risk['latest']['date'])}{omitted})")
+    EconStyle.save_chart(fig, output_dir / "19_macro_regional_erp.png")
+    print("   ✓ Equity Risk Premiums by Region")
+
+
+def chart_ratings_vs_markets(risk, output_dir, mode="dashboard"):
+    """
+    The gap itself, one bar per country: what credit default swap markets
+    charge for a country's risk minus what its Moody's rating implies. Drawn
+    as a difference so the reader is never asked to subtract two dots.
+    """
+    latest = risk["latest"]
+    rows = _g20_rows(latest["countries"])
+    no_cds = rows.loc[rows["crp_cds"].isna(), "label"].tolist()
+    rows = rows.dropna(subset=["crp_cds"]).assign(gap=lambda d: d["crp_cds"] - d["crp"])
+    rows = rows.sort_values(["gap", "label"], ascending=[False, False]).reset_index(drop=True)
+    y = np.arange(len(rows))
+    minus = lambda text: text.replace("-", "−")
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size=(9.5, 6.0))
+    ax.barh(y, rows["gap"], height=0.62, zorder=3, edgecolor="white", linewidth=1.2,
+            color=[LINE_TEAL if g < 0 else LINE_MAROON for g in rows["gap"]])
+    ax.axvline(0, color=INK, linewidth=1.2, zorder=4)
+    for yi, gap in zip(y, rows["gap"]):
+        ax.annotate(f"{_signed(gap)} pp", xy=(gap, yi), xytext=(6 if gap >= 0 else -6, 0),
+                    textcoords="offset points", va="center", ha="left" if gap >= 0 else "right",
+                    fontsize=9, fontweight="bold", color=INK)
+    top = len(rows) - 0.42
+    ax.annotate("◀  Markets see less risk than the rating", xy=(0, top), xytext=(-8, 0),
+                textcoords="offset points", ha="right", va="center", fontsize=8.5, fontweight="bold",
+                color=LINE_TEAL)
+    ax.annotate("Markets see more risk  ▶", xy=(0, top), xytext=(8, 0), textcoords="offset points",
+                ha="left", va="center", fontsize=8.5, fontweight="bold", color=LINE_MAROON)
+    reach = max(abs(rows["gap"].min()), abs(rows["gap"].max()))
+    _style_row_axes(ax, rows["label"], lambda v, _: minus(f"{v:.1f}"))
+    # Both sides share one scale; the margins only hold the value labels and
+    # the two captions, so they need not be symmetric.
+    ax.set_xlim(rows["gap"].min() - reach * 0.32, max(rows["gap"].max() + reach * 0.32, reach * 0.95))
+    ax.set_ylim(-0.7, len(rows) + 0.3)
+    ax.set_xlabel("Difference in the country risk premium, percentage points",
+                  fontsize=EconStyle.FONT_SIZE_AXIS, color=INK_MUTED, labelpad=6)
+
+    _t, _s = MACRO_TITLES["ratings_vs_markets"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    note = f"; no CDS market: {', '.join(no_cds)}" if no_cds else ""
+    EconStyle.add_source(fig, f"Aswath Damodaran, NYU Stern ({_update_label(latest['date'])}{note})")
+    EconStyle.save_chart(fig, output_dir / "20_macro_ratings_vs_markets.png")
+    print("   ✓ Country Risk: Ratings vs Markets")
+
+
+def chart_em_borrowing(engine, output_dir, mode="dashboard"):
+    """Yields on EM companies' dollar bonds, high yield and investment grade, against the 10-year Treasury."""
+    lines = [
+        ("em_hy_yield", "EM high yield", LINE_ORANGE),
+        ("em_ig_yield", "EM investment grade", LINE_TEAL),
+        ("us_10y", "10-year Treasury", LINE_BLUE),
+    ]
+    daily = {ind_id: engine.get_transformed(ind_id) for ind_id, _, _ in lines}
+    missing = [ind_id for ind_id, s in daily.items() if s.empty]
+    if missing:
+        raise ValueError(f"no data for {', '.join(missing)}")
+    start = max(s.index[0] for s in daily.values())    # ICE BofA history on FRED starts three years back
+    weekly = {ind_id: weekly_average(s[s.index >= start]) for ind_id, s in daily.items()}
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    first = min(s.index[0] for s in weekly.values())
+    end = max(s.index[-1] for s in weekly.values())
+    labels = []
+    for ind_id, name, color in reversed(lines):        # Treasury drawn first, underneath
+        s = weekly[ind_id]
+        _draw_line(ax, *monotone_curve(s.index, s.values), color, width=HEAVY_LINE)
+        _end_dot(ax, s.index[-1], s.iloc[-1], color, size=58)
+        labels.append({"y": float(s.iloc[-1]), "name": name, "value": f"{s.iloc[-1]:.2f}%", "color": color})
+
+    _style_line_axes(ax, lambda v, _: f"{v:.0f}%" if float(v).is_integer() else f"{v:.1f}%")
+    _padded_ylim(ax, [s.min() for s in weekly.values()], [s.max() for s in weekly.values()])
+    _time_axis(ax, first, end, right_margin=0.26)
+    _margin_labels(ax, labels, end)
+
+    _t, _s = MACRO_TITLES["em_borrowing"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "FRED (ICE BofA Emerging Markets Corporate Plus indices, US Treasury)")
+    EconStyle.save_chart(fig, output_dir / "14_macro_em_borrowing.png")
+    print("   ✓ Emerging-Market Dollar Borrowing Costs")
+
+
+def chart_em_dollar(engine, output_dir, mode="dashboard"):
+    """
+    The Fed's EM dollar index and the rupee, plus whichever of the other
+    emerging-market currencies has moved furthest each way over the window.
+    All are quoted per dollar and indexed to 100 on their first common week,
+    so a line above 100 is a currency that has weakened against the dollar.
+    """
+    series = {"em": engine.get_transformed("em_usd_index"), "inr": engine.get_transformed("usd_inr")}
+    for key in EM_FX_PEERS:
+        series[key] = engine.get_transformed(key)
+    frame = pd.concat(series, axis=1).dropna()        # only days every currency traded; nothing filled
+    if len(frame) < 250:
+        raise ValueError(f"only {len(frame)} days with the EM dollar index and all {len(series) - 1} currencies")
+    weekly = pd.DataFrame({col: weekly_average(frame[col]) for col in frame})
+    indexed = weekly / weekly.iloc[0] * 100
+    moves = (indexed.iloc[-1] - 100).drop(["em", "inr"])
+    weakest, strongest = moves.idxmax(), moves.idxmin()   # per dollar: biggest rise, biggest fall
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    start, end = indexed.index[0], indexed.index[-1]
+    ax.hlines(100, start, end, colors=INK, linewidth=0.9, zorder=2)
+    lines = [("em", "EM dollar index", LINE_BLUE), ("inr", "Indian rupee", LINE_RUPEE),
+             (weakest, EM_FX_PEERS[weakest][1], LINE_MAROON), (strongest, EM_FX_PEERS[strongest][1], LINE_TEAL)]
+    labels = []
+    for col, name, color in lines:
+        _draw_line(ax, *monotone_curve(indexed.index, indexed[col].values), color, width=HEAVY_LINE, halo=False)
+        _end_dot(ax, end, indexed[col].iloc[-1], color, size=58)
+        change = indexed[col].iloc[-1] - 100
+        labels.append({"y": float(indexed[col].iloc[-1]), "name": name,
+                       "value": f"{'+' if change >= 0 else chr(0x2212)}{abs(change):.1f}%", "color": color})
+
+    _style_line_axes(ax, lambda v, _: f"{v:.0f}")
+    _padded_ylim(ax, [indexed[[c for c, _, _ in lines]].min().min(), 100],
+                 [indexed[[c for c, _, _ in lines]].max().max(), 100])
+    _time_axis(ax, start, end, right_margin=0.42)
+    _margin_labels(ax, labels, end)
+
+    _t, _s = MACRO_TITLES["em_dollar"][mode]
+    EconStyle.set_title(ax, _t, _s)
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, f"FRED (Federal Reserve H.10: nominal EME dollar index and {len(EM_FX_PEERS) + 1} "
+                              f"emerging-market currencies)")
+    EconStyle.save_chart(fig, output_dir / "15_macro_em_dollar.png")
+    print("   ✓ The Dollar vs Emerging-Market Currencies")
+
+
+# ═══════════════════════════════════════════════
+# PIPELINE
+# ═══════════════════════════════════════════════
 
 def generate_macro_dashboard(mode="dashboard"):
+    """Build every World tab output. Returns the process exit code (1 if anything automatic failed)."""
     month_str = datetime.now().strftime("%Y-%m")
     output_dir = PROJECT_ROOT / "output" / "macro" / month_str
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print("📊 Generating Economics Hub — Macro Pulse Dashboard")
+    print("Generating Economics Hub - World tab")
     print(f"   Output: {output_dir}")
     print(f"   Mode:   {mode}\n")
 
     if FRED_API_KEY == "YOUR_FRED_API_KEY":
-        print("⚠  FRED API key not set! Open config/settings.py")
-        return
+        print("FRED_API_KEY is not set (local .env or the GitHub Actions secret). Nothing generated.")
+        return 1
 
+    problems = []
     fred = FredFetcher(api_key=FRED_API_KEY)
     engine = MacroDataEngine(fred)
 
-    print("   Fetching macro data from FRED...")
-    success = 0
+    print("   Fetching US series from FRED...")
     for ind_id in MACRO_INDICATORS:
+        issue = engine.freshness_problem(ind_id)
+        if issue:
+            problems.append(issue)
+        else:
+            print(f"   ✓ {MACRO_INDICATORS[ind_id]['name']}")
+
+    print("\n   Generating US and emerging-market charts...")
+    for name, draw in [
+        ("US inflation", lambda: chart_inflation(engine, output_dir, mode)),
+        ("US labour", lambda: chart_labour(engine, output_dir, mode)),
+        ("Fed balance sheet", lambda: chart_fed_balance_sheet(engine, output_dir, mode)),
+        ("EM borrowing costs", lambda: chart_em_borrowing(engine, output_dir, mode)),
+        ("dollar vs EM currencies", lambda: chart_em_dollar(engine, output_dir, mode)),
+    ]:
         try:
-            data = engine.fetch_raw(ind_id)
-            if not data.empty:
-                success += 1
-                print(f"   ✓ {MACRO_INDICATORS[ind_id]['name']}")
-        except Exception: pass
+            draw()
+        except Exception as exc:  # noqa: BLE001 — reported below and fails the run
+            problems.append(f"{name} chart: {type(exc).__name__}: {exc}")
 
-    print(f"\n   Fetched {success}/{len(MACRO_INDICATORS)} FRED indicators\n")
+    print("\n   Fetching US equity valuations (Shiller, Damodaran) and drawing their charts...")
+    for name, fetch, draw in [
+        ("Shiller CAPE (shillerdata.com)", fetch_shiller, lambda data: chart_cape(data, output_dir, mode)),
+        ("Damodaran implied ERP (NYU Stern)", fetch_damodaran_erp,
+         lambda data: chart_equity_risk_premium(data, output_dir, mode)),
+    ]:
+        try:
+            draw(fetch())
+        except Exception as exc:  # noqa: BLE001 — reported below and fails the run
+            problems.append(f"{name}: {type(exc).__name__}: {exc}")
 
-    #print("   Fetching International Data via DBnomics...")
-    #fetch_macro_oecd_cli(output_dir)
-    #fetch_macro_em_vulnerability(output_dir)
+    print("\n   Fetching country risk premiums (Damodaran) and drawing their charts...")
+    try:
+        country_risk = fetch_country_risk()
+    except Exception as exc:  # noqa: BLE001 — reported below and fails the run
+        problems.append(f"Damodaran country risk premiums: {type(exc).__name__}: {exc}")
+        country_risk = None
+    if country_risk is not None:
+        for name, draw in [("G20 equity risk premiums", chart_country_erp),
+                           ("regional equity risk premiums", chart_regional_erp),
+                           ("ratings vs markets", chart_ratings_vs_markets)]:
+            try:
+                draw(country_risk, output_dir, mode)
+            except Exception as exc:  # noqa: BLE001 — reported below and fails the run
+                problems.append(f"{name} chart: {type(exc).__name__}: {exc}")
 
-    print("\n   Generating charts...")
+    print("\n   Building the World snapshot (central banks, scoreboard, regime, calendar)...")
+    snapshot, series, snapshot_problems = build_snapshot(
+        FRED_API_KEY, RBI_SENTINEL_DB, load_world_manual_rows()
+    )
+    problems += snapshot_problems
 
-    # ── Core macro charts ──
-    chart_macro_table(engine, output_dir)
-    chart_inflation(engine, output_dir, mode=mode)
-    chart_labour(engine, output_dir, mode=mode)
-    chart_financial_conditions(engine, output_dir, mode=mode)
+    print("\n   Generating World charts...")
+    for name, draw in [
+        ("growth vs inflation momentum", lambda: chart_world_regime(snapshot, output_dir, mode)),
+        ("OECD leading indicators", lambda: chart_oecd_cli(series["cli"], output_dir, mode)),
+    ]:
+        try:
+            draw()
+        except Exception as exc:  # noqa: BLE001 — reported below and fails the run
+            problems.append(f"{name} chart: {type(exc).__name__}: {exc}")
 
-    # ── Extended macro charts ──
-    chart_money_rates(engine, output_dir, mode=mode)
-    chart_sahm_rule(engine, output_dir, mode=mode)
-    chart_fed_balance_sheet(engine, output_dir, mode=mode)
-    chart_housing(engine, output_dir, mode=mode)
-    chart_consumer_sentiment(engine, output_dir, mode=mode)
+    snapshot["problems"] = problems
+    with open(output_dir / "world_snapshot.json", "w") as fh:
+        json.dump(snapshot, fh, indent=1, ensure_ascii=False)
+    print("   ✓ world_snapshot.json")
 
-    print(f"\n✅ Macro Pulse complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
-    print(f"   {output_dir}")
+    print(f"\n{len(list(output_dir.glob('*.png')))} charts in {output_dir}")
+    if problems:
+        print("\nFINISHED WITH PROBLEMS (nothing should be published until these are fixed):")
+        for p in problems:
+            print(f"   - {p}")
+        return 1
+    print("Finished: all sources current.")
+    return 0
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Economics Hub Macro Pulse Dashboard")
+    parser = argparse.ArgumentParser(description="Generate the Economics Hub World tab")
     parser.add_argument("--preview", action="store_true", help="Lower DPI for quick test")
     parser.add_argument(
         "--mode",
@@ -1244,7 +1613,7 @@ def main():
     if args.preview:
         EconStyle.DPI = 120
 
-    generate_macro_dashboard(mode=args.mode)
+    sys.exit(generate_macro_dashboard(mode=args.mode))
 
 if __name__ == "__main__":
     main()

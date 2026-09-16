@@ -12,13 +12,13 @@ An automated Python pipeline tracking Global Equities, Forex, Sovereign Bonds, C
 
 ## Sample Charts
 
-| **Market Snapshot** | **Macro Pulse** |
+| **Market Snapshot** | **World: Shiller CAPE and Excess CAPE Yield** |
 |:---:|:---:|
-| <img src="assets/readme_showcase/weekly_summary_table.png" width="100%"> | <img src="assets/readme_showcase/macro_table.png" width="100%"> |
-| **Sectoral Rotations** | **Fiscal Deficit** |
-| <img src="assets/readme_showcase/weekly_sector_rotation.png" width="100%"> | <img src="assets/readme_showcase/india_fiscal_deficit_gdp.png" width="100%"> |
-| **Expenditure Quality** | **US Housing Market** |
-| <img src="assets/readme_showcase/india_expenditure_quality.png" width="100%"> | <img src="assets/readme_showcase/macro_housing.png" width="100%"> |
+| <img src="assets/readme_showcase/weekly_summary_table.png" width="100%"> | <img src="assets/readme_showcase/macro_cape.png" width="100%"> |
+| **The Crude Oil Futures Curve** | **Fiscal Deficit** |
+| <img src="assets/readme_showcase/weekly_crude_curve.png" width="100%"> | <img src="assets/readme_showcase/india_fiscal_deficit_gdp.png" width="100%"> |
+| **Expenditure Quality** | **World: OECD Composite Leading Indicators** |
+| <img src="assets/readme_showcase/india_expenditure_quality.png" width="100%"> | <img src="assets/readme_showcase/macro_oecd_cli.png" width="100%"> |
 
 *Charts update automatically after each pipeline run — images always reflect the latest data.*
 
@@ -59,9 +59,9 @@ source ~/.bashrc
 ```
 economics_hub/
 ├── app.py                       # Streamlit 4-tab dashboard
-├── generate_weekly.py           # Weekly global dashboard (~32 charts, every Saturday via CI)
-├── generate_macro.py            # Monthly macro pulse (9–11 charts, via CI)
-├── generate_india.py            # India macro dashboard (14 charts, Saturdays via CI + manual)
+├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
+├── generate_macro.py            # World tab: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
+├── generate_india.py            # India tab (14 charts, Saturdays via CI + manual)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
 ├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
@@ -71,18 +71,22 @@ economics_hub/
 │   └── templates/               # Reusable chart template classes
 ├── config/
 │   ├── settings.py              # Weekly indicators (Yahoo Finance + FRED tickers)
-│   ├── macro_settings.py        # Monthly macro indicators (FRED + manual data)
+│   ├── macro_settings.py        # World tab: US and emerging-market series (FRED)
+│   ├── world_settings.py        # World tab: countries, sources, central bank calendars
 │   └── insights.py              # Chart explanations shown under each chart
 ├── data/
 │   ├── fetchers/                # yfinance, FRED and India data fetchers
 │   ├── india_manual_entry.py    # CLI for monthly India figures (PMI, GST, CPI, IIP)
+│   ├── world_snapshot.py        # World tab data: BIS, OECD, Eurostat, central banks, FRED
+│   ├── world_manual_entry.py    # CLI for World figures with no free API (PMIs, Japan CPI, China)
+│   ├── valuations.py            # World tab: Shiller CAPE, Damodaran equity risk premium and country risk downloads
 │   ├── india_macro.db           # India SQLite database
 │   ├── cag_monthly_accounts.xlsx # India CAG fiscal data
 │   └── rbi_sentinel.db          # RBI MPC documents, scores and rate decisions
 ├── rbi_sentinel/                # RBI Sentinel package (fetch, score, charts)
 │   ├── research/                # Research charts drawn outside the pipeline
 │   └── seed_rates.py            # Repo-rate history corrections
-├── tests/
+├── tests/                       # Guards against silently wrong numbers (units, staleness, date alignment)
 ├── assets/                      # Git-tracked PNGs served by Streamlit Cloud
 │   ├── weekly/YYYY-MM-DD/       # Newest 4 editions kept (monthly folders too)
 │   ├── macro/YYYY-MM/
@@ -100,18 +104,19 @@ economics_hub/
 ## Usage
 
 ### 1. Weekly Global Dashboard
-Generates ~32 charts (Equities, Commodities, Yields, FX, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions.
+Generates 35 charts (Equities, Commodities, Yields, FX, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions. Commodities covers the WTI futures curve (contango vs backwardation), gold against real interest rates and a 13-market breadth measure.
 ```bash
 python generate_weekly.py
 ```
 
-### 2. Macro Pulse
-Generates 9–11 monthly macro charts — runs automatically on the 2nd Saturday via GitHub Actions.
+### 2. World
+Central bank rates and meeting dates, a six-economy scoreboard (US, euro area, UK, Japan, China, India), a growth-vs-inflation regime chart, a five-week calendar, and US, equity valuation, country risk, emerging-market and global growth charts — runs every Saturday via GitHub Actions. Figures with no free API (manufacturing PMIs, Japan CPI, China unemployment and 10-year yield) are entered with a CLI.
 ```bash
+python -m data.world_manual_entry status
 python generate_macro.py
 ```
 
-### 3. India Macro Dashboard
+### 3. India
 Generates 14 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
 ```bash
 python -m data.india_manual_entry status
@@ -137,7 +142,9 @@ python make_chart.py
 | Source | Type | Access | Used by |
 |--------|------|--------|---------|
 | Yahoo Finance | Equities, FX, commodities, ETFs, VIX, NIFTY IT | Free, no key | `generate_weekly.py`, `generate_india.py` |
-| FRED | US yields, CPI, PCE, unemployment, M2, NFCI, credit spreads | Free API key | `generate_weekly.py`, `generate_macro.py` |
+| FRED | US yields, CPI, PCE, unemployment, credit spreads, EM corporate bond yields, EM dollar index, Fed and ECB rates, US release calendar | Free API key | `generate_weekly.py`, `generate_macro.py` |
+| OECD · BIS · Eurostat · Bundesbank · Bank of England · MoF Japan | CPI, unemployment, leading indicators, policy rates, 10-year yields | Free, no key | `generate_macro.py` |
+| Robert J. Shiller (shillerdata.com) · Aswath Damodaran (NYU Stern) | CAPE and excess CAPE yield; implied equity risk premium; country and regional equity risk premiums | Free spreadsheets, downloaded each run | `generate_macro.py` |
 | RBI DBIE workbook | India credit, M3, FPI flows, forex reserves, trade | Free, refreshed monthly | `generate_india.py` |
 | Manual entry + CAG workbook | India PMI, GST, CPI, IIP, FPI (NSDL); CAG fiscal accounts | Hand-entered monthly | `generate_india.py` |
 | rbi.org.in | RBI MPC documents (HTML, cached locally) | Free | `generate_rbi_sentinel.py` |

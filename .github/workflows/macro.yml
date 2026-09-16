@@ -1,11 +1,13 @@
-name: Macro Pulse Generator
+name: World Generator
 
 on:
   schedule:
-    # 08:00 UTC, only when day-of-month is 8–14 AND day-of-week is Saturday.
-    # The 2nd Saturday of any month always falls between the 8th and 14th.
-    # This cron expression fires exactly once per month, on the 2nd Saturday.
-    - cron: '0 8 8-14 * 6'
+    # Every Saturday 10:00 UTC, after india.yml (08:00) has pushed its database
+    # update, so the two jobs don't push at once. Charts land in the current
+    # month's folder, so later runs refresh that edition; the central bank
+    # strip, scoreboard and calendar stay at most a week old. (The old
+    # '0 8 8-14 * 6' also ran daily on the 8th-14th: cron ORs the two day fields.)
+    - cron: '0 10 * * 6'
   workflow_dispatch:  # Manual trigger from GitHub Actions UI
 
 jobs:
@@ -28,13 +30,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate macro charts
+      - name: Generate World charts and snapshot
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           PYTHONPATH: "."
         run: python generate_macro.py --mode dashboard
 
-      - name: Copy charts to assets/
+      - name: Copy charts and snapshot to assets/
         run: |
           MONTH_FOLDER=$(ls output/macro/ | sort | tail -1)
           if [ -z "$MONTH_FOLDER" ]; then
@@ -43,7 +45,7 @@ jobs:
           fi
           echo "Copying output/macro/$MONTH_FOLDER/ → assets/macro/$MONTH_FOLDER/"
           mkdir -p "assets/macro/$MONTH_FOLDER"
-          cp output/macro/"$MONTH_FOLDER"/*.png "assets/macro/$MONTH_FOLDER/"
+          cp output/macro/"$MONTH_FOLDER"/*.png output/macro/"$MONTH_FOLDER"/world_snapshot.json "assets/macro/$MONTH_FOLDER/"
           echo "Charts in assets/macro/$MONTH_FOLDER/:"
           ls "assets/macro/$MONTH_FOLDER/"
 
@@ -54,8 +56,8 @@ jobs:
         run: |
           mkdir -p assets/readme_showcase
           MONTH_FOLDER=$(ls output/macro/ | sort | tail -1)
-          cp "output/macro/$MONTH_FOLDER/00_macro_table.png" "assets/readme_showcase/macro_table.png"
-          cp "output/macro/$MONTH_FOLDER/08_macro_housing.png" "assets/readme_showcase/macro_housing.png"
+          cp "output/macro/$MONTH_FOLDER/16_macro_cape.png" "assets/readme_showcase/macro_cape.png"
+          cp "output/macro/$MONTH_FOLDER/11_macro_oecd_cli.png" "assets/readme_showcase/macro_oecd_cli.png"
           echo "README showcase updated from $MONTH_FOLDER"
 
       - name: Commit and push charts
@@ -64,5 +66,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A assets/macro/ assets/readme_showcase/
           git diff --staged --quiet && echo "No changes to commit." && exit 0
-          git commit -m "chore: macro charts $(date -u +%Y-%m)"
+          git commit -m "chore: World charts $(date -u +%Y-%m-%d)"
           git push

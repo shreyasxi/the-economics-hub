@@ -905,12 +905,12 @@ def chart_fpi_flows(df, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 5: INDIA MACRO PULSE TABLE
+# CHART 5: INDIA SUMMARY TABLE
 # ═══════════════════════════════════════════
 
 def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     """
-    India Macro Pulse Table — Bloomberg/FT style matching macro_table.py
+    India summary table — Bloomberg/FT style matching macro_table.py
     Includes CPI section, CAG fiscal data with asterisk, and External Sector
     when forex/trade data is available in india_macro.db.
     """
@@ -1077,7 +1077,8 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     # TITLE BLOCK
     # ═══════════════════════════════════════════
     y = fig_h - 0.4
-    ax.text(0.5, y, "INDIA MACRO PULSE", fontsize=20, fontweight="bold",
+    # Standard name, parallel to the Weekly tab's "Market Snapshot" table.
+    ax.text(0.5, y, "INDIA ECONOMIC SNAPSHOT", fontsize=20, fontweight="bold",
             color="#000000", fontfamily="sans-serif", ha="left")
 
     y -= 0.25
@@ -1190,7 +1191,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     fig.savefig(fp, dpi=EconStyle.DPI, bbox_inches="tight",
                 facecolor=EconStyle.BACKGROUND, pad_inches=0.08)
     plt.close(fig)
-    print(f"   ✓ India Macro Pulse Table")
+    print(f"   ✓ India Summary Table")
     return fp
 
 
@@ -1688,13 +1689,6 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     bars2 = ax.bar(x + width/2, rev_exp, width, label='Revenue Expenditure',
                    color=C_REVENUE_EXP, alpha=0.9, edgecolor='white', linewidth=0.5, zorder=5)
     
-    # The capex Budget Estimate spread evenly over twelve months: capex bars above
-    # the line are running ahead of the pace that spends the full budget.
-    pace = cag_data['be_capex'] / 12 if cag_data.get('be_capex') else None
-    if pace:
-        ax.axhline(y=pace, color=C_CAPEX, linewidth=1.5, linestyle=':', zorder=6,
-                   label=f"Capex Budget ÷ 12 (₹{pace:.2f}L a month)")
-
     # Capex ratio line (secondary insight)
     valid_idx = ~np.isnan(capex) & ~np.isnan(rev_exp) & (rev_exp > 0)
     ratio = np.where(valid_idx, capex / (capex + rev_exp) * 100, np.nan)
@@ -1707,13 +1701,8 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     ax2.set_ylim(0, max(50, np.nanmax(ratio) * 1.4) if valid_idx.any() else 50)
     ax2.tick_params(axis='y', colors='#333333')
 
-    # Reference level (not an official target), named in the legend rather than
-    # on the plot, where it collided with the share line
-    ax2.axhline(y=25, color='#059669', linewidth=1.5, linestyle='--', alpha=0.7, zorder=6,
-                label='25% reference')
-
-    # Value labels on the capex bars. They are drawn on the top axes with a white
-    # backing, so the reference lines pass behind them rather than through them.
+    # Value labels on the capex bars, drawn on the top axes with a white backing
+    # so the share line passes behind them rather than through them.
     _lbl_off = np.nanmax(np.concatenate([capex, rev_exp])) * 0.02
     for i, c in enumerate(capex):
         if not np.isnan(c) and c > 0:
@@ -1724,12 +1713,11 @@ def chart_expenditure_quality(cag_data, df_monthly, output_dir):
     ax.set_xticks(x)
     ax.set_xticklabels(months, fontsize=9)
     ax.set_ylabel('₹ Lakh Crore', fontsize=EconStyle.FONT_SIZE_AXIS)
-    ax.set_ylim(0, np.nanmax(np.concatenate([capex, rev_exp, [pace or 0]])) * 1.3)
+    ax.set_ylim(0, np.nanmax(np.concatenate([capex, rev_exp])) * 1.3)
 
     # Legend in the clear top band, on the top axes so the share line cannot cover
     # it: left-axis items first, then right-axis items
-    handles, names = ax.get_legend_handles_labels()
-    handles = [handles[i] for i in sorted(range(len(names)), key=lambda i: names[i].startswith('Capex Budget'))]
+    handles, _ = ax.get_legend_handles_labels()
     handles2, _ = ax2.get_legend_handles_labels()
     ax2.legend(handles=handles + handles2, loc='upper left', ncol=3, frameon=False, fontsize=8.5,
                handletextpad=0.4, columnspacing=1.2, borderaxespad=0.4).set_zorder(20)
