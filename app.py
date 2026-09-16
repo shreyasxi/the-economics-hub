@@ -109,6 +109,12 @@ st.markdown(
         font-size: 0.9rem; font-weight: 400; color: #4A5262;
         line-height: 1.5; margin: 0; max-width: 46rem;
     }
+    .rbi-head-note {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.82rem; font-style: italic; font-weight: 400; color: #6B7280;
+        line-height: 1.5; margin: 0.45rem 0 0 0; max-width: 46rem;
+    }
+    .rbi-head-note a { color: #6B7280; text-decoration: underline; }
     .rbi-head-meta {
         display: flex; flex-direction: column; align-items: flex-end;
         gap: 0.2rem; white-space: nowrap;
@@ -1893,6 +1899,10 @@ with tab_rbi:
             '<p class="rbi-head-dek">Quantitative tracking of India&rsquo;s monetary policy stance '
             'across all three classes of MPC communication: the Resolution, the Minutes '
             'and the Governor&rsquo;s Statement.</p>'
+            '<p class="rbi-head-note">* The scored database behind these charts took ten years of MPC documents '
+            'and a large language model to build. If you would like to use it in your own research, please get in '
+            'touch at <a href="mailto:thegeekyowl@duck.com">thegeekyowl@duck.com</a> &mdash; glad to share it, '
+            'I would just like to know where it goes.</p>'
             '</div>'
             f'{_meeting_meta}'
             '</div>',

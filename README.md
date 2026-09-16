@@ -149,6 +149,13 @@ python make_chart.py
 | Manual entry + CAG workbook | India PMI, GST, CPI, IIP, FPI (NSDL); CAG fiscal accounts | Hand-entered monthly | `generate_india.py` |
 | rbi.org.in | RBI MPC documents (HTML, cached locally) | Free | `generate_rbi_sentinel.py` |
 
+\* **A note on the scored RBI database.** `data/rbi_sentinel.db` holds ten years of MPC Resolutions, Minutes and
+Governor's Statements scored by a large language model. It ships with this repository so the pipeline and dashboard are
+fully reproducible, but it was expensive to build and is not something you can recreate for free. Under CC BY-NC 4.0 it
+is available for personal and research use with credit to **The Economics Hub**, and not for commercial use.
+*If you would like to use this dataset in your own work, please get in touch first at
+[thegeekyowl@duck.com](mailto:thegeekyowl@duck.com) — I am glad to share it, I would just like to know where it goes.*
+
 ---
 
 ## License
