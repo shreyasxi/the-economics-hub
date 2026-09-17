@@ -32,6 +32,18 @@ jobs:
           PYTHONPATH: "."
         run: python generate_weekly.py --mode dashboard
 
+      # The week in headlines (RSS). Optional by design: a feed that fails is only
+      # a warning inside the script, and if this step fails or times out anyway,
+      # the job carries on and the charts publish without the headlines strip.
+      - name: Fetch the week in headlines
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          PYTHONPATH: "."
+        run: |
+          DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
+          python generate_news.py --out "output/weekly/$DATE_FOLDER"
+
       - name: Copy charts to assets/
         run: |
           DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
@@ -42,7 +54,12 @@ jobs:
           echo "Copying output/weekly/$DATE_FOLDER/ → assets/weekly/$DATE_FOLDER/"
           mkdir -p "assets/weekly/$DATE_FOLDER"
           cp output/weekly/"$DATE_FOLDER"/*.png "assets/weekly/$DATE_FOLDER/"
-          echo "Charts in assets/weekly/$DATE_FOLDER/:"
+          if [ -f "output/weekly/$DATE_FOLDER/news.json" ]; then
+            cp "output/weekly/$DATE_FOLDER/news.json" "assets/weekly/$DATE_FOLDER/"
+          else
+            echo "No news.json: this edition publishes without the headlines strip."
+          fi
+          echo "Files in assets/weekly/$DATE_FOLDER/:"
           ls "assets/weekly/$DATE_FOLDER/"
 
       - name: Keep only the last 4 weeks in assets/

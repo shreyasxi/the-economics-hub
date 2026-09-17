@@ -12,7 +12,9 @@ behind PIPELINE_KEY — only visible to the publisher.
 
 from __future__ import annotations
 
+import html
 import importlib
+import json
 import re
 import subprocess
 import sys
@@ -28,6 +30,7 @@ from charts.loader import (
     is_pipeline_admin,
 )
 import config.insights as _insights
+import config.news_settings as _news_settings
 import config.weekly_settings as _weekly_settings
 import config.world_settings as _world_settings
 
@@ -73,7 +76,7 @@ st.markdown(
     """
     <style>
     /* ── Google Fonts: Inter (UI) + Merriweather (body) + Playfair Display (Masthead) ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&display=swap');
 
     /* ── Global base ── */
     html, body, [class*="css"] {
@@ -458,6 +461,180 @@ st.markdown(
     .wcal-what small { color: #7A828F; font-size: 0.74rem; margin-left: 0.35rem; }
     .wcal-cb .wcal-what { font-weight: 600; color: #0A1F3D; }
     .wcal-in .wcal-what { color: #B35C00; }
+
+    /* ═══ News strip: The week in headlines ══════════════════════════════
+       Drawn only when the weekly edition folder has a news.json (generate_news.py).
+       Editorial, not a card: it sits on the page background and is built from
+       type, hairline rules and spacing. Headlines are set in Newsreader, a serif
+       drawn for news; everything around them stays in the site's Inter.
+       World leads (lead story over a two-by-two grid); India runs as a narrower
+       column. Plain p, a and heading elements are avoided or scoped, because
+       Streamlit's markdown styles those elements with higher specificity. */
+    .nh {
+        --nh-ink: #0A1F3D;          /* headlines */
+        --nh-text: #2B3340;
+        --nh-muted: #6A7280;        /* meta */
+        --nh-faint: #A2AAB5;        /* separators, icons */
+        --nh-rule: #D7DDE4;         /* hairlines on the page background */
+        --nh-world: #1F4E79;
+        --nh-india: #A85600;
+        --nh-india-mark: #EE8A1F;
+        margin: 2.2rem 0 3.2rem 0;
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    /* ── Header: title and week on the left, method on the right ── */
+    .nh-head {
+        position: relative;
+        display: flex; align-items: flex-end; justify-content: space-between;
+        gap: 0.6rem 2rem; flex-wrap: wrap;
+        padding-bottom: 0.85rem; border-bottom: 1px solid var(--nh-ink);
+    }
+    .nh-head-l { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.2rem 0; min-width: 0; }
+    .nh-title {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.46rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
+        color: var(--nh-ink);
+    }
+    .nh-week {
+        font-size: 0.8rem; font-weight: 500; color: var(--nh-muted); white-space: nowrap;
+        font-variant-numeric: tabular-nums lining-nums;
+        margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--nh-rule);
+    }
+    .nh-how { position: static; }
+    .nh-how > summary {
+        list-style: none; cursor: pointer; user-select: none;
+        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0;
+        font-size: 0.76rem; font-weight: 600; color: var(--nh-text);
+        transition: color 0.15s ease;
+    }
+    .nh-how > summary::-webkit-details-marker { display: none; }
+    .nh-how > summary::marker { content: ""; }
+    .nh-how > summary svg { width: 15px; height: 15px; color: var(--nh-muted); transition: color 0.15s ease; }
+    .nh-how > summary:hover, .nh-how[open] > summary { color: var(--nh-world); }
+    .nh-how > summary:hover svg, .nh-how[open] > summary svg { color: var(--nh-world); }
+    .nh-how > summary:focus-visible { outline: 2px solid var(--nh-world); outline-offset: 3px; border-radius: 3px; }
+    .nh-how-panel {
+        position: absolute; right: 0; top: calc(100% + 0.65rem); z-index: 30;
+        width: min(27rem, 100%); box-sizing: border-box;
+        background: #FFFFFF; border: 1px solid #E2E7ED; border-radius: 10px;
+        box-shadow: 0 22px 48px -22px rgba(10,31,61,0.30), 0 2px 6px -2px rgba(10,31,61,0.06);
+        padding: 0.95rem 1.1rem 1rem 1.1rem;
+        font-size: 0.8rem; line-height: 1.55; color: var(--nh-text);
+    }
+    .nh-how-panel span { display: block; }
+    .nh-how-panel span + span { margin-top: 0.55rem; }
+    .nh-how-panel b { font-weight: 600; color: var(--nh-ink); }
+    .nh-how-panel .nh-how-foot { color: var(--nh-muted); font-size: 0.74rem; }
+
+    /* ── Columns: World wide, India narrow, a hairline centred in the gap ── */
+    .nh-grid {
+        display: grid; grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
+        column-gap: 3.5rem; margin-top: 1.6rem;
+    }
+    .nh-grid.is-single { grid-template-columns: minmax(0, 1fr); }
+    .nh-col { position: relative; min-width: 0; }
+    .nh-col + .nh-col::before {
+        content: ""; position: absolute; left: -1.75rem; top: 0.25rem; bottom: 0.4rem;
+        width: 1px; background: var(--nh-rule);
+    }
+    .nh-region {
+        display: flex; align-items: center; gap: 0.6rem; margin: 0 0 1.15rem 0;
+        font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--nh-ink);
+    }
+    .nh-region::before { content: ""; flex: none; width: 9px; height: 9px; border-radius: 1px; background: var(--nh-world); }
+    .nh-region::after { content: ""; flex: 1; height: 1px; background: var(--nh-rule); }
+    .nh-col.is-india .nh-region { color: var(--nh-india); }
+    .nh-col.is-india .nh-region::before { background: var(--nh-india-mark); }
+
+    /* ── A story: kicker, headline, meta. The whole block is the link. ── */
+    .nh-story { position: relative; min-width: 0; }
+    .nh-kicker {
+        display: flex; align-items: center; gap: 0.55rem; margin: 0 0 0.45rem 0;
+        font-size: 0.64rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase;
+        color: var(--nh-world);
+    }
+    .nh-col.is-india .nh-kicker { color: var(--nh-india); }
+    .nh-rank {
+        font-weight: 600; letter-spacing: 0.04em; color: var(--nh-ink);
+        font-variant-numeric: tabular-nums lining-nums;
+    }
+    .nh-rank::after {
+        content: ""; display: inline-block; width: 16px; height: 1px; margin-left: 0.55rem;
+        vertical-align: middle; background: var(--nh-faint);
+    }
+    .nh a.nh-link { color: inherit !important; text-decoration: none !important; }
+    .nh a.nh-link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+    .nh a.nh-link:focus-visible { outline: none; }
+    .nh-story:focus-within { outline: 2px solid var(--nh-world); outline-offset: 5px; border-radius: 2px; }
+    .nh-hl {
+        display: block;
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-weight: 560; color: var(--nh-ink); text-wrap: balance;
+        transition: color 0.15s ease;
+    }
+    .nh-lead .nh-hl { font-size: 1.78rem; line-height: 1.14; letter-spacing: -0.017em; }
+    .nh-col.is-india .nh-lead .nh-hl { font-size: 1.36rem; line-height: 1.2; letter-spacing: -0.012em; }
+    .nh-item .nh-hl { font-size: 1.12rem; line-height: 1.3; letter-spacing: -0.006em; }
+    .nh-hl-text {
+        text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.17em;
+        text-decoration-color: transparent; transition: text-decoration-color 0.15s ease;
+    }
+    .nh-story:hover .nh-hl { color: #0F3563; }
+    .nh-story:hover .nh-hl-text { text-decoration-color: rgba(15,53,99,0.4); }
+    .nh-nowrap { white-space: nowrap; }
+    .nh-ext {
+        display: inline-block; width: 0.46em; height: 0.46em; margin-left: 0.28em; vertical-align: 0.3em;
+        color: var(--nh-faint); transition: transform 0.18s ease, color 0.18s ease;
+    }
+    .nh-story:hover .nh-ext { color: var(--nh-world); transform: translate(1.5px, -1.5px); }
+    .nh-col.is-india .nh-story:hover .nh-ext { color: var(--nh-india); }
+
+    .nh-meta {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem 0.6rem; margin: 0.6rem 0 0 0;
+        font-size: 0.74rem; line-height: 1.3; color: var(--nh-muted);
+        font-variant-numeric: tabular-nums lining-nums;
+    }
+    .nh-pub { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; color: var(--nh-text); }
+    .nh-lock { width: 9px; height: 10px; color: var(--nh-faint); flex: none; }
+    .nh-sep { flex: none; width: 3px; height: 3px; border-radius: 50%; background: var(--nh-faint); }
+    .nh-cov { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 0.45rem; cursor: help; }
+    .nh-pips { display: inline-flex; gap: 2px; }
+    .nh-pips i { display: block; width: 9px; height: 3px; border-radius: 1px; background: var(--nh-rule); }
+    .nh-pips i.on { background: var(--nh-world); }
+    .nh-col.is-india .nh-pips i.on { background: var(--nh-india-mark); }
+    .nh-sr {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+        clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    .nh-lead { padding: 0 0 1.4rem 0; }
+    .nh-rest { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.4rem; }
+    .nh-col.is-india .nh-rest { grid-template-columns: minmax(0, 1fr); }
+    .nh-item { border-top: 1px solid var(--nh-rule); padding: 1.05rem 0 1.2rem 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .nh-hl, .nh-hl-text, .nh-ext, .nh-how > summary { transition: none; }
+        .nh-story:hover .nh-ext { transform: none; }
+    }
+    @media (max-width: 1180px) {
+        .nh-grid { grid-template-columns: minmax(0, 1fr); row-gap: 2.3rem; }
+        .nh-col + .nh-col::before { display: none; }
+        .nh-col.is-india .nh-rest { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .nh-col.is-india .nh-lead .nh-hl { font-size: 1.55rem; }
+    }
+    @media (max-width: 680px) {
+        .nh { margin: 1.1rem 0 2.4rem 0; }
+        .nh-title { font-size: 1.3rem; }
+        .nh-week { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
+        .nh-how { width: 100%; }
+        .nh-how-panel { width: 100%; }
+        .nh-lead .nh-hl, .nh-col.is-india .nh-lead .nh-hl { font-size: 1.38rem; line-height: 1.2; }
+        .nh-item .nh-hl { font-size: 1.06rem; }
+        .nh-rest, .nh-col.is-india .nh-rest { grid-template-columns: minmax(0, 1fr); }
+    }
+    /* ═══ end news strip ═══════════════════════════════════════════════ */
 
     /* ── Scoreboard ── */
     .wsb-wrap { overflow-x: auto; margin: 0.2rem 0 0 0; }
@@ -1606,6 +1783,136 @@ def _scoreboard_html(snapshot: dict) -> str:
     return f'<div class="wsb-wrap"><table class="wsb"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
 
 
+# ── News strip ─────────────────────────────────────────────────────────────
+# The week in headlines, on the Weekly Markets tab, from the news.json that
+# generate_news.py writes into each weekly edition folder. An edition without
+# one (an older edition, or a run where every feed failed) shows no strip.
+# Feed text is untrusted: every title is escaped and only http(s) links are kept.
+
+_NH_ARROW = ('<svg class="nh-ext" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.7" '
+             'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+             '<path d="M2.6 7.4 7.3 2.7"/><path d="M3.6 2.6h3.8v3.8"/></svg>')
+_NH_LOCK = ('<svg class="nh-lock" viewBox="0 0 9 10" aria-hidden="true">'
+            '<path d="M2.75 4.4V3.1a1.75 1.75 0 0 1 3.5 0v1.3" fill="none" stroke="currentColor" stroke-width="1.2"/>'
+            '<rect x="1" y="4.3" width="7" height="5.2" rx="1.1" fill="currentColor"/></svg>')
+_NH_INFO = ('<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true">'
+            '<circle cx="8" cy="8" r="6.4"/><path d="M8 7.3v3.7" stroke-linecap="round"/>'
+            '<circle cx="8" cy="5.05" r="0.2" fill="currentColor" stroke-width="1.1"/></svg>')
+
+
+def _load_news(charts: list[Path]) -> dict | None:
+    """news.json from the same edition folder as the Weekly charts, so headlines and charts always match."""
+    path = charts[0].parent / "news.json" if charts else None
+    if path is None or not path.exists():
+        return None
+    try:
+        with path.open() as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+
+def _esc(text: str | None) -> str:
+    """Feed text for st.markdown's HTML: escaped, with '$' kept from opening a maths span."""
+    return html.escape(text or "").replace("$", "&#36;")
+
+
+def _safe_url(url: str | None) -> str | None:
+    return html.escape(url, quote=True) if re.match(r"https?://", url or "") else None
+
+
+def _fmt_week(start: str, end: str) -> str:
+    """'2026-09-10', '2026-09-17' -> '10–17 September 2026'."""
+    a, b = date.fromisoformat(start), date.fromisoformat(end)
+    if a.year != b.year:
+        return f"{a.day} {a:%B %Y} &ndash; {b.day} {b:%B %Y}"
+    if a.month != b.month:
+        return f"{a.day} {a:%B} &ndash; {b.day} {b:%B %Y}"
+    return f"{a.day}&ndash;{b.day} {b:%B %Y}"
+
+
+def _and_list(names: list[str]) -> str:
+    return names[0] if len(names) < 2 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def _nh_story_html(it: dict, rank: int, outlets_read: int, paywalled: set[str], lead: bool) -> str:
+    """One headline: rank and theme, the linked headline, then outlet, date and how widely it was covered."""
+    url = _safe_url(it.get("url"))
+    first, _, last = _esc(it.get("title")).rpartition(" ")
+    # The last word travels with the link arrow, so the arrow never sits alone on a line.
+    text = ((f'<span class="nh-hl-text">{first} </span>' if first else "")
+            + f'<span class="nh-nowrap"><span class="nh-hl-text">{last}</span>{_NH_ARROW if url else ""}</span>')
+    headline = f'<span class="nh-hl">{text}</span>'
+    if url:
+        headline = (f'<a class="nh-link" href="{url}" target="_blank" rel="noopener noreferrer">'
+                    f'{headline}<span class="nh-sr"> (opens in a new tab)</span></a>')
+
+    also = it.get("also") or []
+    covered = 1 + len(also)
+    total = max(outlets_read, covered)
+    pips = "".join('<i class="on"></i>' if k < covered else "<i></i>" for k in range(total))
+    tip = _esc(f"Also covered by {_and_list(also)}" if also else "No other outlet read carried this story")
+    lock = (f'{_NH_LOCK}<span class="nh-sr"> (may require a subscription)</span>'
+            if it.get("publisher") in paywalled else "")
+    day = date.fromisoformat(it["date"])
+    return (
+        f'<article class="nh-story {"nh-lead" if lead else "nh-item"}">'
+        f'<div class="nh-kicker"><span class="nh-rank">{rank:02d}</span><span>{_esc(it.get("theme"))}</span></div>'
+        f'{headline}'
+        '<div class="nh-meta">'
+        f'<span class="nh-pub">{_esc(it.get("publisher"))}{lock}</span><span class="nh-sep"></span>'
+        f'<span>{day.day} {day:%b}</span><span class="nh-sep"></span>'
+        f'<span class="nh-cov" title="{tip}"><span class="nh-pips" aria-hidden="true">{pips}</span>'
+        f'{covered} of {total} outlets<span class="nh-sr">. {tip}.</span></span>'
+        '</div></article>'
+    )
+
+
+def _headlines_html(news: dict) -> str | None:
+    """
+    The week in headlines: World (a lead story over a two-by-two grid) beside a
+    narrower India column. A column with no headlines is left out.
+    """
+    h = news.get("headlines") or {}
+    cfg = _fresh_config(_news_settings)
+    paywalled = set(cfg.PAYWALLED_PUBLISHERS)
+    cols, read = [], []
+    for region, label in (("world", "World"), ("india", "India")):
+        block = h.get(region) or {}
+        items = block.get("items") or []
+        if not items:
+            continue
+        outlets = block.get("publishers") or []
+        read.append(f"<b>{label}:</b> {_esc(_and_list(outlets))}." if outlets else "")
+        stories = [_nh_story_html(it, i + 1, len(outlets), paywalled, lead=i == 0) for i, it in enumerate(items)]
+        rest = f'<div class="nh-rest">{"".join(stories[1:])}</div>' if len(stories) > 1 else ""
+        cols.append(f'<div class="nh-col is-{region}"><div class="nh-region">{label}</div>{stories[0]}{rest}</div>')
+    if not cols:
+        return None
+
+    themes = _and_list([name.lower() for name, _ in cfg.HEADLINE_THEMES])
+    method = "".join(f"<span>{line.format(themes=themes)}</span>" for line in cfg.HEADLINE_METHOD)
+    updated = ""
+    try:
+        stamp = datetime.strptime(news.get("generated_at", ""), "%Y-%m-%d %H:%M UTC")
+        updated = f'<span class="nh-how-foot">Read {_fmt_day(stamp.date())}, {stamp:%H:%M} UTC</span>'
+    except ValueError:
+        pass
+    return (
+        '<section class="nh" aria-labelledby="nh-title">'
+        '<div class="nh-head">'
+        '<div class="nh-head-l">'
+        '<div class="nh-title" id="nh-title" role="heading" aria-level="2">The Week in Headlines</div>'
+        f'<span class="nh-week">{_fmt_week(h["from"], h["to"])}</span>'
+        '</div>'
+        f'<details class="nh-how"><summary>{_NH_INFO}How these are chosen</summary>'
+        f'<div class="nh-how-panel">{method}<span>{" ".join(r for r in read if r)}</span>{updated}</div></details>'
+        '</div>'
+        f'<div class="nh-grid{" is-single" if len(cols) == 1 else ""}">{"".join(cols)}</div>'
+        '</section>'
+    )
+
+
 def _tab_header_html(title: str, dek: str, meta_label: str, meta_value: str,
                      nav: list[tuple[str, str]] | None = None) -> str:
     """Tab masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
@@ -1655,6 +1962,12 @@ with tab_weekly:
             ),
             unsafe_allow_html=True,
         )
+
+        # The week in headlines, when this edition has them.
+        news = _load_news(charts)
+        headlines = _headlines_html(news) if news else None
+        if headlines:
+            st.markdown(headlines, unsafe_allow_html=True)
 
         if summary:
             _render_summary(summary)

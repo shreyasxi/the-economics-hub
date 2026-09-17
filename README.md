@@ -60,6 +60,7 @@ source ~/.bashrc
 economics_hub/
 ├── app.py                       # Streamlit 4-tab dashboard
 ├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
+├── generate_news.py             # Weekly tab: The Week in Headlines (runs with the weekly charts)
 ├── generate_macro.py            # World tab: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
 ├── generate_india.py            # India tab (14 charts, Saturdays via CI + manual)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
@@ -73,11 +74,13 @@ economics_hub/
 │   ├── settings.py              # Weekly indicators (Yahoo Finance + FRED tickers)
 │   ├── macro_settings.py        # World tab: US and emerging-market series (FRED)
 │   ├── world_settings.py        # World tab: countries, sources, central bank calendars
+│   ├── news_settings.py         # Headline feeds, themes and filters
 │   └── insights.py              # Chart explanations shown under each chart
 ├── data/
 │   ├── fetchers/                # yfinance, FRED and India data fetchers
 │   ├── india_manual_entry.py    # CLI for monthly India figures (PMI, GST, CPI, IIP)
 │   ├── world_snapshot.py        # World tab data: BIS, OECD, Eurostat, central banks, FRED
+│   ├── news.py                  # Headlines: RSS reading, theme sorting, story ranking
 │   ├── world_manual_entry.py    # CLI for World figures with no free API (PMIs, Japan CPI, China)
 │   ├── valuations.py            # World tab: Shiller CAPE, Damodaran equity risk premium and country risk downloads
 │   ├── india_macro.db           # India SQLite database
@@ -105,8 +108,11 @@ economics_hub/
 
 ### 1. Weekly Global Dashboard
 Generates 35 charts (Equities, Commodities, Yields, FX, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions. Commodities covers the WTI futures curve (contango vs backwardation), gold against real interest rates and a 13-market breadth measure.
+
+The same run adds **The Week in Headlines**: the week's top World and India stories from publisher RSS feeds, one per theme (central banks, inflation, trade, energy, growth, markets, public finances), ranked by how many outlets covered each. Headlines are the publishers' own and link to the original. If the feeds fail, the charts still publish without the strip.
 ```bash
 python generate_weekly.py
+python generate_news.py      # headlines for the newest weekly edition
 ```
 
 ### 2. World
@@ -148,6 +154,7 @@ python make_chart.py
 | RBI DBIE workbook | India credit, M3, FPI flows, forex reserves, trade | Free, refreshed monthly | `generate_india.py` |
 | Manual entry + CAG workbook | India PMI, GST, CPI, IIP, FPI (NSDL); CAG fiscal accounts | Hand-entered monthly | `generate_india.py` |
 | rbi.org.in | RBI MPC documents (HTML, cached locally) | Free | `generate_rbi_sentinel.py` |
+| Publisher RSS feeds: BBC News, The Guardian, CNBC, Financial Times, Bloomberg, Mint, Business Standard, BusinessLine, The Indian Express | Headlines and links only | Free, no key | `generate_news.py` |
 
 \* **A note on the scored RBI database.** `data/rbi_sentinel.db` holds ten years of MPC Resolutions, Minutes and
 Governor's Statements scored by a large language model. It ships with this repository so the pipeline and dashboard are
