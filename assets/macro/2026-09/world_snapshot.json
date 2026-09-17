@@ -1,16 +1,16 @@
 {
- "generated_at": "2026-09-17 03:20",
+ "generated_at": "2026-09-17 05:06",
  "as_of": "2026-09-17",
  "central_banks": [
   {
    "id": "fed",
    "status": "ok",
-   "rate": 3.75,
-   "display": "3.50–3.75",
-   "as_of": "2026-09-16",
+   "rate": 4.0,
+   "display": "3.75–4.00",
+   "as_of": "2026-09-17",
    "last_move": {
-    "date": "2025-12-11",
-    "bps": -25
+    "date": "2026-09-17",
+    "bps": 25
    }
   },
   {
@@ -29,7 +29,7 @@
    "status": "ok",
    "rate": 3.75,
    "display": "3.75",
-   "as_of": "2026-09-07",
+   "as_of": "2026-09-15",
    "last_move": {
     "date": "2025-12-18",
     "bps": -25
@@ -96,18 +96,18 @@
      "status": "ok"
     },
     "policy_rate": {
-     "source": "FRED DFEDTARL/DFEDTARU",
+     "source": "FRED DFEDTARL/DFEDTARU + FOMC statement",
      "manual": false,
-     "value": 3.75,
-     "period": "2026-09-16",
-     "display": "3.50–3.75",
+     "value": 4.0,
+     "period": "2026-09-17",
+     "display": "3.75–4.00",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance DX-Y.NYB (DXY)",
      "manual": false,
-     "value": 2.083,
-     "period": "2026-09-16",
+     "value": 2.032,
+     "period": "2026-09-17",
      "status": "ok",
      "label": "DXY"
     }
@@ -159,7 +159,7 @@
     "fx_ytd": {
      "source": "Yahoo Finance EURUSD=X",
      "manual": false,
-     "value": -2.412,
+     "value": -2.356,
      "period": "2026-09-17",
      "status": "ok",
      "label": "vs USD"
@@ -203,16 +203,16 @@
      "status": "ok"
     },
     "policy_rate": {
-     "source": "BIS central bank policy rates (Bank Rate)",
+     "source": "Bank of England IUDBEDR (Bank Rate)",
      "manual": false,
      "value": 3.75,
-     "period": "2026-09-07",
+     "period": "2026-09-15",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance GBPUSD=X",
      "manual": false,
-     "value": -0.688,
+     "value": -0.635,
      "period": "2026-09-17",
      "status": "ok",
      "label": "vs USD"
@@ -265,8 +265,8 @@
     "fx_ytd": {
      "source": "Yahoo Finance JPY=X",
      "manual": false,
-     "value": 0.224,
-     "period": "2026-09-17",
+     "value": 0.739,
+     "period": "2026-09-16",
      "status": "ok",
      "label": "vs USD"
     }
@@ -318,7 +318,7 @@
     "fx_ytd": {
      "source": "Yahoo Finance CNY=X",
      "manual": false,
-     "value": 4.286,
+     "value": 4.309,
      "period": "2026-09-17",
      "status": "ok",
      "label": "vs USD"
@@ -371,7 +371,7 @@
     "fx_ytd": {
      "source": "Yahoo Finance INR=X",
      "manual": false,
-     "value": -6.432,
+     "value": -6.285,
      "period": "2026-09-17",
      "status": "ok",
      "label": "vs USD"
