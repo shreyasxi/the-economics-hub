@@ -2,8 +2,8 @@
 The Economics Hub — Streamlit Dashboard
 Author: Shreyas Urgunde  |  shreyasxi.github.io
 
-Four-tab publication dashboard:
-  Weekly Markets  · World  · India  · RBI Sentinel
+Publication dashboard of four pages, each with its own link:
+  Weekly Markets (/)  · World (/world)  · India (/india)  · RBI Sentinel (/rbi-sentinel)
 
 Charts are served from assets/ (git-tracked, deployed) with a local
 fallback to output/ for development. Pipeline controls are gated
@@ -114,7 +114,7 @@ st.markdown(
         font-size: 0.9rem; font-weight: 400; color: #4A5262;
         line-height: 1.5; margin: 0; max-width: 46rem;
     }
-    /* Jump links under a tab's standfirst (Weekly Markets) */
+    /* Jump links under a page's standfirst (Weekly Markets) */
     .tab-jump {
         display: flex; flex-wrap: wrap; gap: 0.4rem 0.45rem;
         margin: 0.75rem 0 0 0;
@@ -397,7 +397,7 @@ st.markdown(
         .mpc-prov li:first-child { border-top: none; }
     }
 
-    /* ═══ World tab ═══════════════════════════════════════════════════ */
+    /* ═══ World page ═══════════════════════════════════════════════════ */
 
     /* ── Panel eyebrow: small caps label over each HTML panel ── */
     .w-eyebrow {
@@ -409,7 +409,7 @@ st.markdown(
         font-family: 'Inter', -apple-system, sans-serif;
         font-size: 0.72rem; color: #6B7380; line-height: 1.5; margin: 0.55rem 0 0 0;
     }
-    /* Eyebrow with the tab header's heavy navy rule beneath it */
+    /* Eyebrow with the page header's heavy navy rule beneath it */
     .w-eyebrow.is-ruled { padding-bottom: 0.55rem; border-bottom: 2px solid #0A1F3D; }
 
     /* ── Central bank strip: same card and figures as the RBI decision
@@ -775,22 +775,58 @@ st.markdown(
 
     
     
-    /* ── Tab bar ──
-       Two selectors: Streamlit up to 1.50 renders tabs as BaseWeb buttons
-       (data-baseweb="tab"); later releases replaced them with a new
-       component that carries data-testid="stTab" and no BaseWeb attribute. */
-    button[data-baseweb="tab"],
-    button[data-baseweb="tab"] p,
-    button[data-baseweb="tab"] span,
-    [data-testid="stTab"],
-    [data-testid="stTab"] p,
-    [data-testid="stTab"] span {
+    /* ── Section navigation ──
+       Each section is a page of its own (see the foot of this file), so these
+       are links with their own URLs, not tabs. They keep the tab bar's look:
+       uppercase Inter, a navy underline under the page being read and a
+       hairline across the row. The row scrolls sideways on a phone rather
+       than wrapping, as the tabs did. */
+    .st-key-ehnav {
+        gap: 0 !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        scrollbar-width: none;
+        border-bottom: 1px solid rgba(10, 31, 61, 0.18);
+        margin: 0.2rem 0 0 0;
+    }
+    .st-key-ehnav::-webkit-scrollbar { display: none; }
+    /* Streamlit pulls elements together with a negative margin; inside this row
+       it would clip the underline, because a sideways-scrolling row also clips
+       what overflows it vertically. */
+    .st-key-ehnav [data-testid="stLayoutWrapper"],
+    .st-key-ehnav [data-testid="stVerticalBlock"],
+    .st-key-ehnav [data-testid="stElementContainer"] {
+        width: auto !important; flex: 0 0 auto !important; gap: 0 !important; margin: 0 !important;
+    }
+    .st-key-ehnav [data-testid="stPageLink"] { width: auto !important; }
+    .st-key-ehnav [data-testid="stPageLink"] a {
+        background: transparent !important;
+        border-radius: 0;
+        gap: 0;
+        padding: 0.1rem 0 0.5rem 0;
+        margin: 0 1rem 0 0;
+        border-bottom: 3px solid transparent !important;
+        transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .st-key-ehnav [data-testid="stPageLink"] a p,
+    .st-key-ehnav [data-testid="stPageLink"] a span,
+    .st-key-ehnav [data-testid="stPageLink"] a div {
         font-family: 'Inter', sans-serif !important;
         font-weight: 700 !important;
         font-size: 0.80rem !important;
         letter-spacing: 0.06em !important;
         text-transform: uppercase !important;
+        color: #0A0A0A;
+        white-space: nowrap;
     }
+    .st-key-ehnav [data-testid="stPageLink"] a:hover p,
+    .st-key-ehnav [data-testid="stPageLink"] a:hover span,
+    .st-key-ehnav [data-testid="stPageLink"] a:hover div { color: #003366; }
+    .st-key-ehnav [data-testid="stPageLink"] a:hover { border-bottom-color: rgba(0, 51, 102, 0.35) !important; }
+    .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a { border-bottom-color: #003366 !important; }
+    .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a p,
+    .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a span,
+    .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a div { color: #003366; }
 
     /* ── App Background Color (The Seamless Canvas) ── */
     .stApp, [data-testid="stHeader"] {
@@ -1143,34 +1179,6 @@ with st.sidebar:
                             + result.stderr[-600:]
                         )
 
-# ---------------------------------------------------------------------------
-# Masthead
-# ---------------------------------------------------------------------------
-
-st.markdown(
-    '<h1 class="insti-masthead">Global Macro & Cross-Asset Monitor</h1>'
-    '<p class="insti-tagline">Maintained by Shreyas Urgunde</p>'
-    '<div class="substack-center-container">'
-        '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
-            '<span class="substack-cta__label">Subscribe on Substack</span>'
-            '<svg class="substack-cta__arrow" viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" '
-                'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-                '<path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6"/>'
-            '</svg>'
-        '</a>'
-    '</div>'
-    '<div class="insti-rule"></div>',
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
-# Tabs
-# ---------------------------------------------------------------------------
-
-tab_weekly, tab_world, tab_india, tab_rbi = st.tabs(
-    ["Weekly Markets", "World", "India", "RBI Sentinel"]
-)
-
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -1207,7 +1215,7 @@ def _render_wide(chart_path: Path) -> None:
     with col_mid:
         _render_chart(chart_path)
     
-# Fields the RBI tab reads from the cycle brief beyond the original set.
+# Fields the RBI page reads from the cycle brief beyond the original set.
 _BRIEF_KEYS = frozenset({
     "previous_cycle", "facts", "previous_facts", "last_rate_move",
     "decision_streak", "signals", "previous_signals",
@@ -1238,7 +1246,7 @@ def _stance_dir(score: float) -> str:
 
 def _decision_strip_html(brief: dict) -> str:
     """
-    The RBI tab's decision strip: rate and decision, the Sentinel reading
+    The RBI page's decision strip: rate and decision, the Sentinel reading
     and its change, the MPC's own projections and their revision, and the
     next meeting — four labelled groups in one row.
 
@@ -1553,7 +1561,8 @@ def _section(title: str, anchor: str | None = None) -> None:
 
 
 def _anchor(prefix: str, title: str) -> str:
-    """'Rates, Inflation & Credit' -> 'weekly-rates-inflation-credit'. Tabs share one page, so ids carry the tab."""
+    """'Rates, Inflation & Credit' -> 'weekly-rates-inflation-credit'. Ids carry the page, so links
+    shared before the pages were split still find their section."""
     return f"{prefix}-" + re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
 
 def _render_summary(chart_path: Path) -> None:
@@ -1578,7 +1587,7 @@ def _group(charts: list[Path], keyword: str) -> tuple[list[Path], list[Path]]:
     return matched, rest
 
 
-# ── World tab helpers ──────────────────────────────────────────────────────
+# ── World page helpers ──────────────────────────────────────────────────────
 
 def _fresh_config(module):
     """
@@ -1784,7 +1793,7 @@ def _scoreboard_html(snapshot: dict) -> str:
 
 
 # ── News strip ─────────────────────────────────────────────────────────────
-# The week in headlines, on the Weekly Markets tab, from the news.json that
+# The week in headlines, on the Weekly Markets page, from the news.json that
 # generate_news.py writes into each weekly edition folder. An edition without
 # one (an older edition, or a run where every feed failed) shows no strip.
 # Feed text is untrusted: every title is escaped and only http(s) links are kept.
@@ -1923,9 +1932,9 @@ def _headlines_html(news: dict) -> str | None:
     )
 
 
-def _tab_header_html(title: str, dek: str, meta_label: str, meta_value: str,
-                     nav: list[tuple[str, str]] | None = None) -> str:
-    """Tab masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
+def _page_header_html(title: str, dek: str, meta_label: str, meta_value: str,
+                      nav: list[tuple[str, str]] | None = None) -> str:
+    """Page masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
     links = ""
     if nav:
         links = ('<nav class="tab-jump" aria-label="Sections">'
@@ -1946,9 +1955,9 @@ def _tab_header_html(title: str, dek: str, meta_label: str, meta_value: str,
     )
 
 
-# ── Weekly Markets tab ─────────────────────────────────────────────────────
+# ── Weekly Markets page ────────────────────────────────────────────────────
 
-with tab_weekly:
+def page_weekly() -> None:
     charts, date_label = get_charts("weekly")
 
     if not charts:
@@ -1963,7 +1972,7 @@ with tab_weekly:
         sections, unlisted = group_charts(charts, weekly_cfg.WEEKLY_SECTIONS)
 
         st.markdown(
-            _tab_header_html(
+            _page_header_html(
                 "The Week in Markets",
                 "Weekly moves and the trends behind equities, bonds, currencies, commodities "
                 "and crypto across the major markets.",
@@ -1992,9 +2001,9 @@ with tab_weekly:
             _render_grid(unlisted, center_odd=True)
 
 
-# ── World tab ──────────────────────────────────────────────────────────────
+# ── World page ─────────────────────────────────────────────────────────────
 
-with tab_world:
+def page_world() -> None:
     charts, date_label = get_charts("macro")
     snapshot = _load_world_snapshot(charts)
 
@@ -2006,7 +2015,7 @@ with tab_world:
     else:
         _as_of = datetime.strptime(snapshot["generated_at"], "%Y-%m-%d %H:%M")
         st.markdown(
-            _tab_header_html(
+            _page_header_html(
                 "The World Economy",
                 "Central banks, growth and inflation, equity valuations and country risk "
                 "across the world&rsquo;s major economies.",
@@ -2093,9 +2102,9 @@ with tab_world:
             _render_grid(charts)
 
 
-# ── India tab ──────────────────────────────────────────────────────────────
+# ── India page ─────────────────────────────────────────────────────────────
 
-with tab_india:
+def page_india() -> None:
     charts, date_label = get_charts("india")
 
     if not charts:
@@ -2105,7 +2114,7 @@ with tab_india:
         )
     else:
         st.markdown(
-            _tab_header_html(
+            _page_header_html(
                 "The Indian Economy",
                 "Growth, prices, money, trade, capital flows and public finances, from RBI, MoSPI, "
                 "NSDL and CAG data. Charts reflect the latest data committed to the repository.",
@@ -2172,9 +2181,9 @@ with tab_india:
             _render_grid(charts)
 
 
-# ── RBI Sentinel tab ────────────────────────────────────────────────────────
+# ── RBI Sentinel page ───────────────────────────────────────────────────────
 
-with tab_rbi:
+def page_rbi() -> None:
     charts, date_label = get_charts("rbi_sentinel")
 
     if not charts:
@@ -2583,3 +2592,50 @@ I would just like to know where it goes.</p>
         if charts:
             _section("Other")
             _render_grid(charts)
+
+
+# ---------------------------------------------------------------------------
+# Masthead, navigation, page
+# ---------------------------------------------------------------------------
+# Each page has its own URL (/world, /india, /rbi-sentinel), so a section can be
+# linked to and the browser's back button works. Weekly Markets is the default
+# page and keeps the app's root URL, so older links still open it.
+#
+# The navigation is drawn here rather than by Streamlit (position="hidden"):
+# in the sidebar it would be hidden behind the collapsed sidebar, and at the
+# top of the app it would sit above the masthead. These links keep the tabs'
+# place under the masthead and are styled to match.
+
+PAGES = [
+    st.Page(page_weekly, title="Weekly Markets", url_path="weekly", default=True),
+    st.Page(page_world, title="World", url_path="world"),
+    st.Page(page_india, title="India", url_path="india"),
+    st.Page(page_rbi, title="RBI Sentinel", url_path="rbi-sentinel"),
+]
+current = st.navigation(PAGES, position="hidden")
+if current.url_path:                      # the default page keeps the plain title
+    st.set_page_config(page_title=f"{current.title} · The Economics Hub")
+
+st.markdown(
+    '<h1 class="insti-masthead">Global Macro & Cross-Asset Monitor</h1>'
+    '<p class="insti-tagline">Maintained by Shreyas Urgunde</p>'
+    '<div class="substack-center-container">'
+        '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
+            '<span class="substack-cta__label">Subscribe on Substack</span>'
+            '<svg class="substack-cta__arrow" viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" '
+                'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+                '<path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6"/>'
+            '</svg>'
+        '</a>'
+    '</div>'
+    '<div class="insti-rule"></div>',
+    unsafe_allow_html=True,
+)
+
+nav = st.container(key="ehnav", horizontal=True, gap="medium")
+for page in PAGES:
+    with nav.container(key=f"ehnav-{page.url_path or 'weekly'}"
+                           f"{'-current' if page.url_path == current.url_path else ''}"):
+        st.page_link(page, label=page.title)
+
+current.run()

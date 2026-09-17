@@ -58,11 +58,11 @@ source ~/.bashrc
 
 ```
 economics_hub/
-├── app.py                       # Streamlit 4-tab dashboard
+├── app.py                       # Streamlit dashboard: 4 pages, each with its own link
 ├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
-├── generate_news.py             # Weekly tab: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
-├── generate_macro.py            # World tab: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
-├── generate_india.py            # India tab (14 charts, Saturdays via CI + manual)
+├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
+├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
+├── generate_india.py            # India page (14 charts, Saturdays via CI + manual)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
 ├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
@@ -72,17 +72,17 @@ economics_hub/
 │   └── templates/               # Reusable chart template classes
 ├── config/
 │   ├── settings.py              # Weekly indicators (Yahoo Finance + FRED tickers)
-│   ├── macro_settings.py        # World tab: US and emerging-market series (FRED)
-│   ├── world_settings.py        # World tab: countries, sources, central bank calendars
+│   ├── macro_settings.py        # World page: US and emerging-market series (FRED)
+│   ├── world_settings.py        # World page: countries, sources, central bank calendars
 │   ├── news_settings.py         # Headline feeds, themes and filters
 │   └── insights.py              # Chart explanations shown under each chart
 ├── data/
 │   ├── fetchers/                # yfinance, FRED and India data fetchers
 │   ├── india_manual_entry.py    # CLI for monthly India figures (PMI, GST, CPI, IIP)
-│   ├── world_snapshot.py        # World tab data: BIS, OECD, Eurostat, central banks, FRED
+│   ├── world_snapshot.py        # World page data: BIS, OECD, Eurostat, central banks, FRED
 │   ├── news.py                  # Headlines: RSS reading, theme sorting, story ranking
 │   ├── world_manual_entry.py    # CLI for World figures with no free API (PMIs, Japan CPI, China)
-│   ├── valuations.py            # World tab: Shiller CAPE, Damodaran equity risk premium and country risk downloads
+│   ├── valuations.py            # World page: Shiller CAPE, Damodaran equity risk premium and country risk downloads
 │   ├── india_macro.db           # India SQLite database
 │   ├── cag_monthly_accounts.xlsx # India CAG fiscal data
 │   └── rbi_sentinel.db          # RBI MPC documents, scores and rate decisions
