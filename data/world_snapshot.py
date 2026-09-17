@@ -20,9 +20,12 @@ covered by tests/test_world.py.
 from __future__ import annotations
 
 import io
+import re
 import sqlite3
 import time
+import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import numpy as np
@@ -102,6 +105,48 @@ def last_move(s: pd.Series) -> dict | None:
         return None
     when = changes.index[-1]
     return {"date": when.strftime("%Y-%m-%d"), "bps": int(round(changes.iloc[-1] * 100))}
+
+
+def parse_fomc_range(text: str) -> tuple[float, float]:
+    """
+    Target range from an FOMC statement, e.g. '...by 1/4 percentage point to
+    3-3/4 to 4 percent' -> (3.75, 4.0). The decision sentence comes before any
+    dissent ('preferred to raise the target range...'), so the first match wins.
+    """
+    m = re.search(r"target range for the federal funds rate\b.*?\b(?:to|at) "
+                  r"(\d+(?:-\d/\d)?|\d/\d) to (\d+(?:-\d/\d)?|\d/\d) percent", text, flags=re.S)
+    if not m:
+        raise ValueError("FOMC statement: no target range sentence found — has the wording changed?")
+
+    def number(s: str) -> float:
+        whole, _, frac = s.rpartition("-") if "-" in s else ("", "", s)
+        if "/" in frac:
+            n, d = frac.split("/")
+            return (float(whole) if whole else 0.0) + int(n) / int(d)
+        return float(frac)
+
+    return number(m.group(1)), number(m.group(2))
+
+
+def apply_fomc_decision(lo: pd.Series, hi: pd.Series, decision: dict) -> tuple[pd.Series, pd.Series]:
+    """
+    FRED dates a new target range from the day it takes effect (the day after
+    the announcement) and only posts that observation the next US morning, so
+    for ~18 hours after a decision FRED still shows the old range. The Fed's own
+    statement is the authority: when FRED has nothing from the effective day
+    on, the announced range is added on that day. When FRED already covers it,
+    the two must agree, otherwise one of the sources is wrong and we raise.
+    """
+    effective = pd.Timestamp(decision["date"]) + pd.Timedelta(days=1)
+    new_lo, new_hi = decision["lo"], decision["hi"]
+    if hi.index[-1] >= effective:
+        got = (float(lo[lo.index >= effective].iloc[0]), float(hi[hi.index >= effective].iloc[0]))
+        if abs(got[0] - new_lo) > 1e-9 or abs(got[1] - new_hi) > 1e-9:
+            raise ValueError(f"FRED range {got[0]:.2f}-{got[1]:.2f} on {effective:%Y-%m-%d} disagrees with the "
+                             f"FOMC statement of {decision['date']} ({new_lo:.2f}-{new_hi:.2f})")
+        return lo, hi
+    return (pd.concat([lo, pd.Series([new_lo], index=[effective])]),
+            pd.concat([hi, pd.Series([new_hi], index=[effective])]))
 
 
 def age_days(period: str, today: date) -> int:
@@ -221,6 +266,22 @@ def fetch_boe(code: str, start: date) -> pd.Series:
         raise ValueError(f"Bank of England: {code} missing from response")
     return pd.Series(pd.to_numeric(df[code], errors="coerce").values,
                      index=pd.to_datetime(df["DATE"], format="%d %b %Y")).dropna().sort_index()
+
+
+FOMC_FEED = "https://www.federalreserve.gov/feeds/press_monetary.xml"
+
+
+def fetch_fomc_decision() -> dict:
+    """The latest FOMC statement in the Fed's monetary policy feed: {'date', 'lo', 'hi', 'url'}."""
+    root = ET.fromstring(_get(FOMC_FEED).content)
+    for item in root.iter("item"):
+        if (item.findtext("title") or "").strip() == "Federal Reserve issues FOMC statement":
+            url = (item.findtext("link") or "").strip()
+            when = parsedate_to_datetime((item.findtext("pubDate") or "").strip()).date()
+            text = re.sub(r"<[^>]+>", " ", _get(url).text)
+            lo, hi = parse_fomc_range(re.sub(r"\s+", " ", text))
+            return {"date": when.isoformat(), "lo": lo, "hi": hi, "url": url}
+    raise ValueError("Fed press feed: no FOMC statement among the recent releases")
 
 
 def fetch_jgb_10y() -> pd.Series:
@@ -381,6 +442,10 @@ def build_snapshot(fred_api_key: str, sentinel_db: Path, manual_rows: list[dict]
     us_unemp = c.run("FRED UNRATE", fred_series, "UNRATE", "2024-01-01")
     fed_lo = c.run("FRED DFEDTARL", fred_series, "DFEDTARL", "2015-01-01")
     fed_hi = c.run("FRED DFEDTARU", fred_series, "DFEDTARU", "2015-01-01")
+    fomc = c.run("Fed FOMC statement", fetch_fomc_decision)
+    if fomc and fed_lo is not None and fed_hi is not None and not fed_lo.empty and not fed_hi.empty:
+        fed_lo, fed_hi = c.run("FOMC statement vs FRED", apply_fomc_decision, fed_lo, fed_hi, fomc) or (fed_lo, fed_hi)
+    boe_rate = c.run("Bank of England Bank Rate", fetch_boe, "IUDBEDR", date(2015, 1, 1))
     us_10y = c.run("FRED DGS10", fred_series, "DGS10", f"{today.year - 1}-01-01")
     ecb_dfr = c.run("FRED ECBDFR", fred_series, "ECBDFR", "2015-01-01")
 
@@ -426,7 +491,7 @@ def build_snapshot(fred_api_key: str, sentinel_db: Path, manual_rows: list[dict]
     banks = [
         bank("fed", fed_hi, fed_display),
         bank("ecb", ecb_dfr),
-        bank("boe", bis.get("GB")),
+        bank("boe", boe_rate),
         bank("boj", bis.get("JP")),
         bank("pboc", bis.get("CN")),
     ]
@@ -445,7 +510,7 @@ def build_snapshot(fred_api_key: str, sentinel_db: Path, manual_rows: list[dict]
     }
     ten = {"US": us_10y, "EA": de_10y, "UK": uk_10y, "JP": jp_10y,
            "CN": manual.get(("CN", "ten_year")), "IN": in_10y}
-    policy = {"US": fed_hi, "EA": ecb_dfr, "UK": bis.get("GB"), "JP": bis.get("JP"), "CN": bis.get("CN")}
+    policy = {"US": fed_hi, "EA": ecb_dfr, "UK": boe_rate, "JP": bis.get("JP"), "CN": bis.get("CN")}
 
     rows = []
     for cc in COUNTRIES:

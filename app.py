@@ -24,9 +24,11 @@ import streamlit as st
 from charts.loader import (
     clean_title,
     get_charts,
+    group_charts,
     is_pipeline_admin,
 )
 import config.insights as _insights
+import config.weekly_settings as _weekly_settings
 import config.world_settings as _world_settings
 
 from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
@@ -109,6 +111,29 @@ st.markdown(
         font-size: 0.9rem; font-weight: 400; color: #4A5262;
         line-height: 1.5; margin: 0; max-width: 46rem;
     }
+    /* Jump links under a tab's standfirst (Weekly Markets) */
+    .tab-jump {
+        display: flex; flex-wrap: wrap; gap: 0.4rem 0.45rem;
+        margin: 0.75rem 0 0 0;
+    }
+    .tab-jump a {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+        color: #0A1F3D !important; text-decoration: none !important;
+        border: 1px solid #C9D2DE; border-radius: 999px; background: #FFFFFF;
+        padding: 0.28rem 0.7rem; white-space: nowrap;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .tab-jump a:hover, .tab-jump a:focus-visible {
+        background: #0A1F3D; border-color: #0A1F3D; color: #FFFFFF !important;
+    }
+    /* Land a jumped-to section below Streamlit's fixed top bar, and glide there */
+    .section-header[id] { scroll-margin-top: 4.5rem; }
+    html, [data-testid="stAppViewContainer"], [data-testid="stMain"] { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+        html, [data-testid="stAppViewContainer"], [data-testid="stMain"] { scroll-behavior: auto; }
+    }
+
     .rbi-head-note {
         font-family: 'Inter', -apple-system, sans-serif;
         font-size: 0.82rem; font-style: italic; font-weight: 400; color: #6B7280;
@@ -1341,12 +1366,18 @@ def _takeaways_html(brief: dict) -> str:
     )
 
 
-def _section(title: str) -> None:
+def _section(title: str, anchor: str | None = None) -> None:
+    anchor_attr = f' id="{anchor}"' if anchor else ""
     st.markdown(
         f'<div class="section-divider"></div>'
-        f'<p class="section-header">{title}</p>',
+        f'<p class="section-header"{anchor_attr}>{title}</p>',
         unsafe_allow_html=True,
     )
+
+
+def _anchor(prefix: str, title: str) -> str:
+    """'Rates, Inflation & Credit' -> 'weekly-rates-inflation-credit'. Tabs share one page, so ids carry the tab."""
+    return f"{prefix}-" + re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
 
 def _render_summary(chart_path: Path) -> None:
     """Summary table constrained to 80% of page width."""
@@ -1372,17 +1403,21 @@ def _group(charts: list[Path], keyword: str) -> tuple[list[Path], list[Path]]:
 
 # ── World tab helpers ──────────────────────────────────────────────────────
 
-def _world_config():
+def _fresh_config(module):
     """
-    config/world_settings.py, reloaded when the file changes: Streamlit Cloud
-    re-runs app.py after a push without re-importing modules, so a yearly
+    A config module, reloaded when its file changes: Streamlit Cloud re-runs
+    app.py after a push without re-importing modules, so a yearly
     meeting-calendar update would otherwise not show until a reboot.
     """
-    mtime = Path(_world_settings.__file__).stat().st_mtime
-    if getattr(_world_settings, "_loaded_mtime", None) != mtime:
-        importlib.reload(_world_settings)
-        _world_settings._loaded_mtime = mtime
-    return _world_settings
+    mtime = Path(module.__file__).stat().st_mtime
+    if getattr(module, "_loaded_mtime", None) != mtime:
+        module = importlib.reload(module)
+        module._loaded_mtime = mtime
+    return module
+
+
+def _world_config():
+    return _fresh_config(_world_settings)
 
 
 def _load_world_snapshot(charts: list[Path]) -> dict | None:
@@ -1571,12 +1606,20 @@ def _scoreboard_html(snapshot: dict) -> str:
     return f'<div class="wsb-wrap"><table class="wsb"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
 
 
-def _tab_header_html(title: str, dek: str, meta_label: str, meta_value: str) -> str:
+def _tab_header_html(title: str, dek: str, meta_label: str, meta_value: str,
+                     nav: list[tuple[str, str]] | None = None) -> str:
+    """Tab masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
+    links = ""
+    if nav:
+        links = ('<nav class="tab-jump" aria-label="Sections">'
+                 + "".join(f'<a href="#{anchor}">{label}</a>' for label, anchor in nav)
+                 + '</nav>')
     return (
         '<div class="rbi-head">'
         '<div class="rbi-head-text">'
         f'<p class="rbi-head-title">{title}</p>'
         f'<p class="rbi-head-dek">{dek}</p>'
+        f'{links}'
         '</div>'
         '<div class="rbi-head-meta">'
         f'<span class="rbi-head-meta-label">{meta_label}</span>'
@@ -1597,96 +1640,33 @@ with tab_weekly:
             "or trigger the Weekly Markets workflow on GitHub Actions."
         )
     else:
+        weekly_cfg = _fresh_config(_weekly_settings)
+        summary, charts = _pop_summary(charts, [weekly_cfg.SUMMARY_CHART, "00_"])
+        # Sections and their chart order live in config/weekly_settings.py.
+        sections, unlisted = group_charts(charts, weekly_cfg.WEEKLY_SECTIONS)
+
         st.markdown(
             _tab_header_html(
                 "The Week in Markets",
                 "Weekly moves and the trends behind equities, bonds, currencies, commodities "
                 "and crypto across the major markets.",
                 "Last updated", _fmt_day(datetime.strptime(date_label, "%Y-%m-%d").date()),
+                nav=[(title, _anchor("weekly", title)) for title, _ in sections],
             ),
             unsafe_allow_html=True,
         )
 
-        summary, charts = _pop_summary(charts, ["summary_table", "00_"])
         if summary:
             _render_summary(summary)
 
-        # 1. Equities
-        equities_kws = ["equities"]
-        equities = [c for c in charts if any(k in c.name for k in equities_kws)]
-        charts = [c for c in charts if c not in equities]
-        if equities:
-            _section("Equities")
-            _render_grid(equities)
+        for title, section_charts in sections:
+            _section(title, anchor=_anchor("weekly", title))
+            _render_grid(section_charts, center_odd=True)
 
-        # 2. Commodities
-        commo_kws = ["commodities", "brent", "wti", "agri", "oil", "gold", "copper"]
-        commo = [c for c in charts if any(k in c.name for k in commo_kws) and "btc" not in c.name]
-        charts = [c for c in charts if c not in commo]
-        if commo:
-            _section("Commodities")
-            _render_grid(commo)
-
-        # 3. Fixed Income & Credit
-        rates_kws = ["yield", "credit_spreads", "bond_etf"]
-        rates = [c for c in charts if any(k in c.name for k in rates_kws)]
-        charts = [c for c in charts if c not in rates]
-        if rates:
-            _section("Fixed Income & Credit")
-            _render_grid(rates)
-
-        # 4. Inflation Signals
-        inflation_kws = ["breakeven", "real_yield"]
-        inflation_sig = [c for c in charts if any(k in c.name for k in inflation_kws)]
-        charts = [c for c in charts if c not in inflation_sig]
-        if inflation_sig:
-            _section("Inflation Signals")
-            _render_grid(inflation_sig)
-
-        # 5. Foreign Exchange (excluding EM FX)
-        fx = [c for c in charts if "fx" in c.name and "em_fx" not in c.name]
-        charts = [c for c in charts if c not in fx]
-        if fx:
-            _section("Foreign Exchange")
-            _render_grid(fx)
-
-        # 6. Volatility & Sentiment
-        vol_kws = ["vix", "move", "sector_rotation", "india_vix"]
-        volatility = [c for c in charts if any(k in c.name for k in vol_kws)]
-        charts = [c for c in charts if c not in volatility]
-        if volatility:
-            _section("Volatility & Sentiment")
-            _render_grid(volatility)
-
-        # 7. Cross-Asset Risk & Breadth
-        risk_kws = ["stock_bond_correlation", "defensives_cyclicals", "risk_appetite", "breadth", "gold_spx", "copper_gold"]
-        risk = [c for c in charts if any(k in c.name for k in risk_kws)]
-        charts = [c for c in charts if c not in risk]
-        if risk:
-            _section("Cross-Asset Risk & Breadth")
-            _render_grid(risk)
-
-
-        # 8. Emerging Markets
-        em_kws = ["em_fx", "em_equity", "india_vs_em", "stress_monitor"]
-        em = [c for c in charts if any(k in c.name for k in em_kws)]
-        charts = [c for c in charts if c not in em]
-        if em:
-            _section("Emerging Markets")
-            _render_grid(em)
-
-        # 9. Crypto Assets
-        crypto_kws = ["eth_btc", "btc_gold", "btc_global", "stablecoin"]
-        crypto = [c for c in charts if any(k in c.name for k in crypto_kws)]
-        charts = [c for c in charts if c not in crypto]
-        if crypto:
-            _section("Crypto Assets")
-            _render_grid(crypto)
-
-        # Catch-all
-        if charts:
+        # A chart the generator writes but the config does not list yet.
+        if unlisted:
             _section("Other")
-            _render_grid(charts)
+            _render_grid(unlisted, center_odd=True)
 
 
 # ── World tab ──────────────────────────────────────────────────────────────
@@ -1899,10 +1879,6 @@ with tab_rbi:
             '<p class="rbi-head-dek">Quantitative tracking of India&rsquo;s monetary policy stance '
             'across all three classes of MPC communication: the Resolution, the Minutes '
             'and the Governor&rsquo;s Statement.</p>'
-            '<p class="rbi-head-note">* The scored database behind these charts took ten years of MPC documents '
-            'and a large language model to build. If you would like to use it in your own research, please get in '
-            'touch at <a href="mailto:thegeekyowl@duck.com">thegeekyowl@duck.com</a> &mdash; glad to share it, '
-            'I would just like to know where it goes.</p>'
             '</div>'
             f'{_meeting_meta}'
             '</div>',
@@ -2105,6 +2081,10 @@ with tab_rbi:
   </div>
 
 </div>
+<p class="rbi-head-note" style="margin-top: 1.1rem;">The scored database behind these charts took ten years of MPC
+documents and a large language model to build. If you would like to use it in your own research, please get in
+touch at <a href="mailto:shreyasurgunde20@gmail.com">shreyasurgunde20@gmail.com</a> &mdash; glad to share it,
+I would just like to know where it goes.</p>
 """, unsafe_allow_html=True)
 
         # ── Decision strip: the cycle's facts in one row, ahead of any chart ──

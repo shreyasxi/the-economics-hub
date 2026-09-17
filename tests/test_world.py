@@ -67,6 +67,37 @@ def test_last_move_finds_latest_change_and_sign():
     assert ws.last_move(pd.Series([2.0, 2.0], index=pd.to_datetime(["2026-01-01", "2026-01-02"]))) is None
 
 
+def test_fomc_range_parses_hike_hold_and_ignores_dissent():
+    hike = ("The Committee decided to raise the target range for the federal funds rate by 1/4 percentage "
+            "point to 3-3/4 to 4 percent, in support of the Federal Reserve's dual mandate.")
+    hold = ("The Committee decided to maintain the target range for the federal funds rate at 3-1/2 to 3-3/4 "
+            "percent. Voting against were A and B, who preferred to raise the target range for the federal "
+            "funds rate by 1/4 percentage point at this meeting.")
+    assert ws.parse_fomc_range(hike) == (3.75, 4.0)
+    assert ws.parse_fomc_range(hold) == (3.5, 3.75)
+    assert ws.parse_fomc_range("to lower the target range for the federal funds rate to 0 to 1/4 percent") == (0.0, 0.25)
+
+
+def test_fomc_decision_fills_the_gap_before_fred_posts_it():
+    """16 Sep 2026: the Fed hiked at 18:00 UTC; a run at 03:20 UTC on the 17th still read 3.50-3.75 from FRED."""
+    idx = pd.to_datetime(["2026-09-15", "2026-09-16"])
+    lo, hi = pd.Series([3.5, 3.5], index=idx), pd.Series([3.75, 3.75], index=idx)
+    decision = {"date": "2026-09-16", "lo": 3.75, "hi": 4.0}
+    lo2, hi2 = ws.apply_fomc_decision(lo, hi, decision)
+    assert hi2.index[-1] == pd.Timestamp("2026-09-17") and hi2.iloc[-1] == 4.0 and lo2.iloc[-1] == 3.75
+    assert ws.last_move(hi2) == {"date": "2026-09-17", "bps": 25}
+    # Once FRED has posted the new range the statement adds nothing ...
+    lo3, hi3 = ws.apply_fomc_decision(lo2, hi2, decision)
+    assert len(hi3) == len(hi2)
+    # ... and a FRED value that contradicts the statement is an error, not a silent pick.
+    try:
+        ws.apply_fomc_decision(lo2, hi2, {"date": "2026-09-16", "lo": 3.5, "hi": 3.75})
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("conflicting FRED and FOMC ranges were accepted")
+
+
 def test_regime_quadrants():
     assert ws.regime_label(0.3, -0.2) == "Goldilocks"
     assert ws.regime_label(0.3, 0.2) == "Overheating"

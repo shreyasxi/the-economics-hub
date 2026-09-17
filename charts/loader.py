@@ -131,6 +131,28 @@ def _natural_sort_key(filename: str) -> list:
     return [int(p) if p.isdigit() else p.lower() for p in parts]
 
 
+def chart_key(filename: str) -> str:
+    """'10b_india_sector_rotation.png' -> 'india_sector_rotation' (the name without its numeric prefix)."""
+    return re.sub(r"^\d+[a-z]*_", "", Path(filename).stem)
+
+
+def group_charts(charts: list[Path], sections: list[tuple[str, list[str]]]
+                 ) -> tuple[list[tuple[str, list[Path]]], list[Path]]:
+    """
+    Charts placed into named sections by chart_key, in the order each section
+    lists them. Returns (sections that have at least one chart, charts not listed
+    anywhere). A listed chart missing from the folder is simply skipped.
+    """
+    by_key = {chart_key(c.name): c for c in charts}
+    grouped, used = [], set()
+    for title, keys in sections:
+        found = [by_key[k] for k in keys if k in by_key]
+        used.update(keys)
+        if found:
+            grouped.append((title, found))
+    return grouped, [c for c in charts if chart_key(c.name) not in used]
+
+
 def clean_title(filename: str) -> str:
     """
     Derive a human-readable chart title from a filename.

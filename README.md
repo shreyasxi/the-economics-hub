@@ -143,7 +143,7 @@ python make_chart.py
 |--------|------|--------|---------|
 | Yahoo Finance | Equities, FX, commodities, ETFs, VIX, NIFTY IT | Free, no key | `generate_weekly.py`, `generate_india.py` |
 | FRED | US yields, CPI, PCE, unemployment, credit spreads, EM corporate bond yields, EM dollar index, Fed and ECB rates, US release calendar | Free API key | `generate_weekly.py`, `generate_macro.py` |
-| OECD · BIS · Eurostat · Bundesbank · Bank of England · MoF Japan | CPI, unemployment, leading indicators, policy rates, 10-year yields | Free, no key | `generate_macro.py` |
+| OECD · BIS · Eurostat · Bundesbank · Bank of England · Federal Reserve · MoF Japan | CPI, unemployment, leading indicators, policy rates, 10-year yields | Free, no key | `generate_macro.py` |
 | Robert J. Shiller (shillerdata.com) · Aswath Damodaran (NYU Stern) | CAPE and excess CAPE yield; implied equity risk premium; country and regional equity risk premiums | Free spreadsheets, downloaded each run | `generate_macro.py` |
 | RBI DBIE workbook | India credit, M3, FPI flows, forex reserves, trade | Free, refreshed monthly | `generate_india.py` |
 | Manual entry + CAG workbook | India PMI, GST, CPI, IIP, FPI (NSDL); CAG fiscal accounts | Hand-entered monthly | `generate_india.py` |
@@ -154,7 +154,7 @@ Governor's Statements scored by a large language model. It ships with this repos
 fully reproducible, but it was expensive to build and is not something you can recreate for free. Under CC BY-NC 4.0 it
 is available for personal and research use with credit to **The Economics Hub**, and not for commercial use.
 *If you would like to use this dataset in your own work, please get in touch first at
-[thegeekyowl@duck.com](mailto:thegeekyowl@duck.com) — I am glad to share it, I would just like to know where it goes.*
+[shreyasurgunde20@gmail.com](mailto:shreyasurgunde20@gmail.com) — I am glad to share it, I would just like to know where it goes.*
 
 ---
 

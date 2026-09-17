@@ -29,10 +29,10 @@ class TrendLineChart:
         self.fig = self.ax = None
 
     def add_series(self, name, dates, values, color_key=None, index=0,
-                   show_area=True, linewidth=2.0, linestyle="-"):
+                   show_area=True, linewidth=2.0, linestyle="-", color=None):
         self.series.append({
             "name": name, "dates": dates, "values": values,
-            "color_key": color_key, "index": index,
+            "color_key": color_key, "index": index, "color": color,
             "show_area": show_area, "linewidth": linewidth,
             "linestyle": linestyle,
         })
@@ -56,8 +56,9 @@ class TrendLineChart:
         label_positions = [] # <--- NEW: List to hold label data to prevent collisions
 
         for i, s in enumerate(self.series):
-            color = (EconStyle.get_color(s["color_key"]) if s["color_key"]
-                     else EconStyle.SERIES_COLORS[s["index"] % len(EconStyle.SERIES_COLORS)])
+            # An explicit colour wins: two series can share a region (FTSE 100 and Euro Stoxx 50).
+            color = s["color"] or (EconStyle.get_color(s["color_key"]) if s["color_key"]
+                                   else EconStyle.SERIES_COLORS[s["index"] % len(EconStyle.SERIES_COLORS)])
 
             values = np.array(s["values"], dtype=float)
             if normalize and len(values) > 0 and values[0] != 0:

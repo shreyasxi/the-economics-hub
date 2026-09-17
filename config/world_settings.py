@@ -52,7 +52,7 @@ CELL_SOURCES = {
         "mfg_pmi": "manual",
         "cpi_yoy": "FRED CPIAUCSL (BLS)",
         "unemployment": "FRED UNRATE (BLS)",
-        "policy_rate": "FRED DFEDTARL/DFEDTARU",
+        "policy_rate": "FRED DFEDTARL/DFEDTARU + FOMC statement",
         "ten_year": "FRED DGS10",
         "fx_ytd": "Yahoo Finance DX-Y.NYB (DXY)",
     },
@@ -68,7 +68,7 @@ CELL_SOURCES = {
         "mfg_pmi": "manual",
         "cpi_yoy": "OECD Prices (ONS CPI)",
         "unemployment": "OECD Labour Force Statistics (ONS)",
-        "policy_rate": "BIS central bank policy rates (Bank Rate)",
+        "policy_rate": "Bank of England IUDBEDR (Bank Rate)",
         "ten_year": "Bank of England IUDMNPY (par yield)",
         "fx_ytd": "Yahoo Finance GBPUSD=X",
     },
@@ -145,7 +145,7 @@ OECD_CLI_COUNTRIES = {
     "KOR": "South Korea", "MEX": "Mexico", "TUR": "Turkey",
     "USA": "United States", "ZAF": "South Africa",
 }
-BIS_POLICY_AREAS = {"UK": "GB", "JP": "JP", "CN": "CN"}
+BIS_POLICY_AREAS = {"JP": "JP", "CN": "CN"}   # UK Bank Rate comes from the BoE itself: BIS runs ~9 days behind
 FX_TICKERS = {
     # (ticker, quoted as USD per unit of local currency?)
     "US": ("DX-Y.NYB", True),   # DXY: the dollar itself; up = stronger dollar

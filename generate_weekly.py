@@ -605,13 +605,17 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     print("   [2/8] Equities — 12-Month Trends")
     trend = TrendLineChart()
-    for ind_id in ["sp500", "nifty50", "ftse100"]:
+    # Five markets on five continents' clocks; the Dow and NASDAQ would only add two more US lines.
+    # Euro Stoxx 50 shares FTSE 100's region colour, so it gets its own.
+    trend_colors = {"eurostoxx50": EconStyle.LINE_MAROON}
+    for ind_id in ["sp500", "ftse100", "eurostoxx50", "nifty50", "nikkei225"]:
         dates, vals = get_trend(ind_id)
         if dates:
             ind = INDICATORS[ind_id]
-            trend.add_series(ind["name"], dates, vals, color_key=ind["color_key"])
+            trend.add_series(ind["name"], dates, vals, color_key=ind["color_key"],
+                             color=trend_colors.get(ind_id))
     trend.render(title="Major Indices — Trailing 12 Months",
-                 subtitle="Indexed to 100 at start  ·  S&P 500, Nifty 50, FTSE 100",
+                 subtitle="Indexed to 100 at start  ·  S&P 500, FTSE 100, Euro Stoxx 50, Nifty 50, Nikkei 225",
                  source="Yahoo Finance", normalize=True, ylabel="Indexed (start = 100)")
     trend.save(output_dir / "02_equities_trend.png")
 
