@@ -32,6 +32,17 @@ jobs:
           PYTHONPATH: "."
         run: python generate_weekly.py --mode dashboard
 
+      # The week's headlines, collected every 4 hours by the Headline Collector
+      # workflow. If there is no pool (its first week, or the cache was lost),
+      # the next step reads the feeds once instead.
+      - name: Restore the week's headline pool
+        continue-on-error: true
+        uses: actions/cache/restore@v4
+        with:
+          path: output/headline_pool
+          key: headline-pool-${{ github.run_id }}
+          restore-keys: headline-pool-
+
       # The week in headlines (RSS). Optional by design: a feed that fails is only
       # a warning inside the script, and if this step fails or times out anyway,
       # the job carries on and the charts publish without the headlines strip.

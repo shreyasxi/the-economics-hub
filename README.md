@@ -60,7 +60,7 @@ source ~/.bashrc
 economics_hub/
 ├── app.py                       # Streamlit 4-tab dashboard
 ├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
-├── generate_news.py             # Weekly tab: The Week in Headlines (runs with the weekly charts)
+├── generate_news.py             # Weekly tab: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
 ├── generate_macro.py            # World tab: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
 ├── generate_india.py            # India tab (14 charts, Saturdays via CI + manual)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
@@ -109,10 +109,11 @@ economics_hub/
 ### 1. Weekly Global Dashboard
 Generates 35 charts (Equities, Commodities, Yields, FX, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions. Commodities covers the WTI futures curve (contango vs backwardation), gold against real interest rates and a 13-market breadth measure.
 
-The same run adds **The Week in Headlines**: the week's top World and India stories from publisher RSS feeds, one per theme (central banks, inflation, trade, energy, growth, markets, public finances), ranked by how many outlets covered each. Headlines are the publishers' own and link to the original. If the feeds fail, the charts still publish without the strip.
+The same run adds **The Week in Headlines**: the week's top World and India stories from publisher RSS feeds, one per theme (central banks, inflation, trade, energy, growth, markets, public finances), ranked by how many outlets covered each, then by how many days each stayed in the news. Headlines are the publishers' own and link to the original. Some feeds hold only hours of stories, so a separate workflow collects every feed every 4 hours into a pool of the week's headlines. The pool lives in GitHub's Actions cache, never in the repository, and keeps 8 days at most. If the feeds fail, the charts still publish without the strip; if the pool is missing, the feeds are read once instead.
 ```bash
 python generate_weekly.py
-python generate_news.py      # headlines for the newest weekly edition
+python generate_news.py --collect   # add the feeds' current headlines to the week's pool
+python generate_news.py             # rank the week for the newest weekly edition
 ```
 
 ### 2. World

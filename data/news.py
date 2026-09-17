@@ -2,7 +2,11 @@
 News strip: The Week in Headlines (Weekly Markets tab).
 
 generate_news.py writes news.json into each weekly edition folder; the weekly
-workflow runs it after the charts and publishes it with them.
+workflow runs it after the charts and publishes it with them. Through the week,
+the Headline Collector workflow adds every feed's headlines to a pool every 4
+hours (collect_headlines), so the weekly run ranks the whole week, not just what
+the feeds still hold on Saturday. The pool keeps 8 days at most and lives in
+GitHub's Actions cache, never in the repository.
 
 The pipeline selects, it never writes: every line on the page is a publisher's
 own headline, linked to the original.
@@ -104,6 +108,11 @@ def parse_feed(content: bytes) -> list[dict]:
 
 def in_window(published: datetime | None, start: datetime, end: datetime) -> bool:
     return published is not None and start <= published <= end + timedelta(hours=1)
+
+
+def article_key(url: str) -> str:
+    """One article however a feed decorates its link ('?at_medium=RSS')."""
+    return url.split("?")[0].split("#")[0]
 
 
 # ═══════════════════════════════════════════════
@@ -208,57 +217,73 @@ def lacks_local_angle(title: str, local: dict[str, list[str]] | None) -> bool:
     return bool(local) and is_foreign_story([title], local)
 
 
+def headline_kind(title: str, explainers: list[str], min_words: int) -> int:
+    """0 a plain report of the news, 1 an explainer or analysis, 2 too short to say what happened."""
+    if len(title.split()) < min_words:
+        return 2
+    return 1 if is_excluded(title, explainers) else 0
+
+
 def select_headlines(items: list[dict], *, publishers: list[str], themes: list[tuple[str, list[str]]],
                      exclude: list[str], stopwords: set[str], synonyms: list[tuple[str, str]],
                      similarity: float, limit: int, per_publisher: int,
                      one_outlet_themes: set[str] | None = None,
-                     local: dict[str, list[str]] | None = None) -> list[dict]:
+                     local: dict[str, list[str]] | None = None,
+                     explainers: list[str] = (), min_words: int = 0) -> list[dict]:
     """
     The week's top stories from dated feed items ({'title', 'url', 'publisher', 'published'}).
 
     Headlines are sorted into themes and, within a theme, into stories. A story
     counts once however many outlets ran it and ranks by how many did, then by
-    its theme's priority (the order of `themes`), then by how many headlines it
-    drew, then by recency. Each theme offers its top story and the column takes
-    the best `limit` of those, so one event cannot fill it. A story only one
-    outlet carried qualifies only in `one_outlet_themes` (all themes if None).
-    With `local`, foreign stories without a local angle are dropped first.
+    how many days it stayed in the news (different publication dates, each in
+    its publisher's own time zone), then by its theme's priority (the order of
+    `themes`), then by how many headlines it drew, then by recency. Each theme
+    offers its top story and the column takes the best `limit` of those, so one
+    event cannot fill it. A story only one outlet carried qualifies only in
+    `one_outlet_themes` (all themes if None). With `local`, foreign stories
+    without a local angle are dropped first.
 
-    A story's headline is its most typical one, or a close runner-up from a
-    publisher listed earlier in `publishers` (free-to-read outlets). Once an
-    outlet has `per_publisher` headlines in the column, another outlet's
-    headline for the story is used if there is one; the story itself is never
-    dropped for that. With `local`, a headline with a local angle is preferred.
+    A story's headline is its most typical one, or a close runner-up that
+    reports the news plainly (not one of `explainers`, and at least `min_words`
+    words long) or comes from a publisher listed earlier in `publishers`
+    (free-to-read outlets), in that order of preference. Once an outlet has
+    `per_publisher` headlines in the column, another outlet's headline for the
+    story is used if there is one; the story itself is never dropped for that.
+    With `local`, a headline with a local angle is preferred first.
     """
-    seen, pool = set(), []
+    seen, candidates = set(), []
     for it in sorted(items, key=lambda i: i["published"], reverse=True):
-        key = (it["url"].split("?")[0], it["title"].lower())
+        key = (article_key(it["url"]), it["title"].lower())
         if not it["title"] or key[0] in seen or key[1] in seen:
             continue
         seen.update(key)
         theme = headline_theme(it["title"], themes)
         if theme and not is_excluded(it["title"], exclude):
-            pool.append({**it, "theme": theme})
-    if not pool:
+            candidates.append({**it, "theme": theme})
+    if not candidates:
         return []
 
     rank = {p: i for i, p in enumerate(publishers)}
     stories = []
-    tokens = [story_tokens(p["title"], stopwords, synonyms) for p in pool]
-    for members in cluster_stories(tokens, similarity, labels=[p["theme"] for p in pool]):
+    tokens = [story_tokens(p["title"], stopwords, synonyms) for p in candidates]
+    for members in cluster_stories(tokens, similarity, labels=[p["theme"] for p in candidates]):
         top = members[0][1]
-        ordered = sorted(members, key=lambda m: (lacks_local_angle(pool[m[0]]["title"], local), m[1] < top - 0.1,
-                                                 rank.get(pool[m[0]]["publisher"], 99), -m[1]))
-        group = [pool[i] for i, _ in ordered]
+        ordered = sorted(members, key=lambda m: (
+            lacks_local_angle(candidates[m[0]]["title"], local), m[1] < top - 0.1,
+            headline_kind(candidates[m[0]]["title"], explainers, min_words),
+            rank.get(candidates[m[0]]["publisher"], 99), -m[1]))
+        group = [candidates[i] for i, _ in ordered]
         if is_foreign_story([g["title"] for g in group], local):
             continue
         stories.append({
             "items": group, "theme": group[0]["theme"],
             "outlets": sorted({g["publisher"] for g in group}, key=lambda p: rank.get(p, 99)),
+            "days": len({g["published"].date() for g in group}),
             "latest": max(g["published"] for g in group),
         })
     priority = {name: i for i, (name, _) in enumerate(themes)}
-    stories.sort(key=lambda s: (-len(s["outlets"]), priority[s["theme"]], -len(s["items"]), -s["latest"].timestamp()))
+    stories.sort(key=lambda s: (-len(s["outlets"]), -s["days"], priority[s["theme"]], -len(s["items"]),
+                                -s["latest"].timestamp()))
 
     chosen, themes_used, per = [], set(), Counter()
     for s in stories:
@@ -272,11 +297,62 @@ def select_headlines(items: list[dict], *, publishers: list[str], themes: list[t
         chosen.append({
             "title": pick["title"], "url": pick["url"], "publisher": pick["publisher"],
             "date": pick["published"].date().isoformat(), "theme": s["theme"],
-            "also": [o for o in s["outlets"] if o != pick["publisher"]],
+            "also": [o for o in s["outlets"] if o != pick["publisher"]], "days": s["days"],
         })
         if len(chosen) == limit:
             break
     return chosen
+
+
+# ═══════════════════════════════════════════════
+# PURE HELPERS — the week's pool
+# ═══════════════════════════════════════════════
+
+POOL_VERSION = 1
+
+
+def empty_pool() -> dict:
+    return {"reads": [], "headlines": {}}
+
+
+def merge_pool(stored: list[dict], fresh: list[dict], *, start: datetime, end: datetime, cap: int) -> list[dict]:
+    """
+    A column's pool after a read: each article once, as its feed last showed it
+    (outlets rewrite headlines during the day), only articles published between
+    `start` and `end`, newest first, at most `cap`.
+    """
+    merged: dict[str, dict] = {}
+    for it in [*stored, *fresh]:                 # fresh last, so its version wins
+        if in_window(it["published"], start, end):
+            merged[article_key(it["url"])] = it
+    return sorted(merged.values(), key=lambda i: i["published"], reverse=True)[:cap]
+
+
+def pool_to_json(pool: dict) -> dict:
+    """The pool as JSON. Dates keep the publisher's time zone, so a story's days are its publishers' days."""
+    return {
+        "version": POOL_VERSION,
+        "reads": [r.isoformat(timespec="minutes") for r in pool["reads"]],
+        "headlines": {region: [{"title": it["title"], "url": it["url"], "publisher": it["publisher"],
+                                "published": it["published"].isoformat(timespec="minutes")} for it in items]
+                      for region, items in pool["headlines"].items()},
+    }
+
+
+def pool_from_json(data) -> dict:
+    """The pool pool_to_json wrote. ValueError for anything else, such as a pool from an older version."""
+    if not isinstance(data, dict) or data.get("version") != POOL_VERSION:
+        raise ValueError(f"not a version {POOL_VERSION} headline pool")
+    try:
+        return {
+            "reads": [datetime.fromisoformat(r) for r in data["reads"]],
+            "headlines": {region: [{"title": str(it["title"]), "url": str(it["url"]),
+                                    "publisher": str(it["publisher"]),
+                                    "published": datetime.fromisoformat(it["published"])} for it in items]
+                          for region, items in data["headlines"].items()},
+        }
+    except (KeyError, TypeError, AttributeError) as exc:
+        raise ValueError(f"malformed headline pool ({type(exc).__name__}: {exc})") from exc
 
 
 # ═══════════════════════════════════════════════
@@ -328,43 +404,96 @@ class _Collector:
             return None
 
 
-def _headlines(cfg, c: _Collector, region: str, start: datetime, end: datetime) -> dict:
+def _read_region(cfg, c: _Collector, region: str, start: datetime, end: datetime
+                 ) -> tuple[list[dict], list[str], bool]:
+    """
+    One read of a column's feeds: (items published between start and end,
+    outlets with a feed that failed, whether any feed answered). Feeds are read
+    in parallel, so one slow site costs its own timeout, not everyone's.
+    """
     feeds = cfg.HEADLINE_FEEDS[region]
-    publishers = list(dict.fromkeys(p for p, _ in feeds))
-    # Feeds are read in parallel, so one slow site costs its own timeout, not everyone's.
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        fetched = list(pool.map(lambda f: c.run(f"{f[0]} feed ({f[1]})", fetch_feed, f[1]), feeds))
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        fetched = list(ex.map(lambda f: c.run(f"{f[0]} feed ({f[1]})", fetch_feed, f[1]), feeds))
     items, failed = [], []
     for (publisher, _), got in zip(feeds, fetched):
         if got is None:
             failed.append(publisher)
             continue
         items += [{**it, "publisher": publisher} for it in got if in_window(it["published"], start, end)]
+    return items, failed, any(got is not None for got in fetched)
+
+
+def _headlines(cfg, c: _Collector, region: str, start: datetime, end: datetime,
+               stored: list[dict]) -> tuple[dict, bool]:
+    items, failed, answered = _read_region(cfg, c, region, start, end)
+    # This read's items come first, so an article in both shows its latest headline.
+    items += [it for it in stored if in_window(it["published"], start, end)]
+    publishers = list(dict.fromkeys(p for p, _ in cfg.HEADLINE_FEEDS[region]))
     working = [p for p in publishers if any(it["publisher"] == p for it in items)]
     chosen = select_headlines(
         items, publishers=publishers, themes=cfg.HEADLINE_THEMES, exclude=cfg.HEADLINE_EXCLUDE,
         stopwords=cfg.STORY_STOPWORDS, synonyms=cfg.STORY_SYNONYMS, similarity=cfg.STORY_SIMILARITY,
         limit=cfg.HEADLINES_PER_REGION, per_publisher=cfg.MAX_PER_PUBLISHER,
         one_outlet_themes=cfg.ONE_OUTLET_THEMES, local=cfg.HEADLINE_LOCAL.get(region),
+        explainers=cfg.HEADLINE_EXPLAINERS, min_words=cfg.MIN_HEADLINE_WORDS,
     )
     if len(chosen) < cfg.MIN_HEADLINES:
         c.problems.append(f"{region.title()} headlines: only {len(chosen)} found, so the column is left out")
         chosen = []
     return {"items": chosen, "publishers": working,
-            "unavailable": sorted({p for p in failed if p not in working})}
+            "unavailable": sorted({p for p in failed if p not in working})}, answered
 
 
-def build_news(cfg, now: datetime | None = None) -> tuple[dict, list[str]]:
-    """(news.json content, problems). Problems are warnings: the strip is built from whatever worked."""
+def build_news(cfg, now: datetime | None = None, pool: dict | None = None) -> tuple[dict, list[str]]:
+    """
+    (news.json content, problems). Ranks the week's pool together with a read
+    made now; without a pool (the collector's first week, or the cache was
+    lost), that read alone. Problems are warnings: the strip is built from
+    whatever worked, and a read that fails still leaves the pool to rank.
+    """
     now = now or datetime.now(timezone.utc)
+    pool = pool or empty_pool()
     c = _Collector()
     start = now - timedelta(days=cfg.HEADLINE_WINDOW_DAYS)
+    columns, answered = {}, False
+    for region in cfg.HEADLINE_FEEDS:
+        columns[region], ok = _headlines(cfg, c, region, start, now, pool["headlines"].get(region, []))
+        answered = answered or ok
+    reads = sorted(r for r in pool["reads"] if start <= r <= now) + ([now] if answered else [])
     news = {
         "generated_at": now.strftime("%Y-%m-%d %H:%M UTC"),
-        "headlines": {
-            "from": start.date().isoformat(), "to": now.date().isoformat(),
-            **{region: _headlines(cfg, c, region, start, now) for region in cfg.HEADLINE_FEEDS},
-        },
+        "reads": {"count": len(reads),
+                  "first": reads[0].astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC") if reads else None},
+        "headlines": {"from": start.date().isoformat(), "to": now.date().isoformat(), **columns},
     }
     news["problems"] = c.problems
     return news, c.problems
+
+
+def collect_headlines(cfg, pool: dict | None = None, now: datetime | None = None
+                      ) -> tuple[dict, dict[str, int | None], list[str]]:
+    """
+    One read of every feed added to the week's pool: (pool, new articles per
+    column, or None for a column none of whose feeds answered, problems). The
+    Headline Collector workflow runs this every 4 hours. Only headlines that
+    could be chosen are kept, and none published more than POOL_KEEP_DAYS ago,
+    so the pool stays small and temporary. A read in which no feed answered is
+    not counted as a read.
+    """
+    now = now or datetime.now(timezone.utc)
+    pool = pool or empty_pool()
+    c = _Collector()
+    start = now - timedelta(days=cfg.POOL_KEEP_DAYS)
+    headlines, added = {}, {}
+    for region in cfg.HEADLINE_FEEDS:
+        items, _, answered = _read_region(cfg, c, region, start, now)
+        fresh = [it for it in items if it["title"] and re.match(r"https?://", it["url"])
+                 and headline_theme(it["title"], cfg.HEADLINE_THEMES)
+                 and not is_excluded(it["title"], cfg.HEADLINE_EXCLUDE)]
+        stored = pool["headlines"].get(region, [])
+        known = {article_key(it["url"]) for it in stored}
+        headlines[region] = merge_pool(stored, fresh, start=start, end=now, cap=cfg.POOL_MAX_PER_REGION)
+        added[region] = len({article_key(it["url"]) for it in fresh} - known) if answered else None
+    answered = any(n is not None for n in added.values())
+    reads = [r for r in pool["reads"] if start <= r <= now] + ([now] if answered else [])
+    return {"reads": reads, "headlines": headlines}, added, c.problems

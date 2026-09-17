@@ -525,7 +525,7 @@ st.markdown(
     .nh-how-panel span { display: block; }
     .nh-how-panel span + span { margin-top: 0.55rem; }
     .nh-how-panel b { font-weight: 600; color: var(--nh-ink); }
-    .nh-how-panel .nh-how-foot { color: var(--nh-muted); font-size: 0.74rem; }
+    .nh-how-panel .nh-how-foot { color: var(--nh-muted); font-size: 0.74rem; text-wrap: balance; }
 
     /* ── Columns: World wide, India narrow, a hairline centred in the gap ── */
     .nh-grid {
@@ -1851,7 +1851,10 @@ def _nh_story_html(it: dict, rank: int, outlets_read: int, paywalled: set[str], 
     covered = 1 + len(also)
     total = max(outlets_read, covered)
     pips = "".join('<i class="on"></i>' if k < covered else "<i></i>" for k in range(total))
-    tip = _esc(f"Also covered by {_and_list(also)}" if also else "No other outlet read carried this story")
+    tip = f"Also covered by {_and_list(also)}" if also else "No other outlet read carried this story"
+    if (it.get("days") or 0) > 1:
+        tip += f"; in the news on {it['days']} days"
+    tip = _esc(tip)
     lock = (f'{_NH_LOCK}<span class="nh-sr"> (may require a subscription)</span>'
             if it.get("publisher") in paywalled else "")
     day = date.fromisoformat(it["date"])
@@ -1895,8 +1898,15 @@ def _headlines_html(news: dict) -> str | None:
     updated = ""
     try:
         stamp = datetime.strptime(news.get("generated_at", ""), "%Y-%m-%d %H:%M UTC")
-        updated = f'<span class="nh-how-foot">Read {_fmt_day(stamp.date())}, {stamp:%H:%M} UTC</span>'
-    except ValueError:
+        last = f"{_fmt_day(stamp.date())}, {stamp:%H:%M}&nbsp;UTC"
+        reads = news.get("reads") or {}
+        if (reads.get("count") or 0) > 1:
+            first = datetime.strptime(reads["first"], "%Y-%m-%d %H:%M UTC")
+            updated = f"Collected {reads['count']} times since {_fmt_day(first.date())}; last read {last}"
+        else:
+            updated = f"Read {last}"
+        updated = f'<span class="nh-how-foot">{updated}</span>'
+    except (ValueError, KeyError, TypeError):
         pass
     return (
         '<section class="nh" aria-labelledby="nh-title">'

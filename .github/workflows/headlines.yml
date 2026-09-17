@@ -1,0 +1,76 @@
+name: Headline Collector
+
+# Reads the news feeds every 4 hours into a pool of the week's headlines, which
+# the Weekly Markets Generator ranks for "The Week in Headlines". Some feeds
+# hold only hours of stories, so a single read on Saturday would miss most of
+# the week.
+#
+# Temporary by design: the pool lives in GitHub's Actions cache, never in the
+# repository, and nothing is committed. Each run deletes headlines older than
+# 8 days and then the previous copy of the pool, so one copy of at most 8 days
+# exists. If the cache is ever lost, the next run starts a new pool and the
+# weekly run falls back to reading the feeds once.
+
+on:
+  schedule:
+    # Every 4 hours at :41. Off the hour, when GitHub delays scheduled runs least.
+    - cron: '41 */4 * * *'
+  workflow_dispatch:  # Manual trigger from GitHub Actions UI
+
+permissions:
+  contents: read
+  actions: write      # to delete the previous copy of the pool from the cache
+
+concurrency:
+  group: headline-pool   # one run at a time, so two runs never save diverging pools
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        # Only what the feed reader needs; the full requirements take minutes.
+        run: pip install "requests>=2.31.0" "lxml>=5.0.0"
+
+      - name: Restore the headline pool
+        uses: actions/cache/restore@v4
+        with:
+          path: output/headline_pool
+          key: headline-pool-${{ github.run_id }}
+          restore-keys: headline-pool-
+
+      - name: Collect headlines
+        env:
+          PYTHONPATH: "."
+        run: python generate_news.py --collect
+
+      - name: Save the headline pool
+        uses: actions/cache/save@v4
+        with:
+          path: output/headline_pool
+          key: headline-pool-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Delete the previous copy of the pool
+        # Tidying only: GitHub also deletes cache entries unused for 7 days.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh cache list --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF" --key headline-pool- \
+            --sort created_at --order desc --limit 50 --json key --jq '.[1:][].key' |
+          while read -r key; do
+            echo "Deleting $key"
+            gh cache delete "$key" --repo "$GITHUB_REPOSITORY"
+          done

@@ -19,6 +19,15 @@ HEADLINES_PER_REGION = 5
 MIN_HEADLINES = 3           # fewer than this after filtering: the column is left out
 MAX_PER_PUBLISHER = 2       # beyond this, another outlet's headline for the story is used if it has one
 
+# Collected through the week, not read once on Saturday: some feeds hold only
+# hours of stories (Business Standard markets about 6 h, Mint markets 10 h,
+# Bloomberg 15 h; measured 17 Sep 2026). The Headline Collector workflow reads
+# every feed every 4 hours into a pool kept in GitHub's Actions cache, never
+# in the repository, and the weekly run ranks the whole pool. Only headlines
+# that could be chosen are kept: a theme matches and no exclusion does.
+POOL_KEEP_DAYS = 8          # older headlines are deleted on every read: the week plus a day's margin
+POOL_MAX_PER_REGION = 3000  # a safety cap, newest kept; a normal week is under 1,000 per column
+
 # (publisher, feed URL). When several outlets carry the same story, the
 # headline shown comes from the publisher listed first, so free-to-read outlets
 # lead. WSJ, Yahoo Finance and Moneycontrol were left out: their feeds serve
@@ -102,13 +111,29 @@ HEADLINE_EXCLUDE = [
     r"\bas it happened\b", r"\bbusiness live\b", r"^watch:", r"markets wrap$",
     r"\|\s*editorial$", r"(?-i:\| [A-Z][\w'’.-]+(?: [A-Z][\w'’.-]+)+$)",   # Guardian opinion columns end "| Author Name"
     r"\?$",                                                              # questions are explainers, not the news
-    # Daily market reports: every outlet runs one, so they look widely covered.
+    # Daily market reports: every outlet runs one, so they look widely covered,
+    # and across a week's collection they would also look like the story that
+    # stayed in the news longest.
     r"\bearly trade\b", r"\bat midday\b", r"\bmorning (?:gains|losses|trade)\b", r"\bopening bell\b",
     r"\bmarket today\b", r"\bpaise\b", r"\b\d[\d,]* (?:pts|points)\b", r"\b(?:positive|negative) terrain\b",
     r"\bsnaps? \d+-day\b", r"\bbuzzing stocks\b", r"\bstocks? for (?:today|tomorrow|\w+ \d{1,2})\b",
-    r"\bfutures (?:rise|fall|gain|decline|climb|slip|drop|edge|trade)s?\b", r"\bprices? today\b",
+    r"\bfutures (?:rise|fall|gain|decline|climb|slip|drop|edge|trade|jump|surge|slide|dip|inch|sink)s?\b",
+    r"\bprices? today\b",
     r"\b(?:gold|silver|petrol|diesel) (?:rate|price)s? (?:in india )?(?:today|on \w+ \d{1,2})\b", r"\btoday'?s (?:gold|silver) rate\b",
     r"\bturns \d{2,3}\b",
+    # Closing reports and previews of the next session. Checked on 10-17 Sep 2026
+    # headlines: these caught only such reports, no macro news.
+    r"\bbarometers?\b", r"\bquick wrap\b", r"\bmarket (?:prediction|highlights)\b", r"\bcues to watch\b",
+    r"\b(?:sensex|nifty) today\b", r"\bmixed trend\b", r"\bmarkets? (?:steady|flat|subdued|range-?bound)\b",
+    r"\b(?:sensex|nifty)(?:,? (?:and )?(?:sensex|nifty))?(?: 50)? (?:holds?|stays?|ends?|closes?|settles?|opens?|trades?|finishes?)\b",
+    r"\b(?:ends?|closes?|settles?|finishes?|opens?) (?:above|below|near|around|at) [\d,.]{3,}",
+    r"\b(?:ends?|closes?|settles?|finishes?|trades?|opens?) (?:almost |nearly )?(?:flat|sideways|mixed|higher|lower|in the (?:red|green))\b",
+    r"\b(?:rupee|inr) (?:settles?|ends?|closes?|opens?) (?:almost |nearly |marginally )?(?:flat|higher|lower|up|down|at|near|\d)",
+    r"\bwall street (?:climbs|rises|gains|rallies|falls|slips|drops|dips|sinks|ends|closes|opens|edges)\b",
+    r"\b(?:gold|silver)(?:,? (?:and )?silver)? (?:prices?|rates?) (?:rise|fall|gain|drop|dip|edge|climb|slip|decline)s?\b",
+    # A company group's or a sector's shares moving is stock chatter, not the week's market news.
+    r"\b(?:group|sector|sectoral|psu|defen[cs]e|pharma|metal|auto|realty|railway|sugar|cement|fmcg|smallcap|midcap) (?:stocks|shares)\b",
+    r"\bstocks? (?:on fire|in focus)\b",
 ]
 
 # The India column is for India's own news. Indian outlets rarely say "India"
@@ -136,6 +161,7 @@ HEADLINE_LOCAL: dict[str, dict[str, list[str]]] = {
 # rate"), so common variants are rewritten to one word first, in this order.
 STORY_SYNONYMS: list[tuple[str, str]] = [
     (r"\bfederal reserve\b|\bfomc\b|\bus central bank\b", "fed"),
+    (r"\b(?:kevin )?warsh\b", "fed"),                      # the Fed chair: update when the chair changes
     (r"\bbank of england\b", "boe"),
     (r"\bbank of japan\b", "boj"),
     (r"\beuropean central bank\b", "ecb"),
@@ -157,7 +183,21 @@ STORY_STOPWORDS = {
     "may", "might", "can", "than", "more", "most", "first", "since", "year", "years",
     "week", "what", "why", "how", "who", "not", "no", "but", "about", "ahead", "us",
     "india", "indian", "global", "world", "market", "markets", "set", "here", "plus",
+    # Counting words match unrelated stories: BBC's "US interest rates raised for first time in
+    # three years" joined the FT's "The BoE's three balance sheet problem" (17 Sep 2026).
+    "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "second", "third", "time",
 }
+# Headlines that count as coverage of a story but are shown for it only when no
+# plain report of the news is as typical of the story: explainers, analysis and
+# newsletters. A headline of fewer than MIN_HEADLINE_WORDS words ("AI debt vs
+# Treasuries") is too short to say what happened, and is shown last of all.
+# A week's collection holds more of these: they follow an event for days.
+HEADLINE_EXPLAINERS = [
+    r"^(?:why|how|what|who|here's|here are)\b", r"^(?:analysis|explainer|opinion|comment|firstft|the big read)\b",
+    r"\bexplained\b", r"\btakeaways\b", r"\bwhat (?:it|this|that) means\b", r"\bwhat to (?:know|expect|watch)\b",
+]
+MIN_HEADLINE_WORDS = 5
+
 # A headline joins a story (within its theme) when its similarity to the story
 # so far, TF-IDF cosine against the story's centroid, reaches this. Checked on
 # the week of 10-17 Sep 2026: 0.25 split the Fed hike's coverage, 0.3 split
@@ -177,7 +217,8 @@ PAYWALLED_PUBLISHERS = {"Financial Times", "Bloomberg"}
 HEADLINE_METHOD = [
     "Chosen automatically from the week’s RSS headlines. Each theme ({themes}) offers its most "
     "widely covered story.",
-    "Stories rank by how many of the outlets read carried them; the bars beside each one show that count.",
+    "Stories rank by how many of the outlets read carried them (the bars beside each one show that count), "
+    "then by how many days they stayed in the news.",
     "Headlines are the publishers’ own and link to the original. A lock marks outlets that may require "
     "a subscription.",
 ]
