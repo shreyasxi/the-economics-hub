@@ -12,6 +12,7 @@ behind PIPELINE_KEY — only visible to the publisher.
 
 from __future__ import annotations
 
+import difflib
 import html
 import importlib
 import json
@@ -24,6 +25,7 @@ from pathlib import Path
 import streamlit as st
 
 from charts.loader import (
+    chart_key,
     clean_title,
     get_charts,
     group_charts,
@@ -1012,6 +1014,51 @@ st.markdown(
     .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a span,
     .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a div { color: #003366; }
 
+    /* ── Chart search ──
+       One field under the page links, the width of a column of results. The
+       field is quiet until it is used: a hairline box on the page's own cream,
+       no shadow, no icon. Results are links, set like the charts they lead to. */
+    .st-key-ehsearch { max-width: 560px; margin: 0.9rem auto 0.55rem auto; }
+    .st-key-ehsearch [data-baseweb="input"],
+    .st-key-ehsearch [data-baseweb="base-input"] {
+        background: #FFFFFF !important;
+        border: 1px solid rgba(10, 31, 61, 0.22) !important;
+        border-radius: 2px !important;
+    }
+    .st-key-ehsearch [data-baseweb="input"]:focus-within {
+        border-color: #003366 !important; box-shadow: none !important;
+    }
+    .st-key-ehsearch input {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.85rem !important; color: #0A1F3D !important;
+        padding: 0.45rem 0.6rem !important;
+    }
+    .st-key-ehsearch input::placeholder { color: #8A929E !important; }
+    .ehs-results { border-top: 1px solid rgba(10, 31, 61, 0.18); margin: 0.55rem 0 0.8rem 0; }
+    .ehs-hit {
+        display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+        padding: 0.5rem 0.15rem 0.55rem 0.15rem;
+        border-bottom: 1px solid rgba(10, 31, 61, 0.10);
+        text-decoration: none !important;
+    }
+    .ehs-hit-title {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 0.98rem; line-height: 1.3; color: #0A1F3D;
+    }
+    .ehs-hit:hover .ehs-hit-title { text-decoration: underline; }
+    .ehs-hit-page {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+        color: #A85600; white-space: nowrap;
+    }
+    .ehs-none {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.8rem; color: #6A7280; margin: 0.55rem 0 0 0.15rem;
+    }
+    /* Where a result lands: an empty target above the chart, held clear of the
+       top of the window so the chart's title is not tucked under it. */
+    .chart-anchor { display: block; height: 0; scroll-margin-top: 4.5rem; }
+
     /* ── App Background Color (The Seamless Canvas) ── */
     .stApp, [data-testid="stHeader"] {
         background-color: #FFFFF0; /* Keeps the main chart area crisp cream */
@@ -1367,7 +1414,19 @@ with st.sidebar:
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
+def _chart_anchor(chart_path: Path) -> None:
+    """An empty target above a chart, so a search result can link straight to it."""
+    st.markdown(f'<div class="chart-anchor" id="{_chart_anchor_id(chart_path.name)}"></div>',
+                unsafe_allow_html=True)
+
+
+def _chart_anchor_id(filename: str) -> str:
+    """'14_india_credit_deposit.png' -> 'chart-india-credit-deposit'."""
+    return "chart-" + chart_key(filename).replace("_", "-")
+
+
 def _render_chart(chart_path: Path) -> None:
+    _chart_anchor(chart_path)
     st.image(
         str(chart_path),
         caption=clean_title(chart_path.name),
@@ -1754,6 +1813,7 @@ def _render_summary(chart_path: Path) -> None:
     """Summary table constrained to 80% of page width."""
     _, col_img, _ = st.columns([1, 4, 1])
     with col_img:
+        _chart_anchor(chart_path)
         st.image(str(chart_path), use_container_width=True)
 
 
@@ -2243,6 +2303,112 @@ def _soe_html(soe: dict) -> str | None:
     )
 
 
+# ── Chart search ───────────────────────────────────────────────────────────
+# Every chart on the site, findable by name from any page. The index is built
+# from the chart files themselves, so a chart a generator adds is searchable as
+# soon as it is published and one that is dropped disappears with it: no list of
+# charts is kept by hand here. A result links to the chart's own anchor.
+
+_SEARCH_PAGES: list[tuple[str, str, str]] = [
+    # (chart folder, page name, url path)
+    ("weekly",       "Weekly Markets", "weekly"),
+    ("macro",        "World",          "world"),
+    ("india",        "India",          "india"),
+    ("rbi_sentinel", "RBI Sentinel",   "rbi-sentinel"),
+]
+
+# What a reader types, against what the chart files are called. Every term on the
+# right appears in a filename; nothing here renames a chart or invents a subject
+# the site does not cover.
+_SEARCH_ALIASES: dict[str, tuple[str, ...]] = {
+    "cpi": ("inflation",), "wpi": ("inflation",), "prices": ("inflation",),
+    "jobs": ("labour",), "employment": ("labour",), "unemployment": ("labour",),
+    "stocks": ("equities", "sector", "nifty", "breadth"), "shares": ("equities", "nifty"),
+    "bonds": ("yield", "bond", "spreads"), "gsec": ("yield", "bond"), "gilts": ("yield", "bond"),
+    "rates": ("rate", "yield", "transmission"), "repo": ("rate", "transmission", "stance"),
+    "policy": ("rbi", "stance", "rate"), "mpc": ("rbi", "stance", "sentiment"),
+    "passthrough": ("transmission",), "borrowers": ("transmission", "credit"),
+    "currency": ("fx", "forex", "dollar"), "rupee": ("fx", "forex"), "dollar": ("fx", "dollar"),
+    "growth": ("pmi", "iip", "cli"), "activity": ("pmi", "iip"), "industrial": ("iip",),
+    "budget": ("fiscal", "expenditure", "capex", "gst"), "tax": ("gst",),
+    "liquidity": ("money", "credit"), "loans": ("credit", "transmission"),
+    "lending": ("credit", "transmission"), "deposits": ("credit", "transmission"),
+    "foreign": ("fpi", "forex", "em"), "fii": ("fpi",), "flows": ("fpi",),
+    "crude": ("oil",), "energy": ("oil", "commodities"),
+    "crypto": ("btc", "eth"), "bitcoin": ("btc",),
+    "valuation": ("cape", "erp", "premium"), "valuations": ("cape", "erp", "premium"),
+    "volatility": ("vix", "move"), "emerging": ("em",),
+}
+
+_SEARCH_MIN_CHARS = 2
+_SEARCH_MAX_HITS = 7
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def _search_index() -> list[dict]:
+    """Every published chart: what it is called, which page it is on, where it sits."""
+    index = []
+    for folder, page, url_path in _SEARCH_PAGES:
+        charts, _ = get_charts(folder)
+        for chart in charts:
+            title = clean_title(chart.name)
+            index.append({
+                "title": title,
+                "page": page,
+                "url": f"/{url_path}#{_chart_anchor_id(chart.name)}",
+                "terms": f"{title} {chart_key(chart.name)} {page}".lower().replace("_", " "),
+            })
+    return index
+
+
+def _search_charts(query: str, index: list[dict]) -> list[dict]:
+    """
+    Charts matching every word typed, best first. A word matches a chart's name,
+    its page, or one of the aliases above; a near-miss ('inflaton') matches by
+    similarity. Requiring every word keeps a two-word search from widening.
+    """
+    words = [w for w in re.split(r"[^a-z0-9]+", query.lower()) if w]
+    if not words or len("".join(words)) < _SEARCH_MIN_CHARS:
+        return []
+
+    hits = []
+    for item in index:
+        terms = item["terms"]
+        vocabulary = terms.split()
+        score = 0
+        for word in words:
+            if any(t.startswith(word) for t in vocabulary):
+                score += 3
+            elif word in terms:
+                score += 2
+            elif (aliases := sum(1 for a in _SEARCH_ALIASES.get(word, ()) if a in terms)):
+                # A chart the alias matches twice ('repo' -> rate, transmission)
+                # is the one that was meant.
+                score += aliases
+            elif difflib.get_close_matches(word, vocabulary, n=1, cutoff=0.82):
+                score += 1
+            else:
+                score = 0
+                break
+        if score:
+            hits.append((-score, item["title"], item))
+    return [item for _, _, item in sorted(hits)][:_SEARCH_MAX_HITS]
+
+
+def _search_results_html(query: str, hits: list[dict]) -> str:
+    """Results as links; an empty result says so rather than showing nothing."""
+    if not hits:
+        return (f'<div class="ehs-results"><p class="ehs-none">No chart matches '
+                f'&ldquo;{_esc(query.strip())}&rdquo;.</p></div>')
+    rows = "".join(
+        f'<a class="ehs-hit" href="{hit["url"]}">'
+        f'<span class="ehs-hit-title">{_esc(hit["title"])}</span>'
+        f'<span class="ehs-hit-page">{_esc(hit["page"])}</span></a>'
+        for hit in hits
+    )
+    return f'<div class="ehs-results">{rows}</div>'
+
+
 def _page_header_html(title: str, dek: str, meta_label: str, meta_value: str,
                       nav: list[tuple[str, str]] | None = None) -> str:
     """Page masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
@@ -2351,6 +2517,7 @@ def page_world() -> None:
         with col_regime:
             st.markdown('<p class="w-eyebrow">Where each economy is heading</p>', unsafe_allow_html=True)
             if regime:
+                _chart_anchor(regime)
                 st.image(str(regime), use_container_width=True)
                 _regime_insight = get_insight(regime.name)
                 if _regime_insight:
@@ -2448,6 +2615,7 @@ def page_india() -> None:
         if summary and changed:
             col_table, col_changed = st.columns([1.2, 1], gap="large")
             with col_table:
+                _chart_anchor(summary)
                 st.image(str(summary), use_container_width=True)
             with col_changed:
                 st.markdown(changed, unsafe_allow_html=True)
@@ -2758,6 +2926,7 @@ I would just like to know where it goes.</p>
             col_chart, col_text = st.columns([1.2, 1], gap="large")
 
             with col_chart:
+                _chart_anchor(stance)
                 st.image(str(stance), use_container_width=True)
 
                 # ── Source documents: one column per document, same row
@@ -2853,6 +3022,7 @@ I would just like to know where it goes.</p>
         trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])
         if trajectory:
             _section("Sentiment Over Time")
+            _chart_anchor(trajectory)
             st.image(str(trajectory), use_container_width=True)
             insight = get_insight(trajectory.name)
             if insight:
@@ -2868,6 +3038,7 @@ I would just like to know where it goes.</p>
 
         # Main analytical chart (FULL WIDTH)
         if comparison:
+            _chart_anchor(comparison)
             st.image(str(comparison), use_container_width=True)
             insight = get_insight(comparison.name)
             if insight:
@@ -2878,6 +3049,7 @@ I would just like to know where it goes.</p>
         if radar:
             _, col_mid, _ = st.columns([1, 2, 1])
             with col_mid:
+                _chart_anchor(radar)
                 st.image(str(radar), use_container_width=True)
                 insight = get_insight(radar.name)
                 if insight:
@@ -2888,6 +3060,7 @@ I would just like to know where it goes.</p>
         rate_chart, charts = _pop_summary(charts, ["05_rbi_rate_and_sentiment"])
         if rate_chart:
             _section("Repo Rate vs. Sentiment")
+            _chart_anchor(rate_chart)
             st.image(str(rate_chart), use_container_width=True)
             insight = get_insight(rate_chart.name)
             if insight:
@@ -2900,6 +3073,7 @@ I would just like to know where it goes.</p>
         _tone_chart = PROJECT_ROOT / "assets" / "rbi_research" / "07_rbi_tone_vs_10y.png"
         if _tone_chart.exists():
             _section("Tone and the Bond Market")
+            _chart_anchor(_tone_chart)
             st.image(str(_tone_chart), use_container_width=True)
             insight = get_insight(_tone_chart.name)
             if insight:
@@ -2911,6 +3085,7 @@ I would just like to know where it goes.</p>
 
         if gov_divergence:
             _section("Governor Signal Analysis")
+            _chart_anchor(gov_divergence)
             st.image(str(gov_divergence), use_container_width=True)
             insight = get_insight(gov_divergence.name)
             if insight:
@@ -2969,5 +3144,18 @@ for page in PAGES:
     with nav.container(key=f"ehnav-{page.url_path or 'weekly'}"
                            f"{'-current' if page.url_path == current.url_path else ''}"):
         st.page_link(page, label=page.title)
+
+# One box for all four pages: type what you want to see, land on the chart.
+# Results are drawn only while something is typed, so the page reads as it did.
+with st.container(key="ehsearch"):
+    _query = st.text_input(
+        "Search charts",
+        key="chart_search",
+        placeholder="Search charts — try credit, PMI, inflation, gold",
+        label_visibility="collapsed",
+    )
+    if _query and _query.strip():
+        st.markdown(_search_results_html(_query, _search_charts(_query, _search_index())),
+                    unsafe_allow_html=True)
 
 current.run()
