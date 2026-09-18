@@ -643,16 +643,19 @@ st.markdown(
        Editorial like the headlines strip: no card, hairline rules, the RBI's own
        opening summary set in Newsreader. Every word inside is RBI's, so nothing
        here styles an interpretation — only the quote, its date and its source. */
-    .soe {
+    /* The palette is declared on both blocks, not only on the section: the
+       month-on-month comparison is drawn in its own Streamlit column, beside the
+       snapshot table, so it inherits nothing from the briefing above it. */
+    .soe, .soe-changes {
         --soe-ink: #0A1F3D;
         --soe-text: #2B3340;
         --soe-muted: #6A7280;
         --soe-faint: #A2AAB5;
         --soe-rule: #D7DDE4;
         --soe-mark: #A85600;        /* the India tab's accent, as used by the headlines column */
-        margin: 1.6rem 0 2.6rem 0;
         font-family: 'Inter', -apple-system, sans-serif;
     }
+    .soe { margin: 1.6rem 0 2.6rem 0; }
     /* Inline-flex, so the rule under the title runs to the end of the edition
        date and stops there rather than across the whole column. */
     .soe-head {
@@ -678,24 +681,23 @@ st.markdown(
         margin: 1.1rem 0 0 0; max-width: 62rem;
     }
     /* What changed since last month: RBI's sentence on a topic above the one it
-       wrote a month earlier. One topic to a row, the topic named in a left rail
-       and each quote dated, so the eye reads down one column of prose instead of
-       across two — the balanced two-column setting packed the quotes too tightly
-       to compare them. */
-    .soe-changes { margin-top: 1.9rem; max-width: 62rem; }
+       wrote a month earlier, one topic to a row, each quote dated. It sits in
+       the column beside the snapshot table, so it is set narrow: the month's
+       numbers on the left, the month's words on the right. */
+    .soe-changes { max-width: 62rem; }
     .soe-chg-head {
         font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
         color: var(--soe-muted); padding-bottom: 0.6rem; border-bottom: 1px solid var(--soe-ink);
     }
     .soe-chg {
-        display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 0 1.7rem;
-        align-items: start; padding: 1.05rem 0 1.1rem 0; border-bottom: 1px solid var(--soe-rule);
+        display: grid; gap: 0.4rem 0;
+        padding: 0.9rem 0 0.95rem 0; border-bottom: 1px solid var(--soe-rule);
     }
     .soe-chg-topic {
-        font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
-        color: var(--soe-mark); padding-top: 0.22rem;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+        color: var(--soe-mark);
     }
-    .soe-chg-lines { display: grid; gap: 0.6rem; }
+    .soe-chg-lines { display: grid; gap: 0.55rem; }
     /* The date sits in its own column so a wrapped line does not run back under
        it: each quote keeps one straight left edge. */
     .soe-chg-now, .soe-chg-was {
@@ -704,9 +706,9 @@ st.markdown(
     }
     .soe-chg-now {
         font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 1.02rem; line-height: 1.5; color: var(--soe-text);
+        font-size: 0.99rem; line-height: 1.5; color: var(--soe-text);
     }
-    .soe-chg-was { font-size: 0.86rem; line-height: 1.5; color: var(--soe-muted); }
+    .soe-chg-was { font-size: 0.83rem; line-height: 1.5; color: var(--soe-muted); }
     .soe-chg-when {
         padding: 0.06rem 0.34rem; border: 1px solid var(--soe-rule); border-radius: 3px;
         font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
@@ -755,10 +757,7 @@ st.markdown(
         .soe-title { font-size: 1.3rem; }
         .soe-edition { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
         .soe-lede { font-size: 1.04rem; }
-        /* Not enough width for a left rail: the topic sits above its quotes. */
-        .soe-chg { grid-template-columns: minmax(0, 1fr); gap: 0.45rem 0; }
-        .soe-chg-topic { padding-top: 0; }
-        .soe-chg-now { font-size: 0.99rem; }
+        .soe-changes { margin-top: 0.4rem; }
         /* The meta line wraps on a phone, which left a separator dot stranded
            at the end of a line; spacing carries the separation instead. */
         .soe-dot { display: none; }
@@ -2171,13 +2170,25 @@ def _soe_changes_html(changes: list[dict], compared_with: str | None,
             f'<div>{"".join(rows)}</div></div>')
 
 
+def _soe_changes_block(soe: dict) -> str:
+    """The month-on-month comparison alone, for the column beside the snapshot table."""
+    try:
+        edition = datetime.strptime(soe["month"], "%Y-%m")
+    except (KeyError, TypeError, ValueError):
+        return ""
+    return _soe_changes_html(soe.get("changes") or [], soe.get("compared_with"), edition)
+
+
 def _soe_html(soe: dict) -> str | None:
     """
-    RBI's opening summary, its concluding assessment behind a disclosure, what
-    changed since last month, and where it came from. The Bank's own framing of
-    the month comes first, then the topic-by-topic comparison. Returns None when
+    RBI's opening summary, its concluding assessment behind a disclosure, and
+    where it came from. The month-on-month comparison is drawn separately, in the
+    column beside the snapshot table (`_soe_changes_block`). Returns None when
     the file is not what it should be, so a bad read leaves the tab without a
     briefing rather than with a fragment.
+
+    The publication date is read but not printed: the edition month is already
+    beside the title, and the date is only needed to tell a stale edition.
     """
     cfg = _fresh_config(_soe_settings)
     try:
@@ -2219,10 +2230,8 @@ def _soe_html(soe: dict) -> str | None:
         '</div>'
         f'<div class="soe-lede">{summary}</div>'
         f'{more}'
-        f'{_soe_changes_html(soe.get("changes") or [], soe.get("compared_with"), edition)}'
         '<div class="soe-meta">'
-        f'<span class="soe-src">{cfg.ATTRIBUTION}</span><span class="soe-dot"></span>'
-        f'<span>Published {published.day} {published:%B %Y}</span>'
+        f'<span class="soe-src">{cfg.ATTRIBUTION}</span>'
         f'{stale}'
         f'{"<span class=" + chr(34) + "soe-dot" + chr(34) + "></span>" + link if link else ""}'
         '</div>'
@@ -2427,9 +2436,21 @@ def page_india() -> None:
         if briefing:
             st.markdown(briefing, unsafe_allow_html=True)
 
+        # The month's numbers beside the month's words: the snapshot table on the
+        # left, RBI's verdict on each topic against last month's on the right.
+        # Either half stands on its own when the other is missing.
         summary, charts = _pop_summary(charts, ["india_table", "05_india"])
-        if summary:
+        changed = _soe_changes_block(soe) if soe else ""
+        if summary and changed:
+            col_table, col_changed = st.columns([1.2, 1], gap="large")
+            with col_table:
+                st.image(str(summary), use_container_width=True)
+            with col_changed:
+                st.markdown(changed, unsafe_allow_html=True)
+        elif summary:
             _render_summary(summary)
+        elif changed:
+            st.markdown(changed, unsafe_allow_html=True)
 
         # 1. High-Frequency Growth Indicators
         growth_kws = ["pmi", "iip"]
