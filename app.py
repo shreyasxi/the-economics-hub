@@ -12,7 +12,6 @@ behind PIPELINE_KEY — only visible to the publisher.
 
 from __future__ import annotations
 
-import difflib
 import html
 import importlib
 import json
@@ -678,9 +677,12 @@ st.markdown(
         font-variant-numeric: tabular-nums lining-nums;
         margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--soe-rule);
     }
+    /* RBI's opening summary, set exactly as the Sentinel's executive-summary
+       paragraphs (.mpc-body): same face, size, colour and leading. The two are
+       the only long passages of prose on the site and they now read as one. */
     .soe-lede {
-        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 1.12rem; font-weight: 400; line-height: 1.5; color: var(--soe-text);
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.9rem; font-weight: 400; line-height: 1.72; color: #24282F;
         margin: 1.1rem 0 0 0; max-width: 62rem;
     }
     /* What changed since last month: RBI's sentence on a topic above the one it
@@ -711,13 +713,15 @@ st.markdown(
         display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 0.55rem;
         align-items: start;
     }
-    /* This month's sentence is set bold and in the darker ink: it is the line
-       that is being read, with last month's kept light underneath it. */
+    /* Both quotes are set in the body face rather than the title serif: five
+       bold serif sentences stacked in a narrow column read as a slab. This
+       month's is the same Inter as the summary above, a step heavier and in the
+       darker ink, which separates it from last month's without the weight. */
     .soe-chg-now {
-        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 1rem; font-weight: 700; line-height: 1.5; color: var(--soe-ink);
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.9rem; font-weight: 600; line-height: 1.6; color: var(--soe-ink);
     }
-    .soe-chg-was { font-size: 0.83rem; line-height: 1.5; color: var(--soe-muted); }
+    .soe-chg-was { font-size: 0.83rem; line-height: 1.55; color: var(--soe-muted); }
     .soe-chg-when {
         padding: 0.06rem 0.34rem; border: 1px solid var(--soe-rule); border-radius: 3px;
         font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
@@ -748,7 +752,7 @@ st.markdown(
     .soe-concl {
         border-left: 2px solid var(--soe-rule); padding: 0.1rem 0 0.1rem 1rem; margin-top: 0.7rem;
         display: grid; gap: 0.7rem; max-width: 62rem;
-        font-size: 0.92rem; line-height: 1.55; color: var(--soe-text);
+        font-size: 0.9rem; line-height: 1.72; color: #24282F;
     }
     .soe-meta {
         display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem;
@@ -769,7 +773,6 @@ st.markdown(
         .soe { margin: 1rem 0 2rem 0; }
         .soe-title { font-size: 1.3rem; }
         .soe-edition { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
-        .soe-lede { font-size: 1.04rem; }
         .soe-changes { margin-top: 0.4rem; }
         /* The meta line wraps on a phone, which left a separator dot stranded
            at the end of a line; spacing carries the separation instead. */
@@ -1023,57 +1026,12 @@ st.markdown(
 
     /* ── Chart search ──
        One field under the page links, the width of a column of results. The
-       field is quiet until it is used: a hairline box on the page's own cream,
-       no shadow, no icon. Results are links, set like the charts they lead to. */
+       field itself is drawn inside a component frame (see _search_box_html):
+       suggestions have to appear as the reader types, and Streamlit's own text
+       input only reports back on Enter. All that is styled here is the space
+       the frame sits in; the box and its list carry their own styles. */
     .st-key-ehsearch { max-width: 560px; margin: 0.9rem auto 0.55rem auto; }
-    .st-key-ehsearch [data-baseweb="input"],
-    .st-key-ehsearch [data-baseweb="base-input"] {
-        background: #FFFFFF !important;
-        border: 1px solid rgba(10, 31, 61, 0.22) !important;
-        border-radius: 2px !important;
-    }
-    .st-key-ehsearch [data-baseweb="input"]:focus-within {
-        border-color: #003366 !important; box-shadow: none !important;
-    }
-    .st-key-ehsearch input {
-        font-family: 'Inter', -apple-system, sans-serif !important;
-        font-size: 0.85rem !important; color: #0A1F3D !important;
-        padding: 0.45rem 0.6rem !important;
-    }
-    .st-key-ehsearch input::placeholder { color: #8A929E !important; }
-    .ehs-results { border-top: 1px solid rgba(10, 31, 61, 0.18); margin: 0.55rem 0 0.8rem 0; }
-    .ehs-rule { border-top: 1px solid rgba(10, 31, 61, 0.18); margin-top: 0.55rem; }
-    /* A result is a button, so that it moves page inside the app rather than
-       opening a tab; it is set to read as a line of type, not as a control. */
-    .st-key-ehsearch [class*="st-key-ehshit-"] {
-        align-items: baseline !important; justify-content: space-between !important;
-        gap: 1rem !important; padding: 0.42rem 0.15rem 0.45rem 0.15rem !important;
-        border-bottom: 1px solid rgba(10, 31, 61, 0.10);
-    }
-    .st-key-ehsearch [data-testid="stButton"] { width: auto !important; }
-    .st-key-ehsearch [data-testid="stButton"] button {
-        background: transparent !important; border: none !important; box-shadow: none !important;
-        padding: 0 !important; min-height: 0 !important; text-align: left !important;
-    }
-    .st-key-ehsearch [data-testid="stButton"] button p {
-        font-family: 'Newsreader', Georgia, 'Times New Roman', serif !important;
-        font-optical-sizing: auto;
-        font-size: 0.98rem !important; font-weight: 400 !important; line-height: 1.3 !important;
-        color: #0A1F3D !important; margin: 0 !important;
-    }
-    .st-key-ehsearch [data-testid="stButton"] button:hover p { text-decoration: underline; }
-    .st-key-ehsearch [data-testid="stButton"] button:focus-visible {
-        outline: 2px solid #A85600; outline-offset: 2px;
-    }
-    .ehs-hit-page {
-        font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
-        color: #A85600; white-space: nowrap;
-    }
-    .ehs-none {
-        font-family: 'Inter', -apple-system, sans-serif;
-        font-size: 0.8rem; color: #6A7280; margin: 0.55rem 0 0 0.15rem;
-    }
+    .st-key-ehsearch iframe { background: transparent; display: block; }
     /* Where a result lands: an empty target above the chart, held clear of the
        top of the window so the chart's title is not tucked under it. */
     .chart-anchor { display: block; height: 0; scroll-margin-top: 4.5rem; }
@@ -1212,34 +1170,42 @@ st.markdown(
         border-bottom: 2px solid #111111; /* BANGER: A heavy structural underline */
         padding-bottom: 0.4rem;
     }
-    .sb-data-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center; /* Perfectly centers the text vertically */
-        border-bottom: 1px solid #E2DFD8; /* Swapped dotted for a clean, elegant solid line */
-        padding: 0.45rem 0;
-        margin: 0;
-    }
-    /* Targets the last row to remove the bottom border so it looks like a clean table */
-    .sb-data-row:last-of-type {
-        border-bottom: none; 
-    }
-    .sb-data-label {
+    /* The four pipelines that build the site, one row each: the section in the
+       label face, what it is built from in the serif beneath it, and when it
+       runs as a small outlined chip. A left rule ties the rows into a stack, so
+       the block reads as a colophon rather than a table of two columns. */
+    .sb-arch-note {
         font-family: 'Inter', sans-serif;
-        font-size: 0.65rem; /* INCREASED from 0.55rem */
-        font-weight: 700;
-        color: #666666;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
+        font-size: 0.62rem; font-style: italic; color: #7A7A72;
+        line-height: 1.45; margin: -0.45rem 0 0.8rem 0;
     }
-    .sb-data-val {
+    .sb-arch-row {
+        display: grid; gap: 0.2rem;
+        padding: 0.5rem 0 0.55rem 0.7rem; margin: 0;
+        border-left: 2px solid #E2DFD8;
+        border-bottom: 1px solid #EDEBE4;
+    }
+    .sb-arch-row:hover { border-left-color: #111111; }
+    .sb-arch-row:last-of-type { border-bottom: none; padding-bottom: 0.2rem; }
+    .sb-arch-top {
+        display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    }
+    .sb-arch-name {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.62rem; font-weight: 800; color: #111111;
+        letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .sb-arch-when {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.5rem; font-weight: 700; color: #8A8A80;
+        letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap;
+        border: 1px solid #DAD6CD; border-radius: 2px; padding: 0.1rem 0.28rem;
+    }
+    .sb-arch-src {
         font-family: 'Merriweather', Georgia, serif;
-        font-size: 0.75rem; /* INCREASED from 0.65rem */
-        font-style: italic; 
-        color: #111111;
-        text-align: right;
+        font-size: 0.72rem; font-style: italic; color: #333333; line-height: 1.45;
     }
-    
+
     /* Pipeline Buttons (Light mode adjustments) */
     [data-testid="stSidebar"] .stButton > button {
         background-color: #F5F3EC;
@@ -1381,11 +1347,26 @@ with st.sidebar:
     # ── 4. The Data Matrix ─────────────────────────────────────────────────────
     st.markdown('<p class="sb-section-label">Data Architecture</p>', unsafe_allow_html=True)
     
+    # What each section is actually built from, and when its pipeline runs. The
+    # schedules are the crons in .github/workflows; the sources are the fetchers
+    # each generator calls. Keep both in step with those files when either moves.
+    _ARCHITECTURE = [
+        ("Weekly Markets", "Saturdays", "Yahoo Finance &middot; NSE"),
+        ("World",          "Saturdays", "FRED &middot; OECD &middot; BIS"),
+        ("India",          "Saturdays", "RBI Bulletin &amp; DBIE &middot; MoSPI &middot; CGA &middot; NSDL"),
+        ("RBI Sentinel",   "Weekdays",  "RBI policy documents, scored by Claude"),
+        ("Headlines",      "4-hourly",  "Nine publishers&rsquo; news feeds"),
+    ]
     st.markdown(
-        '<div class="sb-data-row"><span class="sb-data-label">Markets</span><span class="sb-data-val">Yahoo Finance</span></div>'
-        '<div class="sb-data-row"><span class="sb-data-label">World</span><span class="sb-data-val">FRED &middot; OECD &middot; BIS</span></div>'
-        '<div class="sb-data-row"><span class="sb-data-label">India Macro</span><span class="sb-data-val">RBI &middot; MoSPI</span></div>'
-        '<div class="sb-data-row"><span class="sb-data-label">NLP Engine</span><span class="sb-data-val">Anthropic Claude</span></div>',
+        '<p class="sb-arch-note">What each section is built from, and when it refreshes.</p>'
+        + "".join(
+            '<div class="sb-arch-row">'
+            f'<div class="sb-arch-top"><span class="sb-arch-name">{name}</span>'
+            f'<span class="sb-arch-when">{when}</span></div>'
+            f'<div class="sb-arch-src">{sources}</div>'
+            '</div>'
+            for name, when, sources in _ARCHITECTURE
+        ),
         unsafe_allow_html=True
     )
 
@@ -2368,6 +2349,22 @@ _SEARCH_MIN_CHARS = 2
 _SEARCH_MAX_HITS = 7
 
 
+# Chart titles are built from filenames, which title-cases an acronym into
+# "India Pmi". Every caption on the site is set in capitals by CSS, so this has
+# never shown; in a list of suggestions it does, and only there.
+_SEARCH_ACRONYMS = {
+    "Btc": "BTC", "Cape": "CAPE", "Cli": "CLI", "Em": "EM", "Erp": "ERP", "Eth": "ETH",
+    "Etf": "ETF", "Fpi": "FPI", "Fx": "FX", "Gdp": "GDP", "Gst": "GST", "Iip": "IIP",
+    "It": "IT", "M2": "M2", "Move": "MOVE", "Nifty": "NIFTY", "Oecd": "OECD",
+    "Pmi": "PMI", "Rbi": "RBI", "Spx": "SPX", "Us": "US", "Vix": "VIX", "Vs": "vs",
+}
+
+
+def _search_title(filename: str) -> str:
+    """The chart's name as a suggestion shows it."""
+    return " ".join(_SEARCH_ACRONYMS.get(word, word) for word in clean_title(filename).split())
+
+
 @st.cache_data(ttl=600, show_spinner=False)
 def _search_index() -> list[dict]:
     """Every published chart: what it is called, which page it is on, where it sits."""
@@ -2375,7 +2372,7 @@ def _search_index() -> list[dict]:
     for folder, page, url_path in _SEARCH_PAGES:
         charts, _ = get_charts(folder)
         for chart in charts:
-            title = clean_title(chart.name)
+            title = _search_title(chart.name)
             index.append({
                 "title": title,
                 "page": page,
@@ -2386,117 +2383,362 @@ def _search_index() -> list[dict]:
     return index
 
 
-def _scroll_to_chart_html(slug: str) -> str:
-    """
-    The script that puts a search result on screen. The page is still being built
-    when it starts, so it waits for the chart's anchor to appear; the page then
-    keeps growing as the charts above load, so it holds the position until the
-    layout settles. A reader who scrolls takes over at once.
-
-    Streamlit scrolls a container of its own rather than the window, so the
-    offset is worked out against that container and not against the document.
-    """
-    anchor = json.dumps(f"chart-{slug}")
-    return """
-<script>
-(() => {
-  const outer = window.parent, doc = outer.document, id = %s;
+# The scroll that puts a chart on screen, used both by the search box and by a
+# ?chart= link someone has kept. The page is still being built when it starts,
+# so it waits for the chart's anchor to appear; the page then keeps growing as
+# the charts above it load, so it holds the position until the layout settles.
+# A reader who scrolls takes over at once.
+#
+# Streamlit scrolls a container of its own rather than the window, so the offset
+# is worked out against that container and not against the document.
+_SCROLL_JS = r"""
+function ehScrollToChart(outer, slug) {
+  const doc = outer.document, id = "chart-" + slug;
+  const box = () => doc.querySelector('[data-testid="stMain"]');
   const place = () => {
     const target = doc.getElementById(id);
     if (!target) return false;
-    const box = doc.querySelector('[data-testid="stMain"]');
-    if (box) {
-      const top = target.getBoundingClientRect().top - box.getBoundingClientRect().top
-                  + box.scrollTop - 24;
-      box.scrollTo({top: Math.max(top, 0), behavior: "auto"});
+    const main = box();
+    if (main) {
+      const top = target.getBoundingClientRect().top - main.getBoundingClientRect().top
+                  + main.scrollTop - 24;
+      main.scrollTo({top: Math.max(top, 0), behavior: "auto"});
     } else {
       target.scrollIntoView({block: "start"});
     }
     return true;
   };
+  if (outer.__ehScrollTimer) clearInterval(outer.__ehScrollTimer);
   let tries = 0;
-  const timer = setInterval(() => {
+  outer.__ehScrollTimer = setInterval(() => {
     if (place()) {
-      clearInterval(timer);
+      clearInterval(outer.__ehScrollTimer);
       const holds = [300, 900, 1800, 3000].map((ms) => setTimeout(place, ms));
       const release = () => holds.forEach(clearTimeout);
+      const main = box() || outer;
       ["wheel", "touchstart", "keydown"].forEach(
-        (e) => box_listen(e, release));
+        (e) => main.addEventListener(e, release, {once: true, passive: true}));
       const url = new URL(outer.location.href);
       url.searchParams.delete("chart");
       outer.history.replaceState(null, "", url);
     } else if (++tries > 150) {
-      clearInterval(timer);
+      clearInterval(outer.__ehScrollTimer);
     }
   }, 100);
-  function box_listen(event, fn) {
-    const box = doc.querySelector('[data-testid="stMain"]') || outer;
-    box.addEventListener(event, fn, {once: true, passive: true});
+}
+"""
+
+
+def _scroll_to_chart_html(slug: str) -> str:
+    """The scroll on its own, for ?chart=<slug> arriving in the URL."""
+    return ("<script>" + _SCROLL_JS
+            + f"ehScrollToChart(window.parent, {json.dumps(slug)});</script>")
+
+
+# ── The search box ─────────────────────────────────────────────────────────
+# Streamlit's own text input only reports what was typed once Enter is pressed,
+# which is not how a search box behaves anywhere else, so the field is drawn in
+# a component frame with the whole chart index inside it and matches the reader
+# as they type. Two things follow from that frame:
+#
+#   * the list of suggestions is drawn in the page rather than in the frame —
+#     an iframe cannot paint outside itself, and the list has to lie over the
+#     page instead of pushing it down;
+#   * choosing a chart on another page clicks that page's own link, so the app
+#     moves as it does when the reader clicks it, and the scroll above waits
+#     for the chart to arrive. A full page load is the fallback if that link
+#     is not there.
+_SEARCH_TEMPLATE = r"""
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+html, body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+.ehs-box {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #FFFFFF; border: 1px solid rgba(10, 31, 61, 0.22); border-radius: 2px;
+  padding: 0.4rem 0.6rem; transition: border-color 0.15s ease;
+}
+.ehs-box:focus-within { border-color: #0A1F3D; }
+.ehs-icon { flex: none; width: 15px; height: 15px; display: block; }
+#ehs-q {
+  flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent;
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 0.85rem;
+  color: #0A1F3D; line-height: 1.45; padding: 0;
+}
+#ehs-q::placeholder { color: #8A929E; }
+#ehs-q::-webkit-search-cancel-button { display: none; }
+.ehs-clear {
+  flex: none; display: none; border: 0; background: transparent; cursor: pointer;
+  padding: 0 0 0 0.2rem; line-height: 1; color: #8A929E;
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 1rem; font-weight: 600;
+}
+.ehs-clear:hover { color: #0A1F3D; }
+.ehs-box.has-text .ehs-clear { display: block; }
+</style></head><body>
+<div class="ehs-box" id="ehs-box">
+  <svg class="ehs-icon" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.4"
+       stroke-linecap="round" aria-hidden="true">
+    <circle cx="10.4" cy="10.4" r="7.1"/><path d="M15.6 15.6 L21 21"/>
+  </svg>
+  <input id="ehs-q" type="text" autocomplete="off" spellcheck="false"
+         placeholder="__PLACEHOLDER__" aria-label="Search charts"
+         role="combobox" aria-expanded="false" aria-autocomplete="list">
+  <button class="ehs-clear" id="ehs-clear" type="button" aria-label="Clear search">&times;</button>
+</div>
+<script>
+__SCROLL__
+(() => {
+  const INDEX = __INDEX__, ALIASES = __ALIASES__, PATHS = __PATHS__;
+  const MAX = __MAX__, MIN = __MIN__;
+  const outer = window.parent, doc = outer.document, frame = window.frameElement;
+  const box = document.getElementById("ehs-box");
+  const input = document.getElementById("ehs-q");
+  const clearBtn = document.getElementById("ehs-clear");
+
+  const PANEL_CSS = `
+#ehs-panel {
+  position: fixed; z-index: 2000000; display: none;
+  background: #FFFFFF; border: 1px solid rgba(10, 31, 61, 0.22); border-top: none;
+  box-shadow: 0 12px 30px rgba(10, 31, 61, 0.14);
+  max-height: 21rem; overflow-y: auto;
+}
+#ehs-panel.is-open { display: block; }
+.ehs-hit {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  padding: 0.44rem 0.72rem 0.48rem 0.72rem; cursor: pointer;
+  border-bottom: 1px solid rgba(10, 31, 61, 0.07);
+}
+.ehs-hit:last-child { border-bottom: none; }
+.ehs-hit.is-active { background: #F4F2E9; }
+.ehs-hit-name {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+  font-size: 0.95rem; font-weight: 400; line-height: 1.3; color: #0A1F3D; min-width: 0;
+}
+.ehs-hit-name b { font-weight: 700; color: #000000; }
+.ehs-hit-page {
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; color: #A85600; white-space: nowrap;
+}
+.ehs-empty {
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 0.78rem; color: #6A7280;
+  padding: 0.55rem 0.72rem 0.6rem 0.72rem;
+}
+.ehs-foot {
+  font-family: 'Inter', -apple-system, sans-serif; font-size: 0.55rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; color: #9AA2AD;
+  padding: 0.4rem 0.72rem 0.45rem 0.72rem; border-top: 1px solid rgba(10, 31, 61, 0.07);
+}
+`;
+
+  // A rerun rebuilds this frame; anything the last one left in the page goes first.
+  if (outer.__ehsCleanup) { try { outer.__ehsCleanup(); } catch (e) {} }
+  if (!doc.getElementById("ehs-panel-style")) {
+    const style = doc.createElement("style");
+    style.id = "ehs-panel-style";
+    style.textContent = PANEL_CSS;
+    doc.head.appendChild(style);
   }
+  const panel = doc.createElement("div");
+  panel.id = "ehs-panel";
+  panel.setAttribute("role", "listbox");
+  doc.body.appendChild(panel);
+
+  const esc = (s) => String(s).replace(/[&<>"]/g,
+    (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+
+  // What the reader typed, shown in bold where it matched the chart's name.
+  const mark = (title, words) => {
+    let out = esc(title);
+    for (const w of words) {
+      if (w.length < 2) continue;
+      const safe = w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      out = out.replace(new RegExp("(" + safe + ")", "ig"), "<b>$1</b>");
+    }
+    return out;
+  };
+
+  // A typo still finds the chart: one edit for a short word, two for a long one.
+  const near = (a, b) => {
+    if (Math.abs(a.length - b.length) > 2) return false;
+    let prev = Array.from({length: b.length + 1}, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+                          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[b.length] <= (Math.max(a.length, b.length) >= 8 ? 2 : 1);
+  };
+
+  // Every word has to match something, so a second word narrows the list
+  // rather than widening it. A word matches a chart's name, its page, or one
+  // of the aliases; the start of a word counts for more than the middle of one.
+  const search = (text) => {
+    const words = text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    if (!words.length || words.join("").length < MIN) return {words: words, hits: []};
+    const found = [];
+    for (const item of INDEX) {
+      const terms = item.terms, vocab = terms.split(" ");
+      let score = 0, ok = true;
+      for (const word of words) {
+        if (vocab.some((v) => v.startsWith(word))) score += 3;
+        else if (terms.indexOf(word) >= 0) score += 2;
+        else {
+          const aliases = (ALIASES[word] || []).filter((a) => terms.indexOf(a) >= 0).length;
+          if (aliases) score += aliases;
+          else if (word.length >= 4 && vocab.some((v) => near(word, v))) score += 1;
+          else { ok = false; break; }
+        }
+      }
+      if (ok && score) found.push([score, item]);
+    }
+    found.sort((a, b) => b[0] - a[0] || a[1].title.localeCompare(b[1].title));
+    return {words: words, hits: found.slice(0, MAX).map((h) => h[1])};
+  };
+
+  let shown = [], active = -1, open = false;
+
+  const place = () => {
+    const r = frame.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > outer.innerHeight) { panel.classList.remove("is-open"); return; }
+    panel.style.left = r.left + "px";
+    panel.style.top = (r.top + b.height) + "px";
+    panel.style.width = r.width + "px";
+    if (open) panel.classList.add("is-open");
+  };
+
+  const show = () => { open = true; input.setAttribute("aria-expanded", "true"); place(); };
+  const hide = () => {
+    open = false; active = -1;
+    input.setAttribute("aria-expanded", "false");
+    panel.classList.remove("is-open");
+  };
+
+  const paint = () => {
+    const rows = panel.querySelectorAll(".ehs-hit");
+    rows.forEach((row, i) => row.classList.toggle("is-active", i === active));
+    if (active >= 0 && rows[active]) rows[active].scrollIntoView({block: "nearest"});
+  };
+
+  const render = () => {
+    const text = input.value;
+    box.classList.toggle("has-text", text.length > 0);
+    if (!text.trim()) { panel.innerHTML = ""; hide(); return; }
+    const {words, hits} = search(text);
+    shown = hits;
+    active = hits.length ? 0 : -1;
+    panel.innerHTML = hits.length
+      ? hits.map((h, i) =>
+          '<div class="ehs-hit' + (i === 0 ? " is-active" : "") + '" data-i="' + i + '"'
+          + ' role="option" aria-selected="' + (i === 0) + '">'
+          + '<span class="ehs-hit-name">' + mark(h.title, words) + "</span>"
+          + '<span class="ehs-hit-page">' + esc(h.page) + "</span></div>").join("")
+        + '<div class="ehs-foot">&uarr;&darr; to move &middot; Enter to open</div>'
+      : '<div class="ehs-empty">No chart matches &ldquo;' + esc(text.trim()) + "&rdquo;.</div>";
+    show();
+  };
+
+  // Which page is on screen: the app's default page answers to the root URL,
+  // so anything that is not one of the other paths is the default.
+  const currentPath = () => {
+    const seg = outer.location.pathname.replace(/\/+$/, "").split("/").pop() || "";
+    return PATHS.indexOf(seg) >= 0 ? seg : PATHS[0];
+  };
+
+  const hardNav = (item) => {
+    let base = outer.location.pathname.replace(/\/+$/, "");
+    const seg = base.split("/").pop();
+    if (PATHS.indexOf(seg) >= 0) base = base.slice(0, -(seg.length + 1));
+    outer.location.assign(base + "/" + (item.path === PATHS[0] ? "" : item.path)
+                          + "?chart=" + encodeURIComponent(item.slug));
+  };
+
+  const go = (item) => {
+    if (!item) return;
+    hide();
+    input.blur();
+    if (currentPath() === item.path) { ehScrollToChart(outer, item.slug); return; }
+    const link = doc.querySelector('[class*="st-key-ehnav-' + item.path + '"] a');
+    if (!link) { hardNav(item); return; }
+    link.click();
+    // The scroll is armed only once the app has actually changed page: two
+    // pages can hold a chart of the same name, and it should be the new one.
+    let waited = 0;
+    const timer = setInterval(() => {
+      if (currentPath() === item.path) { clearInterval(timer); ehScrollToChart(outer, item.slug); }
+      else if ((waited += 100) > 2500) { clearInterval(timer); hardNav(item); }
+    }, 100);
+  };
+
+  input.addEventListener("input", render);
+  input.addEventListener("focus", () => { if (input.value.trim()) render(); });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!open || !shown.length) return;
+      e.preventDefault();
+      active = (active + (e.key === "ArrowDown" ? 1 : shown.length - 1)) % shown.length;
+      paint();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (shown.length) go(shown[Math.max(active, 0)]);
+    } else if (e.key === "Escape") {
+      if (open) hide();
+      else { input.value = ""; render(); }
+    }
+  });
+  clearBtn.addEventListener("click", () => { input.value = ""; render(); input.focus(); });
+
+  // mousedown, not click: the field must not lose focus before the choice is read.
+  const onPanelDown = (e) => {
+    const row = e.target.closest(".ehs-hit");
+    if (!row) return;
+    e.preventDefault();
+    go(shown[+row.dataset.i]);
+  };
+  const onPanelMove = (e) => {
+    const row = e.target.closest(".ehs-hit");
+    if (!row) return;
+    active = +row.dataset.i;
+    paint();
+  };
+  const onDocDown = (e) => { if (!panel.contains(e.target)) hide(); };
+  const onMove = () => { if (open) place(); };
+
+  panel.addEventListener("mousedown", onPanelDown);
+  panel.addEventListener("mousemove", onPanelMove);
+  doc.addEventListener("mousedown", onDocDown);
+  outer.addEventListener("scroll", onMove, true);
+  outer.addEventListener("resize", onMove);
+
+  outer.__ehsCleanup = () => {
+    doc.removeEventListener("mousedown", onDocDown);
+    outer.removeEventListener("scroll", onMove, true);
+    outer.removeEventListener("resize", onMove);
+    const stale = doc.getElementById("ehs-panel");
+    if (stale) stale.remove();
+  };
 })();
-</script>
-""" % anchor
+</script></body></html>
+"""
+
+_SEARCH_PLACEHOLDER = "Search charts — try credit, PMI, inflation, gold"
+_SEARCH_BOX_HEIGHT = 44          # the field, drawn at the top of its frame
 
 
-def _search_charts(query: str, index: list[dict]) -> list[dict]:
-    """
-    Charts matching every word typed, best first. A word matches a chart's name,
-    its page, or one of the aliases above; a near-miss ('inflaton') matches by
-    similarity. Requiring every word keeps a two-word search from widening.
-    """
-    words = [w for w in re.split(r"[^a-z0-9]+", query.lower()) if w]
-    if not words or len("".join(words)) < _SEARCH_MIN_CHARS:
-        return []
-
-    hits = []
-    for item in index:
-        terms = item["terms"]
-        vocabulary = terms.split()
-        score = 0
-        for word in words:
-            if any(t.startswith(word) for t in vocabulary):
-                score += 3
-            elif word in terms:
-                score += 2
-            elif (aliases := sum(1 for a in _SEARCH_ALIASES.get(word, ()) if a in terms)):
-                # A chart the alias matches twice ('repo' -> rate, transmission)
-                # is the one that was meant.
-                score += aliases
-            elif difflib.get_close_matches(word, vocabulary, n=1, cutoff=0.82):
-                score += 1
-            else:
-                score = 0
-                break
-        if score:
-            hits.append((-score, item["title"], item))
-    return [item for _, _, item in sorted(hits)][:_SEARCH_MAX_HITS]
-
-
-def _render_search_results(query: str, hits: list[dict], pages: dict[str, "st.Page"]) -> None:
-    """
-    Results as buttons rather than links: Streamlit rewrites a link in its own
-    markdown to open in a new tab, which is wrong for moving around one site.
-    A button switches page inside the app and leaves the chart to scroll to in
-    session state, which no rewriting can touch.
-    """
-    if not hits:
-        st.markdown(f'<div class="ehs-results"><p class="ehs-none">No chart matches '
-                    f'&ldquo;{_esc(query.strip())}&rdquo;.</p></div>', unsafe_allow_html=True)
-        return
-
-    st.markdown('<div class="ehs-rule"></div>', unsafe_allow_html=True)
-    for hit in hits:
-        with st.container(key=f"ehshit-{hit['path']}-{hit['slug']}", horizontal=True):
-            if st.button(hit["title"], key=f"ehsgo-{hit['path']}-{hit['slug']}"):
-                st.session_state["_scroll_to"] = hit["slug"]
-                # The default page answers to an empty url_path, as the page
-                # links above also have to allow for.
-                target = pages.get(hit["path"])
-                if target is not None and hit["path"] != (current.url_path or "weekly"):
-                    st.switch_page(target)
-                st.rerun()
-            st.markdown(f'<span class="ehs-hit-page">{_esc(hit["page"])}</span>',
-                        unsafe_allow_html=True)
+def _search_box_html() -> str:
+    """The search field, with every chart on the site inside it."""
+    return (_SEARCH_TEMPLATE
+            .replace("__SCROLL__", _SCROLL_JS)
+            .replace("__INDEX__", json.dumps(_search_index(), separators=(",", ":")))
+            .replace("__ALIASES__", json.dumps({k: list(v) for k, v in _SEARCH_ALIASES.items()},
+                                               separators=(",", ":")))
+            .replace("__PATHS__", json.dumps([p for _, _, p in _SEARCH_PAGES],
+                                             separators=(",", ":")))
+            .replace("__MAX__", str(_SEARCH_MAX_HITS))
+            .replace("__MIN__", str(_SEARCH_MIN_CHARS))
+            .replace("__PLACEHOLDER__", _SEARCH_PLACEHOLDER))
 
 
 def _page_header_html(title: str, dek: str, meta_label: str, meta_value: str,
@@ -3236,17 +3478,10 @@ for page in PAGES:
         st.page_link(page, label=page.title)
 
 # One box for all four pages: type what you want to see, land on the chart.
-# Results are drawn only while something is typed, so the page reads as it did.
+# The suggestions appear as the reader types and lie over the page, so nothing
+# below moves until a chart is chosen.
 with st.container(key="ehsearch"):
-    _query = st.text_input(
-        "Search charts",
-        key="chart_search",
-        placeholder="Search charts — try credit, PMI, inflation, gold",
-        label_visibility="collapsed",
-    )
-    if _query and _query.strip():
-        _render_search_results(_query, _search_charts(_query, _search_index()),
-                               {p.url_path or "weekly": p for p in PAGES})
+    components.html(_search_box_html(), height=_SEARCH_BOX_HEIGHT)
 
 current.run()
 
