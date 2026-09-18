@@ -670,32 +670,40 @@ st.markdown(
         font-variant-numeric: tabular-nums lining-nums;
         margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--soe-rule);
     }
-    .soe-how { position: static; }
-    .soe-how > summary {
-        list-style: none; cursor: pointer; user-select: none;
-        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0;
-        font-size: 0.76rem; font-weight: 600; color: var(--soe-text);
-        transition: color 0.15s ease;
-    }
-    .soe-how > summary::-webkit-details-marker { display: none; }
-    .soe-how > summary::marker { content: ""; }
-    .soe-how > summary svg { width: 15px; height: 15px; color: var(--soe-muted); transition: color 0.15s ease; }
-    .soe-how > summary:hover, .soe-how[open] > summary { color: var(--soe-mark); }
-    .soe-how > summary:hover svg, .soe-how[open] > summary svg { color: var(--soe-mark); }
-    .soe-how > summary:focus-visible { outline: 2px solid var(--soe-mark); outline-offset: 3px; border-radius: 3px; }
-    .soe-how-panel {
-        position: absolute; right: 0; top: calc(100% + 0.65rem); z-index: 30;
-        width: min(27rem, 100%); box-sizing: border-box;
-        background: #FFFFFF; border: 1px solid #E2E7ED; border-radius: 10px;
-        box-shadow: 0 10px 28px rgba(16, 24, 40, 0.13);
-        padding: 0.9rem 1rem; display: grid; gap: 0.5rem;
-        font-size: 0.76rem; line-height: 1.45; color: var(--soe-text);
-    }
     .soe-lede {
         font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
         font-size: 1.12rem; font-weight: 400; line-height: 1.5; color: var(--soe-text);
         margin: 1.1rem 0 0 0; max-width: 62rem;
     }
+    /* What changed since last month: two quotes per topic, this month over last. */
+    .soe-changes { margin-top: 1.5rem; }
+    .soe-chg-head {
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--soe-muted); padding-bottom: 0.6rem; border-bottom: 1px solid var(--soe-ink);
+    }
+    /* Balanced columns rather than a two-column grid: the quotes differ in
+       length, and a grid left one row stranded beside an empty cell. */
+    .soe-chg-grid { column-count: 2; column-gap: 2.6rem; }
+    .soe-chg { break-inside: avoid; -webkit-column-break-inside: avoid; }
+    .soe-chg { border-bottom: 1px solid var(--soe-rule); padding: 0.85rem 0 0.9rem 0; }
+    .soe-chg-topic {
+        font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+        color: var(--soe-mark); margin-bottom: 0.32rem;
+    }
+    .soe-chg-now {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 0.98rem; line-height: 1.45; color: var(--soe-text);
+    }
+    .soe-chg-was {
+        margin-top: 0.4rem; font-size: 0.78rem; line-height: 1.45; color: var(--soe-muted);
+    }
+    .soe-chg-when {
+        display: inline-block; margin-right: 0.45rem; padding: 0.05rem 0.32rem;
+        border: 1px solid var(--soe-rule); border-radius: 3px;
+        font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+        color: var(--soe-faint); vertical-align: 1px;
+    }
+
     .soe-more { margin-top: 0.9rem; }
     .soe-more > summary {
         list-style: none; cursor: pointer; user-select: none;
@@ -732,9 +740,8 @@ st.markdown(
         .soe { margin: 1rem 0 2rem 0; }
         .soe-title { font-size: 1.3rem; }
         .soe-edition { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
-        .soe-how { width: 100%; }
-        .soe-how-panel { width: 100%; }
         .soe-lede { font-size: 1.04rem; }
+        .soe-chg-grid { column-count: 1; }
         /* The meta line wraps on a phone, which left a separator dot stranded
            at the end of a line; spacing carries the separation instead. */
         .soe-dot { display: none; }
@@ -787,31 +794,68 @@ st.markdown(
         border-radius: 2px; /* Gives the ends a slightly polished, rounded look */
     }
 
-    /* ── Institutional Masthead ── */
+    /* ── Institutional masthead ──────────────────────────────────────────────
+       Three levels, deliberately unalike, so a first-time reader takes them in
+       order: the nameplate, then what the publication is, then who writes it.
+       The descriptor is the one a stranger needs, so it is navy and banded
+       between rules; the byline is grey sentence case and recedes.          */
+    /* Streamlit styles h1 and p inside its markdown container, and those rules
+       beat a bare class selector: every declaration it sets is forced here. */
     .insti-masthead {
-        font-family: 'Inter', sans-serif;
-        font-size: 2.6rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        color: #0A1128; 
+        font-family: 'Playfair Display', Georgia, serif !important;
+        font-size: 3.3rem !important;
+        font-weight: 900 !important;
+        letter-spacing: 0.005em !important;
+        color: #0A1128 !important;
         text-align: center;
         text-transform: uppercase;
-        margin-bottom: 0;
-        line-height: 1.1;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.04 !important;
     }
-    
-    .insti-tagline {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #6B7280; 
+
+    /* The band hugs its text (fit-content), so the rules read as a deliberate
+       device rather than as a stray divider the width of the column. */
+    .insti-descriptor {
+        width: fit-content;
+        max-width: 92%;
+        margin: 1.15rem auto 0 auto !important;
+        padding: 0.5rem 1.8rem 0.55rem 1.8rem !important;
+        border-top: 1px solid rgba(0, 51, 102, 0.3);
+        border-bottom: 1px solid rgba(0, 51, 102, 0.3);
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.84rem !important;
+        font-weight: 700 !important;
+        color: #003366 !important;
         text-align: center;
-        letter-spacing: 0.15em; 
+        letter-spacing: 0.2em !important;
         text-transform: uppercase;
-        margin-top: 0.6rem;
-        margin-bottom: 1.2rem;
+        line-height: 1.45 !important;
     }
-    
+
+    .insti-byline {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.79rem !important;
+        font-weight: 400 !important;
+        color: #6B7280 !important;
+        text-align: center;
+        letter-spacing: 0.01em !important;
+        margin: 0.8rem 0 1.35rem 0 !important;
+    }
+
+    /* A phone cannot hold 0.2em of tracking across that descriptor without
+       breaking it into three ragged lines. */
+    @media (max-width: 680px) {
+        .insti-masthead { font-size: 2.05rem !important; }
+        .insti-descriptor {
+            font-size: 0.68rem !important;
+            letter-spacing: 0.1em !important;
+            padding: 0.45rem 0.9rem 0.5rem 0.9rem !important;
+            margin-top: 0.9rem !important;
+        }
+        .insti-byline { font-size: 0.72rem !important; }
+    }
+
     .substack-center-container {
         text-align: center;
         margin-bottom: 1.5rem;
@@ -2060,11 +2104,44 @@ def _load_soe(charts: list[Path]) -> dict | None:
         return None
 
 
+def _soe_changes_html(changes: list[dict], compared_with: str | None) -> str:
+    """
+    What changed since last month: RBI's sentence on each topic beside the one it
+    wrote a month earlier. Both sides are quoted, so the reader compares the
+    Bank's own wording rather than a verdict formed here.
+    """
+    if not changes or not compared_with:
+        return ""
+    try:
+        before_month = datetime.strptime(compared_with, "%Y-%m")
+    except (TypeError, ValueError):
+        return ""
+
+    rows = []
+    for change in changes:
+        now, before = _esc(change.get("now")), _esc(change.get("before"))
+        if not now or not before:
+            continue
+        rows.append(
+            '<div class="soe-chg">'
+            f'<div class="soe-chg-topic">{_esc(change.get("topic"))}</div>'
+            f'<div class="soe-chg-now">{now}</div>'
+            f'<div class="soe-chg-was"><span class="soe-chg-when">{before_month:%b}</span>{before}</div>'
+            '</div>'
+        )
+    if not rows:
+        return ""
+    return ('<div class="soe-changes">'
+            f'<div class="soe-chg-head">What changed since {before_month:%B}</div>'
+            f'<div class="soe-chg-grid">{"".join(rows)}</div></div>')
+
+
 def _soe_html(soe: dict) -> str | None:
     """
-    RBI's opening summary, its concluding assessment behind a disclosure, and
-    where it came from. Returns None when the file is not what it should be,
-    so a bad read leaves the tab without a briefing rather than with a fragment.
+    RBI's opening summary, what changed since last month, its concluding
+    assessment behind a disclosure, and where it came from. Returns None when the
+    file is not what it should be, so a bad read leaves the tab without a
+    briefing rather than with a fragment.
     """
     cfg = _fresh_config(_soe_settings)
     try:
@@ -2103,14 +2180,9 @@ def _soe_html(soe: dict) -> str | None:
         '<div class="soe-title" id="soe-title" role="heading" aria-level="2">State of the Economy</div>'
         f'<span class="soe-edition">{edition:%B %Y}</span>'
         '</div>'
-        f'<details class="soe-how"><summary>{_NH_INFO}About this report</summary>'
-        f'<div class="soe-how-panel"><span>{cfg.DISCLAIMER}</span>'
-        '<span>The opening summary and concluding assessment are reproduced word for word '
-        'from the article; nothing on this page is a paraphrase.</span>'
-        '<span>Published monthly in the RBI Bulletin, usually in the fourth week.</span>'
-        '</div></details>'
         '</div>'
         f'<div class="soe-lede">{summary}</div>'
+        f'{_soe_changes_html(soe.get("changes") or [], soe.get("compared_with"))}'
         f'{more}'
         '<div class="soe-meta">'
         f'<span class="soe-src">{cfg.ATTRIBUTION}</span><span class="soe-dot"></span>'
@@ -2814,7 +2886,8 @@ if current.url_path:                      # the default page keeps the plain tit
 
 st.markdown(
     '<h1 class="insti-masthead">The Economics Hub</h1>'
-    '<p class="insti-tagline">Global macro &amp; cross-asset research by Shreyas Urgunde</p>'
+    '<p class="insti-descriptor">Global Macro &amp; Cross-Asset Monitor</p>'
+    '<p class="insti-byline">Research by Shreyas Urgunde &nbsp;·&nbsp; Updated every Saturday</p>'
     '<div class="substack-center-container">'
         '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
             '<span class="substack-cta__label">Subscribe on Substack</span>'

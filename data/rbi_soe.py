@@ -37,9 +37,10 @@ from bs4 import BeautifulSoup
 
 from config.soe_settings import (
     ARTICLE_TITLE, ARTICLE_URL, BULLETIN_URL, CACHE_DIR, CONCLUSION_MAX_PARAGRAPHS,
-    CYCLE_LABEL_ROW, CYCLE_ROW, FIRST_EDITION, MAX_ATTEMPTS, MAX_PLAUSIBLE_BPS, MONTHLY_ROW,
+    CHANGES_MAX, CHANGES_MIN_WORDS, CHART_REFERENCE, CYCLE_LABEL_ROW, CYCLE_ROW, FIRST_EDITION, MAX_ATTEMPTS, MAX_PLAUSIBLE_BPS, MONTHLY_ROW,
     PAUSE_SECONDS, PERIOD_ROW, REQUEST_TIMEOUT, SUMMARY_MAX_WORDS, SUMMARY_MIN_WORDS,
-    TRANSMISSION_CAPTION, TRANSMISSION_COLUMNS, TRANSMISSION_OPTIONAL, USER_AGENT,
+    TOPIC_SECTIONS, TRANSMISSION_CAPTION, TRANSMISSION_COLUMNS, TRANSMISSION_OPTIONAL,
+    USER_AGENT,
 )
 
 log = logging.getLogger(__name__)
@@ -275,6 +276,70 @@ def parse_conclusion(page: str) -> list[str]:
             if len(out) == CONCLUSION_MAX_PARAGRAPHS:
                 break
     return out
+
+
+def summary_sentences(summary: str) -> list[str]:
+    """
+    The summary as sentences, without cutting figures in half.
+
+    "4.45 per cent" and "US$ 44.2 billion" carry full stops that a naive split
+    turns into sentence breaks, which is how an early version of this parser
+    reported CPI as "from 4."
+    """
+    guarded = re.sub(r"(\d)\.(\d)", "\\1\x00\\2", summary)
+    guarded = re.sub(r"\b(US|Rs|No|Dr|Mr|vs|Prof)\.", "\\1\x00", guarded)
+    parts = re.split(r"(?<=[.;])\s+(?=[A-Z(])", guarded)
+    return [p.replace("\x00", ".").strip() for p in parts if p.strip()]
+
+
+def parse_topics(page: str) -> dict[str, str]:
+    """
+    Each section's opening verdict: {topic: RBI's first sentence under that heading}.
+
+    Sections are used rather than the summary because they carry the month's
+    figures in RBI's own sentence ("inflation increased marginally to 4.45 per
+    cent (y-o-y) in July 2026 from 4.38 per cent in June"), and because the
+    summary is already shown in full above. Only the chart pointers RBI writes
+    for its own readers are removed; nothing else in the sentence is touched.
+    """
+    topics: dict[str, str] = {}
+    heading: str | None = None
+    for para in _paragraphs(_article_table(page)):
+        text = _clean(para)
+        if para.get("class"):
+            heading = text
+            continue
+        if heading is None:
+            continue
+        label = next((name for name, pattern in TOPIC_SECTIONS if re.search(pattern, heading)), None)
+        if label is None or label in topics:
+            continue
+        sentence = re.sub(CHART_REFERENCE, "", summary_sentences(text)[0]).strip()
+        if len(sentence.split()) >= CHANGES_MIN_WORDS:
+            topics[label] = sentence
+    return topics
+
+
+def compare_editions(page: str, month: str, previous_page: str, previous_month: str) -> list[dict]:
+    """
+    What RBI said about each topic this month, beside what it said last month.
+
+    Only topics both editions cover are returned, in the order of SUMMARY_TOPICS,
+    and both sides are quoted verbatim. Nothing here decides whether a topic got
+    better or worse: the two sentences say that, in RBI's words.
+    """
+    now, before = parse_topics(page), parse_topics(previous_page)
+    changes = []
+    for label, _ in TOPIC_SECTIONS:
+        if label in now and label in before and now[label] != before[label]:
+            changes.append({
+                "topic": label,
+                "now": now[label],
+                "now_month": month,
+                "before": before[label],
+                "before_month": previous_month,
+            })
+    return changes[:CHANGES_MAX]
 
 
 def parse_briefing(page: str, edition: Edition) -> dict:

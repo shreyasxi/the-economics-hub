@@ -69,11 +69,44 @@ CONCLUSION_MAX_PARAGRAPHS = 3
 # monthly, so 45 days means one edition has been missed entirely.
 MAX_EDITION_AGE_DAYS = 45
 
-# The article is written by RBI staff and carries RBI's own disclaimer. The
-# dashboard repeats it rather than presenting the text as an RBI decision.
 ATTRIBUTION = "Reserve Bank of India &middot; Bulletin"
-DISCLAIMER = ("Prepared by staff of the Reserve Bank; the RBI states that the views "
-              "expressed are those of the authors and not of the Reserve Bank of India.")
+
+# ─────────────────────────────────────────────
+# WHAT CHANGED SINCE LAST MONTH
+# ─────────────────────────────────────────────
+
+# Each section of the article opens by saying what happened to its part of the
+# economy, with the figures in it: "The headline consumer price index (CPI)
+# inflation increased marginally to 4.45 per cent (y-o-y) in July 2026 from 4.38
+# per cent in June". Taking that opening sentence from this edition and from the
+# month before puts RBI's own verdict on each topic side by side, and carries the
+# numbers without any figure being parsed out of the prose and re-presented.
+#
+# The section headings are stable where the summary's wording is not: over the 19
+# editions from Feb 2025 to Aug 2026, Aggregate Supply and Financial Conditions
+# appear in all 19, Global and Inflation in 19 and 18, Aggregate Demand in 18.
+# Headings drift slightly ("II. Global Setting" and "II. Global Section" are the
+# same section), so each is matched by pattern.
+#
+# A topic missing from either month is left out rather than filled in.
+TOPIC_SECTIONS: list[tuple[str, str]] = [
+    ("Inflation", r"(?i)^inflation$"),
+    ("Demand", r"(?i)^aggregate demand$"),
+    ("Supply", r"(?i)^aggregate supply$"),
+    ("Money and credit", r"(?i)financial conditions$"),
+    ("Global", r"(?i)^[IVX]+\.\s*(the\s+)?global\s"),
+]
+
+# Chart pointers are dropped from a quoted sentence: "(Chart III.5a)" is a
+# direction to look at a picture that is not on this page. Nothing else in the
+# sentence is touched.
+CHART_REFERENCE = r"\s*\((?:see\s+)?(?:Chart|Table)[^)]*\)"
+
+# Rows shown at most; five topics is the whole set.
+CHANGES_MAX = 5
+
+# A sentence shorter than this is a fragment, not a verdict worth quoting.
+CHANGES_MIN_WORDS = 8
 
 # ─────────────────────────────────────────────
 # TRANSMISSION TABLE (Table IV.3, numbered differently in older editions)

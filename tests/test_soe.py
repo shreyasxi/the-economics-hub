@@ -104,6 +104,84 @@ def test_a_changed_layout_is_refused_rather_than_guessed():
         raise AssertionError("a truncated opening paragraph was published as the summary")
 
 
+# ── What changed since last month ──────────────────────────────────────────
+
+def test_sentences_are_not_split_inside_a_figure():
+    """An early parser split on every full stop and reported CPI as "from 4."."""
+    from data.rbi_soe import summary_sentences
+
+    sentences = summary_sentences(
+        "Headline CPI inflation rose to 4.45 per cent in July. Exports reached US$ 44.2 billion.")
+    assert len(sentences) == 2
+    assert "4.45 per cent" in sentences[0]
+    assert "US$ 44.2 billion" in sentences[1]
+
+
+def test_each_section_gives_its_opening_verdict_with_the_figures_in_it():
+    """The point of using sections rather than the summary: RBI's numbers come along."""
+    from data.rbi_soe import parse_topics
+
+    topics = parse_topics(fixture("2026-08"))
+    assert set(topics) == {"Inflation", "Demand", "Supply", "Money and credit", "Global"}
+    assert len(set(topics.values())) == len(topics)          # no sentence shown twice
+    assert "4.45 per cent" in topics["Inflation"] and "from 4.38 per cent in June" in topics["Inflation"]
+    assert topics["Money and credit"].startswith("System liquidity improved")
+
+
+def test_chart_pointers_are_dropped_from_a_quoted_sentence():
+    """"(Chart III.5a)" sends the reader to a picture that is not on this page."""
+    from data.rbi_soe import parse_topics
+
+    for topic in parse_topics(fixture("2026-07")).values():
+        assert "Chart" not in topic and "(Table" not in topic
+
+
+def test_a_month_is_paired_with_the_one_before_it():
+    from data.rbi_soe import compare_editions
+
+    changes = compare_editions(fixture("2026-08"), "2026-08", fixture("2026-07"), "2026-07")
+    assert [c["topic"] for c in changes] == [
+        "Inflation", "Demand", "Supply", "Money and credit", "Global"]
+
+    inflation = changes[0]
+    assert "4.45 per cent" in inflation["now"]
+    assert "4.4 per cent in June 2026" in inflation["before"]
+    assert (inflation["now_month"], inflation["before_month"]) == ("2026-08", "2026-07")
+
+
+def test_both_sides_of_a_comparison_are_quoted_from_their_own_edition():
+    """Neither side may be reworded: each must appear in the edition it claims."""
+    from data.rbi_soe import compare_editions
+
+    # The article's own words, with only the markup and footnote markers taken
+    # out — the same cleanup the parser does, and nothing more.
+    from data.rbi_soe import _article_table, _clean, _paragraphs
+
+    pages = {month: " ".join(_clean(p) for p in _paragraphs(_article_table(fixture(month))))
+             for month in ("2026-08", "2026-07")}
+    for change in compare_editions(fixture("2026-08"), "2026-08", fixture("2026-07"), "2026-07"):
+        for side, month in (("now", "now_month"), ("before", "before_month")):
+            # Chart pointers are removed, so the sentence is checked up to the first one.
+            opening = change[side].split(" (Chart")[0][:60]
+            assert opening in pages[change[month]], f"{change['topic']} {side} is not verbatim"
+
+
+def test_a_section_one_month_does_not_carry_is_left_out():
+    """An edition without a section is simply not paired on that topic."""
+    from data.rbi_soe import compare_editions, parse_topics
+
+    without = fixture("2026-07").replace('class="head">Inflation<', 'class="head">Prices and Costs<')
+    assert "Inflation" not in parse_topics(without)
+    topics = [c["topic"] for c in compare_editions(fixture("2026-08"), "2026-08", without, "2026-07")]
+    assert "Inflation" not in topics and "Demand" in topics
+
+
+def test_an_unreadable_previous_edition_leaves_the_briefing_without_a_comparison():
+    from data.rbi_soe import compare_editions
+
+    assert compare_editions(fixture("2026-08"), "2026-08", fixture("2026-08"), "2026-08") == []
+
+
 # ── The transmission table ─────────────────────────────────────────────────
 
 def test_current_layout_reads_both_cycles_and_the_monthly_block():
@@ -217,6 +295,33 @@ def test_chart_draws_only_the_current_cycle():
     ))
     assert set(df["cycle_start"]) == {"2025-02"}
     assert list(df["cycle_end"]) == ["2026-05", "2026-06"]
+
+
+def test_a_hiking_cycle_replaces_the_easing_one():
+    """The chart is not built around cuts: when RBI turns to hiking, that cycle is drawn."""
+    from generate_india import load_transmission
+
+    df = load_transmission(_history(
+        "2026-08,2026-08-25,easing,2025-02,2026-06,-125,-63,-51,-125,-50,-80,-79,-91,u\n"
+        "2027-03,2027-03-20,tightening,2027-01,2027-02,100,45,12,100,25,38,15,30,u\n"
+        "2027-04,2027-04-21,tightening,2027-01,2027-03,150,80,30,150,45,70,33,55,u\n"
+    ))
+    assert df["cycle_type"].iloc[0] == "tightening"
+    assert list(df["cycle_end"]) == ["2027-02", "2027-03"]
+    assert df["repo_bps"].iloc[-1] == 150
+
+
+def test_a_new_cycle_with_one_month_keeps_the_finished_cycle_up():
+    """One point is not a path, so the completed cycle stays until the new one has two."""
+    from generate_india import load_transmission
+
+    df = load_transmission(_history(
+        "2026-07,2026-07-22,easing,2025-02,2026-05,-125,-78,-52,-125,-35,-82,-85,-90,u\n"
+        "2026-08,2026-08-25,easing,2025-02,2026-06,-125,-63,-51,-125,-50,-80,-79,-91,u\n"
+        "2027-02,2027-02-20,tightening,2027-01,2027-01,50,20,5,50,10,18,6,15,u\n"
+    ))
+    assert set(df["cycle_start"]) == {"2025-02"}
+    assert len(df) == 2
 
 
 def test_a_blank_figure_in_the_history_stops_the_run():

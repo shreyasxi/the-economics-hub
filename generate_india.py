@@ -1517,13 +1517,9 @@ def load_transmission(path=TRANSMISSION_CSV):
     if df.empty:
         return None
 
-    current_start = df["cycle_start"].max()
-    df = df[df["cycle_start"] == current_start].copy()
-    # Two editions can restate the same data month (RBI revises the figures a
-    # month later), so the newest edition's version of a month is the one kept.
-    df = (df.sort_values(["cycle_end", "month"])
-            .drop_duplicates(subset="cycle_end", keep="last"))
-
+    # Every figure in the file is checked, not only the ones about to be drawn:
+    # a blank or a stray word anywhere means the file was hand-edited, and the
+    # run stops rather than charting whatever survives.
     for column, label, _, _ in TRANSMISSION_SERIES:
         df[column] = pd.to_numeric(df[column], errors="coerce")
         if df[column].isna().any():
@@ -1531,6 +1527,21 @@ def load_transmission(path=TRANSMISSION_CSV):
                 f"{path.name}: {label} is blank or not a number in "
                 f"{df.loc[df[column].isna(), 'month'].tolist()}"
             )
+
+    # The newest cycle that has enough months to draw a path. When the RBI turns
+    # from cutting to hiking, its table starts a new cycle with a single row, and
+    # one point is not a chart: the completed cycle stays up, under its own dates,
+    # until the new one has two months of bank rates behind it.
+    starts = sorted(df["cycle_start"].unique(), reverse=True)
+    drawable = [s for s in starts if (df["cycle_start"] == s).sum() >= 2]
+    if not drawable:
+        return None
+    current_start = drawable[0]
+    df = df[df["cycle_start"] == current_start].copy()
+    # Two editions can restate the same data month (RBI revises the figures a
+    # month later), so the newest edition's version of a month is the one kept.
+    df = (df.sort_values(["cycle_end", "month"])
+            .drop_duplicates(subset="cycle_end", keep="last"))
 
     # Every row must describe the same cycle, and RBI's own repo column must not
     # wander within it: both would mean rows from different tables were mixed.

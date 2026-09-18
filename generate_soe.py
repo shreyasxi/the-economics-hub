@@ -39,10 +39,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from config.soe_settings import (
-    BRIEFING_FILENAME, MAX_EDITION_AGE_DAYS, PAUSE_SECONDS, PROJECT_ROOT, TRANSMISSION_CSV,
+    BRIEFING_FILENAME, FIRST_EDITION, MAX_EDITION_AGE_DAYS, PAUSE_SECONDS, PROJECT_ROOT, TRANSMISSION_CSV,
 )
-from data.rbi_soe import Edition, SoeError, build_session, fetch_article, find_latest, find_month, \
-    parse_briefing, parse_transmission
+from data.rbi_soe import Edition, SoeError, build_session, compare_editions, fetch_article, \
+    find_latest, find_month, parse_briefing, parse_transmission
 
 INDIA_OUTPUT = PROJECT_ROOT / "output" / "india"
 SENTINEL_DB = PROJECT_ROOT / "data" / "rbi_sentinel.db"
@@ -78,6 +78,40 @@ def latest_edition_folder(base: Path = INDIA_OUTPUT) -> Path | None:
     folders = sorted((p for p in base.iterdir() if p.is_dir() and any(p.glob("*.png"))),
                      key=lambda p: p.name)
     return folders[-1] if folders else None
+
+
+def previous_month(month: str) -> str:
+    """"2026-08" -> "2026-07"."""
+    year, mon = int(month[:4]), int(month[5:])
+    return f"{year - 1}-12" if mon == 1 else f"{year}-{mon - 1:02d}"
+
+
+def read_changes(session, edition: Edition, page: str, *, use_cache: bool) -> tuple[list[dict], str | None]:
+    """
+    What RBI said this month beside what it said last month, topic by topic.
+
+    The comparison is a bonus, never a blocker: if last month's edition cannot be
+    read, the briefing publishes without it. Two months are tried, so a Bulletin
+    that skipped the article does not end the comparison.
+    """
+    month = edition.month
+    for _ in range(2):
+        month = previous_month(month)
+        if month < FIRST_EDITION:
+            return [], None
+        try:
+            past = find_month(session, month)
+            if past is None:
+                continue
+            changes = compare_editions(page, edition.month,
+                                       fetch_article(session, past, use_cache=use_cache), month)
+            if changes:
+                return changes, month
+        except SoeError as exc:
+            log_problem = f"{month}: {exc}"
+            print(f"   Could not compare with {log_problem}")
+            return [], None
+    return [], None
 
 
 def month_range(start: str, end: str) -> list[str]:
@@ -199,6 +233,9 @@ def main() -> int:
         page = fetch_article(session, edition, use_cache=use_cache)
         briefing = parse_briefing(page, edition)
         transmission = parse_transmission(page)
+        changes, compared_with = read_changes(session, edition, page, use_cache=use_cache)
+        briefing["changes"] = changes
+        briefing["compared_with"] = compared_with
     except SoeError as exc:
         print(f"Could not read the article: {exc}")
         return 1
@@ -209,6 +246,11 @@ def main() -> int:
     print(f"   {edition.url}")
     print(f"   Summary: {len(briefing['summary'].split())} words; "
           f"conclusion: {len(briefing['conclusion'])} paragraph(s)")
+    if briefing["changes"]:
+        print(f"   Changed since {briefing['compared_with']}: "
+              f"{', '.join(c['topic'] for c in briefing['changes'])}")
+    else:
+        print("   No month-on-month comparison (last month's edition could not be read)")
     if age > MAX_EDITION_AGE_DAYS:
         problems.append(f"the newest edition is {age} days old; an edition has been missed")
 
