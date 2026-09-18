@@ -23,6 +23,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from charts.loader import (
     chart_key,
@@ -722,9 +723,13 @@ st.markdown(
     }
     .soe-chg-now .soe-chg-when { margin-top: 0.22rem; }
     .soe-chg-was .soe-chg-when { margin-top: 0.1rem; }
-    /* This month's date is set in the accent and last month's stays faint, so
-       which quote is current does not depend on reading the months. */
-    .soe-chg-when.is-now { color: var(--soe-mark); border-color: var(--soe-mark); }
+    /* This month's date is filled in the accent and last month's stays a faint
+       outline, so which quote is current is read at a glance, not by comparing
+       two months set in nearly the same weight. */
+    .soe-chg-when.is-now {
+        background: var(--soe-mark); border-color: var(--soe-mark);
+        color: #FFFFFF; font-weight: 800;
+    }
 
     .soe-more { margin-top: 0.9rem; }
     .soe-more > summary {
@@ -1035,17 +1040,29 @@ st.markdown(
     }
     .st-key-ehsearch input::placeholder { color: #8A929E !important; }
     .ehs-results { border-top: 1px solid rgba(10, 31, 61, 0.18); margin: 0.55rem 0 0.8rem 0; }
-    .ehs-hit {
-        display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-        padding: 0.5rem 0.15rem 0.55rem 0.15rem;
+    .ehs-rule { border-top: 1px solid rgba(10, 31, 61, 0.18); margin-top: 0.55rem; }
+    /* A result is a button, so that it moves page inside the app rather than
+       opening a tab; it is set to read as a line of type, not as a control. */
+    .st-key-ehsearch [class*="st-key-ehshit-"] {
+        align-items: baseline !important; justify-content: space-between !important;
+        gap: 1rem !important; padding: 0.42rem 0.15rem 0.45rem 0.15rem !important;
         border-bottom: 1px solid rgba(10, 31, 61, 0.10);
-        text-decoration: none !important;
     }
-    .ehs-hit-title {
-        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 0.98rem; line-height: 1.3; color: #0A1F3D;
+    .st-key-ehsearch [data-testid="stButton"] { width: auto !important; }
+    .st-key-ehsearch [data-testid="stButton"] button {
+        background: transparent !important; border: none !important; box-shadow: none !important;
+        padding: 0 !important; min-height: 0 !important; text-align: left !important;
     }
-    .ehs-hit:hover .ehs-hit-title { text-decoration: underline; }
+    .st-key-ehsearch [data-testid="stButton"] button p {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif !important;
+        font-optical-sizing: auto;
+        font-size: 0.98rem !important; font-weight: 400 !important; line-height: 1.3 !important;
+        color: #0A1F3D !important; margin: 0 !important;
+    }
+    .st-key-ehsearch [data-testid="stButton"] button:hover p { text-decoration: underline; }
+    .st-key-ehsearch [data-testid="stButton"] button:focus-visible {
+        outline: 2px solid #A85600; outline-offset: 2px;
+    }
     .ehs-hit-page {
         font-family: 'Inter', -apple-system, sans-serif;
         font-size: 0.62rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
@@ -1420,9 +1437,14 @@ def _chart_anchor(chart_path: Path) -> None:
                 unsafe_allow_html=True)
 
 
+def _chart_slug(filename: str) -> str:
+    """'14_india_credit_deposit.png' -> 'india-credit-deposit'."""
+    return chart_key(filename).replace("_", "-")
+
+
 def _chart_anchor_id(filename: str) -> str:
-    """'14_india_credit_deposit.png' -> 'chart-india-credit-deposit'."""
-    return "chart-" + chart_key(filename).replace("_", "-")
+    """The id a search result scrolls to."""
+    return f"chart-{_chart_slug(filename)}"
 
 
 def _render_chart(chart_path: Path) -> None:
@@ -2355,10 +2377,63 @@ def _search_index() -> list[dict]:
             index.append({
                 "title": title,
                 "page": page,
-                "url": f"/{url_path}#{_chart_anchor_id(chart.name)}",
+                "path": url_path,
+                "slug": _chart_slug(chart.name),
                 "terms": f"{title} {chart_key(chart.name)} {page}".lower().replace("_", " "),
             })
     return index
+
+
+def _scroll_to_chart_html(slug: str) -> str:
+    """
+    The script that puts a search result on screen. The page is still being built
+    when it starts, so it waits for the chart's anchor to appear; the page then
+    keeps growing as the charts above load, so it holds the position until the
+    layout settles. A reader who scrolls takes over at once.
+
+    Streamlit scrolls a container of its own rather than the window, so the
+    offset is worked out against that container and not against the document.
+    """
+    anchor = json.dumps(f"chart-{slug}")
+    return """
+<script>
+(() => {
+  const outer = window.parent, doc = outer.document, id = %s;
+  const place = () => {
+    const target = doc.getElementById(id);
+    if (!target) return false;
+    const box = doc.querySelector('[data-testid="stMain"]');
+    if (box) {
+      const top = target.getBoundingClientRect().top - box.getBoundingClientRect().top
+                  + box.scrollTop - 24;
+      box.scrollTo({top: Math.max(top, 0), behavior: "auto"});
+    } else {
+      target.scrollIntoView({block: "start"});
+    }
+    return true;
+  };
+  let tries = 0;
+  const timer = setInterval(() => {
+    if (place()) {
+      clearInterval(timer);
+      const holds = [300, 900, 1800, 3000].map((ms) => setTimeout(place, ms));
+      const release = () => holds.forEach(clearTimeout);
+      ["wheel", "touchstart", "keydown"].forEach(
+        (e) => box_listen(e, release));
+      const url = new URL(outer.location.href);
+      url.searchParams.delete("chart");
+      outer.history.replaceState(null, "", url);
+    } else if (++tries > 150) {
+      clearInterval(timer);
+    }
+  }, 100);
+  function box_listen(event, fn) {
+    const box = doc.querySelector('[data-testid="stMain"]') || outer;
+    box.addEventListener(event, fn, {once: true, passive: true});
+  }
+})();
+</script>
+""" % anchor
 
 
 def _search_charts(query: str, index: list[dict]) -> list[dict]:
@@ -2395,18 +2470,31 @@ def _search_charts(query: str, index: list[dict]) -> list[dict]:
     return [item for _, _, item in sorted(hits)][:_SEARCH_MAX_HITS]
 
 
-def _search_results_html(query: str, hits: list[dict]) -> str:
-    """Results as links; an empty result says so rather than showing nothing."""
+def _render_search_results(query: str, hits: list[dict], pages: dict[str, "st.Page"]) -> None:
+    """
+    Results as buttons rather than links: Streamlit rewrites a link in its own
+    markdown to open in a new tab, which is wrong for moving around one site.
+    A button switches page inside the app and leaves the chart to scroll to in
+    session state, which no rewriting can touch.
+    """
     if not hits:
-        return (f'<div class="ehs-results"><p class="ehs-none">No chart matches '
-                f'&ldquo;{_esc(query.strip())}&rdquo;.</p></div>')
-    rows = "".join(
-        f'<a class="ehs-hit" href="{hit["url"]}">'
-        f'<span class="ehs-hit-title">{_esc(hit["title"])}</span>'
-        f'<span class="ehs-hit-page">{_esc(hit["page"])}</span></a>'
-        for hit in hits
-    )
-    return f'<div class="ehs-results">{rows}</div>'
+        st.markdown(f'<div class="ehs-results"><p class="ehs-none">No chart matches '
+                    f'&ldquo;{_esc(query.strip())}&rdquo;.</p></div>', unsafe_allow_html=True)
+        return
+
+    st.markdown('<div class="ehs-rule"></div>', unsafe_allow_html=True)
+    for hit in hits:
+        with st.container(key=f"ehshit-{hit['path']}-{hit['slug']}", horizontal=True):
+            if st.button(hit["title"], key=f"ehsgo-{hit['path']}-{hit['slug']}"):
+                st.session_state["_scroll_to"] = hit["slug"]
+                # The default page answers to an empty url_path, as the page
+                # links above also have to allow for.
+                target = pages.get(hit["path"])
+                if target is not None and hit["path"] != (current.url_path or "weekly"):
+                    st.switch_page(target)
+                st.rerun()
+            st.markdown(f'<span class="ehs-hit-page">{_esc(hit["page"])}</span>',
+                        unsafe_allow_html=True)
 
 
 def _page_header_html(title: str, dek: str, meta_label: str, meta_value: str,
@@ -3155,7 +3243,13 @@ with st.container(key="ehsearch"):
         label_visibility="collapsed",
     )
     if _query and _query.strip():
-        st.markdown(_search_results_html(_query, _search_charts(_query, _search_index())),
-                    unsafe_allow_html=True)
+        _render_search_results(_query, _search_charts(_query, _search_index()),
+                               {p.url_path or "weekly": p for p in PAGES})
 
 current.run()
+
+# The chart a search result asked for, put on screen now the page has been
+# built. ?chart=<slug> does the same thing from a link someone has kept.
+_wanted = st.session_state.pop("_scroll_to", "") or st.query_params.get("chart", "")
+if re.fullmatch(r"[a-z0-9-]{2,64}", _wanted or ""):
+    components.html(_scroll_to_chart_html(_wanted), height=0)
