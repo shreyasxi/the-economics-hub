@@ -158,6 +158,17 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "60-day rolling correlation of S&P 500 and long Treasury daily returns  ·  below zero = bonds cushion equity falls",
         ),
     },
+    "sector_rotation_12m": {
+        "dashboard": (
+            "S&P 500 Sector Rotation — Trailing 12 Months",
+            "Total return by sector over the past year  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Where the Year's Money Went",
+            "Total return by S&P 500 sector over the past year  ·  {date}",
+        ),
+    },
     "defensives_cyclicals": {
         "dashboard": (
             "Defensive vs. Cyclical Sectors",
@@ -821,20 +832,21 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     # ── 6. SECTOR ROTATION ──
     print("   [10/11] S&P 500 Sector Rotation")
+    # Shared with the trailing-12-month chart below, so the two always cover the same sectors.
+    SECTOR_ETFS = {
+        "XLK": "Technology",
+        "XLF": "Financials",
+        "XLE": "Energy",
+        "XLV": "Healthcare",
+        "XLI": "Industrials",
+        "XLC": "Comms",
+        "XLY": "Consumer Disc",
+        "XLP": "Consumer Staples",
+        "XLRE": "Real Estate",
+        "XLU": "Utilities",
+        "XLB": "Materials",
+    }
     try:
-        SECTOR_ETFS = {
-            "XLK": "Technology",
-            "XLF": "Financials",
-            "XLE": "Energy",
-            "XLV": "Healthcare",
-            "XLI": "Industrials",
-            "XLC": "Comms",
-            "XLY": "Consumer Disc",
-            "XLP": "Consumer Staples",
-            "XLRE": "Real Estate",
-            "XLU": "Utilities",
-            "XLB": "Materials",
-        }
         sector_data = []
         for ticker, name in SECTOR_ETFS.items():
             try:
@@ -858,7 +870,39 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             chart.save(output_dir / "10_sector_rotation.png")
     except Exception as e:
         print(f"   ⚠ Sector rotation failed: {e}")
-        
+
+    # ── 6b. SECTOR ROTATION, TRAILING 12 MONTHS ──
+    # The weekly chart above answers "what moved this week"; this one answers "what has
+    # led the year", which a single week's bars cannot show. Yahoo's history() adjusts
+    # closes for dividends, so these are total returns — and that matters at this horizon:
+    # utilities and staples yield around 3%, enough to change the order of the ranking.
+    print("   [10b/11] S&P 500 Sector Rotation — Trailing 12 Months")
+    try:
+        year_data, missing = [], []
+        for ticker, name in SECTOR_ETFS.items():
+            try:
+                closes = yf_fetcher.get_close_series(ticker, period="1y")
+            except Exception:
+                closes = None
+            if closes is None or len(closes) < 200:      # a year is about 250 trading days
+                missing.append(name)
+                continue
+            year_data.append((name, round((closes.iloc[-1] / closes.iloc[0] - 1) * 100, 2)))
+
+        if missing:
+            print(f"   ⚠ No 12-month history for: {', '.join(missing)} — left off the chart")
+        if year_data:
+            year_data.sort(key=lambda x: x[1], reverse=True)
+            _t, _s = WEEKLY_TITLES["sector_rotation_12m"][mode]
+            chart = WeeklyBarChart(names=[s[0] for s in year_data],
+                                   values=[s[1] for s in year_data],
+                                   color_keys=["us"] * len(year_data))
+            chart.render(title=_t, subtitle=_s.format(date=date_label),
+                         source="Yahoo Finance (SPDR sector ETFs, total return)")
+            chart.save(output_dir / "10a_sector_rotation_12m.png")
+    except Exception as e:
+        print(f"   ⚠ 12-month sector rotation failed: {e}")
+
     # ── 7.NIFTY SECTOR ROTATION ──
     print("   [11/12] NIFTY Sector Rotation")
     try:

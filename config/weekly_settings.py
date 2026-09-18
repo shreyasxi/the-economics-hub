@@ -18,8 +18,9 @@ SUMMARY_CHART = "summary_table"
 WEEKLY_SECTIONS: list[tuple[str, list[str]]] = [
     ("Equities", [
         "equities_weekly", "equities_trend",
-        "sector_rotation", "defensives_cyclicals",
-        "market_breadth", "risk_appetite_ratio",
+        "sector_rotation", "sector_rotation_12m",
+        "defensives_cyclicals", "market_breadth",
+        "risk_appetite_ratio",
     ]),
     ("Commodities", [
         "commodities_weekly", "commodities_trend",
