@@ -428,6 +428,12 @@ CHART_INSIGHTS: dict[str, str] = {
 **Practical takeaway:** India's banking system historically operates with a CD ratio between 70–78%. Sustained CD ratios above 78% signal that deposit mobilisation is lagging credit demand — which has historically preceded RBI calls for banks to raise deposit rates, moderated loan growth, or tighter systemic liquidity. The chart also shows whether credit-deposit divergence is cyclical (temporary growth surge) or structural (persistent deposit shortfall). When deposit growth consistently trails credit growth for 4+ months, watch for RBI governor commentary on deposit mobilisation — this has been a frequent conference theme in 2023–24.
 """,
 
+    "india_rate_transmission": """\
+**How to read this chart:** Each line is the cumulative change, in basis points, since the start of the current policy rate cycle: the RBI's repo rate against the rates banks actually charge and pay. The figures are the RBI's own, from Table IV.3 of the State of the Economy article in each month's Bulletin, and every edition restates the cycle to date — so reading the same row across editions traces how far the policy move has travelled. The external benchmark rate (EBLR) follows the repo mechanically and is left off; what matters is the gap between the repo line and the loan and deposit lines, which is the part of the move that has not reached borrowers and savers. Bank rates are reported with a lag, so the last point is usually two months behind the repo rate.
+
+**Practical takeaway:** Transmission is slow, partial and reversible. In the cycle that began in February 2025, the full repo cut reached the external benchmark immediately, while fresh lending rates moved by roughly two-thirds of it and fresh deposit rates moved further still before giving part of it back — cumulative deposit pass-through peaked and then narrowed as banks competed for funding against strong credit demand. Fresh deposit rates are the most volatile line because they reflect the mix of new business each month, not the whole deposit book; outstanding rates move slowest, since existing loans and deposits reprice only at reset dates. A widening gap between the repo line and the lending lines means policy is working less than the headline rate suggests, and it is the clearest signal that further cuts may be needed to achieve the same effect.
+""",
+
     # ── INDIA: ECONOMIC ACTIVITY ──────────────────────────────────────────────
 
     "india_iip": """\

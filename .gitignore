@@ -43,6 +43,9 @@ Desktop.ini
 # ── RBI Sentinel — local data, cache, logs ──
 data/rbi_sentinel_cache/
 
+# ── RBI Bulletin, State of the Economy — downloaded article pages ──
+data/rbi_soe_cache/
+
 # Ignore SQLite temp files
 *.db-shm
 *.db-wal

@@ -10,6 +10,20 @@ An automated Python pipeline tracking Global Equities, Forex, Sovereign Bonds, C
 
 ---
 
+## Featured research: RBI Sentinel
+
+A tone index for Indian monetary policy, scored from **285 Reserve Bank documents across 61 policy
+cycles since 2016**, with a pre-registered live test running from October 2026 on whether it
+predicts the bond market's reaction to a decision.
+
+It reports its negative results as prominently as its positive one: tone does **not** predict the
+rate decision once the RBI's stated stance is known, and shows no reliable relationship with
+equities or the rupee. What it does track is the 10-year government security's move on decision day.
+
+**→ [Read the write-up](RBI_SENTINEL.md)** · [see it live](https://weekly-macro-dashboard.streamlit.app/rbi-sentinel)
+
+---
+
 ## Sample Charts
 
 | **Market Snapshot** | **World: Shiller CAPE and Excess CAPE Yield** |
@@ -62,7 +76,8 @@ economics_hub/
 ├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
 ├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
 ├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
-├── generate_india.py            # India page (14 charts, Saturdays via CI + manual)
+├── generate_india.py            # India page (15 charts, Saturdays via CI + manual)
+├── generate_soe.py              # India page: RBI's State of the Economy (briefing + rate transmission history)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
 ├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
@@ -128,6 +143,8 @@ Generates 14 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) �
 ```bash
 python -m data.india_manual_entry status
 python generate_india.py
+python generate_soe.py              # RBI's State of the Economy: briefing + transmission history
+python generate_soe.py --history    # read any editions missing from data/rbi_transmission.csv
 ```
 
 ### 4. Reserve Bank of India Policy Related Charts

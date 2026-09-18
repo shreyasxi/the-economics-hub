@@ -31,6 +31,7 @@ from charts.loader import (
 )
 import config.insights as _insights
 import config.news_settings as _news_settings
+import config.soe_settings as _soe_settings
 import config.weekly_settings as _weekly_settings
 import config.world_settings as _world_settings
 
@@ -615,6 +616,7 @@ st.markdown(
     .nh-item { border-top: 1px solid var(--nh-rule); padding: 1.05rem 0 1.2rem 0; }
 
     @media (prefers-reduced-motion: reduce) {
+        .soe-more > summary svg { transition: none; }
         .nh-hl, .nh-hl-text, .nh-ext, .nh-how > summary { transition: none; }
         .nh-story:hover .nh-ext { transform: none; }
     }
@@ -635,6 +637,110 @@ st.markdown(
         .nh-rest, .nh-col.is-india .nh-rest { grid-template-columns: minmax(0, 1fr); }
     }
     /* ═══ end news strip ═══════════════════════════════════════════════ */
+
+    /* ═══ State of the Economy: the RBI's monthly read, top of the India tab ══
+       Drawn only when the India edition folder has a soe.json (generate_soe.py).
+       Editorial like the headlines strip: no card, hairline rules, the RBI's own
+       opening summary set in Newsreader. Every word inside is RBI's, so nothing
+       here styles an interpretation — only the quote, its date and its source. */
+    .soe {
+        --soe-ink: #0A1F3D;
+        --soe-text: #2B3340;
+        --soe-muted: #6A7280;
+        --soe-faint: #A2AAB5;
+        --soe-rule: #D7DDE4;
+        --soe-mark: #A85600;        /* the India tab's accent, as used by the headlines column */
+        margin: 1.6rem 0 2.6rem 0;
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+    .soe-head {
+        position: relative;
+        display: flex; align-items: flex-end; justify-content: space-between;
+        gap: 0.6rem 2rem; flex-wrap: wrap;
+        padding-bottom: 0.8rem; border-bottom: 1px solid var(--soe-ink);
+    }
+    .soe-head-l { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.2rem 0; min-width: 0; }
+    .soe-title {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.46rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
+        color: var(--soe-ink);
+    }
+    .soe-edition {
+        font-size: 0.8rem; font-weight: 500; color: var(--soe-muted); white-space: nowrap;
+        font-variant-numeric: tabular-nums lining-nums;
+        margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--soe-rule);
+    }
+    .soe-how { position: static; }
+    .soe-how > summary {
+        list-style: none; cursor: pointer; user-select: none;
+        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0;
+        font-size: 0.76rem; font-weight: 600; color: var(--soe-text);
+        transition: color 0.15s ease;
+    }
+    .soe-how > summary::-webkit-details-marker { display: none; }
+    .soe-how > summary::marker { content: ""; }
+    .soe-how > summary svg { width: 15px; height: 15px; color: var(--soe-muted); transition: color 0.15s ease; }
+    .soe-how > summary:hover, .soe-how[open] > summary { color: var(--soe-mark); }
+    .soe-how > summary:hover svg, .soe-how[open] > summary svg { color: var(--soe-mark); }
+    .soe-how > summary:focus-visible { outline: 2px solid var(--soe-mark); outline-offset: 3px; border-radius: 3px; }
+    .soe-how-panel {
+        position: absolute; right: 0; top: calc(100% + 0.65rem); z-index: 30;
+        width: min(27rem, 100%); box-sizing: border-box;
+        background: #FFFFFF; border: 1px solid #E2E7ED; border-radius: 10px;
+        box-shadow: 0 10px 28px rgba(16, 24, 40, 0.13);
+        padding: 0.9rem 1rem; display: grid; gap: 0.5rem;
+        font-size: 0.76rem; line-height: 1.45; color: var(--soe-text);
+    }
+    .soe-lede {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.12rem; font-weight: 400; line-height: 1.5; color: var(--soe-text);
+        margin: 1.1rem 0 0 0; max-width: 62rem;
+    }
+    .soe-more { margin-top: 0.9rem; }
+    .soe-more > summary {
+        list-style: none; cursor: pointer; user-select: none;
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        font-size: 0.78rem; font-weight: 600; color: var(--soe-mark);
+    }
+    .soe-more > summary svg { width: 10px; height: 10px; transition: transform 0.15s ease; }
+    .soe-more[open] > summary svg { transform: rotate(90deg); }
+    .soe-more > summary:hover { text-decoration: underline; }
+    .soe-more > summary::-webkit-details-marker { display: none; }
+    .soe-more > summary::marker { content: ""; }
+    .soe-more > summary:focus-visible { outline: 2px solid var(--soe-mark); outline-offset: 3px; border-radius: 3px; }
+    .soe-concl {
+        border-left: 2px solid var(--soe-rule); padding: 0.1rem 0 0.1rem 1rem; margin-top: 0.7rem;
+        display: grid; gap: 0.7rem; max-width: 62rem;
+        font-size: 0.92rem; line-height: 1.55; color: var(--soe-text);
+    }
+    .soe-meta {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem;
+        margin-top: 1rem; padding-top: 0.7rem; border-top: 1px solid var(--soe-rule);
+        font-size: 0.74rem; line-height: 1.3; color: var(--soe-muted);
+        font-variant-numeric: tabular-nums lining-nums;
+    }
+    .soe-src { font-weight: 600; color: var(--soe-text); }
+    .soe-dot { flex: none; width: 3px; height: 3px; border-radius: 50%; background: var(--soe-faint); }
+    .soe-stale { color: var(--soe-mark); font-weight: 600; }
+    .soe-link {
+        display: inline-flex; align-items: center; gap: 0.28rem;
+        color: var(--soe-mark) !important; font-weight: 600; text-decoration: none !important;
+    }
+    .soe-link:hover { text-decoration: underline !important; }
+    .soe-link svg { width: 10px; height: 10px; }
+    @media (max-width: 680px) {
+        .soe { margin: 1rem 0 2rem 0; }
+        .soe-title { font-size: 1.3rem; }
+        .soe-edition { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
+        .soe-how { width: 100%; }
+        .soe-how-panel { width: 100%; }
+        .soe-lede { font-size: 1.04rem; }
+        /* The meta line wraps on a phone, which left a separator dot stranded
+           at the end of a line; spacing carries the separation instead. */
+        .soe-dot { display: none; }
+        .soe-meta { column-gap: 0.9rem; }
+    }
+    /* ═══ end State of the Economy ═════════════════════════════════════ */
 
     /* ── Scoreboard ── */
     .wsb-wrap { overflow-x: auto; margin: 0.2rem 0 0 0; }
@@ -1114,7 +1220,8 @@ with st.sidebar:
     st.markdown(
         '<p class="sb-byline-label">Research by</p>'
         '<p class="sb-byline-name">Shreyas Urgunde</p>'
-        '<p class="sb-coverage">Weekly coverage of global equities, rates, FX, commodities, and the Indian economy.</p>',
+        '<p class="sb-coverage">Automated weekly analysis of global markets, the world economy '
+        'and India &mdash; with sentiment scoring of RBI policy.</p>',
         unsafe_allow_html=True,
     )
 
@@ -1932,6 +2039,89 @@ def _headlines_html(news: dict) -> str | None:
     )
 
 
+# ── State of the Economy, at the top of the India tab ──────────────────────
+# The RBI's monthly article, from the soe.json that generate_soe.py writes into
+# each India edition folder. An edition without one shows no briefing. Every
+# sentence is RBI's own, quoted verbatim and dated: nothing here is summarised.
+
+_SOE_CHEVRON = ('<svg class="soe-chev" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" '
+                'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.4 1.8 6.9 5 3.4 8.2"/></svg>')
+
+
+def _load_soe(charts: list[Path]) -> dict | None:
+    """soe.json from the same edition folder as the India charts, so text and charts match."""
+    path = charts[0].parent / "soe.json" if charts else None
+    if path is None or not path.exists():
+        return None
+    try:
+        with path.open(encoding="utf-8") as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+
+def _soe_html(soe: dict) -> str | None:
+    """
+    RBI's opening summary, its concluding assessment behind a disclosure, and
+    where it came from. Returns None when the file is not what it should be,
+    so a bad read leaves the tab without a briefing rather than with a fragment.
+    """
+    cfg = _fresh_config(_soe_settings)
+    try:
+        published = date.fromisoformat(soe["published"])
+        edition = datetime.strptime(soe["month"], "%Y-%m")
+        summary = _esc(soe["summary"]).strip()
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not summary:
+        return None
+
+    conclusion = [_esc(p) for p in (soe.get("conclusion") or []) if str(p).strip()]
+    more = ""
+    if conclusion:
+        paragraphs = "".join(f"<span>{p}</span>" for p in conclusion)
+        more = ('<details class="soe-more">'
+                f'<summary>{_SOE_CHEVRON}RBI&rsquo;s concluding assessment</summary>'
+                f'<div class="soe-concl">{paragraphs}</div></details>')
+
+    url = _safe_url(soe.get("url"))
+    link = (f'<a class="soe-link" href="{url}" target="_blank" rel="noopener noreferrer">'
+            f'Read the full article{_NH_ARROW}<span class="nh-sr"> (opens in a new tab)</span></a>'
+            if url else "")
+
+    # The article is monthly; past the limit, say so rather than let a dated
+    # quote read as this month's view.
+    stale = ""
+    if (date.today() - published).days > cfg.MAX_EDITION_AGE_DAYS:
+        stale = ('<span class="soe-dot"></span>'
+                 '<span class="soe-stale">Latest edition published; no newer one yet</span>')
+
+    return (
+        '<section class="soe" aria-labelledby="soe-title">'
+        '<div class="soe-head">'
+        '<div class="soe-head-l">'
+        '<div class="soe-title" id="soe-title" role="heading" aria-level="2">State of the Economy</div>'
+        f'<span class="soe-edition">{edition:%B %Y}</span>'
+        '</div>'
+        f'<details class="soe-how"><summary>{_NH_INFO}About this report</summary>'
+        f'<div class="soe-how-panel"><span>{cfg.DISCLAIMER}</span>'
+        '<span>The opening summary and concluding assessment are reproduced word for word '
+        'from the article; nothing on this page is a paraphrase.</span>'
+        '<span>Published monthly in the RBI Bulletin, usually in the fourth week.</span>'
+        '</div></details>'
+        '</div>'
+        f'<div class="soe-lede">{summary}</div>'
+        f'{more}'
+        '<div class="soe-meta">'
+        f'<span class="soe-src">{cfg.ATTRIBUTION}</span><span class="soe-dot"></span>'
+        f'<span>Published {published.day} {published:%B %Y}</span>'
+        f'{stale}'
+        f'{"<span class=" + chr(34) + "soe-dot" + chr(34) + "></span>" + link if link else ""}'
+        '</div>'
+        '</section>'
+    )
+
+
 def _page_header_html(title: str, dek: str, meta_label: str, meta_value: str,
                       nav: list[tuple[str, str]] | None = None) -> str:
     """Page masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
@@ -2123,6 +2313,12 @@ def page_india() -> None:
             unsafe_allow_html=True,
         )
 
+        # RBI's own read of the month, when this edition was published with one.
+        soe = _load_soe(charts)
+        briefing = _soe_html(soe) if soe else None
+        if briefing:
+            st.markdown(briefing, unsafe_allow_html=True)
+
         summary, charts = _pop_summary(charts, ["india_table", "05_india"])
         if summary:
             _render_summary(summary)
@@ -2144,7 +2340,7 @@ def page_india() -> None:
             _render_grid(inflation)
 
         # 3. Monetary Conditions
-        monetary_kws = ["money", "supply", "credit", "deposit", "m3"]
+        monetary_kws = ["money", "supply", "credit", "deposit", "m3", "transmission"]
         monetary = [c for c in charts if any(k in c.name for k in monetary_kws)]
         charts = [c for c in charts if c not in monetary]
         if monetary:
@@ -2617,8 +2813,8 @@ if current.url_path:                      # the default page keeps the plain tit
     st.set_page_config(page_title=f"{current.title} · The Economics Hub")
 
 st.markdown(
-    '<h1 class="insti-masthead">Global Macro & Cross-Asset Monitor</h1>'
-    '<p class="insti-tagline">Maintained by Shreyas Urgunde</p>'
+    '<h1 class="insti-masthead">The Economics Hub</h1>'
+    '<p class="insti-tagline">Global macro &amp; cross-asset research by Shreyas Urgunde</p>'
     '<div class="substack-center-container">'
         '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
             '<span class="substack-cta__label">Subscribe on Substack</span>'

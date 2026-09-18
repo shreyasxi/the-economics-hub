@@ -63,6 +63,7 @@ from charts.style import EconStyle
 DEFAULT_CSV   = Path(__file__).parent / "data" / "india_manual.csv"
 DEFAULT_CAG   = Path(__file__).parent / "data" / "cag_monthly_accounts.xlsx"
 DEFAULT_DB    = Path(__file__).parent / "data" / "india_macro.db"
+TRANSMISSION_CSV = Path(__file__).parent / "data" / "rbi_transmission.csv"
 OUTPUT_BASE   = Path(__file__).parent / "output" / "india"
 
 # Colors
@@ -1475,6 +1476,157 @@ def chart_iip(df, output_dir):
 
 
 # ═══════════════════════════════════════════
+# CHART 18: MONETARY TRANSMISSION
+# ═══════════════════════════════════════════
+
+TRANSMISSION_SERIES = [
+    # column, label, colour, line style
+    ("repo_bps",             "Policy repo rate",  "#000000",  "-"),
+    ("walr_fresh_bps",       "Fresh loans",       "#1E3A8A",  "-"),
+    ("walr_outstanding_bps", "Existing loans",    "#0B8F82",  "-"),
+    ("wadtdr_fresh_bps",     "Fresh deposits",    "#D97706",  "--"),
+]
+
+
+class TransmissionDataError(ValueError):
+    """The transmission history is present but cannot be trusted."""
+
+
+def load_transmission(path=TRANSMISSION_CSV):
+    """
+    The current rate cycle from data/rbi_transmission.csv, one row per edition.
+
+    Each edition of RBI's State of the Economy restates the cycle to date, so
+    reading the same row across editions gives the path of pass-through through
+    the cycle — including the recent months when fresh deposit rates gave some
+    of the cut back. Only the newest cycle is returned; earlier cycles stay in
+    the file as history.
+
+    Missing file: returns None, and the chart is skipped. A file that is there
+    but malformed raises, because wrong basis points on a chart are worse than
+    no chart.
+    """
+    if not path.exists():
+        return None
+
+    df = pd.read_csv(path)
+    needed = {"month", "cycle_type", "cycle_start", "cycle_end"} | {c for c, _, _, _ in TRANSMISSION_SERIES}
+    missing = needed - set(df.columns)
+    if missing:
+        raise TransmissionDataError(f"{path.name} is missing columns {sorted(missing)}")
+    if df.empty:
+        return None
+
+    current_start = df["cycle_start"].max()
+    df = df[df["cycle_start"] == current_start].copy()
+    # Two editions can restate the same data month (RBI revises the figures a
+    # month later), so the newest edition's version of a month is the one kept.
+    df = (df.sort_values(["cycle_end", "month"])
+            .drop_duplicates(subset="cycle_end", keep="last"))
+
+    for column, label, _, _ in TRANSMISSION_SERIES:
+        df[column] = pd.to_numeric(df[column], errors="coerce")
+        if df[column].isna().any():
+            raise TransmissionDataError(
+                f"{path.name}: {label} is blank or not a number in "
+                f"{df.loc[df[column].isna(), 'month'].tolist()}"
+            )
+
+    # Every row must describe the same cycle, and RBI's own repo column must not
+    # wander within it: both would mean rows from different tables were mixed.
+    if df["cycle_type"].nunique() != 1:
+        raise TransmissionDataError(f"{path.name}: cycle {current_start} holds more than one cycle type")
+
+    df["date"] = pd.to_datetime(df["cycle_end"], format="%Y-%m")
+    return df
+
+
+def chart_rate_transmission(output_dir, path=TRANSMISSION_CSV):
+    """
+    How much of the policy rate move has reached bank lending and deposit rates.
+
+    Drawn as the path through the cycle rather than one set of bars: the gap
+    between the repo line and the others is the part of the move that has not
+    reached borrowers and savers, and the way that gap widens or narrows month
+    by month is the point of the chart.
+    """
+    df = load_transmission(path)
+    if df is None or len(df) < 2:
+        print("   ⚠ Skipping Monetary Transmission — no RBI transmission history "
+              "(run: python generate_soe.py --history)")
+        return None
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    dates = df["date"].tolist()
+
+    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
+    ax.set_axisbelow(True)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    ends: list[tuple[float, str, str]] = []
+    for column, label, color, style in TRANSMISSION_SERIES:
+        values = df[column].values
+        # The repo rate holds between MPC decisions, so it is drawn as steps;
+        # bank rates are monthly averages and are drawn as lines.
+        ax.plot(dates, values, color=color, linewidth=2.5, linestyle=style, zorder=4,
+                solid_capstyle="round", label=label,
+                drawstyle="steps-post" if column == "repo_bps" else "default")
+        ends.append((float(values[-1]), label, color))
+
+    ax.axhline(y=0, color="#000000", linewidth=1.0, zorder=2)
+    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%d"))
+    ax.set_ylabel("Cumulative change (basis points)", fontsize=EconStyle.FONT_SIZE_AXIS)
+
+    # Ticks every second month: sixteen monthly labels ran into each other.
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    plt.setp(ax.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+
+    span = df[[c for c, _, _, _ in TRANSMISSION_SERIES]].values
+    low, high = span.min() - 20, max(span.max(), 0) + 20
+    ax.set_ylim(low, high)
+    # The axis stops with the data: empty months to the right would read as a
+    # gap in reporting rather than as room for the labels.
+    ax.set_xlim(dates[0], dates[-1] + pd.Timedelta(days=42))
+
+    # End labels, nudged apart when two series finish within a hair of each
+    # other (fresh and existing loans ended one basis point apart in Jun 2026).
+    gap = (high - low) * 0.075
+    placed: list[float] = []
+    for value, label, color in sorted(ends, reverse=True):
+        y = value
+        for taken in placed:
+            if abs(y - taken) < gap:
+                y = taken - gap
+        placed.append(y)
+        ax.annotate(
+            f"{label}  {value:,.0f}",
+            xy=(dates[-1], y), xytext=(10, 0), textcoords="offset points",
+            va="center", fontsize=9, fontweight="bold", color=color,
+            fontfamily=EconStyle.FONT_FAMILY, annotation_clip=False, zorder=10,
+        )
+
+    cycle = df["cycle_type"].iloc[0]
+    start = pd.to_datetime(df["cycle_start"].iloc[0], format="%Y-%m")
+    EconStyle.set_title(
+        ax,
+        "Monetary Transmission: How Far the Repo Cut Has Travelled"
+        if cycle == "easing" else "Monetary Transmission: How Far the Repo Rise Has Travelled",
+        f"Cumulative change since the start of the {cycle} cycle ({start:%b %Y}), "
+        f"basis points — bank rates through {df['date'].iloc[-1]:%b %Y}",
+    )
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "RBI Bulletin, State of the Economy (Table IV.3)")
+
+    fp = output_dir / "18_india_rate_transmission.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Monetary Transmission ({len(df)} editions)")
+    return fp
+
+
+# ═══════════════════════════════════════════
 # CHART 16: FOREX RESERVES
 # ═══════════════════════════════════════════
 
@@ -2029,6 +2181,7 @@ def main():
     # ── Monetary Conditions charts ─────────────────────────────────────────────
     chart_money_supply(df, output_dir)
     chart_credit_deposit(df, output_dir)
+    chart_rate_transmission(output_dir)
 
     # ── Economic Activity — IIP (new) ──────────────────────────────────────────
     chart_iip(df, output_dir)
