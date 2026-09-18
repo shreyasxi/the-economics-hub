@@ -803,9 +803,9 @@ st.markdown(
        beat a bare class selector: every declaration it sets is forced here. */
     .insti-masthead {
         font-family: 'Playfair Display', Georgia, serif !important;
-        font-size: 3.3rem !important;
+        font-size: 2.55rem !important;
         font-weight: 900 !important;
-        letter-spacing: 0.005em !important;
+        letter-spacing: -0.005em !important;
         color: #0A1128 !important;
         text-align: center;
         text-transform: uppercase;
@@ -833,6 +833,20 @@ st.markdown(
         line-height: 1.45 !important;
     }
 
+    /* The author's name is the one thing in the masthead a reader may want to
+       follow, so it is a link — but it must not out-shout the strip it sits in,
+       hence the same colour and a rule that only appears on hover. */
+    a.insti-author, a.insti-author:visited {
+        color: inherit !important;
+        text-decoration: none !important;
+        border-bottom: 1px solid rgba(0, 51, 102, 0.35);
+        padding-bottom: 1px;
+        transition: border-color 0.15s ease-in-out;
+    }
+    a.insti-author:hover {
+        border-bottom-color: #003366;
+    }
+
     .insti-byline {
         font-family: 'Inter', sans-serif !important;
         font-size: 0.79rem !important;
@@ -846,7 +860,7 @@ st.markdown(
     /* A phone cannot hold 0.2em of tracking across that descriptor without
        breaking it into three ragged lines. */
     @media (max-width: 680px) {
-        .insti-masthead { font-size: 2.05rem !important; }
+        .insti-masthead { font-size: 1.62rem !important; }
         .insti-descriptor {
             font-size: 0.68rem !important;
             letter-spacing: 0.1em !important;
@@ -1264,8 +1278,8 @@ with st.sidebar:
     st.markdown(
         '<p class="sb-byline-label">Research by</p>'
         '<p class="sb-byline-name">Shreyas Urgunde</p>'
-        '<p class="sb-coverage">Automated weekly analysis of global markets, the world economy '
-        'and India &mdash; with sentiment scoring of RBI policy.</p>',
+        '<p class="sb-coverage">Automated weekly analysis of global markets, the world and Indian '
+        'economy. Also contains sentiment analysis of RBI policy.</p>',
         unsafe_allow_html=True,
     )
 
@@ -2885,9 +2899,11 @@ if current.url_path:                      # the default page keeps the plain tit
     st.set_page_config(page_title=f"{current.title} · The Economics Hub")
 
 st.markdown(
-    '<h1 class="insti-masthead">The Economics Hub</h1>'
-    '<p class="insti-descriptor">Global Macro &amp; Cross-Asset Monitor</p>'
-    '<p class="insti-byline">Research by Shreyas Urgunde &nbsp;·&nbsp; Updated every Saturday</p>'
+    '<h1 class="insti-masthead">Global Macro &amp; Cross-Asset Monitor</h1>'
+    '<p class="insti-descriptor">Research &amp; Maintained by '
+    '<a class="insti-author" href="https://shreyasxi.github.io/" target="_blank" rel="noopener">'
+    'Shreyas Urgunde</a></p>'
+    '<p class="insti-byline">Updated every Saturday</p>'
     '<div class="substack-center-container">'
         '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
             '<span class="substack-cta__label">Subscribe on Substack</span>'

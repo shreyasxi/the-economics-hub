@@ -20,7 +20,7 @@ It reports its negative results as prominently as its positive one: tone does **
 rate decision once the RBI's stated stance is known, and shows no reliable relationship with
 equities or the rupee. What it does track is the 10-year government security's move on decision day.
 
-**→ [Read the write-up](RBI_SENTINEL.md)** · [see it live](https://weekly-macro-dashboard.streamlit.app/rbi-sentinel)
+**→ [Read the write-up](https://shreyasxi.github.io/economics-hub/#sentinel)** · [see it live](https://weekly-macro-dashboard.streamlit.app/rbi-sentinel)
 
 ---
 
