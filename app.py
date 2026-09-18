@@ -653,11 +653,13 @@ st.markdown(
         margin: 1.6rem 0 2.6rem 0;
         font-family: 'Inter', -apple-system, sans-serif;
     }
+    /* Inline-flex, so the rule under the title runs to the end of the edition
+       date and stops there rather than across the whole column. */
     .soe-head {
         position: relative;
-        display: flex; align-items: flex-end; justify-content: space-between;
-        gap: 0.6rem 2rem; flex-wrap: wrap;
-        padding-bottom: 0.8rem; border-bottom: 1px solid var(--soe-ink);
+        display: inline-flex; align-items: flex-end;
+        gap: 0.6rem 2rem; flex-wrap: wrap; max-width: 100%;
+        padding-bottom: 0.7rem; border-bottom: 1px solid var(--soe-ink);
     }
     .soe-head-l { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.2rem 0; min-width: 0; }
     .soe-title {
@@ -675,34 +677,46 @@ st.markdown(
         font-size: 1.12rem; font-weight: 400; line-height: 1.5; color: var(--soe-text);
         margin: 1.1rem 0 0 0; max-width: 62rem;
     }
-    /* What changed since last month: two quotes per topic, this month over last. */
-    .soe-changes { margin-top: 1.5rem; }
+    /* What changed since last month: RBI's sentence on a topic above the one it
+       wrote a month earlier. One topic to a row, the topic named in a left rail
+       and each quote dated, so the eye reads down one column of prose instead of
+       across two — the balanced two-column setting packed the quotes too tightly
+       to compare them. */
+    .soe-changes { margin-top: 1.9rem; max-width: 62rem; }
     .soe-chg-head {
         font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
         color: var(--soe-muted); padding-bottom: 0.6rem; border-bottom: 1px solid var(--soe-ink);
     }
-    /* Balanced columns rather than a two-column grid: the quotes differ in
-       length, and a grid left one row stranded beside an empty cell. */
-    .soe-chg-grid { column-count: 2; column-gap: 2.6rem; }
-    .soe-chg { break-inside: avoid; -webkit-column-break-inside: avoid; }
-    .soe-chg { border-bottom: 1px solid var(--soe-rule); padding: 0.85rem 0 0.9rem 0; }
+    .soe-chg {
+        display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 0 1.7rem;
+        align-items: start; padding: 1.05rem 0 1.1rem 0; border-bottom: 1px solid var(--soe-rule);
+    }
     .soe-chg-topic {
-        font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
-        color: var(--soe-mark); margin-bottom: 0.32rem;
+        font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+        color: var(--soe-mark); padding-top: 0.22rem;
+    }
+    .soe-chg-lines { display: grid; gap: 0.6rem; }
+    /* The date sits in its own column so a wrapped line does not run back under
+       it: each quote keeps one straight left edge. */
+    .soe-chg-now, .soe-chg-was {
+        display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 0.55rem;
+        align-items: start;
     }
     .soe-chg-now {
         font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 0.98rem; line-height: 1.45; color: var(--soe-text);
+        font-size: 1.02rem; line-height: 1.5; color: var(--soe-text);
     }
-    .soe-chg-was {
-        margin-top: 0.4rem; font-size: 0.78rem; line-height: 1.45; color: var(--soe-muted);
-    }
+    .soe-chg-was { font-size: 0.86rem; line-height: 1.5; color: var(--soe-muted); }
     .soe-chg-when {
-        display: inline-block; margin-right: 0.45rem; padding: 0.05rem 0.32rem;
-        border: 1px solid var(--soe-rule); border-radius: 3px;
+        padding: 0.06rem 0.34rem; border: 1px solid var(--soe-rule); border-radius: 3px;
         font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-        color: var(--soe-faint); vertical-align: 1px;
+        color: var(--soe-faint); white-space: nowrap;
     }
+    .soe-chg-now .soe-chg-when { margin-top: 0.22rem; }
+    .soe-chg-was .soe-chg-when { margin-top: 0.1rem; }
+    /* This month's date is set in the accent and last month's stays faint, so
+       which quote is current does not depend on reading the months. */
+    .soe-chg-when.is-now { color: var(--soe-mark); border-color: var(--soe-mark); }
 
     .soe-more { margin-top: 0.9rem; }
     .soe-more > summary {
@@ -741,7 +755,10 @@ st.markdown(
         .soe-title { font-size: 1.3rem; }
         .soe-edition { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
         .soe-lede { font-size: 1.04rem; }
-        .soe-chg-grid { column-count: 1; }
+        /* Not enough width for a left rail: the topic sits above its quotes. */
+        .soe-chg { grid-template-columns: minmax(0, 1fr); gap: 0.45rem 0; }
+        .soe-chg-topic { padding-top: 0; }
+        .soe-chg-now { font-size: 0.99rem; }
         /* The meta line wraps on a phone, which left a separator dot stranded
            at the end of a line; spacing carries the separation instead. */
         .soe-dot { display: none; }
@@ -2118,11 +2135,12 @@ def _load_soe(charts: list[Path]) -> dict | None:
         return None
 
 
-def _soe_changes_html(changes: list[dict], compared_with: str | None) -> str:
+def _soe_changes_html(changes: list[dict], compared_with: str | None,
+                      edition: datetime) -> str:
     """
-    What changed since last month: RBI's sentence on each topic beside the one it
-    wrote a month earlier. Both sides are quoted, so the reader compares the
-    Bank's own wording rather than a verdict formed here.
+    What changed since last month: RBI's sentence on each topic above the one it
+    wrote a month earlier. Both sides are quoted and both are dated, so the
+    reader compares the Bank's own wording rather than a verdict formed here.
     """
     if not changes or not compared_with:
         return ""
@@ -2139,22 +2157,26 @@ def _soe_changes_html(changes: list[dict], compared_with: str | None) -> str:
         rows.append(
             '<div class="soe-chg">'
             f'<div class="soe-chg-topic">{_esc(change.get("topic"))}</div>'
-            f'<div class="soe-chg-now">{now}</div>'
-            f'<div class="soe-chg-was"><span class="soe-chg-when">{before_month:%b}</span>{before}</div>'
-            '</div>'
+            '<div class="soe-chg-lines">'
+            f'<div class="soe-chg-now">'
+            f'<span class="soe-chg-when is-now">{edition:%b}</span>{now}</div>'
+            f'<div class="soe-chg-was">'
+            f'<span class="soe-chg-when">{before_month:%b}</span>{before}</div>'
+            '</div></div>'
         )
     if not rows:
         return ""
     return ('<div class="soe-changes">'
             f'<div class="soe-chg-head">What changed since {before_month:%B}</div>'
-            f'<div class="soe-chg-grid">{"".join(rows)}</div></div>')
+            f'<div>{"".join(rows)}</div></div>')
 
 
 def _soe_html(soe: dict) -> str | None:
     """
-    RBI's opening summary, what changed since last month, its concluding
-    assessment behind a disclosure, and where it came from. Returns None when the
-    file is not what it should be, so a bad read leaves the tab without a
+    RBI's opening summary, its concluding assessment behind a disclosure, what
+    changed since last month, and where it came from. The Bank's own framing of
+    the month comes first, then the topic-by-topic comparison. Returns None when
+    the file is not what it should be, so a bad read leaves the tab without a
     briefing rather than with a fragment.
     """
     cfg = _fresh_config(_soe_settings)
@@ -2196,8 +2218,8 @@ def _soe_html(soe: dict) -> str | None:
         '</div>'
         '</div>'
         f'<div class="soe-lede">{summary}</div>'
-        f'{_soe_changes_html(soe.get("changes") or [], soe.get("compared_with"))}'
         f'{more}'
+        f'{_soe_changes_html(soe.get("changes") or [], soe.get("compared_with"), edition)}'
         '<div class="soe-meta">'
         f'<span class="soe-src">{cfg.ATTRIBUTION}</span><span class="soe-dot"></span>'
         f'<span>Published {published.day} {published:%B %Y}</span>'
