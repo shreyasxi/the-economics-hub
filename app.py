@@ -711,9 +711,11 @@ st.markdown(
         display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 0.55rem;
         align-items: start;
     }
+    /* This month's sentence is set bold and in the darker ink: it is the line
+       that is being read, with last month's kept light underneath it. */
     .soe-chg-now {
         font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 0.99rem; line-height: 1.5; color: var(--soe-text);
+        font-size: 1rem; font-weight: 700; line-height: 1.5; color: var(--soe-ink);
     }
     .soe-chg-was { font-size: 0.83rem; line-height: 1.5; color: var(--soe-muted); }
     .soe-chg-when {
