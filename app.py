@@ -685,9 +685,13 @@ st.markdown(
        the column beside the snapshot table, so it is set narrow: the month's
        numbers on the left, the month's words on the right. */
     .soe-changes { max-width: 62rem; }
+    /* Set like the article's own title, a size down: the two are a pair, the
+       briefing above and the month-on-month read beside the table. */
     .soe-chg-head {
-        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-        color: var(--soe-muted); padding-bottom: 0.6rem; border-bottom: 1px solid var(--soe-ink);
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.15rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em;
+        color: var(--soe-ink);
+        padding-bottom: 0.6rem; border-bottom: 1px solid var(--soe-ink);
     }
     .soe-chg {
         display: grid; gap: 0.4rem 0;
