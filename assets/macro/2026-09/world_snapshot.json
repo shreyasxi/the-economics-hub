@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-19 05:48",
+ "generated_at": "2026-09-19 13:43",
  "as_of": "2026-09-19",
  "central_banks": [
   {
@@ -7,7 +7,7 @@
    "status": "ok",
    "rate": 4.0,
    "display": "3.75–4.00",
-   "as_of": "2026-09-18",
+   "as_of": "2026-09-19",
    "last_move": {
     "date": "2026-09-17",
     "bps": 25
@@ -99,7 +99,7 @@
      "source": "FRED DFEDTARL/DFEDTARU + FOMC statement",
      "manual": false,
      "value": 4.0,
-     "period": "2026-09-18",
+     "period": "2026-09-19",
      "display": "3.75–4.00",
      "status": "ok"
     },
@@ -159,7 +159,7 @@
     "fx_ytd": {
      "source": "Yahoo Finance EURUSD=X",
      "manual": false,
-     "value": -2.199,
+     "value": -2.188,
      "period": "2026-09-18",
      "status": "ok",
      "label": "vs USD"
@@ -212,8 +212,8 @@
     "fx_ytd": {
      "source": "Yahoo Finance GBPUSD=X",
      "manual": false,
-     "value": -0.547,
-     "period": "2026-09-18",
+     "value": -0.552,
+     "period": "2026-09-19",
      "status": "ok",
      "label": "vs USD"
     }
