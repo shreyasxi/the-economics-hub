@@ -1,13 +1,13 @@
 {
- "generated_at": "2026-09-17 05:06",
- "as_of": "2026-09-17",
+ "generated_at": "2026-09-19 05:48",
+ "as_of": "2026-09-19",
  "central_banks": [
   {
    "id": "fed",
    "status": "ok",
    "rate": 4.0,
    "display": "3.75–4.00",
-   "as_of": "2026-09-17",
+   "as_of": "2026-09-18",
    "last_move": {
     "date": "2026-09-17",
     "bps": 25
@@ -18,7 +18,7 @@
    "status": "ok",
    "rate": 2.5,
    "display": "2.50",
-   "as_of": "2026-09-16",
+   "as_of": "2026-09-18",
    "last_move": {
     "date": "2026-09-16",
     "bps": 25
@@ -29,7 +29,7 @@
    "status": "ok",
    "rate": 3.75,
    "display": "3.75",
-   "as_of": "2026-09-15",
+   "as_of": "2026-09-17",
    "last_move": {
     "date": "2025-12-18",
     "bps": -25
@@ -40,7 +40,7 @@
    "status": "ok",
    "rate": 1.0,
    "display": "1.00",
-   "as_of": "2026-09-08",
+   "as_of": "2026-09-15",
    "last_move": {
     "date": "2026-06-17",
     "bps": 25
@@ -51,7 +51,7 @@
    "status": "ok",
    "rate": 3.0,
    "display": "3.00",
-   "as_of": "2026-09-08",
+   "as_of": "2026-09-15",
    "last_move": {
     "date": "2025-05-20",
     "bps": -10
@@ -90,24 +90,24 @@
     "ten_year": {
      "source": "FRED DGS10",
      "manual": false,
-     "change": 0.29,
-     "value": 5.0,
-     "period": "2026-09-15",
+     "change": 0.25,
+     "value": 4.94,
+     "period": "2026-09-17",
      "status": "ok"
     },
     "policy_rate": {
      "source": "FRED DFEDTARL/DFEDTARU + FOMC statement",
      "manual": false,
      "value": 4.0,
-     "period": "2026-09-17",
+     "period": "2026-09-18",
      "display": "3.75–4.00",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance DX-Y.NYB (DXY)",
      "manual": false,
-     "value": 2.032,
-     "period": "2026-09-17",
+     "value": 1.974,
+     "period": "2026-09-18",
      "status": "ok",
      "label": "DXY"
     }
@@ -128,8 +128,8 @@
     "cpi_yoy": {
      "source": "Eurostat prc_hicp_minr (HICP)",
      "manual": false,
-     "change": 0.4,
-     "value": 3.3,
+     "change": 0.3,
+     "value": 3.2,
      "period": "2026-08",
      "status": "ok"
     },
@@ -144,23 +144,23 @@
     "ten_year": {
      "source": "Deutsche Bundesbank (German Bund)",
      "manual": false,
-     "change": 0.29,
-     "value": 3.58,
-     "period": "2026-09-16",
+     "change": 0.25,
+     "value": 3.52,
+     "period": "2026-09-18",
      "status": "ok"
     },
     "policy_rate": {
      "source": "FRED ECBDFR (deposit facility rate)",
      "manual": false,
      "value": 2.5,
-     "period": "2026-09-16",
+     "period": "2026-09-18",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance EURUSD=X",
      "manual": false,
-     "value": -2.356,
-     "period": "2026-09-17",
+     "value": -2.199,
+     "period": "2026-09-18",
      "status": "ok",
      "label": "vs USD"
     }
@@ -197,23 +197,23 @@
     "ten_year": {
      "source": "Bank of England IUDMNPY (par yield)",
      "manual": false,
-     "change": 0.327,
-     "value": 5.37,
-     "period": "2026-09-14",
+     "change": 0.202,
+     "value": 5.242,
+     "period": "2026-09-16",
      "status": "ok"
     },
     "policy_rate": {
      "source": "Bank of England IUDBEDR (Bank Rate)",
      "manual": false,
      "value": 3.75,
-     "period": "2026-09-15",
+     "period": "2026-09-17",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance GBPUSD=X",
      "manual": false,
-     "value": -0.635,
-     "period": "2026-09-17",
+     "value": -0.547,
+     "period": "2026-09-18",
      "status": "ok",
      "label": "vs USD"
     }
@@ -250,23 +250,23 @@
     "ten_year": {
      "source": "Ministry of Finance Japan (JGB)",
      "manual": false,
-     "change": 0.104,
-     "value": 2.998,
-     "period": "2026-09-16",
+     "change": 0.139,
+     "value": 2.993,
+     "period": "2026-09-17",
      "status": "ok"
     },
     "policy_rate": {
      "source": "BIS central bank policy rates",
      "manual": false,
      "value": 1.0,
-     "period": "2026-09-08",
+     "period": "2026-09-15",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance JPY=X",
      "manual": false,
-     "value": 0.739,
-     "period": "2026-09-16",
+     "value": -0.282,
+     "period": "2026-09-19",
      "status": "ok",
      "label": "vs USD"
     }
@@ -312,14 +312,14 @@
      "source": "BIS central bank policy rates (1Y LPR)",
      "manual": false,
      "value": 3.0,
-     "period": "2026-09-08",
+     "period": "2026-09-15",
      "status": "ok"
     },
     "fx_ytd": {
      "source": "Yahoo Finance CNY=X",
      "manual": false,
-     "value": 4.309,
-     "period": "2026-09-17",
+     "value": 4.46,
+     "period": "2026-09-19",
      "status": "ok",
      "label": "vs USD"
     }
@@ -371,8 +371,8 @@
     "fx_ytd": {
      "source": "Yahoo Finance INR=X",
      "manual": false,
-     "value": -6.285,
-     "period": "2026-09-17",
+     "value": -6.373,
+     "period": "2026-09-19",
      "status": "ok",
      "label": "vs USD"
     }
@@ -395,7 +395,7 @@
   {
    "country": "EA",
    "growth_change": 0.251,
-   "inflation_change": 0.1,
+   "inflation_change": 0.0,
    "cli_period": "2026-08",
    "cpi_period": "2026-08",
    "label": "Overheating",
