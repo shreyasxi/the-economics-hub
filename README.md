@@ -76,7 +76,7 @@ economics_hub/
 ├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
 ├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
 ├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
-├── generate_india.py            # India page (15 charts, Saturdays via CI + manual)
+├── generate_india.py            # India page (16 charts, Saturdays via CI + manual)
 ├── generate_soe.py              # India page: RBI's State of the Economy (briefing + rate transmission history)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
 ├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
@@ -94,6 +94,8 @@ economics_hub/
 ├── data/
 │   ├── fetchers/                # yfinance, FRED and India data fetchers
 │   ├── india_manual_entry.py    # CLI for monthly India figures (PMI, GST, CPI, IIP)
+│   ├── nse_shareholding.py      # India page: promoter holdings from NSE's quarterly filings
+│   ├── nse_promoter_holdings.csv # Archived filings (rebuild: python -m data.nse_shareholding --rebuild)
 │   ├── world_snapshot.py        # World page data: BIS, OECD, Eurostat, central banks, FRED
 │   ├── news.py                  # Headlines: RSS reading, theme sorting, story ranking
 │   ├── world_manual_entry.py    # CLI for World figures with no free API (PMIs, Japan CPI, China)
@@ -166,7 +168,7 @@ python make_chart.py
 | Source | Type | Access | Used by |
 |--------|------|--------|---------|
 | Yahoo Finance | Equities, FX, commodities, ETFs, VIX, NIFTY IT | Free, no key | `generate_weekly.py`, `generate_india.py` |
-| NSE (nseindia.com) | NIFTY sector index levels and their 1-week and 1-year changes | Free, no key | `generate_weekly.py` |
+| NSE (nseindia.com) | NIFTY sector index levels and their 1-week and 1-year changes; quarterly shareholding filings (promoter holdings of every listed company) | Free, no key | `generate_weekly.py`, `generate_india.py` |
 | Coin Metrics Community API | Bitcoin MVRV and price, daily since 2010 | Free, no key | `generate_weekly.py` |
 | FRED | US yields, CPI, PCE, unemployment, credit spreads, EM corporate bond yields, EM dollar index, Fed and ECB rates, US release calendar | Free API key | `generate_weekly.py`, `generate_macro.py` |
 | OECD · BIS · Eurostat · Bundesbank · Bank of England · Federal Reserve · MoF Japan | CPI, unemployment, leading indicators, policy rates, 10-year yields | Free, no key | `generate_macro.py` |

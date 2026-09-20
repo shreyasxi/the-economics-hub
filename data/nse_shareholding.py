@@ -23,8 +23,10 @@ NSE serves the filings through two endpoints:
     which is worth running after each filing season (late January, April,
     July and October).
 
-A failed download, a changed payload, holdings that do not add up or a filing
-season that has not arrived raises ValueError, and the India run fails.
+A failed download, a changed payload, holdings that do not add up or filings
+that have stopped arriving raises ValueError, and the chart is not drawn. A
+quarter missing from the middle of the archive is reported but not fatal: a
+chart comparing two quarters it names is unaffected by a hole between them.
 
 Note on the history: the filings are read from the companies listed today, so
 earlier quarters do not contain companies that have since delisted, and a
@@ -69,12 +71,26 @@ CONTROL = 50.0
 MAX_AGE = 220
 MIN_COMPANIES = 1200
 
+ARCHIVE_COLUMNS = ["symbol", "quarter", "promoter", "public"]
+
 
 def session() -> requests.Session:
-    """An NSE session carrying the cookies its API requires."""
+    """
+    A session for NSE's API. Visiting the home page first sets the cookies the
+    API sometimes asks for, but NSE serves that page to a script only when it
+    feels like it — a refusal there is not a refusal of the data, so it is
+    ignored and the API request itself decides whether this worked.
+    """
     s = requests.Session()
-    s.get(NSE_HOME, headers=HEADERS, timeout=20).raise_for_status()
+    _warm(s)
     return s
+
+
+def _warm(s: requests.Session) -> None:
+    try:
+        s.get(NSE_HOME, headers=HEADERS, timeout=20)
+    except requests.RequestException:
+        pass
 
 
 def _get_json(s: requests.Session, url: str, what: str, attempts: int = 3):
@@ -87,6 +103,7 @@ def _get_json(s: requests.Session, url: str, what: str, attempts: int = 3):
             if attempt == attempts - 1:
                 raise ValueError(f"NSE {what}: no usable response after {attempts} attempts")
             time.sleep(3 * (attempt + 1))
+            _warm(s)                       # a refusal often clears with fresh cookies
 
 
 def parse_filings(records: list[dict], what: str) -> pd.DataFrame:
@@ -190,16 +207,30 @@ def fetch_shareholding(today: date | None = None, history_path: Path = HISTORY_C
     latest = current["quarter"].max()
     check_fresh(latest, today)
 
-    quarters = sorted(set(history["quarter"]) | {latest})
-    expected = pd.date_range(min(quarters), latest, freq="QE")
-    behind = [q for q in expected if q not in quarters]
+    # A quarter the archive never picked up is a hole nothing but a rebuild can
+    # fill, because the master list carries only the newest quarter. It is said
+    # plainly rather than raised: a chart comparing two quarters it names is
+    # unaffected, and anything reading the series quarter by quarter should
+    # check for itself with missing_quarters().
+    behind = missing_quarters(history["quarter"], latest)
     if behind:
-        raise ValueError(f"{history_path.name} has no filings for "
-                         f"{', '.join(f'{q:%b %Y}' for q in behind[:4])} and NSE's master list carries only the "
-                         f"newest quarter — rebuild it with: python -m data.nse_shareholding --rebuild")
+        print(f"   · {history_path.name} has no filings for "
+              f"{', '.join(f'{q:%b %Y}' for q in behind[:4])}"
+              f"{' and others' if len(behind) > 4 else ''}; "
+              f"rebuild with: python -m data.nse_shareholding --rebuild")
 
     frame = pd.concat([history[history["quarter"] != latest], current], ignore_index=True)
     return frame.sort_values(["quarter", "symbol"]).reset_index(drop=True)
+
+
+def missing_quarters(archived, latest: pd.Timestamp) -> list[pd.Timestamp]:
+    """
+    Quarters between the start of the archive and the newest filings that the
+    archive does not hold. NSE's master list carries only the newest quarter,
+    so a hole here can be filled by a rebuild and by nothing else.
+    """
+    quarters = set(pd.to_datetime(pd.Series(list(archived)))) | {latest}
+    return [q for q in pd.date_range(min(quarters), latest, freq="QE") if q not in quarters]
 
 
 def constant_panel(frame: pd.DataFrame, quarters: list[pd.Timestamp]) -> pd.DataFrame:
@@ -242,7 +273,10 @@ def rebuild(path: Path = HISTORY_CSV, pause: float = 0.0) -> pd.DataFrame:
                .sort_values(["quarter", "symbol"])
                .drop_duplicates(["symbol", "quarter"], keep="last")
                .reset_index(drop=True))
-    frame.to_csv(path, index=False, date_format="%Y-%m-%d")
+    # Company names and submission dates are dropped: the master list carries a
+    # name for every company on each run, the submission date has already done
+    # its work picking revisions, and the archive is rewritten every quarter.
+    frame[ARCHIVE_COLUMNS].to_csv(path, index=False, date_format="%Y-%m-%d")
     counts = frame.groupby("quarter")["symbol"].size()
     print(f"\n   {len(frame)} filings from {len(symbols) - len(failed)} companies written to {path.name}")
     print(f"   {counts.index.min():%b %Y} to {counts.index.max():%b %Y}, "

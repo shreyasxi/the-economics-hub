@@ -50,6 +50,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
 import matplotlib.patches as mpatches
+import matplotlib.patheffects as pe
 
 # ── Project imports ──
 sys.path.insert(0, str(Path(__file__).parent))
@@ -1479,6 +1480,111 @@ def chart_iip(df, output_dir):
 
 
 # ═══════════════════════════════════════════
+# CHART 19: WHO CONTROLS CORPORATE INDIA
+# ═══════════════════════════════════════════
+
+PROMOTER_BAND = 2.5          # width of each bar, in percentage points of the share register
+PROMOTER_SAFFRON = EconStyle.LINE_RUPEE
+PROMOTER_GHOST = "#8A94A6"   # the earlier quarter: present, but never competing with the bars
+
+
+def _promoter_shares(values, edges):
+    """Each band's share of companies, in per cent."""
+    counts, _ = np.histogram(values, bins=edges)
+    return counts / counts.sum() * 100
+
+
+def chart_promoter_holdings(frame, output_dir):
+    """
+    How much of each listed company its promoter owns, today against the
+    earliest quarter NSE keeps.
+
+    Both quarters are drawn over the same companies, so the shift is promoters
+    buying and selling rather than the market listing new ones. Two lines mark
+    the rules that shape the picture: control passes at 50%, and no promoter may
+    hold more than 75%, because a quarter of every company must sit with the
+    public.
+    """
+    from data.nse_shareholding import CONTROL, PROMOTER_CEILING, constant_panel
+
+    latest = frame["quarter"].max()
+    filings = frame.groupby("quarter")["symbol"].nunique()
+    # NSE's archive thins out in its earliest quarters; start where it is whole.
+    first = filings[filings >= filings.max() * 0.6].index.min()
+    if first >= latest:
+        raise ValueError("NSE shareholding history has only one quarter of filings")
+    panel = constant_panel(frame, [first, latest])
+    now, before = panel.loc[latest].values, panel.loc[first].values
+
+    edges = np.arange(0, 100 + PROMOTER_BAND, PROMOTER_BAND)
+    centres = edges[:-1] + PROMOTER_BAND / 2
+    share_now, share_before = _promoter_shares(now, edges), _promoter_shares(before, edges)
+    median_now, median_before = float(np.median(now)), float(np.median(before))
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size="wide")
+    ax.bar(centres, share_now, width=PROMOTER_BAND * 0.9, color=PROMOTER_SAFFRON, edgecolor="white",
+           linewidth=0.6, zorder=3, label=f"{latest:%b %Y}   median {median_now:.0f}%")
+    ax.step(np.append(edges[:-1], edges[-1]), np.append(share_before, share_before[-1]), where="post",
+            color=PROMOTER_GHOST, linewidth=1.5, zorder=4, label=f"{first:%b %Y}   median {median_before:.0f}%")
+
+    top = max(share_now.max(), share_before.max()) * 1.30
+    ax.set_ylim(0, top)
+    ax.set_xlim(-1.5, 101.5)
+
+    for x, label, side in [(CONTROL, "50%\noutright control", "right"),
+                           (PROMOTER_CEILING, "75%\nthe legal ceiling", "left")]:
+        ax.axvline(x, color=EconStyle.INK, linewidth=1.0, zorder=5)
+        ax.annotate(label, xy=(x, top * 0.55), xytext=(7 if side == "left" else -6, 0),
+                    textcoords="offset points", ha=side, va="center", fontsize=8.5,
+                    color=EconStyle.INK, linespacing=1.35,
+                    path_effects=[pe.withStroke(linewidth=3, foreground="white")])
+
+    # The wall of companies parked just under the ceiling, and the companies with no promoter at all.
+    at_ceiling = int(((now >= PROMOTER_CEILING - PROMOTER_BAND) & (now <= PROMOTER_CEILING)).sum())
+    ax.annotate(f"one company in {round(len(now) / at_ceiling)} sits within\n"
+                f"{PROMOTER_BAND:g} points of the ceiling",
+                xy=(PROMOTER_CEILING - PROMOTER_BAND, share_now[int((PROMOTER_CEILING - PROMOTER_BAND) // PROMOTER_BAND)]),
+                xytext=(-16, 34), textcoords="offset points", ha="right", va="bottom", fontsize=8.5,
+                color=EconStyle.INK, linespacing=1.35, zorder=8,
+                path_effects=[pe.withStroke(linewidth=3, foreground="white")],
+                arrowprops=dict(arrowstyle="-", color=EconStyle.INK, linewidth=0.8, shrinkB=6))
+    ax.annotate(f"{int((now == 0).sum())} companies have\nno promoter at all",
+                xy=(PROMOTER_BAND / 2, share_now[0]), xytext=(14, 34), textcoords="offset points",
+                ha="left", va="bottom", fontsize=8.5, color=EconStyle.INK_MUTED, linespacing=1.35,
+                arrowprops=dict(arrowstyle="-", color=EconStyle.INK_MUTED, linewidth=0.8, shrinkB=3))
+
+    ax.set_xlabel("Promoter and promoter-group stake in the company",
+                  fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.INK_MUTED, labelpad=6)
+    ax.set_ylabel("Share of companies", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.INK_MUTED)
+    ax.yaxis.grid(True, color=EconStyle.GRID_COLOR, linewidth=0.5)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right", "left"):
+        ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(10))
+    ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
+    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=6, steps=[1, 2, 5, 10]))
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
+    ax.tick_params(axis="y", length=0, labelsize=EconStyle.FONT_SIZE_TICK)
+    ax.tick_params(axis="x", length=4, width=0.8, color=EconStyle.AXIS_COLOR, labelsize=EconStyle.FONT_SIZE_TICK)
+    ax.legend(loc="upper left", frameon=False, fontsize=9.5, handlelength=1.5, borderaxespad=0.8)
+
+    EconStyle.set_title(ax, "Who Controls Corporate India",
+                        f"Promoter stake in each of {panel.shape[1]:,} listed companies, in "
+                        f"{PROMOTER_BAND:g}-point bands  ·  the same companies in both quarters")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+    EconStyle.add_source(fig, "NSE shareholding filings (quarterly, under SEBI listing rules)")
+
+    fp = output_dir / "19_india_promoter_holdings.png"
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Who Controls Corporate India ({panel.shape[1]:,} companies, "
+          f"median {median_before:.1f}% → {median_now:.1f}%)")
+    return fp
+
+
+# ═══════════════════════════════════════════
 # CHART 18: MONETARY TRANSMISSION
 # ═══════════════════════════════════════════
 
@@ -2204,6 +2310,13 @@ def main():
     # ── External Sector charts (new) ──────────────────────────────────────────
     chart_forex_reserves(df_weekly, output_dir)
     chart_trade_balance(df, output_dir)
+
+    # ── Corporate ownership (NSE shareholding filings, quarterly) ─────────────
+    try:
+        from data.nse_shareholding import fetch_shareholding
+        chart_promoter_holdings(fetch_shareholding(), output_dir)
+    except Exception as exc:  # noqa: BLE001 — the chart is skipped, never drawn from part of the market
+        print(f"   ⚠ Skipping Who Controls Corporate India — {type(exc).__name__}: {exc}")
 
     # ── Fiscal charts (from CAG) — FROZEN, no changes ─────────────────────────
     if cag_data:
