@@ -14,7 +14,9 @@ import matplotlib.font_manager as fm
 import matplotlib.ticker as mticker
 import matplotlib.patheffects as pe
 import numpy as np
-from matplotlib.offsetbox import AnchoredOffsetbox, HPacker, TextArea
+from matplotlib.lines import Line2D
+from matplotlib.offsetbox import (AnchoredOffsetbox, DrawingArea, HPacker,
+                                  TextArea, VPacker)
 from pathlib import Path
 from datetime import datetime
 
@@ -155,6 +157,17 @@ class EconStyle:
     WATERMARK_CAPS   = True
     WATERMARK_TRACK  = " "       # "" for no letter-spacing
 
+    # The rule or shape that closes the mark, so it reads as a logo rather than
+    # a line of type. One of:
+    #   "none"  the wordmark alone
+    #   "under" a hairline the full width of the mark, beneath it
+    #   "dash"  a short centred rule beneath, a masthead dash
+    #   "band"  hairlines above and below, as the site's descriptor strip
+    #   "lead"  a short rule before "The", on the same line
+    #   "box"   a thin outline around the whole mark
+    WATERMARK_RULE   = "under"
+    WATERMARK_RULE_LW = 0.7          # points
+
     # Bundled (assets/fonts). The fallbacks are italics rather than romans: if
     # the script face is ever missing, a slanted "The" still reads as a
     # different voice from the caps beside it.
@@ -198,17 +211,8 @@ class EconStyle:
         return fm.FontProperties(family=cls.SCRIPT_FONTS, style="italic")
 
     @classmethod
-    def draw_credit(cls, fig, x=0.96, y=0.02, size=None, ax=None, transform=None):
-        """
-        Draw the wordmark with its lower-right corner at (x, y).
-
-        The two parts are packed on a shared baseline rather than placed by
-        hand: the script word's width changes with the face, and measuring it
-        to position the caps would have to happen after the figure is laid out
-        but before it is saved. Anchored to the figure by default; pass an
-        Axes and its transform to place it inside one (the summary table).
-        """
-        size = size or cls.WATERMARK_SIZE
+    def _credit_row(cls, size):
+        """Script word and caps packed on one baseline."""
         parts = []
         if cls.WATERMARK_SCRIPT:
             parts.append(TextArea(cls.WATERMARK_SCRIPT, textprops=dict(
@@ -219,14 +223,76 @@ class EconStyle:
             fontproperties=cls._get_masthead_font(),
             fontsize=size,
             color=cls.WATERMARK_COLOR)))
+        return HPacker(children=parts, align="baseline", pad=0, sep=cls.WATERMARK_GAP)
+
+    @classmethod
+    def _rule(cls, width_pt):
+        """A horizontal hairline `width_pt` long, as an offsetbox child."""
+        lw = cls.WATERMARK_RULE_LW
+        area = DrawingArea(width_pt, lw, 0, 0)
+        area.add_artist(Line2D([0, width_pt], [lw / 2, lw / 2],
+                               lw=lw, color=cls.WATERMARK_COLOR,
+                               solid_capstyle="butt"))
+        return area
+
+    @classmethod
+    def draw_credit(cls, fig, x=0.96, y=0.02, size=None, ax=None, transform=None):
+        """
+        Draw the wordmark with its lower-right corner at (x, y).
+
+        The parts are packed rather than placed by hand: the script word's
+        width changes with the face, and measuring it to position the caps
+        would have to happen after the figure is laid out but before it is
+        saved. A rule is sized the same way — from the row's measured width, so
+        it always matches the mark it closes. Anchored to the figure by
+        default; pass an Axes and its transform to place it inside one (the
+        summary tables).
+        """
+        size = size or cls.WATERMARK_SIZE
+        row = cls._credit_row(size)
+        rule = cls.WATERMARK_RULE
+        child, frame = row, False
+
+        if rule in ("under", "dash", "band", "lead"):
+            # Measure the mark so the rule is exactly as wide as it is. The
+            # packer has to know its figure first — its Text children read the
+            # figure's dpi to lay themselves out, and raise without one.
+            try:
+                renderer = fig.canvas.get_renderer()
+                row.set_figure(fig)
+                bbox = row.get_bbox(renderer)          # Matplotlib >= 3.7
+                width_pt = bbox.width * 72.0 / fig.dpi
+            except Exception as exc:    # never fail a chart over a rule
+                print(f"   ⚠ credit rule skipped: {exc}")
+                width_pt = 0
+            if width_pt > 0:
+                gap = max(1.6, size * 0.28)
+                if rule == "under":
+                    child = VPacker(children=[row, cls._rule(width_pt)],
+                                    align="center", pad=0, sep=gap)
+                elif rule == "dash":
+                    child = VPacker(children=[row, cls._rule(width_pt * 0.3)],
+                                    align="center", pad=0, sep=gap)
+                elif rule == "band":
+                    child = VPacker(children=[cls._rule(width_pt), row,
+                                              cls._rule(width_pt)],
+                                    align="center", pad=0, sep=gap)
+                elif rule == "lead":
+                    child = HPacker(children=[cls._rule(width_pt * 0.22), row],
+                                    align="center", pad=0, sep=gap * 1.6)
+        elif rule == "box":
+            frame = True
 
         box = AnchoredOffsetbox(
-            loc="lower right",
-            child=HPacker(children=parts, align="baseline", pad=0, sep=cls.WATERMARK_GAP),
-            pad=0, borderpad=0, frameon=False,
+            loc="lower right", child=child,
+            pad=0.34 if frame else 0, borderpad=0, frameon=frame,
             bbox_to_anchor=(x, y),
             bbox_transform=transform if transform is not None else fig.transFigure,
         )
+        if frame:
+            box.patch.set(boxstyle="round,pad=0.3,rounding_size=0.18",
+                          facecolor="none", edgecolor=cls.WATERMARK_COLOR,
+                          linewidth=cls.WATERMARK_RULE_LW, alpha=0.75)
         (ax if ax is not None else fig).add_artist(box)
         return box
 

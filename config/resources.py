@@ -5,8 +5,10 @@ Everything on /about is edited here. Adding a source is one line in SOURCES;
 changing how a page is built is one line in ARCHITECTURE. Nothing else has to
 change.
 
-The prose below is a draft, written to show the shape of the page — replace it
-with your own. Keep the notes to one line each: the page reads as a list of
+INTRO is the owner's own writing, deliberately informal and personal. Do not
+smooth it into house style, and do not rewrite it without being asked.
+
+Keep the source notes to one line each: the page reads as a list of
 recommendations, and a paragraph per entry turns it into an essay nobody
 finishes.
 
@@ -18,36 +20,48 @@ Fields
     paywall True if most of it sits behind a subscription
 """
 
-# ── The opening. Two or three paragraphs, first person. ────────────────────
+# ── The opening. The owner's own words — keep the informal voice. ──────────
 INTRO = [
-    "This site began as my own reading of markets, kept in one place so I "
-    "would stop rebuilding the same charts every week. It now runs on its own: "
-    "the charts are drawn from live data on a schedule, and nothing on them "
-    "is typed in by hand except the handful of Indian series that no API "
-    "publishes.",
+    "This project grew out of my own curiosity and a somewhat idiosyncratic "
+    "way of reading financial markets. Rather than claiming to have found the "
+    "“best” way of making sense of them (something I doubt we ever really "
+    "will — kudos to the fun of lifelong learning!), I wanted to standardise "
+    "my own process and bring the different pieces of information I routinely "
+    "follow into one place. This will, hopefully, make the day-to-day task of "
+    "keeping up with markets a little more structured and convenient. I use "
+    "the project myself to track developments across markets, and having built "
+    "it from scratch has naturally made me rather particular about its data, "
+    "presentation, and reliability. At its core, it is a practical attempt to "
+    "turn a process that was previously quite fragmented into something more "
+    "systematic to follow.",
 
-    "It is deliberately incomplete. I add what I find myself wanting to look "
-    "at, drop what I stop reading, and would rather show one chart that "
-    "settles a question than five that gesture at it. If something here is "
-    "wrong, or if there is a series you think belongs on it, tell me — "
-    "recommendations are genuinely welcome.",
+    "Of course, these are ultimately just data points, and I would not pretend "
+    "that a collection of charts can do the harder part of interpreting the "
+    "market for you. The explanations are there to provide some context and, "
+    "hopefully, make the relevant developments easier to spot. But the real "
+    "value comes from connecting those dots. Working out which movements "
+    "matter, which are merely noise, and whether they point towards any "
+    "broader or leading theme. The project can hopefully help with that "
+    "process, but the connecting of the dots is still very much a human job.",
+
+    "If something here looks wrong, or there is a series you think belongs on "
+    "it, please tell me. I genuinely welcome the recommendations and am always "
+    "looking for ways to make the project better (&amp; useful!!).",
 ]
 
 # ── How it is built. ───────────────────────────────────────────────────────
 # Longer than a caption, shorter than documentation: enough that a reader can
 # judge how much to trust a chart without opening the repository.
 BUILD_NOTES = [
-    "Nothing here is drawn by hand. Each page is a Python job that fetches "
-    "its own data, draws its charts and publishes them; the site itself only "
-    "displays what the latest run produced.",
+    "Nothing here is drawn by hand each week. Most of it is automated "
+    "(although getting to this stage took a great deal of effort, and enough "
+    "care is taken to avoid errors \U0001F610). Each page is a Python job that "
+    "fetches its own data, draws its charts and publishes them; the site "
+    "itself only displays what the latest run produced.",
 
     "The jobs run on a schedule rather than on demand, so a chart is as fresh "
     "as the line under it says it is. Every chart carries its source and the "
     "date it was drawn.",
-
-    "Where a figure cannot be fetched, the chart is left out rather than "
-    "filled in. There is no placeholder data anywhere on this site: a missing "
-    "source fails the run loudly instead of publishing a plausible number.",
 
     "Revisions are respected. Series that get restated — Indian fiscal "
     "accounts, payrolls, the national accounts — are re-read in full on each "
@@ -106,9 +120,6 @@ SOURCES: list[tuple[str, list[dict]]] = [
         dict(name="ECB Data Portal", url="https://data.ecb.europa.eu/",
              note="Euro-area rates, balance sheet and bank lending surveys.",
              used=False),
-        dict(name="NBER business cycle dating", url="https://www.nber.org/research/business-cycle-dating",
-             note="The recession dates every shaded chart on this site uses.",
-             used=True),
     ]),
     ("Markets, valuation & prices", [
         dict(name="Yahoo Finance", url="https://finance.yahoo.com/",
@@ -140,13 +151,13 @@ SOURCES: list[tuple[str, list[dict]]] = [
         dict(name="RBI Database on the Indian Economy", url="https://data.rbi.org.in/DBIE/",
              note="The primary source for Indian monetary and banking data; awkward to scrape, worth it.",
              used=True),
-        dict(name="Controller General of Accounts", url="https://cga.nic.in/MonthlyReport.aspx",
+        dict(name="Controller General of Accounts", url="https://cga.nic.in/index.aspx#account-section",
              note="Monthly union accounts: receipts, spending and how the deficit is financed.",
              used=True),
         dict(name="MoSPI", url="https://www.mospi.gov.in/",
              note="CPI, IIP and the national accounts, at source rather than through a wire report.",
              used=True),
-        dict(name="NSDL FPI flows", url="https://www.fpi.nsdl.co.in/web/Reports/ReportItem.aspx?ReportId=31",
+        dict(name="NSDL FPI flows", url="https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx?RptType=6",
              note="What foreign investors actually bought and sold, by sector, fortnightly.",
              used=True),
         dict(name="NSE India", url="https://www.nseindia.com/",

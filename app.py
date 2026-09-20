@@ -1027,16 +1027,32 @@ st.markdown(
     }
     .about-lede .about-tag { margin-left: 0.15rem; margin-right: 0.15rem; }
 
-    /* What each page is built from: name, cadence and sources in three
-       columns, moved here from the sidebar where it was too narrow to read. */
-    .about-arch { margin: 0.2rem 0 0 0; border-top: 1px solid rgba(10, 31, 61, 0.18); }
+    /* "How it is built": bullets on the left, the schedule table on the right.
+       The bullets only run to about half the column, and the rest of the row
+       was white space. */
+    .about-built {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+        gap: 0 3rem;
+        align-items: start;
+    }
+    .about-built .about-build { max-width: none; }
+
+    /* What each page is built from, moved here from the sidebar where the
+       column was too narrow to read it. Name and cadence share a line, sources
+       sit under them: this now lives in a half-width column, so the three
+       across that the full page allowed would be cramped. */
+    .about-arch { margin: 0.2rem 0 0 0; }
     .about-arch-row {
         display: grid;
-        grid-template-columns: 11rem 7rem minmax(0, 1fr);
-        gap: 0.15rem 1.2rem;
-        align-items: baseline;
-        padding: 0.62rem 0;
+        gap: 0.2rem;
+        padding: 0.55rem 0 0.6rem 0;
         border-bottom: 1px solid rgba(10, 31, 61, 0.09);
+    }
+    .about-arch-row:last-child { border-bottom: none; }
+    .about-arch-top {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 0.8rem;
     }
     .about-arch-name {
         font-family: 'Inter', -apple-system, sans-serif !important;
@@ -1044,13 +1060,15 @@ st.markdown(
     }
     .about-arch-when {
         font-family: 'Inter', -apple-system, sans-serif !important;
-        font-size: 0.68rem !important; font-weight: 700 !important;
-        letter-spacing: 0.09em !important; text-transform: uppercase !important;
-        color: #7A828F !important;
+        font-size: 0.6rem !important; font-weight: 700 !important;
+        letter-spacing: 0.08em !important; text-transform: uppercase !important;
+        color: #7A828F !important; white-space: nowrap;
+        border: 1px solid rgba(10, 31, 61, 0.16); border-radius: 3px;
+        padding: 0.1rem 0.34rem;
     }
     .about-arch-src {
         font-family: 'Inter', -apple-system, sans-serif !important;
-        font-size: 0.9rem !important; line-height: 1.5 !important; color: #4A5262 !important;
+        font-size: 0.86rem !important; line-height: 1.5 !important; color: #4A5262 !important;
     }
     /* Four groups across on a wide screen, so none is left alone on a row of
        its own; it reflows to three, two and one as the column narrows. */
@@ -1104,10 +1122,14 @@ st.markdown(
         vertical-align: 0.1rem;
     }
     .about-tag-lock { color: #9B1C31; border-color: rgba(155, 28, 49, 0.32); }
+    /* The schedule table drops under the bullets before the text gets narrow
+       enough to break the bullets themselves. */
+    @media (max-width: 900px) {
+        .about-built { grid-template-columns: minmax(0, 1fr); gap: 1.6rem 0; }
+    }
     @media (max-width: 640px) {
         .about-prose p { font-size: 0.96rem !important; }
         .about-grid { gap: 1.1rem; }
-        .about-arch-row { grid-template-columns: minmax(0, 1fr); row-gap: 0.2rem; }
     }
 
     /* ── Section headers — Inter 800, all-caps, navy ── */
@@ -3149,6 +3171,13 @@ def page_india() -> None:
             _section("Capital Flows")
             _render_grid(flows)
 
+        # Corporate ownership: who holds the shares of listed India (NSE filings)
+        ownership = [c for c in charts if any(k in c.name for k in ["promoter", "shareholding"])]
+        charts = [c for c in charts if c not in ownership]
+        if ownership:
+            _section("Corporate Ownership")
+            _render_grid(ownership, center_odd=True)
+
         # 6. Fiscal Policy & Public Finances
         fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
         fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
@@ -3596,8 +3625,8 @@ def _about_arch_html(rows: list[tuple[str, str, str]]) -> str:
         '<div class="about-arch">'
         + "".join(
             '<div class="about-arch-row">'
-            f'<span class="about-arch-name">{name}</span>'
-            f'<span class="about-arch-when">{when}</span>'
+            f'<div class="about-arch-top"><span class="about-arch-name">{name}</span>'
+            f'<span class="about-arch-when">{when}</span></div>'
             f'<span class="about-arch-src">{sources}</span>'
             '</div>'
             for name, when, sources in rows
@@ -3618,14 +3647,21 @@ def page_about() -> None:
         unsafe_allow_html=True,
     )
 
+    # Bullets left, the schedule table right: the bullets run to about half the
+    # column and the rest of the row was empty.
     _section("How it is built")
     st.markdown(
+        '<div class="about-built">'
         '<ul class="about-build">'
         + "".join(f"<li>{line}</li>" for line in res.BUILD_NOTES)
-        + '</ul>',
+        + '</ul>'
+        '<div class="about-arch-col">'
+        '<p class="about-group-title">What runs, and when</p>'
+        + _about_arch_html(res.ARCHITECTURE)
+        + '</div>'
+        '</div>',
         unsafe_allow_html=True,
     )
-    st.markdown(_about_arch_html(res.ARCHITECTURE), unsafe_allow_html=True)
 
     _section("Data and where to find it")
     st.markdown(
