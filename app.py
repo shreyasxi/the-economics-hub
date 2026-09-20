@@ -26,11 +26,14 @@ import streamlit.components.v1 as components
 
 from charts.loader import (
     chart_key,
-    clean_title,
     get_charts,
     group_charts,
     is_pipeline_admin,
 )
+# The module itself, not just names from it: chart titles are read through
+# _chart_title() so a change to charts/loader.py takes effect on the next run
+# rather than on the next reboot. See _chart_title.
+import charts.loader as _loader
 import config.insights as _insights
 import config.news_settings as _news_settings
 import config.resources as _resources
@@ -1576,6 +1579,19 @@ def _chart_anchor(chart_path: Path) -> None:
                 unsafe_allow_html=True)
 
 
+def _chart_title(filename: str) -> str:
+    """
+    A chart's name, from a charts.loader that is current with the file on disk.
+
+    Streamlit Cloud re-runs app.py after a push but does not re-import the
+    modules app.py imported, so a renamed chart kept its old caption until
+    somebody rebooted the app — the same trap get_insight() works around for
+    config.insights. Going through the module object rather than the name
+    imported above is what makes the reload take effect.
+    """
+    return _fresh_config(_loader).clean_title(filename)
+
+
 def _chart_slug(filename: str) -> str:
     """'14_india_credit_deposit.png' -> 'india-credit-deposit'."""
     return chart_key(filename).replace("_", "-")
@@ -1610,7 +1626,7 @@ def _render_chart(chart_path: Path) -> None:
     _chart_anchor(chart_path)
     st.image(
         str(chart_path),
-        caption=clean_title(chart_path.name),
+        caption=_chart_title(chart_path.name),
         use_container_width=True,
     )
     insight = get_insight(chart_path.name)
@@ -2540,7 +2556,7 @@ def _search_index() -> list[dict]:
     for folder, page, url_path in _SEARCH_PAGES:
         charts, _ = get_charts(folder)
         for chart in charts:
-            title = clean_title(chart.name)
+            title = _chart_title(chart.name)
             index.append({
                 "title": title,
                 "page": page,
