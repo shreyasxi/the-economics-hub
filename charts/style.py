@@ -14,8 +14,32 @@ import matplotlib.font_manager as fm
 import matplotlib.ticker as mticker
 import matplotlib.patheffects as pe
 import numpy as np
+from matplotlib.offsetbox import AnchoredOffsetbox, HPacker, TextArea
 from pathlib import Path
 from datetime import datetime
+
+
+# ─── BUNDLED FONTS ───────────────────────────────────────────────────────────
+# Faces the charts need that no machine can be assumed to have. They are
+# committed to the repository, not installed, so a chart drawn here and the
+# same chart drawn by GitHub Actions use the same letters. Drop a .ttf in and
+# it is registered on import; nothing else has to change.
+FONT_DIR = Path(__file__).resolve().parent.parent / "assets" / "fonts"
+
+
+def _register_bundled_fonts() -> set:
+    """Add assets/fonts/*.ttf to Matplotlib's font list. Returns the family names."""
+    names = set()
+    for ttf in sorted(FONT_DIR.glob("*.ttf")):
+        try:
+            fm.fontManager.addfont(str(ttf))
+            names.add(fm.FontProperties(fname=str(ttf)).get_name())
+        except Exception as exc:                      # a broken file must not stop a run
+            print(f"   ⚠ could not load font {ttf.name}: {exc}")
+    return names
+
+
+_BUNDLED_FONTS = _register_bundled_fonts()
 
 
 class EconStyle:
@@ -108,19 +132,51 @@ class EconStyle:
 
     DPI              = 250
     DPI_PREVIEW      = 120
-    WATERMARK_TEXT   = "The Economics Hub"
+
+    # ── Credit line ──
+    # The credit is a signature, not a second title. It used to be set three
+    # points larger than the source line and in near-black, so on a dashboard
+    # of forty charts the eye landed on the byline before the data.
+    #
+    # It is now a wordmark in two parts on one baseline: "The" in a script
+    # face, then "ECONOMICS HUB" in letter-spaced caps. The script is set a
+    # little larger because a cursive lower case is small for its point size —
+    # at the same size it would look like a mistake rather than a contrast.
+    # Matplotlib has no tracking control, so thin spaces stand in for it.
+    #
+    # To restyle it, change these constants — no drawing code anywhere calls
+    # for the credit itself. WATERMARK_SCRIPT = "" gives the caps alone.
+    WATERMARK_SCRIPT = "The"
+    WATERMARK_TEXT   = "Economics Hub"
+    WATERMARK_SIZE   = FONT_SIZE_SOURCE - 0.5    # the caps; the source line's size
+    WATERMARK_SCRIPT_BOOST = 2.5                 # points added for the script word
+    WATERMARK_GAP    = 3.5                       # points between the two parts
+    WATERMARK_COLOR  = "#6B7280"                 # "#003366" for the house navy
+    WATERMARK_CAPS   = True
+    WATERMARK_TRACK  = " "       # "" for no letter-spacing
+
+    # Bundled (assets/fonts). The fallbacks are italics rather than romans: if
+    # the script face is ever missing, a slanted "The" still reads as a
+    # different voice from the caps beside it.
+    SCRIPT_FONTS = ["Dancing Script", "Snell Roundhand", "Apple Chancery", "DejaVu Serif"]
 
     # ── Masthead Typography ──
-    # Clean bold serif — institutional style (IMF, BIS, Federal Reserve).
-    # NOT italic, NOT blackletter. Just strong, authoritative roman serif.
-    # Cambria (Microsoft institutional default) → Georgia → Palatino → Times
+    # Playfair Display is the face the site's own nameplate is set in, so the
+    # credit at the foot of a chart is a small echo of the masthead at the top
+    # of the page. It is bundled (assets/fonts) rather than assumed: the list
+    # used to start with Cambria and Palatino, which exist on neither this
+    # machine nor the CI runner, and the credit resolved to Georgia here and to
+    # DejaVu Serif in Actions — two different wordmarks on the same site.
+    #
+    # The list still ends in DejaVu Serif, and that matters beyond insurance:
+    # Matplotlib falls back family by family for a glyph the chosen face lacks,
+    # and the thin spaces that letter-space the caps are exactly such a glyph
+    # in several serifs. Playfair has U+2009; keep a font that does at the end.
     MASTHEAD_FONTS = [
-        "Cambria",                 # Microsoft's institutional serif (Win default)
-        "Georgia",                 # Robust screen serif (Win/Mac)
-        "Palatino Linotype",       # Classical humanist (Windows)
-        "Garamond",                # Renaissance elegance (Windows)
-        "Times New Roman",         # Universal fallback
-        "DejaVu Serif",           # Linux fallback
+        "Playfair Display",        # bundled — the site's masthead face
+        "Georgia",                 # robust screen serif (Win/Mac)
+        "Times New Roman",         # universal fallback
+        "DejaVu Serif",            # ships with Matplotlib everywhere
         "serif",
     ]
 
@@ -129,6 +185,50 @@ class EconStyle:
     @classmethod
     def _get_font(cls, weight="regular"):
         return fm.FontProperties(family=cls.FONT_FAMILY, weight=weight)
+
+    @classmethod
+    def _watermark_label(cls):
+        """The roman half of the credit as it is drawn: caps, with thin spaces for tracking."""
+        text = cls.WATERMARK_TEXT.upper() if cls.WATERMARK_CAPS else cls.WATERMARK_TEXT
+        return cls.WATERMARK_TRACK.join(text) if cls.WATERMARK_TRACK else text
+
+    @classmethod
+    def _get_script_font(cls):
+        """The cursive face for the credit's first word."""
+        return fm.FontProperties(family=cls.SCRIPT_FONTS, style="italic")
+
+    @classmethod
+    def draw_credit(cls, fig, x=0.96, y=0.02, size=None, ax=None, transform=None):
+        """
+        Draw the wordmark with its lower-right corner at (x, y).
+
+        The two parts are packed on a shared baseline rather than placed by
+        hand: the script word's width changes with the face, and measuring it
+        to position the caps would have to happen after the figure is laid out
+        but before it is saved. Anchored to the figure by default; pass an
+        Axes and its transform to place it inside one (the summary table).
+        """
+        size = size or cls.WATERMARK_SIZE
+        parts = []
+        if cls.WATERMARK_SCRIPT:
+            parts.append(TextArea(cls.WATERMARK_SCRIPT, textprops=dict(
+                fontproperties=cls._get_script_font(),
+                fontsize=size + cls.WATERMARK_SCRIPT_BOOST,
+                color=cls.WATERMARK_COLOR)))
+        parts.append(TextArea(cls._watermark_label(), textprops=dict(
+            fontproperties=cls._get_masthead_font(),
+            fontsize=size,
+            color=cls.WATERMARK_COLOR)))
+
+        box = AnchoredOffsetbox(
+            loc="lower right",
+            child=HPacker(children=parts, align="baseline", pad=0, sep=cls.WATERMARK_GAP),
+            pad=0, borderpad=0, frameon=False,
+            bbox_to_anchor=(x, y),
+            bbox_transform=transform if transform is not None else fig.transFigure,
+        )
+        (ax if ax is not None else fig).add_artist(box)
+        return box
 
     @classmethod
     def _get_masthead_font(cls):
@@ -232,15 +332,8 @@ class EconStyle:
             ha="left", va="bottom",
         )
 
-        # ── Masthead watermark (right) — bold roman serif ──
-        fig.text(
-            0.96, 0.025,
-            cls.WATERMARK_TEXT,
-            fontproperties=cls._get_masthead_font(),
-            fontsize=cls.FONT_SIZE_SOURCE + 3,
-            color="#1A1A1A",
-            ha="right", va="bottom",
-        )
+        # ── Credit (right) — the wordmark, on the source line's baseline ──
+        cls.draw_credit(fig, x=0.96, y=0.02)
 
     # ─── HELPERS ─────────────────────────────
 

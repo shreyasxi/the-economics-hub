@@ -196,9 +196,11 @@ class SummaryTable:
         ax.text(0.5, footer_y, f"Source: {source}", 
                 fontsize=8, color="#666666", ha="left", va="bottom")
         
-        ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT, 
-                fontproperties=EconStyle._get_masthead_font(),
-                fontsize=13, color="#1A1A1A", ha="right", va="bottom")
+        # Placed in the table's own coordinates rather than the figure's, and a
+        # point and a half up: this table is drawn larger than a chart.
+        EconStyle.draw_credit(self.fig, x=9.5, y=footer_y,
+                              size=EconStyle.WATERMARK_SIZE + 1.5,
+                              ax=ax, transform=ax.transData)
 
         ax.set_ylim(footer_y - 0.15, fig_h)
 

@@ -153,12 +153,89 @@ def group_charts(charts: list[Path], sections: list[tuple[str, list[str]]]
     return grouped, [c for c in charts if chart_key(c.name) not in used]
 
 
+# A filename is lower case and title-casing it gives "Btc Gold Ratio" and
+# "India Gdp". These are the words that have to survive it — indicators,
+# institutions and tickers keep their capitals, as they do in the chart's own
+# title. Every caption and every search suggestion reads through this map, so a
+# word added here is fixed in both places at once.
+_ACRONYMS = {
+    "btc": "BTC", "cag": "CAG", "cape": "CAPE", "cga": "CGA", "cli": "CLI",
+    "cpi": "CPI", "eia": "EIA", "em": "EM", "erp": "ERP", "etf": "ETF",
+    "eth": "ETH", "fpi": "FPI", "fx": "FX", "gdp": "GDP", "gsci": "GSCI",
+    "gst": "GST", "iip": "IIP", "imf": "IMF", "inr": "INR", "it": "IT",
+    "m2": "M2", "mospi": "MoSPI", "move": "MOVE", "mvrv": "MVRV",
+    "nbfc": "NBFC", "nifty": "NIFTY", "nse": "NSE", "oecd": "OECD",
+    "pmi": "PMI", "rbi": "RBI", "sahm": "Sahm", "spx": "S&P 500",
+    "spy": "SPY", "tlt": "TLT", "us": "US", "usd": "USD", "vix": "VIX",
+    "wti": "WTI", "yoy": "YoY",
+    "vs": "vs", "and": "and", "per": "per",
+    "12m": "12-Month", "3m": "3-Month",
+}
+
+# Names a filename cannot produce, or produces wrongly. Keyed by chart_key (the
+# filename without its numeric prefix and extension), so renaming a chart's
+# file is the only thing that can break one of these — and the fallback is then
+# the derived name, not an error.
+#
+# These are shortened from the title drawn on the chart itself (WEEKLY_TITLES
+# in generate_weekly.py, MACRO_TITLES in generate_macro.py): a caption sits
+# under a chart that already carries its full title, so it only has to say
+# which chart this is. Where the filename says something the chart does not —
+# btc_global_m2 plots US M2, not global — the chart wins.
+_TITLE_OVERRIDES = {
+    # Cross-asset ratios: a slash reads as a ratio, an underscore does not
+    "btc_gold_ratio":            "Bitcoin Priced in Gold",
+    "btc_mvrv":                  "Bitcoin MVRV Ratio",
+    "btc_global_m2":             "Bitcoin vs US M2",
+    "eth_btc_ratio":             "ETH / BTC Ratio",
+    "copper_gold_ratio":         "Copper / Gold Ratio",
+    "gold_spx_ratio":            "Gold / S&P 500 Ratio",
+    "spy_tlt_ratio":             "Stocks vs Bonds (SPY / TLT)",
+    "brent_wti_spread":          "Brent – WTI Spread",
+    "gold_real_rates":           "Gold vs Real Rates",
+    "defensives_cyclicals":      "Defensive vs Cyclical Sectors",
+    "stock_bond_correlation":    "Stock–Bond Correlation",
+    "sector_rotation_12m":       "S&P 500 Sector Rotation (12 Months)",
+    "india_sector_rotation_12m": "NIFTY Sector Rotation (12 Months)",
+    "nifty_it_trend_custom":     "NIFTY IT Trend",
+    "india_vix_vs_us":           "India VIX vs US VIX",
+    "india_fiscal_deficit_gdp":  "India's Fiscal Deficit, % of GDP",
+    "india_inflation_bar":       "India Inflation",
+    # World page: "macro_" is a file prefix, and these say more than it does
+    "macro_inflation":           "US Inflation Metrics",
+    "macro_labour":              "US Labour Market",
+    "macro_balance_sheet":       "Federal Reserve Balance Sheet",
+    "macro_world_regime":        "Growth vs Inflation Momentum",
+    "macro_oecd_cli":            "OECD Composite Leading Indicators",
+    "macro_cape":                "Shiller CAPE and Excess CAPE Yield",
+    "macro_equity_risk_premium": "US Equity Risk Premium",
+    "macro_country_erp":         "Equity Risk Premiums Across the G20",
+    "macro_regional_erp":        "Equity Risk Premiums by Region",
+    "macro_ratings_vs_markets":  "Markets vs the Rating Agencies",
+    "macro_em_borrowing":        "EM Dollar Borrowing Costs",
+    "macro_em_dollar":           "The Dollar vs EM Currencies",
+    "macro_sahm":                "Sahm Rule Recession Indicator",
+}
+
+
 def clean_title(filename: str) -> str:
     """
     Derive a human-readable chart title from a filename.
-    '01_equities_weekly.png' → 'Equities Weekly'
-    '10b_sector_rotation.png' → 'Sector Rotation'
+
+    '01_equities_weekly.png'  → 'Equities Weekly'
+    '27_btc_gold_ratio.png'   → 'Bitcoin Priced in Gold'   (an override)
+    '18_india_gdp.png'        → 'India GDP'                (the acronym map)
+
+    Captions on the site are set in capitals by CSS, so this shows in full only
+    in the search suggestions — but the casing is carried through both so the
+    two never disagree.
     """
     stem = Path(filename).stem                    # strip .png
-    stem = re.sub(r"^\d+[a-z]?_", "", stem)      # strip leading numeric prefix
-    return stem.replace("_", " ").title()
+    stem = re.sub(r"^\d+[a-z]?_", "", stem)       # strip leading numeric prefix
+    if stem in _TITLE_OVERRIDES:
+        return _TITLE_OVERRIDES[stem]
+    # "macro_" is the World page's file prefix, not part of any chart's name —
+    # but only stripped where something is left to name the chart by.
+    if stem.startswith("macro_") and stem.count("_") > 1:
+        stem = stem[len("macro_"):]
+    return " ".join(_ACRONYMS.get(word, word.title()) for word in stem.split("_"))

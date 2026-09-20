@@ -169,6 +169,17 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Total return by S&P 500 sector over the past year  ·  {date}",
         ),
     },
+    "india_sector_rotation_12m": {
+        "dashboard": (
+            "NIFTY Sector Rotation — Trailing 12 Months",
+            "Price return by sector over the past year, not total return  ·  {date}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Where India's Money Went This Year",
+            "Price return by NIFTY sector over the past year, not total return  ·  {date}",
+        ),
+    },
     "defensives_cyclicals": {
         "dashboard": (
             "Defensive vs. Cyclical Sectors",
@@ -222,6 +233,17 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             # ── EDIT for each Substack issue ──────────────────────────────
             "Gold Is Reclaiming Its Role as the Macro Hedge",
             "Gold/SPX ratio rising above its 52-week mean signals institutional flight from equities",
+        ),
+    },
+    "commodities_vs_equities": {
+        "dashboard": (
+            "Commodities vs. Equities",
+            "S&P GSCI relative to the S&P 500, log scale  ·  rising = commodities outperforming",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Commodities Are Near a 40-Year Low Against Stocks",
+            "The S&P GSCI relative to the S&P 500 has rarely been lower since 1984",
         ),
     },
     "em_fx_weekly": {
@@ -304,12 +326,23 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     "commodities_breadth": {
         "dashboard": (
             "How Broad Is the Commodity Rally?",
-            "Share of 13 major commodities trading above their own 200-day average",
+            "Share of 13 major commodities above their own 200-day average  ·  smoothed over 3 months",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "The Commodity Rally Is Narrower Than It Looks",
             "Energy is carrying the complex while precious metals roll over",
+        ),
+    },
+    "commodity_cycle": {
+        "dashboard": (
+            "The Long Commodity Cycle",
+            "S&P GSCI adjusted for US inflation, monthly since {start}  ·  {start}–{end} average = 100",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Commodities Move in Decade-Long Cycles",
+            "Inflation-adjusted commodity prices have swung between booms and busts for four decades",
         ),
     },
     "agri_weekly": {
@@ -336,13 +369,13 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
     "btc_gold_ratio": {
         "dashboard": (
-            "Bitcoin vs. Gold Ratio — Digital vs. Monetary Safe Haven",
-            "BTC/Gold price ratio  ·  rising = crypto commanding more per oz of gold",
+            "Bitcoin Priced in Gold",
+            "Ounces of gold one bitcoin buys, weekly since 2015  ·  rising = bitcoin gaining on gold",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Bitcoin Is Reclaiming Its Role as Digital Gold",
-            "BTC/Gold ratio recovering above its 1-year mean signals renewed institutional bitcoin demand",
+            "Bitcoin Has Stopped Gaining on Gold",
+            "A decade of ground won against the older store of value, and little of it since 2021",
         ),
     },
     "btc_global_m2": {
@@ -354,6 +387,17 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             # ── EDIT for each Substack issue ──────────────────────────────
             "Bitcoin vs. US Liquidity: The M2 Correlation",
             "The expansion of US M2 remains a structural driver for crypto prices",
+        ),
+    },
+    "btc_mvrv": {
+        "dashboard": (
+            "Bitcoin's Cycle Gauge: MVRV",
+            "Market value ÷ realised value, roughly what holders paid  ·  daily since {start}",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Where Bitcoin Sits in Its Cycle",
+            "MVRV compares the market price with what holders paid; past cycles topped above 3.5",
         ),
     },
     "move_index": {
@@ -397,6 +441,81 @@ def get_output_dir():
     for stale in out_dir.glob("*.png"):
         stale.unlink()
     return out_dir
+
+
+def _turning_points(series, swing):
+    """
+    The highs and lows a series turned from by at least `swing`, measured in
+    logs (0.45 is a 57% rise or a 36% fall), as [(date, value, "high"|"low")].
+
+    A turn counts only once the reversal has happened, so the latest peak or
+    trough is never marked while the market could still carry on past it. The
+    first counts only if the series moved at least as far to reach it, so the
+    first month of data is never taken for a turn.
+    """
+    import numpy as np
+
+    v = np.log(series.to_numpy(dtype=float))
+    turns, trend, hi, lo = [], 0, 0, 0
+    for i in range(1, len(v)):
+        if trend >= 0:
+            if v[i] > v[hi]:
+                hi = i
+            if v[hi] - v[i] >= swing:
+                turns.append((hi, "high"))
+                trend, lo = -1, i
+        if trend <= 0:
+            if v[i] < v[lo]:
+                lo = i
+            if v[i] - v[lo] >= swing:
+                turns.append((lo, "low"))
+                trend, hi = 1, i
+    if turns and abs(v[turns[0][0]] - v[0]) < swing:
+        turns = turns[1:]
+    return [(series.index[i], float(series.iloc[i]), kind) for i, kind in turns]
+
+
+def _mark_turns(ax, turns, color, label=lambda when, level: when.strftime("%b %Y")):
+    """A dot on each turn, labelled (by default with its date) above a high and below a low."""
+    for when, level, kind in turns:
+        ax.plot(when, level, "o", ms=5.5, color=color, mec="white", mew=1.3, zorder=6)
+        high = kind == "high"
+        ax.annotate(label(when, level), xy=(when, level), xytext=(0, 8 if high else -8),
+                    textcoords="offset points", ha="center", va="bottom" if high else "top",
+                    fontsize=8.5, fontweight="bold", color=EconStyle.INK, zorder=6)
+
+
+def _recession_bands(ax, usrec, note="Shaded: US recessions"):
+    """
+    Grey bands over the NBER recessions, as FRED's own charts draw them.
+
+    `usrec` is FRED's USREC: monthly, 1 through a recession and 0 otherwise.
+    The bands are read from the series rather than typed in, so a future
+    recession appears by itself. Returns the number of bands drawn.
+
+    Call this last: a band is a patch like any other, so it widens the axes to
+    the 1960s if drawn on a chart that starts later. The x limits in force when
+    it is called are what the chart keeps.
+    """
+    import pandas as pd
+    import matplotlib.dates as mdates
+    flag = pd.Series(usrec).astype(int)
+    flag.index = pd.to_datetime(flag.index)
+    edges = flag.diff().fillna(flag.iloc[0])
+    x0, x1 = ax.get_xlim()
+    drawn = 0
+    for start in flag.index[edges == 1]:
+        after = flag.index[(flag.index > start) & (edges == -1)]
+        end = after[0] if len(after) else flag.index[-1]
+        if mdates.date2num(end) < x0 or mdates.date2num(start) > x1:
+            continue                              # outside the years on screen
+        ax.axvspan(start, end, color="#4B5563", alpha=0.13, lw=0, zorder=1)
+        drawn += 1
+    ax.set_xlim(x0, x1)
+    if note and drawn:
+        ax.annotate(note, xy=(0.01, 0.03), xycoords="axes fraction", ha="left", va="bottom",
+                    fontsize=8.5, color=EconStyle.INK_MUTED, zorder=6)
+    return drawn
 
 
 def generate_with_live_data(output_dir, mode="dashboard"):
@@ -905,23 +1024,31 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     # ── 7.NIFTY SECTOR ROTATION ──
     print("   [11/12] NIFTY Sector Rotation")
+    # Sourced from NSE directly: Yahoo stopped updating most ^CNX* sector
+    # indices in Jul 2026, which silently cut the chart to three sectors. One
+    # snapshot serves this chart and the 12-month one below, so the two always
+    # cover the same sectors on the same day.
+    NIFTY_SECTORS = {
+        "NIFTY BANK": "Bank Nifty",
+        "NIFTY IT": "IT",
+        "NIFTY AUTO": "Auto",
+        "NIFTY FMCG": "FMCG",
+        "NIFTY PHARMA": "Pharma",
+        "NIFTY METAL": "Metal",
+        "NIFTY REALTY": "Realty",
+        "NIFTY ENERGY": "Energy",
+        "NIFTY PSU BANK": "PSU Bank",
+        "NIFTY INFRASTRUCTURE": "Infra",
+    }
     try:
-        # Sourced from NSE directly: Yahoo stopped updating most ^CNX* sector
-        # indices in Jul 2026, which silently cut the chart to three sectors.
-        from data.fetchers.india_fetcher import fetch_nifty_sector_weekly
-        NIFTY_SECTORS = {
-            "NIFTY BANK": "Bank Nifty",
-            "NIFTY IT": "IT",
-            "NIFTY AUTO": "Auto",
-            "NIFTY FMCG": "FMCG",
-            "NIFTY PHARMA": "Pharma",
-            "NIFTY METAL": "Metal",
-            "NIFTY REALTY": "Realty",
-            "NIFTY ENERGY": "Energy",
-            "NIFTY PSU BANK": "PSU Bank",
-            "NIFTY INFRASTRUCTURE": "Infra",
-        }
-        nse = fetch_nifty_sector_weekly(list(NIFTY_SECTORS))
+        from data.fetchers.india_fetcher import fetch_nifty_sector_changes
+        nse = fetch_nifty_sector_changes(list(NIFTY_SECTORS))
+    except Exception as e:
+        nse = None
+        print(f"   ⚠ NSE sector snapshot failed: {e}")
+    try:
+        if nse is None:
+            raise ValueError("no NSE sector snapshot")
         sector_data = [(label, nse[idx]["change_pct"]) for idx, label in NIFTY_SECTORS.items()]
 
         if sector_data:
@@ -938,6 +1065,26 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             chart.save(output_dir / "10b_india_sector_rotation.png")
     except Exception as e:
         print(f"   ⚠ Sector rotation failed: {e}")
+
+    # ── 7b. NIFTY SECTOR ROTATION, TRAILING 12 MONTHS ──
+    # India's counterpart to the S&P chart above. NSE's sector indices are price
+    # indices, so unlike the SPDR ETFs these returns leave out dividends; the
+    # subtitle says so, because the two charts are read side by side.
+    print("   [11b/12] NIFTY Sector Rotation — Trailing 12 Months")
+    try:
+        if nse is None:
+            raise ValueError("no NSE sector snapshot")
+        year_data = sorted(((label, nse[idx]["change_pct_1y"]) for idx, label in NIFTY_SECTORS.items()),
+                           key=lambda x: x[1], reverse=True)
+        _t, _s = WEEKLY_TITLES["india_sector_rotation_12m"][mode]
+        chart = WeeklyBarChart(names=[s[0] for s in year_data],
+                               values=[s[1] for s in year_data],
+                               color_keys=["us"] * len(year_data))
+        chart.render(title=_t, subtitle=_s.format(date=date_label),
+                     source="NSE (allIndices, price indices)")
+        chart.save(output_dir / "10c_india_sector_rotation_12m.png")
+    except Exception as e:
+        print(f"   ⚠ 12-month NIFTY sector rotation failed: {e}")
         
     # ── 8. REAL WAGE GROWTH ──
     print("   [12/12] US Real Wage Growth (Data only for Summary Table)")
@@ -1187,50 +1334,72 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # Replaced the SPY/TLT ratio, which only ever rose: because TLT is driven
     # by long rates, the ratio climbed whenever yields rose, even in an equity
     # selloff. Their correlation asks the question that ratio was gesturing at
-    # — whether bonds still hedge equities at all.
-    print("   [15] Stock-Bond Correlation (60-Day Rolling)")
+    # — whether bonds still hedge equities at all. It runs from TLT's launch in
+    # 2002, because the point is the contrast: two decades of bonds cushioning
+    # equity falls, then a regime since 2021 in which they mostly have not.
+    print("   [15] Stock-Bond Correlation (60-Day Rolling, since 2002)")
     try:
-        spy_s = yf_fetcher.get_close_series("SPY", period="3y")
-        tlt_s = yf_fetcher.get_close_series("TLT", period="3y")
+        spy_s = yf_fetcher.get_close_series("SPY", period="max")
+        tlt_s = yf_fetcher.get_close_series("TLT", period="max")
         both = pd.concat({"spy": spy_s, "tlt": tlt_s}, axis=1).dropna()
+        if len(both) < 5000:                          # TLT has traded since Jul 2002
+            raise ValueError(f"only {len(both)} days of SPY/TLT history")
 
-        if len(both) > 200:
-            returns = both.pct_change().dropna()
-            corr_s = returns["spy"].rolling(60).corr(returns["tlt"]).dropna()
+        returns = both.pct_change().dropna()
+        corr_s = returns["spy"].rolling(60).corr(returns["tlt"]).dropna()
+        corr_s.index = corr_s.index.tz_localize(None)
+        regime = pd.Timestamp("2021-01-01")
+        before, after = corr_s[corr_s.index < regime], corr_s[corr_s.index >= regime]
+        # Shares of days are counted on every daily reading; the line shows one
+        # reading a week, because 6,000 daily points at this width is a smear.
+        weekly_corr = corr_s.resample("W-FRI").last().dropna()
 
-            fig, ax = EconStyle.create_figure(size="wide")
-            c_dates = corr_s.index.to_pydatetime()
-            zeros = [0.0] * len(corr_s)
-            ax.fill_between(c_dates, corr_s.values, zeros, where=(corr_s.values > 0),
-                            color="#9B1C31", alpha=0.16, interpolate=True)
-            ax.fill_between(c_dates, corr_s.values, zeros, where=(corr_s.values <= 0),
-                            color="#0B8F82", alpha=0.16, interpolate=True)
-            ax.plot(c_dates, corr_s.values, color="#003366", linewidth=2.5, zorder=4)
-            ax.axhline(0, color="#1A1A1A", linewidth=1.1, zorder=5)
+        fig, ax = EconStyle.create_figure(size="wide")
+        c_dates = weekly_corr.index.to_pydatetime()
+        zeros = [0.0] * len(weekly_corr)
+        ax.axvspan(regime, weekly_corr.index[-1], color="#6B7280", alpha=0.10, lw=0, zorder=0)
+        ax.fill_between(c_dates, weekly_corr.values, zeros, where=(weekly_corr.values > 0),
+                        color="#9B1C31", alpha=0.16, interpolate=True)
+        ax.fill_between(c_dates, weekly_corr.values, zeros, where=(weekly_corr.values <= 0),
+                        color="#0B8F82", alpha=0.16, interpolate=True)
+        ax.plot(c_dates, weekly_corr.values, color="#003366", linewidth=2.5, zorder=4)
+        ax.axhline(0, color="#1A1A1A", linewidth=1.1, zorder=5)
 
-            latest = float(corr_s.iloc[-1])
-            ax.annotate(f"{latest:+.2f}".replace("-", "−"), xy=(c_dates[-1], latest),
-                        xytext=(8, 0), textcoords="offset points", va="center", ha="left",
-                        fontsize=11, fontweight="bold", color="#003366", annotation_clip=False)
-            ax.annotate("Bonds and equities fall together", xy=(0.012, 0.95), xycoords="axes fraction",
-                        ha="left", va="top", fontsize=9.5, fontweight="bold", color="#9B1C31")
-            ax.annotate("Bonds hedge equities", xy=(0.012, 0.05), xycoords="axes fraction",
-                        ha="left", va="bottom", fontsize=9.5, fontweight="bold", color="#0B8F82")
+        latest = float(corr_s.iloc[-1])
+        ax.annotate(f"{latest:+.2f}".replace("-", "−"), xy=(c_dates[-1], latest),
+                    xytext=(8, 0), textcoords="offset points", va="center", ha="left",
+                    fontsize=11, fontweight="bold", color="#003366", annotation_clip=False)
+        ax.annotate("Bonds and equities fall together", xy=(0.012, 0.95), xycoords="axes fraction",
+                    ha="left", va="top", fontsize=9.5, fontweight="bold", color="#9B1C31")
+        ax.annotate("Bonds hedge equities", xy=(0.012, 0.05), xycoords="axes fraction",
+                    ha="left", va="bottom", fontsize=9.5, fontweight="bold", color="#0B8F82")
+        # Each period's share of days above zero, over its span. The earlier
+        # label sits right of centre to clear the caption at the top left.
+        for label, share, x in (
+            (f"{before.index[0].year}–{regime.year - 1}", (before > 0).mean() * 100,
+             before.index[0] + (regime - before.index[0]) * 0.6),
+            (f"Since {regime.year}", (after > 0).mean() * 100,
+             regime + (after.index[-1] - regime) / 2),
+        ):
+            ax.annotate(f"{label}\nabove zero on {share:.0f}% of days", xy=(x, 0.95),
+                        xycoords=("data", "axes fraction"), ha="center", va="top",
+                        fontsize=9, fontweight="bold", color="#1A1A1A", linespacing=1.3)
 
-            ax.set_ylabel("Correlation of daily returns", fontsize=EconStyle.FONT_SIZE_AXIS,
-                          fontweight="bold", color="#1C1C1E")
-            ax.set_ylim(-1.0, 1.0)
-            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+        ax.set_ylabel("Correlation of daily returns", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.set_ylim(-1.0, 1.0)
+        ax.margins(x=0.01)
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
 
-            _t, _s = WEEKLY_TITLES["stock_bond_correlation"][mode]
-            EconStyle.set_title(ax, _t, _s)
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (SPY, TLT daily returns)")
-            EconStyle.save_chart(fig, output_dir / "15_stock_bond_correlation.png")
+        _t, _s = WEEKLY_TITLES["stock_bond_correlation"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Yahoo Finance (SPY, TLT daily returns)")
+        EconStyle.save_chart(fig, output_dir / "15_stock_bond_correlation.png")
     except Exception as e:
         print(f"   ⚠ Stock-bond correlation failed: {e}")
 
@@ -1420,6 +1589,64 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             EconStyle.save_chart(fig, output_dir / "19_gold_spx_ratio.png")
     except Exception as e:
         print(f"   ⚠ Gold/SPX ratio failed: {e}")
+
+    # ── 19b. COMMODITIES VS EQUITIES ──
+    # Four decades of commodities priced in equities. The ratio drifts down
+    # over time, because shares compound earnings while commodity prices
+    # mostly track inflation; the log scale lets the cycles around that drift
+    # show. ^SPGSCI is the spot index, the price of the commodities themselves,
+    # not the return from rolling futures.
+    print("   [19b] Commodities vs Equities (S&P GSCI / S&P 500, since 1984)")
+    try:
+        import matplotlib.ticker as mticker
+        gsci_s = yf_fetcher.get_close_series("^SPGSCI", period="max")
+        spx_s = yf_fetcher.get_close_series("^GSPC", period="max")
+        if len(gsci_s) < 8000 or len(spx_s) < 8000:      # both run back to the 1980s
+            raise ValueError("no long S&P GSCI or S&P 500 history")
+        gsci_s.index = gsci_s.index.tz_localize(None)
+        spx_s.index = spx_s.index.tz_localize(None)
+        # Month-end closes, so the last point is the latest close.
+        ratio_s = (gsci_s.resample("MS").last() / spx_s.resample("MS").last()).dropna()
+        ratio_s = ratio_s / ratio_s.iloc[0] * 100
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        color = EconStyle.LINE_ORANGE
+        ax.plot(ratio_s.index.to_pydatetime(), ratio_s.values, color=color, linewidth=2.5, zorder=4)
+        _mark_turns(ax, _turning_points(ratio_s, 0.7), color)
+
+        latest = float(ratio_s.iloc[-1])
+        ax.annotate(f"{latest:.1f}", xy=(ratio_s.index[-1], latest), xytext=(8, 0),
+                    textcoords="offset points", va="center", ha="left", fontsize=11,
+                    fontweight="bold", color=color, annotation_clip=False)
+        ax.annotate(f"Now lower than in {(ratio_s > latest).mean() * 100:.0f}% of months "
+                    f"since {ratio_s.index[0].year}",
+                    xy=(0.99, 0.95), xycoords="axes fraction", ha="right", va="top",
+                    fontsize=9.5, fontweight="bold", color=color)
+
+        ax.set_yscale("log")
+        ax.set_ylim(ratio_s.min() / 1.5, ratio_s.max() * 1.15)   # room for the dated lows
+        ax.yaxis.set_major_locator(mticker.FixedLocator([2, 5, 10, 20, 50, 100, 200]))
+        ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f"{y:,.0f}"))
+        ax.yaxis.set_minor_locator(mticker.NullLocator())
+        ax.set_ylabel(f"{ratio_s.index[0]:%b %Y} = 100, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.margins(x=0.01)
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.set_major_locator(mdates.YearLocator(5))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+
+        # Last, once the years on screen are settled (see _recession_bands).
+        _recession_bands(ax, fred_fetcher.fetch_series("USREC", period_years=60))
+
+        _t, _s = WEEKLY_TITLES["commodities_vs_equities"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "S&P GSCI and S&P 500 via Yahoo Finance; recession dates NBER via FRED")
+        EconStyle.save_chart(fig, output_dir / "19b_commodities_vs_equities.png")
+    except Exception as e:
+        print(f"   ⚠ Commodities vs equities failed: {e}")
 
     # ── 20. EM FX WEEKLY BAR ──
     print("   [20] EM FX — Weekly Performance Bar Chart")
@@ -1900,8 +2127,10 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # ── 23c. COMMODITY BREADTH ──
     # Whether a commodity move is a global demand impulse or one squeezed
     # market. A headline index cannot separate the two; counting how many
-    # members are in their own uptrend can.
-    print("   [23c] Commodity Breadth (share above 200-day average)")
+    # members are in their own uptrend can. It runs from 2008, when all 13 have
+    # history on Yahoo (Brent is the last to start), so that more than one
+    # commodity cycle is on the chart.
+    print("   [23c] Commodity Breadth (share above 200-day average, since 2008)")
     try:
         BREADTH_BASKET = {
             "BZ=F": "Brent", "CL=F": "WTI", "NG=F": "Natural gas",
@@ -1909,45 +2138,46 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             "ZW=F": "Wheat", "ZC=F": "Corn", "ZS=F": "Soybeans",
             "KC=F": "Coffee", "SB=F": "Sugar", "CC=F": "Cocoa",
         }
-        # Four years of prices to show three years of breadth: the 200-day
-        # average needs a warm-up before the first reading means anything.
-        legs_b = {}
+        status = {}
         for ticker, name in BREADTH_BASKET.items():
-            s = yf_fetcher.get_close_series(ticker, period="4y")
+            s = yf_fetcher.get_close_series(ticker, period="max")
             if s is None or len(s) < 250:
                 raise ValueError(f"no usable history for {name} ({ticker})")
             s.index = s.index.tz_localize(None)
-            legs_b[name] = s
+            ma = s.rolling(200).mean()
+            # 1 above its own 200-day average, 0 below, and NaN until the
+            # average has 200 closes behind it: `price > NaN` is False, so
+            # without the mask the warm-up would be published as a zero.
+            status[name] = (s > ma).astype(float).where(ma.notna())
 
-        px_b = pd.concat(legs_b, axis=1).ffill().dropna()
-        ma_b = px_b.rolling(200).mean()
-        # Drop the warm-up explicitly. `price > NaN` evaluates to False rather
-        # than NaN, so comparing first and dropping after would publish the
-        # warm-up as a genuine reading of zero.
-        ma_b = ma_b.dropna(how="any")
-        above = px_b.loc[ma_b.index] > ma_b
-        breadth = (above.mean(axis=1) * 100)
-
-        cutoff = breadth.index[-1] - pd.Timedelta(days=3 * 365)
-        breadth = breadth[breadth.index >= cutoff]
-        above = above.loc[breadth.index]
-        if len(breadth) < 400:
-            raise ValueError(f"only {len(breadth)} days of breadth after the 200-day warm-up")
-        n_members = above.shape[1]
+        # A reading is carried across a holiday or two, never further. Yahoo's
+        # platinum series has two-month holes in 2008–09, and bridging them
+        # would publish readings no market printed; on those days the share is
+        # of the commodities that did trade, and never of fewer than 12.
+        above = pd.concat(status, axis=1).sort_index().ffill(limit=5)
+        above = above.loc[above.apply(lambda c: c.first_valid_index()).max():]
+        above = above[above.notna().sum(axis=1) >= len(BREADTH_BASKET) - 1]
+        breadth = above.mean(axis=1) * 100
+        if breadth.index[0] > pd.Timestamp("2009-01-01"):
+            raise ValueError(f"breadth starts in {breadth.index[0]:%b %Y}: a member's history was cut short")
+        # Thirteen members move the share in steps of eight points, so the
+        # daily reading is drawn faintly and its 3-month average carries the line.
+        smooth = breadth.rolling(63).mean().dropna()
 
         fig, ax = EconStyle.create_figure(size="wide")
-        b_dates = breadth.index.to_pydatetime()
-        fifty = [50.0] * len(breadth)
-        ax.fill_between(b_dates, breadth.values, fifty, where=(breadth.values >= 50),
+        s_dates = smooth.index.to_pydatetime()
+        fifty = [50.0] * len(smooth)
+        ax.fill_between(s_dates, smooth.values, fifty, where=(smooth.values >= 50),
                         color="#0B8F82", alpha=0.16, interpolate=True, zorder=2)
-        ax.fill_between(b_dates, breadth.values, fifty, where=(breadth.values < 50),
+        ax.fill_between(s_dates, smooth.values, fifty, where=(smooth.values < 50),
                         color="#9B1C31", alpha=0.16, interpolate=True, zorder=2)
-        ax.plot(b_dates, breadth.values, color="#C8620A", linewidth=2.5, zorder=5)
+        ax.plot(breadth.index.to_pydatetime(), breadth.values, color="#C8620A",
+                linewidth=0.7, alpha=0.3, zorder=3)
+        ax.plot(s_dates, smooth.values, color="#C8620A", linewidth=2.5, zorder=5)
         ax.axhline(50, color="#1A1A1A", linewidth=1.1, zorder=4)
 
-        latest_b = float(breadth.iloc[-1])
-        n_up = int(above.iloc[-1].sum())
-        ax.annotate(f"{latest_b:.0f}%", xy=(b_dates[-1], latest_b), xytext=(8, 0),
+        latest_b = float(smooth.iloc[-1])
+        ax.annotate(f"{latest_b:.0f}%", xy=(s_dates[-1], latest_b), xytext=(8, 0),
                     textcoords="offset points", va="center", ha="left",
                     fontsize=11, fontweight="bold", color="#C8620A", annotation_clip=False)
 
@@ -1957,22 +2187,26 @@ def generate_with_live_data(output_dir, mode="dashboard"):
                 return ", ".join(items)
             return ", ".join(items[:limit]) + f" and {len(items) - limit} more"
 
-        rising = [n for n in above.columns if above.iloc[-1][n]]
-        falling = [n for n in above.columns if not above.iloc[-1][n]]
-        ax.annotate(f"Now {n_up} of {n_members} above: " + _names(rising),
-                    xy=(0.012, 0.95), xycoords="axes fraction", ha="left", va="top",
+        # Today's split, from the daily reading. The bands above 100 and below
+        # 0 are the captions' own, so they never sit on the line.
+        today = above.iloc[-1]
+        rising = [n for n in above.columns if today[n] == 1]
+        falling = [n for n in above.columns if today[n] == 0]
+        ax.annotate(f"Now {len(rising)} of {len(rising) + len(falling)} above: " + _names(rising),
+                    xy=(0.012, 0.97), xycoords="axes fraction", ha="left", va="top",
                     fontsize=9, fontweight="bold", color="#0B8F82")
         ax.annotate(f"Below: " + _names(falling),
-                    xy=(0.012, 0.055), xycoords="axes fraction", ha="left", va="bottom",
+                    xy=(0.012, 0.03), xycoords="axes fraction", ha="left", va="bottom",
                     fontsize=9, fontweight="bold", color="#9B1C31")
 
         ax.set_ylabel("Share above 200-day average (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
                       fontweight="bold", color="#1C1C1E")
-        ax.set_ylim(-2, 108)
+        ax.set_ylim(-22, 124)
         ax.set_yticks([0, 25, 50, 75, 100])
+        ax.margins(x=0.01)
         ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+        ax.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
         for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
 
         _t, _s = WEEKLY_TITLES["commodities_breadth"][mode]
@@ -1983,6 +2217,58 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         EconStyle.save_chart(fig, output_dir / "23c_commodities_breadth.png")
     except Exception as e:
         print(f"   ⚠ Commodity breadth failed: {e}")
+
+    # ── 23d. THE LONG COMMODITY CYCLE ──
+    # Breadth says how wide today's move is; this says where it sits in the
+    # long cycle. The S&P GSCI spot index, deflated by US CPI so that the
+    # 1980s and today are in the same money, with each high marked once prices
+    # fell 36% from it and each low once they rose 57% (a log swing of 0.45).
+    # Monthly averages on both sides, as CPI is an average over the
+    # month: a month enters only once its CPI is published, so no price level
+    # is carried into a month it did not measure.
+    print("   [23d] The Long Commodity Cycle (real S&P GSCI, since 1984)")
+    try:
+        gsci_s = yf_fetcher.get_close_series("^SPGSCI", period="max")
+        if len(gsci_s) < 8000:
+            raise ValueError("no long S&P GSCI history")
+        gsci_s.index = gsci_s.index.tz_localize(None)
+        cpi_s = fred_fetcher.fetch_series("CPIAUCSL", period_years=50)
+        real_s = (gsci_s.resample("MS").mean() / cpi_s).dropna()
+        real_s = real_s / real_s.mean() * 100
+        first, last = real_s.index[0].year, real_s.index[-1].year
+
+        fig, ax = EconStyle.create_figure(size="wide")
+        color = EconStyle.LINE_ORANGE
+        ax.plot(real_s.index.to_pydatetime(), real_s.values, color=color, linewidth=2.5, zorder=4)
+        ax.axhline(100, color=EconStyle.INK_MUTED, linewidth=1.1, linestyle="--", zorder=3)
+        # Over the 1990s, when the line runs well below the average.
+        ax.annotate(f"{first}–{last} average", xy=(pd.Timestamp("1993-01-01"), 100),
+                    xytext=(0, 4), textcoords="offset points", ha="left", va="bottom",
+                    fontsize=8.5, color=EconStyle.INK_MUTED)
+        _mark_turns(ax, _turning_points(real_s, 0.45), color)
+
+        latest = float(real_s.iloc[-1])
+        ax.annotate(f"{latest:.0f}", xy=(real_s.index[-1], latest), xytext=(8, 0),
+                    textcoords="offset points", va="center", ha="left", fontsize=11,
+                    fontweight="bold", color=color, annotation_clip=False)
+
+        ax.set_ylim(real_s.min() * 0.6, real_s.max() * 1.1)      # room for the dated turns
+        ax.set_ylabel("Index, average = 100", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.margins(x=0.01)
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.set_major_locator(mdates.YearLocator(5))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+
+        _t, _s = WEEKLY_TITLES["commodity_cycle"][mode]
+        EconStyle.set_title(ax, _t, _s.format(start=first, end=last))
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "S&P GSCI via Yahoo Finance · FRED (US CPI)")
+        EconStyle.save_chart(fig, output_dir / "23d_commodity_cycle.png")
+    except Exception as e:
+        print(f"   ⚠ Long commodity cycle failed: {e}")
 
     # ── 24. AGRICULTURAL COMMODITIES ──
     print("   [24] Agricultural Commodities — Weekly Bar Chart")
@@ -2129,54 +2415,71 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ ETH/BTC ratio failed: {e}")
 
-    # ── 27. BTC VS GOLD RATIO ──
-    print("   [27] Bitcoin vs. Gold Ratio (2-Year Trend)")
+    # ── 27. BITCOIN PRICED IN GOLD ──
+    # How many ounces of gold one bitcoin buys. The chart used to run two years
+    # against a 52-week mean, which showed a wiggle rather than the relationship:
+    # over a decade bitcoin went from a quarter of an ounce to tens of ounces,
+    # and then stopped gaining on gold. Bitcoin's price comes from Coin Metrics,
+    # the same source as the MVRV chart, because Yahoo's BTC-USD only starts in
+    # Sep 2014; gold is the futures contract, the only long series Yahoo carries.
+    print("   [27] Bitcoin Priced in Gold (since 2015)")
     try:
-        btc_s  = yf_fetcher.get_close_series("BTC-USD", period="2y")
-        gold_s = yf_fetcher.get_close_series("GC=F",    period="2y")
+        import pandas as pd
+        import matplotlib.ticker as mticker
+        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv
+        btc_cm = fetch_btc_mvrv()
+        gold_s = yf_fetcher.get_close_series("GC=F", period="max")
+        gold_s.index = pd.to_datetime(gold_s.index).tz_localize(None)
+        gold_s = pd.to_numeric(gold_s, errors="coerce")
 
-        # ── THE FIX: Strip timezones (BTC is UTC, Gold is NY) ──
-        btc_s.index = btc_s.index.tz_localize(None)
-        gold_s.index = gold_s.index.tz_localize(None)
+        pair = pd.DataFrame({"btc": btc_cm["price"], "gold": gold_s}).dropna().sort_index()
+        # Weekly closes: eleven years of daily readings draw as a band, not a line.
+        oz_s = (pair["btc"] / pair["gold"]).resample("W-FRI").last().dropna()
+        oz_s = oz_s[oz_s.index >= "2015-01-01"]
+        if len(oz_s) < 400:
+            raise ValueError("no long bitcoin/gold history")
 
-        if len(btc_s) > 50 and len(gold_s) > 50:
-            import pandas as pd
-            # Force numeric to prevent the 'isfinite' error
-            btc_s = pd.to_numeric(btc_s, errors='coerce')
-            gold_s = pd.to_numeric(gold_s, errors='coerce')
-            
-            combined = pd.DataFrame({"btc": btc_s, "gold": gold_s}).dropna()
-            ratio_s  = combined["btc"] / combined["gold"]
-            mean_52w = ratio_s.rolling(252).mean()
+        fig, ax = EconStyle.create_figure(size="wide")
+        color = "#F59E0B"
+        ax.axhline(1, color=EconStyle.INK_MUTED, linewidth=1, linestyle="--", alpha=0.6, zorder=2)
+        ax.annotate("1 bitcoin = 1 ounce", xy=(oz_s.index[0], 1), xytext=(4, 5),
+                    textcoords="offset points", ha="left", va="bottom",
+                    fontsize=8.5, color=EconStyle.INK_MUTED, zorder=6)
+        ax.plot(oz_s.index.to_pydatetime(), oz_s.values, color=color, linewidth=2.5, zorder=4)
+        _mark_turns(ax, _turning_points(oz_s, 0.9), color,
+                    label=lambda when, level: f"{level:,.1f}" if level < 10 else f"{level:,.0f}")
 
-            fig, ax = EconStyle.create_figure(size="wide")
-            color_line = "#F59E0B"
+        latest = float(oz_s.iloc[-1])
+        ax.annotate(f"{latest:,.1f}", xy=(oz_s.index[-1], latest), xytext=(8, 0),
+                    textcoords="offset points", va="center", ha="left", fontsize=11,
+                    fontweight="bold", color=color, annotation_clip=False)
+        peak, peak_when = float(oz_s.max()), oz_s.idxmax()
+        ax.annotate(f"Peak {peak:,.0f} oz in {peak_when:%b %Y}  ·  {(1 - latest / peak) * 100:.0f}% below it now",
+                    xy=(0.01, 0.95), xycoords="axes fraction", ha="left", va="top",
+                    fontsize=9.5, fontweight="bold", color=color)
 
-            r_dates = ratio_s.index.to_pydatetime()
-            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="BTC/Gold Ratio")
-            ax.plot(mean_52w.index.to_pydatetime(), mean_52w.values,
-                    color="#6B7280", linewidth=1.5, linestyle="--", label="52-Week Mean")
-            ax.fill_between(r_dates, ratio_s.values, mean_52w.reindex(ratio_s.index).values,
-                            where=ratio_s.values >= mean_52w.reindex(ratio_s.index).values,
-                            alpha=0.07, color=color_line, interpolate=True)
+        ax.set_yscale("log")
+        ax.set_ylim(oz_s.min() / 1.3, peak * 1.9)           # room for the labels above the peaks
+        ax.yaxis.set_major_locator(mticker.FixedLocator([0.25, 0.5, 1, 2, 5, 10, 20, 40]))
+        ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f"{y:g}"))
+        ax.yaxis.set_minor_locator(mticker.NullLocator())
+        ax.set_ylabel("Ounces of gold per bitcoin, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color="#1C1C1E")
+        ax.margins(x=0.01)
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
 
-            ax.set_ylabel("BTC / Gold Ratio", fontsize=EconStyle.FONT_SIZE_AXIS,
-                          fontweight="bold", color=color_line)
-            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-            ax.legend(frameon=False, fontsize=10)
-
-            _t, _s = WEEKLY_TITLES["btc_gold_ratio"][mode]
-            EconStyle.set_title(ax, _t, _s)
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance")
-            EconStyle.save_chart(fig, output_dir / "27_btc_gold_ratio.png")
+        _t, _s = WEEKLY_TITLES["btc_gold_ratio"][mode]
+        EconStyle.set_title(ax, _t, _s)
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Coin Metrics Community API (bitcoin), Yahoo Finance (gold)")
+        EconStyle.save_chart(fig, output_dir / "27_btc_gold_ratio.png")
     except Exception as e:
-        print(f"   ⚠ BTC/Gold ratio failed: {e}")
-
+        btc_cm = None
+        print(f"   ⚠ Bitcoin priced in gold failed: {e}")
     # ── 28. BTC VS US LIQUIDITY (M2 MONEY SUPPLY - SINCE 2013) ──
     print("   [28] Bitcoin vs. US Liquidity (M2 Money Supply - Since 2013)")
     try:
@@ -2255,6 +2558,80 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             EconStyle.save_chart(fig, output_dir / "28_btc_global_m2.png")
     except Exception as e:
         print(f"   ⚠ BTC vs US M2 Liquidity failed: {e}")
+
+    # ── 29. BITCOIN MVRV ──
+    # Where bitcoin sits in its own cycle: the market price against what
+    # holders paid for their coins. From Coin Metrics' free API; Glassnode's
+    # needs a paid plan. The series starts in Jul 2010, but its first months
+    # read up to 146 only because so few coins had changed hands, so the chart
+    # starts in 2011. Above 3.5 was long read as a cycle top, but each cycle
+    # has peaked lower (7.7 in 2011, 4.0 in 2021) and the price tops of Nov
+    # 2021 and 2025 came below 3, so the chart dates the last reading above it
+    # and marks every cycle's peak rather than promising the line still holds.
+    # Below 1, the market prices coins under what holders paid on average.
+    print("   [29] Bitcoin MVRV (since 2011)")
+    try:
+        import matplotlib.ticker as mticker
+        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv
+        cm = btc_cm if btc_cm is not None else fetch_btc_mvrv()   # already fetched for chart 27
+        cm = cm[cm.index >= "2011-01-01"]
+        HOT, COLD = 3.5, 1.0
+
+        fig, (ax1, ax2) = EconStyle.create_figure(
+            size="wide", nrows=2, sharex=True,
+            gridspec_kw={"height_ratios": [1, 1.15], "hspace": 0.12})
+        m_dates = cm.index.to_pydatetime()
+        c_price, c_mvrv = "#F59E0B", "#003366"
+
+        ax1.plot(m_dates, cm["price"].values, color=c_price, linewidth=2.5, zorder=4)
+        ax1.set_yscale("log")
+        ax1.yaxis.set_major_locator(mticker.FixedLocator([1, 100, 10_000, 1_000_000]))
+        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f"${y:,.0f}"))
+        ax1.yaxis.set_minor_locator(mticker.NullLocator())
+        ax1.set_ylabel("Price, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
+                       fontweight="bold", color="#1C1C1E")
+        price = float(cm["price"].iloc[-1])
+        ax1.annotate(f"${price / 1000:,.1f}k" if price >= 1000 else f"${price:,.0f}",
+                     xy=(m_dates[-1], price), xytext=(8, 0), textcoords="offset points",
+                     va="center", ha="left", fontsize=11, fontweight="bold", color=c_price,
+                     annotation_clip=False)
+
+        top = max(9.0, float(cm["mvrv"].max()) * 1.18)             # room for the peak labels
+        ax2.axhspan(HOT, top, color="#9B1C31", alpha=0.10, lw=0, zorder=0)
+        ax2.axhspan(0, COLD, color="#0B8F82", alpha=0.12, lw=0, zorder=0)
+        ax2.plot(m_dates, cm["mvrv"].values, color=c_mvrv, linewidth=2.5, zorder=4)
+        # Every high the ratio then more than halved from: each cycle's peak,
+        # and the mid-cycle highs that fell as far.
+        peaks = [t for t in _turning_points(cm["mvrv"], 0.9) if t[2] == "high"]
+        _mark_turns(ax2, peaks, c_mvrv, label=lambda when, level: f"{level:.1f}")
+        mvrv = float(cm["mvrv"].iloc[-1])
+        ax2.annotate(f"{mvrv:.2f}", xy=(m_dates[-1], mvrv), xytext=(8, 0),
+                     textcoords="offset points", va="center", ha="left", fontsize=11,
+                     fontweight="bold", color=c_mvrv, annotation_clip=False)
+        last_hot = cm.index[cm["mvrv"] > HOT].max()
+        ax2.annotate(f"Above {HOT:g}: last reached {last_hot:%b %Y}", xy=(0.99, 0.95),
+                     xycoords="axes fraction", ha="right", va="top",
+                     fontsize=9, fontweight="bold", color="#9B1C31")
+        ax2.annotate(f"Below {COLD:g}: the average holder is at a loss", xy=(0.99, COLD / 2),
+                     xycoords=("axes fraction", "data"), ha="right", va="center",
+                     fontsize=9, fontweight="bold", color="#0B8F82")
+        ax2.set_ylim(0, top)
+        ax2.set_ylabel("MVRV", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+        ax2.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax2.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for ax in (ax1, ax2):
+            ax.margins(x=0.01)
+            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+
+        _t, _s = WEEKLY_TITLES["btc_mvrv"][mode]
+        EconStyle.set_title(ax1, _t, _s.format(start=cm.index[0].year))
+        EconStyle.add_top_rule(ax1)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Coin Metrics Community API")
+        EconStyle.save_chart(fig, output_dir / "29_btc_mvrv.png")
+    except Exception as e:
+        print(f"   ⚠ Bitcoin MVRV failed: {e}")
 
     # ── SUMMARY TABLE ──
     print("   [+] Summary Table")

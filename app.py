@@ -33,6 +33,7 @@ from charts.loader import (
 )
 import config.insights as _insights
 import config.news_settings as _news_settings
+import config.resources as _resources
 import config.soe_settings as _soe_settings
 import config.weekly_settings as _weekly_settings
 import config.world_settings as _world_settings
@@ -879,16 +880,6 @@ st.markdown(
         border-bottom-color: #003366;
     }
 
-    .insti-byline {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 0.79rem !important;
-        font-weight: 400 !important;
-        color: #6B7280 !important;
-        text-align: center;
-        letter-spacing: 0.01em !important;
-        margin: 0.8rem 0 1.35rem 0 !important;
-    }
-
     /* A phone cannot hold 0.2em of tracking across that descriptor without
        breaking it into three ragged lines. */
     @media (max-width: 680px) {
@@ -899,11 +890,13 @@ st.markdown(
             padding: 0.45rem 0.9rem 0.5rem 0.9rem !important;
             margin-top: 0.9rem !important;
         }
-        .insti-byline { font-size: 0.72rem !important; }
     }
 
+    /* The top margin replaces the "Updated every Saturday" line that used to
+       hold the button off the descriptor band. */
     .substack-center-container {
         text-align: center;
+        margin-top: 1.1rem;
         margin-bottom: 1.5rem;
     }
     
@@ -956,7 +949,167 @@ st.markdown(
         transition: transform 0.2s ease;
     }
     a.substack-cta:hover .substack-cta__arrow { transform: translate(2px, -2px); }
-    
+
+    /* ── About link ──
+       A quiet second line under the Substack button. It is deliberately not a
+       tab: the four tabs are the work, this is the note about the work. */
+    /* The row is a flex column, and Streamlit shrink-wraps a page link, so the
+       link is centred by the column rather than by the anchor's own alignment. */
+    .st-key-ehabout {
+        margin: -1.1rem 0 0.1rem 0 !important;
+        align-items: center !important;
+    }
+    .st-key-ehabout [data-testid="stPageLink"] a {
+        background: transparent !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+    .st-key-ehabout [data-testid="stPageLink"] a p,
+    .st-key-ehabout [data-testid="stPageLink"] a span,
+    .st-key-ehabout [data-testid="stPageLink"] a div {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.68rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.1em !important;
+        text-transform: uppercase !important;
+        color: #4B5563 !important;
+    }
+    .st-key-ehabout [data-testid="stPageLink"] a:hover p,
+    .st-key-ehabout [data-testid="stPageLink"] a:hover span,
+    .st-key-ehabout [data-testid="stPageLink"] a:hover div {
+        color: #003366 !important;
+        text-decoration: underline !important;
+        text-underline-offset: 3px !important;
+    }
+
+    /* ── About page ──
+       Everything a reader reads here is set in Inter, the face the rest of the
+       site uses for prose: the serif was lighter and smaller on the stem than
+       the body text elsewhere and read as thin. Sizes are a step above the
+       site's 0.9rem body because this page is read straight through rather
+       than glanced at beside a chart. No cards, no rules beyond the
+       hairlines. */
+    .about-prose p {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 1rem !important;
+        font-weight: 400 !important;
+        line-height: 1.72 !important;
+        color: #24282F !important;
+        max-width: 44rem;
+        margin: 0 0 1.05rem 0 !important;
+    }
+    .about-build { list-style: none; padding: 0; margin: 0.2rem 0 0 0; max-width: 44rem; }
+    .about-build li {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.95rem !important;
+        font-weight: 400 !important;
+        line-height: 1.68 !important;
+        color: #24282F !important;
+        padding: 0.55rem 0 0.55rem 1.05rem;
+        border-bottom: 1px solid rgba(10, 31, 61, 0.09);
+        position: relative;
+    }
+    .about-build li::before {
+        content: ""; position: absolute; left: 0; top: 1.05rem;
+        width: 5px; height: 5px; background: #003366; border-radius: 50%;
+    }
+    /* A line of explanation under a section header, where the header alone
+       does not say what the list below it is for. */
+    .about-lede {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.92rem !important;
+        line-height: 1.6 !important;
+        color: #4A5262 !important;
+        max-width: 46rem;
+        margin: -0.2rem 0 1rem 0 !important;
+    }
+    .about-lede .about-tag { margin-left: 0.15rem; margin-right: 0.15rem; }
+
+    /* What each page is built from: name, cadence and sources in three
+       columns, moved here from the sidebar where it was too narrow to read. */
+    .about-arch { margin: 0.2rem 0 0 0; border-top: 1px solid rgba(10, 31, 61, 0.18); }
+    .about-arch-row {
+        display: grid;
+        grid-template-columns: 11rem 7rem minmax(0, 1fr);
+        gap: 0.15rem 1.2rem;
+        align-items: baseline;
+        padding: 0.62rem 0;
+        border-bottom: 1px solid rgba(10, 31, 61, 0.09);
+    }
+    .about-arch-name {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.92rem !important; font-weight: 700 !important; color: #0A1F3D !important;
+    }
+    .about-arch-when {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.68rem !important; font-weight: 700 !important;
+        letter-spacing: 0.09em !important; text-transform: uppercase !important;
+        color: #7A828F !important;
+    }
+    .about-arch-src {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.9rem !important; line-height: 1.5 !important; color: #4A5262 !important;
+    }
+    /* Four groups across on a wide screen, so none is left alone on a row of
+       its own; it reflows to three, two and one as the column narrows. */
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.6rem 2rem;
+        margin-top: 0.3rem;
+    }
+    .about-group-title {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.68rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.09em !important;
+        text-transform: uppercase !important;
+        color: #4B5563 !important;
+        border-bottom: 1px solid rgba(10, 31, 61, 0.18);
+        padding-bottom: 0.3rem;
+        margin: 0 0 0.25rem 0 !important;
+    }
+    ul.about-list { list-style: none; padding: 0; margin: 0; }
+    .about-item { padding: 0.52rem 0; border-bottom: 1px dotted rgba(10, 31, 61, 0.16); }
+    a.about-name {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        color: #003366 !important;
+        text-decoration: none !important;
+    }
+    a.about-name:hover { text-decoration: underline !important; text-underline-offset: 2px; }
+    .about-note {
+        display: block;
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.88rem !important;
+        line-height: 1.55 !important;
+        color: #4A5262 !important;
+        margin-top: 0.15rem;
+    }
+    .about-tag {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.56rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #0B8F82;
+        border: 1px solid rgba(11, 143, 130, 0.35);
+        border-radius: 3px;
+        padding: 0.06rem 0.3rem;
+        margin-left: 0.45rem;
+        white-space: nowrap;
+        vertical-align: 0.1rem;
+    }
+    .about-tag-lock { color: #9B1C31; border-color: rgba(155, 28, 49, 0.32); }
+    @media (max-width: 640px) {
+        .about-prose p { font-size: 0.96rem !important; }
+        .about-grid { gap: 1.1rem; }
+        .about-arch-row { grid-template-columns: minmax(0, 1fr); row-gap: 0.2rem; }
+    }
+
     /* ── Section headers — Inter 800, all-caps, navy ── */
     .section-header {
         font-family: 'Inter', sans-serif;
@@ -1170,42 +1323,6 @@ st.markdown(
         border-bottom: 2px solid #111111; /* BANGER: A heavy structural underline */
         padding-bottom: 0.4rem;
     }
-    /* The four pipelines that build the site, one row each: the section in the
-       label face, what it is built from in the serif beneath it, and when it
-       runs as a small outlined chip. A left rule ties the rows into a stack, so
-       the block reads as a colophon rather than a table of two columns. */
-    .sb-arch-note {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.62rem; font-style: italic; color: #7A7A72;
-        line-height: 1.45; margin: -0.45rem 0 0.8rem 0;
-    }
-    .sb-arch-row {
-        display: grid; gap: 0.2rem;
-        padding: 0.5rem 0 0.55rem 0.7rem; margin: 0;
-        border-left: 2px solid #E2DFD8;
-        border-bottom: 1px solid #EDEBE4;
-    }
-    .sb-arch-row:hover { border-left-color: #111111; }
-    .sb-arch-row:last-of-type { border-bottom: none; padding-bottom: 0.2rem; }
-    .sb-arch-top {
-        display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
-    }
-    .sb-arch-name {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.62rem; font-weight: 800; color: #111111;
-        letter-spacing: 0.1em; text-transform: uppercase;
-    }
-    .sb-arch-when {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.5rem; font-weight: 700; color: #8A8A80;
-        letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap;
-        border: 1px solid #DAD6CD; border-radius: 2px; padding: 0.1rem 0.28rem;
-    }
-    .sb-arch-src {
-        font-family: 'Merriweather', Georgia, serif;
-        font-size: 0.72rem; font-style: italic; color: #333333; line-height: 1.45;
-    }
-
     /* Pipeline Buttons (Light mode adjustments) */
     [data-testid="stSidebar"] .stButton > button {
         background-color: #F5F3EC;
@@ -1229,6 +1346,36 @@ st.markdown(
         border-radius: 3px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
     }
+
+    /* ── Chart reading widths ────────────────────────────────────────────
+       use_container_width fits a chart to the page, and on a wide layout the
+       page is as wide as the window: a 1,500px desktop drew the RBI charts
+       1,339px across and 800 tall, and the Weekly snapshot table 882 × 1,456,
+       every label scaled up with them. A chart is read, not projected, so
+       each shape gets a width to be read at and is centred in the page.
+       The insights toggle sits inside the same container, so it keeps the
+       width of the chart it belongs to.
+
+       width: 100% is needed as well as max-width: with auto margins and an
+       auto width a Streamlit block is a flex item that shrink-wraps its
+       content instead of filling the cap. The image rule is !important
+       because Streamlit measures the container and writes the result into
+       the image's own style attribute, which a stylesheet cannot outrank. */
+    [class*="st-key-ehcap-"] {
+        width: 100%;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    [class*="st-key-ehcap-wide-"]   { max-width: 940px; }   /* 2:1 time series */
+    [class*="st-key-ehcap-square-"] { max-width: 540px; }   /* radar, 1:1      */
+    [class*="st-key-ehcap-table-"]  { max-width: 660px; }   /* tall tables     */
+    [class*="st-key-ehcap-"] [data-testid="stImage"] img {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    /* No phone rule is needed: width: 100% is the smaller of the two on any
+       screen narrower than the cap, so a chart still fills a phone. */
 
     /* ── Chart insight expanders ─────────────────────────────────────────
        A quiet toggle under each chart, never a card: the chart is the point
@@ -1291,15 +1438,23 @@ st.markdown(
         font-weight: 700;
     }
 
-    /* ── Image captions ── */
-    [data-testid="caption"] {
-        font-family: 'Inter', sans-serif;
-        font-size: 0.68rem;
-        font-weight: 500;
-        color: #999999;
+    /* ── Image captions ──
+       The hook is stImageCaption: Streamlit's caption testid used to be
+       "caption", and when it was renamed this block stopped matching and every
+       chart caption fell back to the default 14px near-black serif — as loud
+       as the chart's own title.
+       Deliberately not upper-cased. The names carry acronyms (GDP, BTC, NIFTY,
+       MVRV) and capitals only read as acronyms when the words around them are
+       not also capitals. */
+    [data-testid="stImageCaption"],
+    [data-testid="stImageCaption"] p {
+        font-family: 'Inter', -apple-system, sans-serif !important;
+        font-size: 0.73rem !important;
+        font-weight: 600 !important;
+        color: #6B7280 !important;
         text-align: center;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        line-height: 1.4;
     }
     </style>
     """,
@@ -1344,31 +1499,10 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    # ── 4. The Data Matrix ─────────────────────────────────────────────────────
-    st.markdown('<p class="sb-section-label">Data Architecture</p>', unsafe_allow_html=True)
-    
-    # What each section is actually built from, and when its pipeline runs. The
-    # schedules are the crons in .github/workflows; the sources are the fetchers
-    # each generator calls. Keep both in step with those files when either moves.
-    _ARCHITECTURE = [
-        ("Weekly Markets", "Saturdays", "Yahoo Finance &middot; NSE"),
-        ("World",          "Saturdays", "FRED &middot; OECD &middot; BIS"),
-        ("India",          "Saturdays", "RBI Bulletin &amp; DBIE &middot; MoSPI &middot; CGA &middot; NSDL"),
-        ("RBI Sentinel",   "Weekdays",  "RBI policy documents, scored by Claude"),
-        ("Headlines",      "4-hourly",  "Nine publishers&rsquo; news feeds"),
-    ]
-    st.markdown(
-        '<p class="sb-arch-note">What each section is built from, and when it refreshes.</p>'
-        + "".join(
-            '<div class="sb-arch-row">'
-            f'<div class="sb-arch-top"><span class="sb-arch-name">{name}</span>'
-            f'<span class="sb-arch-when">{when}</span></div>'
-            f'<div class="sb-arch-src">{sources}</div>'
-            '</div>'
-            for name, when, sources in _ARCHITECTURE
-        ),
-        unsafe_allow_html=True
-    )
+    # ── 4. Data Architecture ───────────────────────────────────────────────────
+    # Moved to the About page (config/resources.py::ARCHITECTURE), where the
+    # column is wide enough to read it. The sidebar keeps the byline and the
+    # links only.
 
     # ── License ─────────────────────────────────────────────────────────────────
     st.markdown('<hr class="sb-rule-thin">', unsafe_allow_html=True)
@@ -1430,6 +1564,26 @@ def _chart_anchor_id(filename: str) -> str:
     return f"chart-{_chart_slug(filename)}"
 
 
+# Widths a chart is read at, set in the CSS above against the container key's
+# prefix. A chart rendered through _render_capped fills its own cap instead of
+# the whole page, so how big it comes out no longer depends on how wide the
+# reader's monitor is.
+CAP_WIDE   = "ehcap-wide"      # a landscape time series: the RBI page's charts
+CAP_SQUARE = "ehcap-square"    # a chart about as tall as it is wide: the radar
+CAP_TABLE  = "ehcap-table"     # a tall table: the Weekly market snapshot
+
+
+def _render_capped(chart_path: Path, cap: str, insight_label: str = "Chart insights") -> None:
+    """A chart and its insights held to a reading width rather than the page's."""
+    with st.container(key=f"{cap}-{_chart_slug(chart_path.name)}"):
+        _chart_anchor(chart_path)
+        st.image(str(chart_path), use_container_width=True)
+        insight = get_insight(chart_path.name)
+        if insight:
+            with st.expander(insight_label):
+                st.markdown(insight)
+
+
 def _render_chart(chart_path: Path) -> None:
     _chart_anchor(chart_path)
     st.image(
@@ -1447,10 +1601,16 @@ def _render_grid(charts: list[Path], cols: int = 2, center_odd: bool = False) ->
     """Charts in a grid; with center_odd, a last chart that would sit alone is centred instead of left in half a row."""
     lone = charts[-1] if center_odd and cols == 2 and len(charts) % 2 == 1 else None
     grid = charts[:-1] if lone else charts
-    if grid:
+    # One st.columns per row rather than one per section. Streamlit stacks each
+    # column independently, so a section built from a single st.columns let a
+    # tall chart (or a long insight) push everything below it in that column
+    # down, and the charts drifted out of line with their neighbours. A row at a
+    # time keeps every pair of tops level; the cost is whitespace under the
+    # shorter chart in a row, which is the lesser of the two.
+    for row_start in range(0, len(grid), cols):
         columns = st.columns(cols)
-        for i, chart_path in enumerate(grid):
-            with columns[i % cols]:
+        for column, chart_path in zip(columns, grid[row_start:row_start + cols]):
+            with column:
                 _render_chart(chart_path)
     if lone:
         _, col_mid, _ = st.columns([1, 2, 1])
@@ -1815,11 +1975,8 @@ def _anchor(prefix: str, title: str) -> str:
     return f"{prefix}-" + re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
 
 def _render_summary(chart_path: Path) -> None:
-    """Summary table constrained to 80% of page width."""
-    _, col_img, _ = st.columns([1, 4, 1])
-    with col_img:
-        _chart_anchor(chart_path)
-        st.image(str(chart_path), use_container_width=True)
+    """The snapshot table at a table's width, not a share of the page's."""
+    _render_capped(chart_path, CAP_TABLE)
 
 
 def _pop_summary(charts: list[Path], keywords: list[str]) -> tuple[Path | None, list[Path]]:
@@ -2349,20 +2506,9 @@ _SEARCH_MIN_CHARS = 2
 _SEARCH_MAX_HITS = 7
 
 
-# Chart titles are built from filenames, which title-cases an acronym into
-# "India Pmi". Every caption on the site is set in capitals by CSS, so this has
-# never shown; in a list of suggestions it does, and only there.
-_SEARCH_ACRONYMS = {
-    "Btc": "BTC", "Cape": "CAPE", "Cli": "CLI", "Em": "EM", "Erp": "ERP", "Eth": "ETH",
-    "Etf": "ETF", "Fpi": "FPI", "Fx": "FX", "Gdp": "GDP", "Gst": "GST", "Iip": "IIP",
-    "It": "IT", "M2": "M2", "Move": "MOVE", "Nifty": "NIFTY", "Oecd": "OECD",
-    "Pmi": "PMI", "Rbi": "RBI", "Spx": "SPX", "Us": "US", "Vix": "VIX", "Vs": "vs",
-}
-
-
-def _search_title(filename: str) -> str:
-    """The chart's name as a suggestion shows it."""
-    return " ".join(_SEARCH_ACRONYMS.get(word, word) for word in clean_title(filename).split())
+# A chart is named once, by clean_title in charts/loader.py, and the caption
+# under the image and the suggestion in this box are the same string. The
+# acronym map that used to live here moved there, so the two cannot drift.
 
 
 @st.cache_data(ttl=600, show_spinner=False)
@@ -2372,7 +2518,7 @@ def _search_index() -> list[dict]:
     for folder, page, url_path in _SEARCH_PAGES:
         charts, _ = get_charts(folder)
         for chart in charts:
-            title = _search_title(chart.name)
+            title = clean_title(chart.name)
             index.append({
                 "title": title,
                 "page": page,
@@ -2741,25 +2887,32 @@ def _search_box_html() -> str:
             .replace("__PLACEHOLDER__", _SEARCH_PLACEHOLDER))
 
 
-def _page_header_html(title: str, dek: str, meta_label: str, meta_value: str,
+def _page_header_html(title: str, dek: str = "", meta_label: str = "", meta_value: str = "",
                       nav: list[tuple[str, str]] | None = None) -> str:
-    """Page masthead; `nav` is (label, anchor id) pairs drawn as jump links under the standfirst."""
+    """
+    Page masthead; `nav` is (label, anchor id) pairs drawn as jump links under
+    the standfirst. The standfirst and the right-hand meta are both optional —
+    a page with nothing to date (About) carries the title alone.
+    """
     links = ""
     if nav:
         links = ('<nav class="tab-jump" aria-label="Sections">'
                  + "".join(f'<a href="#{anchor}">{label}</a>' for label, anchor in nav)
                  + '</nav>')
+    meta = ""
+    if meta_label or meta_value:
+        meta = ('<div class="rbi-head-meta">'
+                f'<span class="rbi-head-meta-label">{meta_label}</span>'
+                f'<span class="rbi-head-meta-value">{meta_value}</span>'
+                '</div>')
     return (
         '<div class="rbi-head">'
         '<div class="rbi-head-text">'
         f'<p class="rbi-head-title">{title}</p>'
-        f'<p class="rbi-head-dek">{dek}</p>'
-        f'{links}'
+        + (f'<p class="rbi-head-dek">{dek}</p>' if dek else "")
+        + f'{links}'
         '</div>'
-        '<div class="rbi-head-meta">'
-        f'<span class="rbi-head-meta-label">{meta_label}</span>'
-        f'<span class="rbi-head-meta-value">{meta_value}</span>'
-        '</div>'
+        f'{meta}'
         '</div>'
     )
 
@@ -3350,17 +3503,16 @@ I would just like to know where it goes.</p>
                     unsafe_allow_html=True,
                 )
 
+        # Every chart from here down is drawn at a reading width (CAP_WIDE, or
+        # CAP_SQUARE for the radar) rather than the width of the window. Run
+        # full width they were over 1,300px across on a large desktop, out of
+        # proportion with the panel above them and with the page's own text.
+
         # ── Sentiment Over Time (PRIMARY) ──
         trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])
         if trajectory:
             _section("Sentiment Over Time")
-            _chart_anchor(trajectory)
-            st.image(str(trajectory), use_container_width=True)
-            insight = get_insight(trajectory.name)
-            if insight:
-                with st.expander("Chart insights"):
-                    st.markdown(insight)
-
+            _render_capped(trajectory, CAP_WIDE)
 
         # ── Meeting Analysis ──
         _section("Meeting Analysis")
@@ -3368,36 +3520,19 @@ I would just like to know where it goes.</p>
         comparison, charts = _pop_summary(charts, ["03_rbi_resolution_vs_minutes"])
         radar, charts = _pop_summary(charts, ["04_rbi_subdimension_radar"])
 
-        # Main analytical chart (FULL WIDTH)
+        # Main analytical chart
         if comparison:
-            _chart_anchor(comparison)
-            st.image(str(comparison), use_container_width=True)
-            insight = get_insight(comparison.name)
-            if insight:
-                with st.expander("Chart insights"):
-                    st.markdown(insight)
+            _render_capped(comparison, CAP_WIDE)
 
-        # Supporting chart (CENTERED)
+        # Supporting chart, narrower because it is square
         if radar:
-            _, col_mid, _ = st.columns([1, 2, 1])
-            with col_mid:
-                _chart_anchor(radar)
-                st.image(str(radar), use_container_width=True)
-                insight = get_insight(radar.name)
-                if insight:
-                    with st.expander("Chart insights"):
-                        st.markdown(insight)
-                        
+            _render_capped(radar, CAP_SQUARE)
+
         # ── Repo Rate vs Sentiment (PRIMARY) ──
         rate_chart, charts = _pop_summary(charts, ["05_rbi_rate_and_sentiment"])
         if rate_chart:
             _section("Repo Rate vs. Sentiment")
-            _chart_anchor(rate_chart)
-            st.image(str(rate_chart), use_container_width=True)
-            insight = get_insight(rate_chart.name)
-            if insight:
-                with st.expander("Chart insights"):
-                    st.markdown(insight)
+            _render_capped(rate_chart, CAP_WIDE)
 
         # ── Tone and the bond market ──
         # A static research chart (rbi_sentinel/research/tone_vs_10y_chart.py); it is not
@@ -3405,29 +3540,104 @@ I would just like to know where it goes.</p>
         _tone_chart = PROJECT_ROOT / "assets" / "rbi_research" / "07_rbi_tone_vs_10y.png"
         if _tone_chart.exists():
             _section("Tone and the Bond Market")
-            _chart_anchor(_tone_chart)
-            st.image(str(_tone_chart), use_container_width=True)
-            insight = get_insight(_tone_chart.name)
-            if insight:
-                with st.expander("Chart insights and testing method"):
-                    st.markdown(insight)
+            _render_capped(_tone_chart, CAP_WIDE, "Chart insights and testing method")
 
         # ── Governor Signal Analysis ──
         gov_divergence, charts = _pop_summary(charts, ["07_rbi_governor_divergence"])
 
         if gov_divergence:
             _section("Governor Signal Analysis")
-            _chart_anchor(gov_divergence)
-            st.image(str(gov_divergence), use_container_width=True)
-            insight = get_insight(gov_divergence.name)
-            if insight:
-                with st.expander("Chart insights"):
-                    st.markdown(insight)
+            _render_capped(gov_divergence, CAP_WIDE)
 
         # ── Catch-all ──
         if charts:
             _section("Other")
             _render_grid(charts)
+
+
+# ── About & Resources page ─────────────────────────────────────────────────
+# Reached from the line under the Substack button, not from the four tabs:
+# the tabs are the charts, this is the note about them. All of its words and
+# both of its lists live in config/resources.py, so adding a source is one
+# line there and this file never changes.
+
+def _about_list_html(items: list[dict]) -> str:
+    rows = []
+    for item in items:
+        tags = ""
+        if item.get("used"):
+            tags += '<span class="about-tag">used here</span>'
+        if item.get("paywall"):
+            tags += '<span class="about-tag about-tag-lock">paywall</span>'
+        rows.append(
+            '<li class="about-item">'
+            f'<a class="about-name" href="{item["url"]}" target="_blank" rel="noopener">{item["name"]}</a>'
+            f'{tags}'
+            f'<span class="about-note">{item["note"]}</span>'
+            '</li>'
+        )
+    return '<ul class="about-list">' + "".join(rows) + '</ul>'
+
+
+def _about_group_html(groups: list[tuple[str, list[dict]]]) -> str:
+    return (
+        '<div class="about-grid">'
+        + "".join(
+            f'<div class="about-group"><p class="about-group-title">{title}</p>'
+            f'{_about_list_html(items)}</div>'
+            for title, items in groups
+        )
+        + '</div>'
+    )
+
+
+def _about_arch_html(rows: list[tuple[str, str, str]]) -> str:
+    return (
+        '<div class="about-arch">'
+        + "".join(
+            '<div class="about-arch-row">'
+            f'<span class="about-arch-name">{name}</span>'
+            f'<span class="about-arch-when">{when}</span>'
+            f'<span class="about-arch-src">{sources}</span>'
+            '</div>'
+            for name, when, sources in rows
+        )
+        + '</div>'
+    )
+
+
+def page_about() -> None:
+    res = _fresh_config(_resources)
+
+    st.markdown(_page_header_html("About & Resources"), unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="about-prose">'
+        + "".join(f"<p>{para}</p>" for para in res.INTRO)
+        + '</div>',
+        unsafe_allow_html=True,
+    )
+
+    _section("How it is built")
+    st.markdown(
+        '<ul class="about-build">'
+        + "".join(f"<li>{line}</li>" for line in res.BUILD_NOTES)
+        + '</ul>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(_about_arch_html(res.ARCHITECTURE), unsafe_allow_html=True)
+
+    _section("Data and where to find it")
+    st.markdown(
+        '<p class="about-lede">'
+        'Marked <span class="about-tag">used here</span> are the sources these charts '
+        'are built from. The rest are portals worth knowing if you are putting '
+        'together your own work — most are free, and all of them publish data you '
+        'can download rather than only read.'
+        '</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(_about_group_html(res.SOURCES), unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------------------
@@ -3448,7 +3658,10 @@ PAGES = [
     st.Page(page_india, title="India", url_path="india"),
     st.Page(page_rbi, title="RBI Sentinel", url_path="rbi-sentinel"),
 ]
-current = st.navigation(PAGES, position="hidden")
+# Registered so it has a URL of its own to link and share, but kept out of the
+# tab row below: the tabs are the four pages of charts.
+ABOUT_PAGE = st.Page(page_about, title="About & Resources", url_path="about")
+current = st.navigation(PAGES + [ABOUT_PAGE], position="hidden")
 if current.url_path:                      # the default page keeps the plain title
     st.set_page_config(page_title=f"{current.title} · The Economics Hub")
 
@@ -3457,7 +3670,6 @@ st.markdown(
     '<p class="insti-descriptor">Research &amp; Maintained by '
     '<a class="insti-author" href="https://shreyasxi.github.io/" target="_blank" rel="noopener">'
     'Shreyas Urgunde</a></p>'
-    '<p class="insti-byline">Updated every Saturday</p>'
     '<div class="substack-center-container">'
         '<a class="substack-cta" href="https://economicshub.substack.com/" target="_blank" rel="noopener">'
             '<span class="substack-cta__label">Subscribe on Substack</span>'
@@ -3466,10 +3678,14 @@ st.markdown(
                 '<path d="M4.5 11.5 11.5 4.5M5.5 4.5h6v6"/>'
             '</svg>'
         '</a>'
-    '</div>'
-    '<div class="insti-rule"></div>',
+    '</div>',
     unsafe_allow_html=True,
 )
+
+with st.container(key="ehabout"):
+    st.page_link(ABOUT_PAGE, label="About this site & resources")
+
+st.markdown('<div class="insti-rule"></div>', unsafe_allow_html=True)
 
 nav = st.container(key="ehnav", horizontal=True, gap="medium")
 for page in PAGES:
@@ -3479,9 +3695,11 @@ for page in PAGES:
 
 # One box for all four pages: type what you want to see, land on the chart.
 # The suggestions appear as the reader types and lie over the page, so nothing
-# below moves until a chart is chosen.
-with st.container(key="ehsearch"):
-    components.html(_search_box_html(), height=_SEARCH_BOX_HEIGHT)
+# below moves until a chart is chosen. About has no charts to search, so the
+# box would only be something to ignore there.
+if current.url_path != ABOUT_PAGE.url_path:
+    with st.container(key="ehsearch"):
+        components.html(_search_box_html(), height=_SEARCH_BOX_HEIGHT)
 
 current.run()
 

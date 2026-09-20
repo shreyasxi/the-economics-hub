@@ -166,6 +166,8 @@ python make_chart.py
 | Source | Type | Access | Used by |
 |--------|------|--------|---------|
 | Yahoo Finance | Equities, FX, commodities, ETFs, VIX, NIFTY IT | Free, no key | `generate_weekly.py`, `generate_india.py` |
+| NSE (nseindia.com) | NIFTY sector index levels and their 1-week and 1-year changes | Free, no key | `generate_weekly.py` |
+| Coin Metrics Community API | Bitcoin MVRV and price, daily since 2010 | Free, no key | `generate_weekly.py` |
 | FRED | US yields, CPI, PCE, unemployment, credit spreads, EM corporate bond yields, EM dollar index, Fed and ECB rates, US release calendar | Free API key | `generate_weekly.py`, `generate_macro.py` |
 | OECD · BIS · Eurostat · Bundesbank · Bank of England · Federal Reserve · MoF Japan | CPI, unemployment, leading indicators, policy rates, 10-year yields | Free, no key | `generate_macro.py` |
 | Robert J. Shiller (shillerdata.com) · Aswath Damodaran (NYU Stern) | CAPE and excess CAPE yield; implied equity risk premium; country and regional equity risk premiums | Free spreadsheets, downloaded each run | `generate_macro.py` |

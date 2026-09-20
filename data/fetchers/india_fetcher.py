@@ -281,17 +281,19 @@ def fetch_weekly_fpi_jugaad(dry_run: bool = False) -> dict[str, dict]:
 
 _NSE_ALL_INDICES_URL = "https://www.nseindia.com/api/allIndices"
 
-def fetch_nifty_sector_weekly(index_names: list[str]) -> dict[str, dict]:
+def fetch_nifty_sector_changes(index_names: list[str]) -> dict[str, dict]:
     """
-    Weekly % change for NSE sector indices, from NSE's allIndices snapshot.
+    Weekly and one-year % change for NSE sector indices, from NSE's allIndices snapshot.
 
     Yahoo Finance stopped updating most ^CNX* sector indices after 17 Jul 2026
     (it returns only the live quote, so there is no week-ago close). NSE's own
-    feed carries the last value and the close one week ago for every index.
+    feed carries the last value and the closes one week and one year ago for
+    every index. These are price indices: the changes leave out dividends.
 
     Raises if NSE is unreachable or any requested index is missing, so the
     chart is never drawn with a silently shortened sector list.
-    Returns { index_name: {"last", "week_ago", "week_ago_date", "change_pct"} }
+    Returns { index_name: {"last", "week_ago", "week_ago_date", "change_pct",
+                           "year_ago", "year_ago_date", "change_pct_1y"} }
     """
     import requests
 
@@ -307,19 +309,23 @@ def fetch_nifty_sector_weekly(index_names: list[str]) -> dict[str, dict]:
     resp.raise_for_status()
     rows = {r["index"]: r for r in resp.json()["data"]}
 
-    missing = [n for n in index_names if n not in rows or not rows[n].get("oneWeekAgoVal")]
+    missing = [n for n in index_names
+               if n not in rows or not rows[n].get("oneWeekAgoVal") or not rows[n].get("oneYearAgoVal")]
     if missing:
-        raise ValueError(f"NSE allIndices has no week-ago value for: {', '.join(missing)}")
+        raise ValueError(f"NSE allIndices has no week-ago or year-ago value for: {', '.join(missing)}")
 
     out = {}
     for name in index_names:
         r = rows[name]
-        last, week_ago = float(r["last"]), float(r["oneWeekAgoVal"])
+        last, week_ago, year_ago = float(r["last"]), float(r["oneWeekAgoVal"]), float(r["oneYearAgoVal"])
         out[name] = {
             "last": last,
             "week_ago": week_ago,
             "week_ago_date": r.get("oneWeekAgo"),
             "change_pct": round((last / week_ago - 1) * 100, 2),
+            "year_ago": year_ago,
+            "year_ago_date": r.get("date365dAgo"),
+            "change_pct_1y": round((last / year_ago - 1) * 100, 2),
         }
     return out
 

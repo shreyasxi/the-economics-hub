@@ -1181,9 +1181,12 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
         ax.text(0.5, footer_y, "* Latest fiscal data",
                 fontsize=7, color="#666666", ha="left", va="bottom", style='italic')
     
-    ax.text(9.5, footer_y, EconStyle.WATERMARK_TEXT,
-            fontproperties=EconStyle._get_masthead_font(),
-            fontsize=13, color="#1A1A1A", ha="right", va="bottom")
+    # The credit, in the table's own coordinates. A point and a half up on the
+    # chart size, as the weekly summary table is: both are drawn larger than a
+    # chart, and both would look undersized at the chart's own 7.5pt.
+    EconStyle.draw_credit(fig, x=9.5, y=footer_y,
+                          size=EconStyle.WATERMARK_SIZE + 1.5,
+                          ax=ax, transform=ax.transData)
 
     # Set tight ylim to trim extra space
     ax.set_ylim(footer_y - 0.1, fig_h)
@@ -2136,8 +2139,9 @@ def chart_fiscal_deficit_gdp(cag_path, output_dir):
     if current_fy_month:                      # the latest year is still in progress
         fig.text(0.02, 0.005, f"* FY{current_fy[-2:]} shows Apr–{current_fy_month.split('-')[0]} YTD only",
                  fontsize=7, color='#666666', style='italic')
-    fig.text(0.98, 0.015, EconStyle.WATERMARK_TEXT,
-            fontsize=10, fontweight='bold', color='#1A1A1A', ha='right')
+    # This chart writes its own footer rather than calling add_source, so it
+    # has to ask for the credit itself.
+    EconStyle.draw_credit(fig, x=0.98, y=0.015)
     
     fp = output_dir / "11_india_fiscal_deficit_gdp.png"
     EconStyle.save_chart(fig, fp)

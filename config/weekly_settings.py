@@ -25,7 +25,8 @@ WEEKLY_SECTIONS: list[tuple[str, list[str]]] = [
     ("Commodities", [
         "commodities_weekly", "commodities_trend",
         "crude_oil_curve", "agri_weekly",
-        "commodities_breadth", "gold_real_rates",
+        "commodity_cycle", "commodities_breadth",
+        "gold_real_rates",
     ]),
     ("Rates, Inflation & Credit", [
         "yield_curve", "move_index",
@@ -37,16 +38,17 @@ WEEKLY_SECTIONS: list[tuple[str, list[str]]] = [
     ]),
     ("Emerging Markets & India", [
         "em_equity_weekly", "em_fx_weekly",
-        "india_vs_em_peers", "india_sector_rotation",
+        "india_sector_rotation", "india_sector_rotation_12m",
+        "india_vs_em_peers", "india_vix_vs_us",
         "em_stress_monitor", "em_vix",
-        "india_vix_vs_us",
     ]),
     ("Cross-Asset Signals", [
         "vix_trend", "stock_bond_correlation",
         "copper_gold_ratio", "gold_spx_ratio",
+        "commodities_vs_equities",
     ]),
     ("Crypto", [
         "eth_btc_ratio", "btc_gold_ratio",
-        "btc_global_m2",
+        "btc_global_m2", "btc_mvrv",
     ]),
 ]
