@@ -1,5 +1,5 @@
 """
-About page: the words and the lists, kept apart from the layout.
+About page and site footer: the words and the lists, kept apart from the layout.
 
 Everything on /about is edited here. Adding a source is one line in SOURCES;
 changing how a page is built is one line in ARCHITECTURE. Nothing else has to
@@ -210,3 +210,37 @@ READING = [
     dict(name="The RBI's own bulletins", url="https://www.rbi.org.in/Scripts/BS_ViewBulletin.aspx",
          note="The State of the Economy article is the closest thing to the RBI thinking aloud.", paywall=False),
 ]
+
+# ── The footer, on every page. ─────────────────────────────────────────────
+# The black strip under the last chart of every page. A link that starts with
+# "/" is a page of this site and opens in the same tab; mailto: opens the
+# reader's email; anything else opens in a new tab. Readers get in touch
+# through the Connect column; the site has no contact form, by choice.
+FOOTER_TAGLINE = "Global macro and cross-asset monitor, researched and maintained by Shreyas Urgunde."
+FOOTER_SUBSCRIBE = "https://economicshub.substack.com/"
+FOOTER_COLUMNS = [
+    ("Sections", [
+        ("Weekly Markets", "/"),
+        ("World", "/world"),
+        ("India", "/india"),
+        ("RBI Sentinel", "/rbi-sentinel"),
+        ("Analysis", "/analysis"),
+    ]),
+    ("The project", [
+        ("About & resources", "/about"),
+        ("System architecture", "https://shreyasxi.github.io/economics-hub/"),
+        ("Newsletter archive", "https://economicshub.substack.com/archive"),
+        ("Source code", "https://github.com/shreyasxi/the-economics-hub"),
+    ]),
+    ("Connect", [
+        ("LinkedIn", "https://www.linkedin.com/in/shreyasurgunde"),
+        ("GitHub", "https://github.com/shreyasxi"),
+        ("Instagram", "https://www.instagram.com/the.economics.hub/"),
+        ("Academic website", "https://shreyasxi.github.io/"),
+        ("Email me", "mailto:shreyasurgunde20@gmail.com"),
+    ]),
+]
+# The repository's LICENSE: Creative Commons Attribution-NonCommercial 4.0.
+FOOTER_LICENCE = ("CC BY-NC 4.0", "https://creativecommons.org/licenses/by-nc/4.0/")
+FOOTER_LEGAL = ("The data remain with the sources credited on each chart. "
+                "For information and research, not investment advice.")

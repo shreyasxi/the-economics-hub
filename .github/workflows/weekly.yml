@@ -55,6 +55,19 @@ jobs:
           DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
           python generate_news.py --out "output/weekly/$DATE_FOLDER"
 
+      # The Analysis page's "Signal or noise" board: the week's move in each of
+      # 52 markets against its typical week (config/signals_settings.py). It
+      # writes signals.json into the newest edition, or nothing at all if more
+      # than a quarter of the series cannot be read; either way the charts
+      # publish, and the page says when an edition has no board.
+      - name: Rank the week's unusual moves
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          PYTHONPATH: "."
+        run: python generate_signals.py
+
       - name: Copy charts to assets/
         run: |
           DATE_FOLDER=$(ls output/weekly/ | sort | tail -1)
@@ -69,6 +82,11 @@ jobs:
             cp "output/weekly/$DATE_FOLDER/news.json" "assets/weekly/$DATE_FOLDER/"
           else
             echo "No news.json: this edition publishes without the headlines strip."
+          fi
+          if [ -f "output/weekly/$DATE_FOLDER/signals.json" ]; then
+            cp "output/weekly/$DATE_FOLDER/signals.json" "assets/weekly/$DATE_FOLDER/"
+          else
+            echo "No signals.json: this edition publishes without the Signal or noise board."
           fi
           echo "Files in assets/weekly/$DATE_FOLDER/:"
           ls "assets/weekly/$DATE_FOLDER/"

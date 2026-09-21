@@ -2,8 +2,9 @@
 The Economics Hub — Streamlit Dashboard
 Author: Shreyas Urgunde  |  shreyasxi.github.io
 
-Publication dashboard of four pages, each with its own link:
+Publication dashboard of four pages of charts and an Analysis page, each with its own link:
   Weekly Markets (/)  · World (/world)  · India (/india)  · RBI Sentinel (/rbi-sentinel)
+  · Analysis (/analysis)
 
 Charts are served from assets/ (git-tracked, deployed) with a local
 fallback to output/ for development. Pipeline controls are gated
@@ -15,6 +16,7 @@ from __future__ import annotations
 import html
 import importlib
 import json
+import math
 import re
 import subprocess
 import sys
@@ -34,13 +36,16 @@ from charts.loader import (
 # _chart_title() so a change to charts/loader.py takes effect on the next run
 # rather than on the next reboot. See _chart_title.
 import charts.loader as _loader
+# config.analysis is imported by _analysis_config(), where a slip in it stops one page.
 import config.insights as _insights
 import config.news_settings as _news_settings
 import config.resources as _resources
+import config.signals_settings as _signals_settings
 import config.soe_settings as _soe_settings
 import config.weekly_settings as _weekly_settings
 import config.world_settings as _world_settings
 
+import data.substack as _substack
 from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
 import rbi_sentinel.cleaners.policy_facts as _policy_facts
 import rbi_sentinel.db.manager as _manager
@@ -82,8 +87,9 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* ── Google Fonts: Inter (UI) + Merriweather (body) + Playfair Display (Masthead) ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&display=swap');
+    /* ── Google Fonts: Inter (UI) + Merriweather (body) + Playfair Display (Masthead)
+       + Dancing Script (the script "The" of the wordmark, in the footer) ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,700;0,900;1,400&family=Playfair+Display:wght@700;900&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..600&family=Dancing+Script:wght@700&display=swap');
 
     /* ── Global base ── */
     html, body, [class*="css"] {
@@ -1201,6 +1207,23 @@ st.markdown(
     .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a p,
     .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a span,
     .st-key-ehnav [class*="-current"] [data-testid="stPageLink"] a div { color: #003366; }
+    /* Analysis is not a fifth page of charts but the page that reads across
+       the four, so a hairline sets it apart. The rule is drawn inside the
+       link's own box, level with the capitals: the row scrolls sideways on a
+       phone and would clip anything drawn outside it. */
+    .st-key-ehnav [class*="st-key-ehnav-analysis"] {
+        position: relative;
+        padding-left: 1.05rem !important;
+    }
+    .st-key-ehnav [class*="st-key-ehnav-analysis"]::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+        height: 0.8rem;
+        width: 1px;
+        background: rgba(10, 31, 61, 0.32);
+    }
 
     /* ── Chart search ──
        One field under the page links, the width of a column of results. The
@@ -1277,11 +1300,6 @@ st.markdown(
         border: none;
         border-top: 2px solid #111111;
         margin: 1.2rem 0;
-    }
-    .sb-rule-thin {
-        border: none;
-        border-top: 1px solid #E2DFD8;
-        margin: 1rem 0;
     }
 
     /* 2. The Byline Block */
@@ -1394,6 +1412,15 @@ st.markdown(
     [class*="st-key-ehcap-wide-"]   { max-width: 940px; }   /* 2:1 time series */
     [class*="st-key-ehcap-square-"] { max-width: 540px; }   /* radar, 1:1      */
     [class*="st-key-ehcap-table-"]  { max-width: 660px; }   /* tall tables     */
+    /* The chart beside a column of text at the top of India (the snapshot
+       table) and RBI Sentinel (the stance meter): held a little under its
+       half of the row and kept to the page's left edge, so it no longer
+       out-sizes the text beside it. */
+    [class*="st-key-ehcap-hero-"] {
+        max-width: 600px;
+        margin-left: 0 !important;
+        margin-right: auto !important;
+    }
     [class*="st-key-ehcap-"] [data-testid="stImage"] img {
         width: 100% !important;
         max-width: 100% !important;
@@ -1481,6 +1508,395 @@ st.markdown(
         letter-spacing: 0.04em;
         line-height: 1.4;
     }
+
+    /* ═══ Analysis page ═══════════════════════════════════════════════════
+       Three blocks, each set like the headlines strip: a Newsreader title over
+       a navy rule, then type and hairlines on the page background, no cards.
+       The board's bars are the page's only colour: blue for a rise, orange for
+       a fall, because here up is not good and down is not bad (the pair clears
+       the colour-blind and contrast checks against the ivory page). Figures
+       stay in ink; the side of the bar and the sign carry the direction.
+       Plain p elements are avoided, as in the headlines strip: Streamlit's
+       markdown styles them with higher specificity than a class. */
+    .stApp {
+        --an-ink: #0A1F3D;
+        --an-text: #2B3340;
+        --an-muted: #6A7280;
+        --an-faint: #A2AAB5;
+        --an-rule: #D7DDE4;
+        --an-link: #1F4E79;
+        --an-up: #23609E;
+        --an-down: #C95F18;
+    }
+    .an-block { font-family: 'Inter', -apple-system, sans-serif; scroll-margin-top: 4.5rem; }
+    .an-head {
+        position: relative;
+        display: flex; align-items: flex-end; justify-content: space-between;
+        gap: 0.6rem 2rem; flex-wrap: wrap;
+        padding-bottom: 0.85rem; border-bottom: 1px solid var(--an-ink);
+    }
+    .an-head-l { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.2rem 0; min-width: 0; }
+    .an-title {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.46rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
+        color: var(--an-ink);
+    }
+    .an-meta {
+        font-size: 0.8rem; font-weight: 500; color: var(--an-muted); white-space: nowrap;
+        font-variant-numeric: tabular-nums lining-nums;
+        margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--an-rule);
+    }
+    a.an-headlink {
+        display: inline-flex; align-items: center; gap: 0.1rem; padding: 0.2rem 0;
+        font-size: 0.78rem; font-weight: 600; color: var(--an-text) !important;
+        text-decoration: none !important; transition: color 0.15s ease;
+    }
+    a.an-headlink:hover { color: var(--an-link) !important; }
+    .an-dot { flex: none; width: 3px; height: 3px; border-radius: 50%; background: var(--an-faint); }
+    .an-empty { font-size: 0.86rem; line-height: 1.6; color: var(--an-muted); margin: 1rem 0 0 0; }
+    .an-empty a { color: var(--an-link) !important; font-weight: 600; }
+    .an-foot { font-size: 0.72rem; line-height: 1.55; color: var(--an-muted); margin: 0.9rem 0 0 0; }
+    .an-block .nh-ext {
+        display: inline-block; width: 0.5em; height: 0.5em; margin-left: 0.3em; vertical-align: 0.28em;
+        color: var(--an-faint); transition: transform 0.18s ease, color 0.18s ease;
+    }
+
+    /* The method, in a popover like the headlines strip's */
+    .an-how { position: static; }
+    .an-how > summary {
+        list-style: none; cursor: pointer; user-select: none;
+        display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0;
+        font-size: 0.76rem; font-weight: 600; color: var(--an-text);
+        transition: color 0.15s ease;
+    }
+    .an-how > summary::-webkit-details-marker { display: none; }
+    .an-how > summary::marker { content: ""; }
+    .an-how > summary svg { width: 15px; height: 15px; color: var(--an-muted); transition: color 0.15s ease; }
+    .an-how > summary:hover, .an-how[open] > summary,
+    .an-how > summary:hover svg, .an-how[open] > summary svg { color: var(--an-link); }
+    .an-how > summary:focus-visible { outline: 2px solid var(--an-link); outline-offset: 3px; border-radius: 3px; }
+    .an-how-panel {
+        position: absolute; right: 0; top: calc(100% + 0.65rem); z-index: 30;
+        width: min(29rem, 100%); box-sizing: border-box;
+        background: #FFFFFF; border: 1px solid #E2E7ED; border-radius: 10px;
+        box-shadow: 0 22px 48px -22px rgba(10,31,61,0.30), 0 2px 6px -2px rgba(10,31,61,0.06);
+        padding: 0.95rem 1.1rem 1rem 1.1rem;
+        font-size: 0.8rem; line-height: 1.55; color: var(--an-text);
+    }
+    .an-how-panel span { display: block; }
+    .an-how-panel span + span { margin-top: 0.55rem; }
+    .an-how-panel b { font-weight: 600; color: var(--an-ink); }
+    .an-how-panel .an-how-foot { color: var(--an-muted); font-size: 0.74rem; }
+
+    /* A disclosure under a block: all series, ranked */
+    .an-more { margin-top: 0.85rem; }
+    .an-more > summary {
+        list-style: none; cursor: pointer; user-select: none;
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        font-size: 0.78rem; font-weight: 600; color: var(--an-link);
+    }
+    .an-more > summary svg { width: 10px; height: 10px; transition: transform 0.15s ease; }
+    .an-more[open] > summary svg { transform: rotate(90deg); }
+    .an-more > summary:hover { text-decoration: underline; }
+    .an-more > summary::-webkit-details-marker { display: none; }
+    .an-more > summary::marker { content: ""; }
+    .an-more > summary:focus-visible { outline: 2px solid var(--an-link); outline-offset: 3px; border-radius: 3px; }
+
+    /* ── Signal or noise: the board ── */
+    .sig { margin: 1.6rem 0 0 0; }
+    .sig-lede {
+        font-size: 0.92rem; line-height: 1.65; color: #24282F;
+        margin: 1rem 0 0.2rem 0; max-width: 62rem;
+    }
+    .sig-lede b { font-weight: 700; color: var(--an-ink); }
+    /* Rank · series · this week · bar · multiple · largest since */
+    .sig-cols, .sig-row {
+        display: grid;
+        grid-template-columns: 1.6rem minmax(0, 1.4fr) 8rem minmax(11rem, 1.3fr) 4.4rem minmax(0, 1.05fr);
+        column-gap: 1.2rem; align-items: center;
+    }
+    .sig-cols {
+        padding: 1rem 0 0.5rem 0; border-bottom: 1px solid var(--an-rule);
+        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+        color: var(--an-muted); white-space: nowrap;
+    }
+    .sig-x-h { text-align: right; }
+    .sig-scale { position: relative; height: 0.9rem; }
+    .sig-scale i {
+        position: absolute; top: 0; transform: translateX(-50%);
+        font-style: normal; letter-spacing: 0.02em; font-variant-numeric: tabular-nums;
+    }
+    .sig-scale .sig-dir { transform: none; color: var(--an-faint); }
+    .sig-list { list-style: none; margin: 0 !important; padding: 0 !important; }
+    .sig-row {
+        margin: 0 !important; padding: 0.62rem 0.35rem 0.62rem 0;
+        border-bottom: 1px solid var(--an-rule);
+        transition: background-color 0.15s ease;
+    }
+    .sig-row:hover { background: rgba(10, 31, 61, 0.03); }
+    .sig-rank { font-size: 0.8rem; font-weight: 600; color: var(--an-muted); font-variant-numeric: tabular-nums; padding-left: 0.2rem; }
+    .sig-name { min-width: 0; }
+    .sig-name b { display: block; font-size: 0.92rem; font-weight: 700; line-height: 1.25; color: var(--an-ink); }
+    .sig-name small, .sig-move small {
+        display: block; margin-top: 0.14rem;
+        font-size: 0.7rem; line-height: 1.3; color: var(--an-muted); font-variant-numeric: tabular-nums;
+    }
+    .sig-move b { display: block; font-size: 0.98rem; font-weight: 700; color: var(--an-ink); font-variant-numeric: tabular-nums; }
+    /* The bar grows from a centre baseline: left for a fall, right for a rise.
+       Faint ticks mark one and two typical weeks either side. */
+    .sig-bar { position: relative; display: block; height: 22px; }
+    .sig-bar::before {
+        content: ""; position: absolute; left: 50%; top: 1px; bottom: 1px; width: 1px;
+        background: var(--an-ink); opacity: 0.6;
+    }
+    .sig-tick { position: absolute; top: 6px; bottom: 6px; width: 1px; background: var(--an-rule); }
+    .sig-fill {
+        position: absolute; top: 7px; height: 8px; left: 50%;
+        border-radius: 0 4px 4px 0; background: var(--an-up);
+    }
+    .sig-row.is-down .sig-fill { left: auto; right: 50%; border-radius: 4px 0 0 4px; background: var(--an-down); }
+    .sig-x { font-size: 0.92rem; font-weight: 700; color: var(--an-ink); text-align: right; font-variant-numeric: tabular-nums; }
+    .sig-since { font-size: 0.78rem; line-height: 1.35; color: var(--an-text); }
+    .sig-table-wrap { overflow-x: auto; margin-top: 0.7rem; }
+    .sig-table {
+        width: 100%; min-width: 720px; border-collapse: collapse;
+        font-size: 0.8rem; color: var(--an-text); font-variant-numeric: tabular-nums lining-nums;
+    }
+    .sig-table th {
+        text-align: left; white-space: nowrap; padding: 0.45rem 0.6rem;
+        font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--an-muted); border-bottom: 1px solid var(--an-ink);
+    }
+    .sig-table td { padding: 0.36rem 0.6rem; border-bottom: 1px solid #ECEFF3; white-space: nowrap; }
+    .sig-table td:nth-child(2) { color: var(--an-ink); font-weight: 600; }
+    .sig-table .num { text-align: right; }
+
+    /* ── What I'm watching: threads ── */
+    .wt { margin: 3.6rem 0 0 0; }
+    .wt-head { font-family: 'Inter', -apple-system, sans-serif; margin: 2.3rem 0 1.2rem 0; }
+    .wt-title {
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.7rem; font-weight: 600; line-height: 1.14; letter-spacing: -0.016em;
+        color: var(--an-ink); text-wrap: balance;
+    }
+    .wt-why { font-size: 0.92rem; line-height: 1.68; color: #24282F; margin-top: 0.6rem; max-width: 62rem; }
+    .wt-cap { font-family: 'Inter', -apple-system, sans-serif; margin: 0.35rem 0 0.4rem 0; }
+    .wt-cap-title { font-size: 0.82rem; font-weight: 700; line-height: 1.35; color: var(--an-ink); margin-bottom: 0.25rem; }
+    .wt-cap-meta {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem 0.55rem;
+        font-size: 0.72rem; line-height: 1.35; color: var(--an-muted);
+    }
+    .wt-cap-src { font-weight: 600; color: var(--an-text); }
+    .wt-cap-meta a {
+        display: inline-flex; align-items: center; font-weight: 600;
+        color: var(--an-link) !important; text-decoration: none !important;
+    }
+    .wt-cap-meta a:hover { text-decoration: underline !important; text-underline-offset: 3px; }
+    .wt-cap-note { font-size: 0.84rem; line-height: 1.55; color: var(--an-text); margin-top: 0.35rem; }
+    /* Three to a row on a desktop: five links then fall three and two, where
+       four to a row left the fifth on a line of its own. */
+    .wt-links {
+        list-style: none; margin: 1.2rem 0 0 0 !important; padding: 0 !important;
+        display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 2.4rem;
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+    .wt-link { margin: 0 !important; padding: 0 !important; border-top: 1px solid var(--an-rule); }
+    .wt-link::marker { content: ""; }
+    a.wt-link-a {
+        display: block; padding: 0.85rem 0 1rem 0;
+        color: inherit !important; text-decoration: none !important;
+    }
+    a.wt-link-a:focus-visible { outline: 2px solid var(--an-link); outline-offset: 3px; border-radius: 2px; }
+    .wt-link-meta {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem 0.55rem;
+        font-size: 0.71rem; line-height: 1.3; color: var(--an-muted); font-variant-numeric: tabular-nums;
+    }
+    .wt-link-src { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; color: var(--an-text); }
+    .wt-link-src .nh-lock { width: 9px; height: 10px; color: var(--an-faint); flex: none; }
+    .wt-link-title {
+        display: block; margin-top: 0.4rem;
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.1rem; font-weight: 560; line-height: 1.28; letter-spacing: -0.005em;
+        color: var(--an-ink); text-wrap: balance; transition: color 0.15s ease;
+    }
+    .wt-link-note { display: block; margin-top: 0.3rem; font-size: 0.8rem; line-height: 1.5; color: var(--an-text); }
+    a.wt-link-a:hover .wt-link-title { color: #0F3563; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.17em; }
+    a.wt-link-a:hover .nh-ext { color: var(--an-link); transform: translate(1.5px, -1.5px); }
+    .wt-mine {
+        padding: 0.1rem 0.38rem; border-radius: 3px; background: var(--an-ink);
+        font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #FFFFFF;
+    }
+    .wt-head.is-later { margin-top: 3rem; padding-top: 2.2rem; border-top: 1px solid var(--an-rule); }
+
+    /* ── From the newsletter: the essay shelf ── */
+    .es { margin: 3.8rem 0 0 0; }
+    .es-grid {
+        display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.8rem; margin-top: 1.4rem;
+    }
+    a.es-card {
+        position: relative; display: flex; flex-direction: column; min-width: 0;
+        color: inherit !important; text-decoration: none !important;
+    }
+    a.es-card:focus-visible { outline: 2px solid var(--an-link); outline-offset: 4px; border-radius: 3px; }
+    .es-cover {
+        display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 3px;
+        background: #E6E9EE;
+    }
+    .es-cover img {
+        display: block; width: 100%; height: 100%; object-fit: cover;
+        box-shadow: none !important; border-radius: 0 !important;
+        transition: transform 0.35s ease;
+    }
+    a.es-card:hover .es-cover img { transform: scale(1.03); }
+    .es-meta {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem 0.5rem; margin-top: 0.75rem;
+        font-size: 0.71rem; line-height: 1.3; color: var(--an-muted); font-variant-numeric: tabular-nums;
+    }
+    .es-new {
+        padding: 0.1rem 0.38rem; border-radius: 3px; background: var(--an-ink);
+        font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #FFFFFF;
+    }
+    .es-title {
+        display: block; margin-top: 0.4rem;
+        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
+        font-size: 1.16rem; font-weight: 600; line-height: 1.24; letter-spacing: -0.008em;
+        color: var(--an-ink); text-wrap: balance; transition: color 0.15s ease;
+    }
+    .es-sub {
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        margin-top: 0.35rem; font-size: 0.8rem; line-height: 1.5; color: var(--an-text);
+    }
+    a.es-card:hover .es-title { color: #0F3563; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.17em; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .an-more > summary svg, .es-cover img, .sig-row, .an-block .nh-ext { transition: none; }
+        a.es-card:hover .es-cover img { transform: none; }
+    }
+    @media (max-width: 1180px) {
+        .es-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .wt-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .sig-cols, .sig-row { grid-template-columns: 1.6rem minmax(0, 1.4fr) 7.4rem minmax(8rem, 1fr) 4rem minmax(0, 1fr); column-gap: 0.9rem; }
+        .sig-scale .sig-dir { display: none; }
+    }
+    @media (max-width: 680px) {
+        .an-title { font-size: 1.3rem; }
+        .an-meta { margin-left: 0; padding-left: 0; border-left: none; flex-basis: 100%; margin-top: 0.3rem; }
+        .an-how { width: 100%; }
+        .an-how-panel { width: 100%; }
+        /* A row becomes three lines: name and multiple, the move and its
+           history, then the bar across the full width. */
+        .sig-cols { display: none; }
+        .sig-row {
+            grid-template-columns: 1.3rem minmax(0, 1fr) auto;
+            grid-template-areas: "rank name x" "rank move since" ". bar bar";
+            row-gap: 0.35rem; column-gap: 0.6rem; padding: 0.75rem 0;
+        }
+        .sig-rank { grid-area: rank; align-self: start; padding: 0.1rem 0 0 0; }
+        .sig-name { grid-area: name; }
+        .sig-x { grid-area: x; align-self: start; }
+        .sig-move { grid-area: move; }
+        .sig-since { grid-area: since; text-align: right; align-self: end; font-size: 0.74rem; }
+        .sig-bar { grid-area: bar; }
+        .wt-title { font-size: 1.42rem; }
+        .wt-links { grid-template-columns: minmax(0, 1fr); }
+        .es-grid { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
+        a.es-card { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); column-gap: 0.9rem; align-items: start; }
+        .es-cover { grid-row: 1 / span 3; aspect-ratio: 4 / 3; }
+        .es-meta { margin-top: 0; }
+        .es-title { font-size: 1.04rem; margin-top: 0.3rem; }
+        .es-sub { -webkit-line-clamp: 2; }
+    }
+    /* ═══ end Analysis page ═════════════════════════════════════════════ */
+
+    /* ═══ Site footer ══════════════════════════════════════════════════════
+       A black strip at the end of every page, so a page reads as finished
+       rather than as charts that stop. It runs edge to edge: Streamlit pads
+       the main column 5rem each side once the window is at least 864px wide
+       (46rem of content plus twice the 4rem difference) and 1rem below that,
+       and the strip cancels the same amount. Streamlit also leaves 10rem of
+       empty page under the last element, which is what made pages feel cut
+       off; the strip now sits at the very end instead. */
+    .stApp { --eh-gutter: 1rem; }
+    @media (min-width: 864px) { .stApp { --eh-gutter: 5rem; } }
+    [data-testid="stMainBlockContainer"] { padding-bottom: 0 !important; }
+    /* A collapsed sidebar slides off the screen but its 2px border stayed in
+       the row, so every page sat 2px right of centre and the strip stopped
+       short of the left edge. The border is only needed while it is open. */
+    [data-testid="stSidebar"][aria-expanded="false"] { border-right-width: 0 !important; }
+    /* "Back to top" lands on #ehtop, above the masthead; the margin keeps the
+       nameplate clear of Streamlit's fixed top bar, so the page shows from its
+       very top. */
+    #ehtop { scroll-margin-top: 8rem; }
+    .st-key-ehfoot {
+        margin: 5.5rem calc(-1 * var(--eh-gutter)) 0 calc(-1 * var(--eh-gutter)) !important;
+        width: auto !important; max-width: none !important;
+    }
+    .ehf {
+        background: #0B0D12; color: #BCC3CD;
+        font-family: 'Inter', -apple-system, sans-serif;
+        padding: 3.4rem var(--eh-gutter) 1.7rem var(--eh-gutter);
+    }
+    .ehf-top {
+        display: grid; grid-template-columns: minmax(0, 1.55fr) repeat(3, minmax(0, 1fr));
+        gap: 2.4rem 3rem;
+    }
+    /* The rule beneath is part of the mark, as in the chart credit
+       (charts/style.py, WATERMARK_RULE = "under"): the full width of the
+       words, a little below them. The caps' last letter-space is taken back
+       so the rule ends at the B. */
+    a.ehf-mark {
+        position: relative; display: inline-flex; align-items: baseline; gap: 0.5rem;
+        padding-bottom: 0.4rem; line-height: 1;
+        color: #FFFFFF !important; text-decoration: none !important;
+    }
+    a.ehf-mark::after {
+        content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+        height: 1.5px; background: currentColor;
+    }
+    .ehf-the { font-family: 'Dancing Script', 'Snell Roundhand', cursive; font-weight: 700; font-size: 1.85rem; line-height: 1; }
+    .ehf-name {
+        font-family: 'Playfair Display', Georgia, serif; font-weight: 700;
+        font-size: 1.16rem; line-height: 1; letter-spacing: 0.22em; text-transform: uppercase;
+        margin-right: -0.22em;
+    }
+    .ehf-tag { font-size: 0.86rem; line-height: 1.6; color: #A3ABB7; margin-top: 0.95rem; max-width: 23rem; }
+    a.ehf-cta {
+        display: inline-flex; align-items: center; gap: 0.1rem; margin-top: 1.3rem;
+        padding: 0.5rem 0.9rem; border: 1px solid rgba(255, 255, 255, 0.34); border-radius: 6px;
+        font-size: 0.8rem; font-weight: 700; color: #FFFFFF !important; text-decoration: none !important;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    a.ehf-cta:hover { background: rgba(255, 255, 255, 0.08); border-color: #FFFFFF; }
+    a.ehf-cta:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 3px; }
+    .ehf-cta .nh-ext { display: inline-block; width: 0.55em; height: 0.55em; margin-left: 0.35em; color: #FFFFFF; }
+    .ehf-h {
+        font-size: 0.66rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+        color: #FFFFFF; margin-bottom: 1rem;
+    }
+    .ehf-list { list-style: none; margin: 0 !important; padding: 0 !important; display: grid; gap: 0.6rem; }
+    .ehf-list li { margin: 0 !important; padding: 0 !important; font-size: 0.87rem; line-height: 1.35; }
+    .ehf-list li::marker { content: ""; }
+    .ehf a:not(.ehf-mark):not(.ehf-cta) { color: #C9CFD8 !important; text-decoration: none !important; transition: color 0.15s ease; }
+    .ehf a:not(.ehf-mark):not(.ehf-cta):hover { color: #FFFFFF !important; text-decoration: underline !important; text-underline-offset: 3px; }
+    .ehf a:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; border-radius: 2px; }
+    .ehf-bottom {
+        display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;
+        gap: 0.7rem 2.5rem; margin-top: 2.8rem; padding-top: 1.25rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.13);
+        font-size: 0.75rem; line-height: 1.6; color: #8C94A1;
+    }
+    .ehf-legal { max-width: 58rem; }
+    .ehf-up { white-space: nowrap; font-weight: 600; }
+    @media (max-width: 1000px) {
+        .ehf-top { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .ehf-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+        .ehf { padding-top: 2.6rem; }
+        .ehf-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.5rem; }
+    }
+    /* ═══ end site footer ════════════════════════════════════════════════ */
     </style>
     """,
     unsafe_allow_html=True,
@@ -1519,8 +1935,7 @@ with st.sidebar:
     st.markdown(
         '<a class="sb-btn" href="https://economicshub.substack.com/" target="_blank">Subscribe on Substack ↗</a>'
         '<a class="sb-btn" href="https://shreyasxi.github.io/economics-hub/" target="_blank">System Architecture ↗</a>'
-        '<a class="sb-btn" href="https://shreyasxi.github.io/" target="_blank">Academic Website ↗</a>'
-        '<hr class="sb-rule-thick">', # CHANGED: Using a thick rule here to firmly separate sections
+        '<a class="sb-btn" href="https://shreyasxi.github.io/" target="_blank">Academic Website ↗</a>',
         unsafe_allow_html=True,
     )
 
@@ -1529,13 +1944,9 @@ with st.sidebar:
     # column is wide enough to read it. The sidebar keeps the byline and the
     # links only.
 
-    # ── License ─────────────────────────────────────────────────────────────────
-    st.markdown('<hr class="sb-rule-thin">', unsafe_allow_html=True)
-    st.markdown(
-        '<p style="font-family:Inter; font-size:0.55rem; color:#888888; text-align:center; text-transform:uppercase; letter-spacing:0.05em;">'
-        'CC BY-NC 4.0 &middot; Not Investment Advice</p>',
-        unsafe_allow_html=True,
-    )
+    # The licence and "not investment advice" line moved to the site footer
+    # (config/resources.py::FOOTER_LICENCE, FOOTER_LEGAL), with the rules that
+    # set it apart here.
 
     # ── Pipeline control ────────────────────────────────────────────────────────
     if is_pipeline_admin():
@@ -1609,6 +2020,7 @@ def _chart_anchor_id(filename: str) -> str:
 CAP_WIDE   = "ehcap-wide"      # a landscape time series: the RBI page's charts
 CAP_SQUARE = "ehcap-square"    # a chart about as tall as it is wide: the radar
 CAP_TABLE  = "ehcap-table"     # a tall table: the Weekly market snapshot
+CAP_HERO   = "ehcap-hero"      # the chart beside a column of text: India's snapshot, RBI's stance meter
 
 
 def _render_capped(chart_path: Path, cap: str, insight_label: str = "Chart insights") -> None:
@@ -3136,8 +3548,8 @@ def page_india() -> None:
         summary, charts = _pop_summary(charts, ["india_table", "05_india"])
         changed = _soe_changes_block(soe) if soe else ""
         if summary and changed:
-            col_table, col_changed = st.columns([1.2, 1], gap="large")
-            with col_table:
+            col_table, col_changed = st.columns([1, 1], gap="large")
+            with col_table, st.container(key=f"{CAP_HERO}-{_chart_slug(summary.name)}"):
                 _chart_anchor(summary)
                 st.image(str(summary), use_container_width=True)
             with col_changed:
@@ -3453,9 +3865,10 @@ I would just like to know where it goes.</p>
         # ── Hero: Stance Meter & AI Briefing (Side-by-Side) ──
         stance, charts = _pop_summary(charts, ["01_rbi_stance_meter"])
         if stance:
-            col_chart, col_text = st.columns([1.2, 1], gap="large")
+            col_chart, col_text = st.columns([1, 1], gap="large")
 
-            with col_chart:
+            # The meter and the source documents under it share one width.
+            with col_chart, st.container(key=f"{CAP_HERO}-{_chart_slug(stance.name)}"):
                 _chart_anchor(stance)
                 st.image(str(stance), use_container_width=True)
 
@@ -3692,6 +4105,442 @@ def page_about() -> None:
     st.markdown(_about_group_html(res.SOURCES), unsafe_allow_html=True)
 
 
+# ── Analysis page ──────────────────────────────────────────────────────────
+# Connecting the dots, in three blocks: which of the week's moves were unusual
+# for their own market (signals.json, which generate_signals.py writes into the
+# Weekly edition folder, so the board and the Weekly charts describe the same
+# week); the threads the owner is following, with charts and reading
+# (config/analysis.py); and the essays from the newsletter, read from Substack
+# when the page opens. Every word written by hand lives in config/analysis.py.
+
+# Pages a thread can borrow a chart from, and where each one lives.
+_DASHBOARD_PAGES = (("weekly", "/", "Weekly Markets"),
+                    ("macro", "/world", "World"),
+                    ("india", "/india", "India"))
+
+# What each group is called in a sentence ("Currencies take 5 of the top 8 places").
+_SIG_GROUP_NOUNS = {
+    "Equities": "stock markets", "Rates": "bond yields", "Credit": "credit spreads",
+    "Currencies": "currencies", "Commodities": "commodities",
+    "Volatility": "volatility indices", "Crypto": "crypto assets",
+}
+
+_AN_CHEVRON = ('<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" '
+               'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 1.8 6.8 5 3.5 8.2"/></svg>')
+
+
+def _load_signals(charts: list[Path]) -> dict | None:
+    """signals.json from the newest Weekly edition, beside the charts of the same week."""
+    path = charts[0].parent / "signals.json" if charts else None
+    if path is None or not path.exists():
+        return None
+    try:
+        with path.open() as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+
+def _minus(text: str) -> str:
+    """
+    A true minus sign, since a hyphen in a column of figures reads as a dash;
+    and no sign at all on a figure that rounds to zero ("+0.00%" is not a rise).
+    """
+    if text[:1] in "+-" and not any(ch in "123456789" for ch in text):
+        return text[1:]
+    return "−" + text[1:] if text.startswith("-") else text
+
+
+def _sig_level(row: dict) -> str:
+    """The latest level, written the way the market quotes it."""
+    v, fmt = row["level"], row["fmt"]
+    if fmt == "yield":
+        return f"{v:.2f}%"
+    if fmt == "spread":
+        return f"{v * 100:.0f} bp"
+    if fmt == "usd":
+        return f"${v:,.0f}" if v >= 10_000 else f"${v:,.2f}"
+    if fmt == "eur":
+        return f"€{v:,.2f}"
+    if fmt == "fx4":
+        return f"{v:,.4f}"
+    if fmt == "fx2":
+        return f"{v:,.2f}"
+    if fmt == "vol":
+        return f"{v:.1f}"
+    return f"{v:,.0f}"
+
+
+def _sig_amount(value: float, measure: str, signed: bool = True) -> str:
+    """A move, or a typical week, in the series' own unit: per cent, or basis points."""
+    sign = "+" if signed else ""
+    if measure == "bp":
+        return _minus(f"{value:{sign}.0f} bp")
+    return _minus(f"{value:{sign}.{1 if abs(value) >= 1 else 2}f}%")
+
+
+def _sig_since(row: dict, week_to: date) -> str:
+    """'Largest rise since Jun 2026': the last week that moved at least as far the same way."""
+    if row["move"] == 0:
+        return "Unchanged"
+    word = "rise" if row["move"] > 0 else "fall"
+    if row["since"]:
+        when = date.fromisoformat(row["since"])
+        # Within the past half-year the day matters; beyond it the month says enough.
+        stamp = f"{when.day} {when:%b}" if (week_to - when).days < 183 else f"{when:%b %Y}"
+        return f"Largest {word} since {stamp}"
+    return f"Largest {word} in data back to {date.fromisoformat(row['history_from']):%b %Y}"
+
+
+def _sig_lede(rows: list[dict], top: list[dict], notable: float) -> str:
+    """Two counts, nothing inferred: how many series moved notably, and where the top of the ranking sits."""
+    # Counted on the multiple as the board shows it (one decimal), so a row
+    # reading 2.0x is never contradicted by a sentence saying none reached 2.
+    n = sum(round(abs(r["multiple"]), 1) >= notable for r in rows)
+    times = "twice" if notable == 2 else f"{notable:g} times"
+    if n:
+        lede = (f"<b>{n} of the {len(rows)}</b> series moved at least {times} "
+                f"{'its' if n == 1 else 'their'} typical week.")
+    else:
+        lede = f"A quiet week by this measure: none of the {len(rows)} series moved {times} its typical week."
+    counts: dict[str, int] = {}
+    for r in top:
+        counts[r["group"]] = counts.get(r["group"], 0) + 1
+    ranked = sorted(counts.items(), key=lambda kv: -kv[1])
+    if ranked and ranked[0][1] * 2 > len(top):
+        noun = _SIG_GROUP_NOUNS.get(ranked[0][0], ranked[0][0].lower())
+        lede += f" {noun[0].upper() + noun[1:]} take {ranked[0][1]} of the top {len(top)} places."
+    elif len(ranked) == 2 and ranked[0][1] == ranked[1][1]:
+        a, b = (_SIG_GROUP_NOUNS.get(g, g.lower()) for g, _ in ranked)
+        lede += f" {a[0].upper() + a[1:]} and {b} share the top {len(top)} places, {ranked[0][1]} each."
+    return lede
+
+
+def _signals_html(sig: dict) -> str:
+    """The board: the top of the ranking as rows with a bar, the rest in a table below."""
+    cfg = _fresh_config(_signals_settings)
+    rows = sig.get("rows", [])
+    top = rows[:cfg.TOP_N]
+    week_to = date.fromisoformat(sig["week"]["to"])
+    notable = sig.get("notable", cfg.NOTABLE)
+
+    # One scale for the rows on show, never less than three typical weeks
+    # either side, so a quiet week does not stretch small moves across the column.
+    span = max(3.0, math.ceil(max((abs(r["multiple"]) for r in top), default=0)))
+    marks = [k for k in (1, 2, 4, 8) if k < span]
+
+    def at(k: float) -> float:
+        return 50 + 50 * k / span
+
+    ticks = "".join(f'<i class="sig-tick" style="left:{at(s * k):.2f}%"></i>' for k in marks for s in (1, -1))
+    # Label the ticks at one and two typical weeks; the direction words sit at
+    # the ends and give way on a narrow column, where the sign carries it.
+    scale = ('<i class="sig-dir" style="left:0">&larr; Fall</i>'
+             '<i class="sig-dir" style="right:0; left:auto">Rise &rarr;</i>'
+             + "".join(f'<i style="left:{at(s * k):.2f}%">{k}&times;</i>' for k in marks if k <= 2 for s in (1, -1)))
+
+    def row_html(i: int, r: dict) -> str:
+        width = min(abs(r["multiple"]) / span, 1.0) * 50
+        move = _sig_amount(r["move"], r["measure"])
+        typical = _sig_amount(r["typical"], r["measure"], signed=False)
+        title = (f"{r['name']}: {move} in the week, {abs(r['multiple']):.1f} times a typical week "
+                 f"of {typical}. {_sig_since(r, week_to)}.")
+        return (
+            f'<li class="sig-row {"is-up" if r["move"] > 0 else "is-down"}" title="{_esc(title)}">'
+            f'<span class="sig-rank">{i}</span>'
+            f'<span class="sig-name"><b>{_esc(r["name"])}</b>'
+            f'<small>{_esc(r["group"])} &middot; {_esc(_sig_level(r))}</small></span>'
+            f'<span class="sig-move"><b>{_esc(move)}</b><small>typical week &plusmn;{_esc(typical)}</small></span>'
+            f'<span class="sig-bar" aria-hidden="true">{ticks}<i class="sig-fill" style="width:{width:.2f}%"></i></span>'
+            f'<span class="sig-x">{abs(r["multiple"]):.1f}&times;</span>'
+            f'<span class="sig-since">{_esc(_sig_since(r, week_to))}</span>'
+            '</li>'
+        )
+
+    table = "".join(
+        f'<tr><td class="num">{i}</td><td>{_esc(r["name"])}</td><td>{_esc(r["group"])}</td>'
+        f'<td class="num">{_esc(_sig_level(r))}</td>'
+        f'<td class="num">{_esc(_sig_amount(r["move"], r["measure"]))}</td>'
+        f'<td class="num">&plusmn;{_esc(_sig_amount(r["typical"], r["measure"], signed=False))}</td>'
+        f'<td class="num">{_minus(format(r["multiple"], "+.1f"))}&times;</td>'
+        f'<td>{_esc(_sig_since(r, week_to))}</td></tr>'
+        for i, r in enumerate(rows, 1)
+    )
+    years = max(1, round(sig.get("window_weeks", cfg.TYPICAL_WINDOW_WEEKS) / 52))
+    how = (
+        f'<details class="an-how"><summary>{_NH_INFO}How this is measured</summary>'
+        '<div class="an-how-panel">'
+        '<span>Each series&rsquo; move over the week to Friday is divided by the size of a typical week '
+        f'for the same series: the root mean square of its weekly moves over the past {years} years. '
+        'A 2% week in an index that usually moves 1% scores 2&times;; the same 2% in a currency that '
+        'usually moves 0.3% scores nearly 7&times;.</span>'
+        '<span>Prices and volatility indices are compared in per cent, yields and credit spreads in '
+        'basis points. <b>Largest since</b> is the last week, in up to '
+        f'{sig.get("history_years", cfg.HISTORY_YEARS)} years of data, with a move at least as large '
+        'in the same direction; FRED keeps three years of the US credit spreads.</span>'
+        '<span>Commodities are front-month futures, so a contract roll can add to a week&rsquo;s move '
+        'when the futures curve is steep.</span>'
+        f'<span class="an-how-foot">The week to Friday {_fmt_day(week_to)}. Weekly closes from Yahoo Finance '
+        f'and FRED. {len(rows)} series ranked, built {_esc(sig.get("generated_at", ""))}.</span>'
+        '</div></details>'
+    )
+    left = sig.get("left_out", [])
+    foot = ('<div class="an-foot">Left out this week, with nothing filled in: '
+            + "; ".join(f"{_esc(x['name'])} ({_esc(x['reason'])})" for x in left) + ".</div>") if left else ""
+    return (
+        '<section class="an-block sig" id="analysis-signal">'
+        '<div class="an-head"><div class="an-head-l"><span class="an-title">Signal or noise</span>'
+        f'<span class="an-meta">{len(rows)} markets, ranked</span></div>{how}</div>'
+        f'<div class="sig-lede">{_sig_lede(rows, top, notable)}</div>'
+        '<div class="sig-cols" aria-hidden="true"><span></span><span>Series</span><span>This week</span>'
+        f'<span class="sig-scale">{scale}</span><span class="sig-x-h">&times; typical</span>'
+        '<span>Largest since</span></div>'
+        '<ol class="sig-list">' + "".join(row_html(i, r) for i, r in enumerate(top, 1)) + '</ol>'
+        f'<details class="an-more"><summary>{_AN_CHEVRON}All {len(rows)} series, ranked</summary>'
+        '<div class="sig-table-wrap"><table class="sig-table"><thead><tr>'
+        '<th class="num">#</th><th>Series</th><th>Group</th><th class="num">Level</th>'
+        '<th class="num">This week</th><th class="num">Typical week</th><th class="num">Multiple</th>'
+        f'<th>Largest since</th></tr></thead><tbody>{table}</tbody></table></div></details>'
+        f'{foot}'
+        '</section>'
+    )
+
+
+def _dashboard_chart(name: str) -> tuple[Path, str, str] | None:
+    """(file, page link, page title) for one of the site's own charts, from that page's newest edition."""
+    for subdir, href, title in _DASHBOARD_PAGES:
+        charts, _ = get_charts(subdir)
+        for chart in charts:
+            if chart_key(chart.name) == name:
+                return chart, href, title
+    return None
+
+
+def _thread_head_html(thread: dict, number: int) -> str:
+    return (
+        f'<div class="wt-head{" is-later" if number > 1 else ""}">'
+        f'<div class="wt-title">{_esc(thread["theme"])}</div>'
+        + (f'<div class="wt-why">{_esc(thread["why"])}</div>' if thread.get("why") else "")
+        + '</div>'
+    )
+
+
+def _thread_caption_html(chart: dict, link: str | None = None, page: str | None = None) -> str:
+    """Under a thread's chart: where it is from, and the owner's note on it."""
+    if link:
+        title = ""
+        meta = ('<span class="wt-cap-src">From this dashboard</span><span class="an-dot"></span>'
+                '<span>updated with each edition</span><span class="an-dot"></span>'
+                f'<a href="{html.escape(link, quote=True)}" target="_self">Open on {_esc(page)}</a>')
+    else:
+        when = date.fromisoformat(chart["date"])
+        url = _safe_url(chart.get("url"))
+        title = f'<div class="wt-cap-title">{_esc(chart.get("title"))}</div>' if chart.get("title") else ""
+        meta = (f'<span class="wt-cap-src">{_esc(chart.get("source"))}</span><span class="an-dot"></span>'
+                f'<span>{when.day} {when:%b %Y}</span>'
+                + (f'<span class="an-dot"></span><a href="{url}" target="_blank" rel="noopener">'
+                   f'Source{_NH_ARROW}</a>' if url else ""))
+    note = f'<div class="wt-cap-note">{_esc(chart["note"])}</div>' if chart.get("note") else ""
+    return f'<div class="wt-cap">{title}<div class="wt-cap-meta">{meta}</div>{note}</div>'
+
+
+def _thread_links_html(links: list[dict]) -> str:
+    items = []
+    for link in links:
+        url = _safe_url(link.get("url"))
+        if not url:
+            continue
+        when = date.fromisoformat(link["date"])
+        mine = '<span class="wt-mine">My essay</span>' if link.get("mine") else ""
+        lock = _NH_LOCK if link.get("paywall") else ""
+        note = f'<span class="wt-link-note">{_esc(link["note"])}</span>' if link.get("note") else ""
+        items.append(
+            '<li class="wt-link">'
+            f'<a class="wt-link-a" href="{url}" target="_blank" rel="noopener">'
+            f'<span class="wt-link-meta">{mine}<span class="wt-link-src">{_esc(link["source"])}{lock}</span>'
+            f'<span class="an-dot"></span><span>{when.day} {when:%b %Y}</span></span>'
+            f'<span class="wt-link-title">{_esc(link["title"])}{_NH_ARROW}</span>{note}'
+            '</a></li>'
+        )
+    return f'<ul class="wt-links">{"".join(items)}</ul>' if items else ""
+
+
+def _render_thread(thread: dict, number: int) -> None:
+    """One thread: its title and why, its charts two to a row, then its reading."""
+    with st.container(key=f"ehwatch-{number}"):
+        st.markdown(_thread_head_html(thread, number), unsafe_allow_html=True)
+        shown = []
+        for chart in thread.get("charts", []):
+            if "dashboard" in chart:
+                found = _dashboard_chart(chart["dashboard"])
+                if found:
+                    path, href, page = found
+                    shown.append((path, _thread_caption_html(chart, f"{href}?chart={_chart_slug(path.name)}", page)))
+            else:
+                path = PROJECT_ROOT / "assets" / chart["image"]
+                if path.exists():
+                    shown.append((path, _thread_caption_html(chart)))
+        for start in range(0, len(shown), 2):
+            pair = shown[start:start + 2]
+            columns = st.columns(2, gap="large") if len(pair) == 2 else st.columns([1, 2, 1])[1:2]
+            for column, (path, caption) in zip(columns, pair):
+                with column:
+                    st.image(str(path), use_container_width=True)
+                    st.markdown(caption, unsafe_allow_html=True)
+        links = _thread_links_html(thread.get("links", []))
+        if links:
+            st.markdown(links, unsafe_allow_html=True)
+
+
+@st.cache_data(ttl=3 * 60 * 60, show_spinner=False)
+def _substack_posts(base_url: str) -> tuple[list[dict], str | None]:
+    """The newsletter's posts, read at most every three hours; a failed read is not kept (see page_analysis)."""
+    return _substack.fetch_posts(base_url)
+
+
+def _essay_card_html(card: dict) -> str:
+    url = _safe_url(card["url"])
+    if not url:
+        return ""
+    cover = _safe_url(_substack.cover_url(card.get("cover")))
+    minutes = _substack.reading_minutes(card.get("words"))
+    meta = ['<span class="es-new">New</span>'] if card.get("is_new") else []
+    meta.append(f'<span>{card["date"].day} {card["date"]:%b %Y}</span>')
+    if minutes:
+        meta.append(f"<span>{minutes} min read</span>")
+    dot = '<span class="an-dot"></span>'
+    return (
+        f'<a class="es-card" href="{url}" target="_blank" rel="noopener">'
+        + (f'<span class="es-cover"><img src="{cover}" alt="" loading="lazy"></span>' if cover
+           else '<span class="es-cover"></span>')
+        + f'<span class="es-meta">{dot.join(meta)}</span>'
+        f'<span class="es-title">{_esc(card["title"])}</span>'
+        + (f'<span class="es-sub">{_esc(card["subtitle"])}</span>' if card.get("subtitle") else "")
+        + '</a>'
+    )
+
+
+def _essays_html(posts: list[dict], cfg) -> str:
+    base = cfg.SUBSTACK_URL.rstrip("/")
+    cards = _substack.shelf(posts, cfg.PINNED, date.today(), cfg.NEW_FOR_DAYS)
+    head = (
+        '<div class="an-head"><div class="an-head-l"><span class="an-title">From the newsletter</span>'
+        f'</div><a class="an-headlink" href="{_safe_url(base + "/archive")}" target="_blank" '
+        f'rel="noopener">All essays{_NH_ARROW}</a></div>'
+    )
+    if cards:
+        body = '<div class="es-grid">' + "".join(_essay_card_html(c) for c in cards) + '</div>'
+    else:
+        body = (f'<div class="an-empty">The essays are on '
+                f'<a href="{_safe_url(base)}" target="_blank" rel="noopener">Substack</a>.</div>')
+    return f'<section class="an-block es" id="analysis-essays">{head}{body}</section>'
+
+
+def _analysis_config():
+    """
+    config/analysis.py, read afresh when it changes (see _fresh_config), with
+    the error if it cannot be read. It is edited by hand, so it is imported
+    here rather than with the app: a slip in it (a missing comma, an unclosed
+    quote) then stops this page with a note saying where, not the whole site.
+    """
+    try:
+        module = sys.modules.get("config.analysis") or importlib.import_module("config.analysis")
+        return _fresh_config(module), None
+    except Exception as exc:
+        return None, exc
+
+
+def page_analysis() -> None:
+    cfg, problem = _analysis_config()
+    if cfg is None:
+        where = f", line {problem.lineno}" if getattr(problem, "lineno", None) else ""
+        st.markdown(
+            '<div class="an-empty">This page is being updated and will be back shortly.'
+            f'<br><small>config/analysis.py{where}: {_esc(str(getattr(problem, "msg", problem)))}</small></div>',
+            unsafe_allow_html=True,
+        )
+        return
+    weekly, _ = get_charts("weekly")
+    signals = _load_signals(weekly)
+
+    st.markdown(
+        _page_header_html(
+            cfg.TITLE, cfg.DEK,
+            nav=[("Signal or noise", "analysis-signal"), ("What I&rsquo;m watching", "analysis-watching"),
+                 ("Essays", "analysis-essays")],
+        ),
+        unsafe_allow_html=True,
+    )
+
+    if signals and signals.get("rows"):
+        st.markdown(_signals_html(signals), unsafe_allow_html=True)
+    else:
+        st.markdown(
+            '<section class="an-block sig" id="analysis-signal"><div class="an-head"><div class="an-head-l">'
+            '<span class="an-title">Signal or noise</span></div></div>'
+            '<div class="an-empty">The board is built with each Saturday edition; this edition was '
+            'published without one.</div></section>',
+            unsafe_allow_html=True,
+        )
+
+    if cfg.WATCHING:
+        st.markdown(
+            '<section class="an-block wt" id="analysis-watching"><div class="an-head"><div class="an-head-l">'
+            '<span class="an-title">What I&rsquo;m watching</span></div></div></section>',
+            unsafe_allow_html=True,
+        )
+        for number, thread in enumerate(cfg.WATCHING, 1):
+            _render_thread(thread, number)
+
+    posts, problem = _substack_posts(cfg.SUBSTACK_URL)
+    if problem:
+        _substack_posts.clear()      # a failed read is tried again on the next visit, not kept for hours
+    st.markdown(_essays_html(posts, cfg), unsafe_allow_html=True)
+
+
+# ── Site footer ────────────────────────────────────────────────────────────
+# The black strip at the foot of every page. Its words and links live in
+# config/resources.py (FOOTER_*), beside the About page's.
+
+def _footer_link(label: str, href: str) -> str:
+    """A page of this site opens in the same tab; anything else in a new one."""
+    if href.startswith("/") or href.startswith("mailto:"):
+        target = ' target="_self"' if href.startswith("/") else ""
+        return f'<a href="{html.escape(href, quote=True)}"{target}>{_esc(label)}</a>'
+    url = _safe_url(href)
+    return f'<a href="{url}" target="_blank" rel="noopener">{_esc(label)}</a>' if url else _esc(label)
+
+
+def _footer_html() -> str:
+    res = _fresh_config(_resources)
+    columns = "".join(
+        f'<nav class="ehf-col" aria-label="{_esc(title)}"><div class="ehf-h">{_esc(title)}</div>'
+        '<ul class="ehf-list">' + "".join(f"<li>{_footer_link(label, href)}</li>" for label, href in items)
+        + '</ul></nav>'
+        for title, items in res.FOOTER_COLUMNS
+    )
+    licence, licence_url = res.FOOTER_LICENCE
+    return (
+        '<footer class="ehf">'
+        '<div class="ehf-top">'
+        '<div class="ehf-brand">'
+        '<a class="ehf-mark" href="/" target="_self" aria-label="The Economics Hub: home">'
+        '<span class="ehf-the">The</span><span class="ehf-name">Economics Hub</span></a>'
+        f'<div class="ehf-tag">{_esc(res.FOOTER_TAGLINE)}</div>'
+        f'<a class="ehf-cta" href="{_safe_url(res.FOOTER_SUBSCRIBE)}" target="_blank" rel="noopener">'
+        f'Subscribe on Substack{_NH_ARROW}</a>'
+        '</div>'
+        f'{columns}'
+        '</div>'
+        '<div class="ehf-bottom">'
+        f'<div class="ehf-legal">&copy; {date.today().year} Shreyas Urgunde. Charts and code are licensed '
+        f'{_footer_link(licence, licence_url)}. {_esc(res.FOOTER_LEGAL)}</div>'
+        '<a class="ehf-up" href="#ehtop" target="_self">Back to top &uarr;</a>'
+        '</div>'
+        '</footer>'
+    )
+
+
 # ---------------------------------------------------------------------------
 # Masthead, navigation, page
 # ---------------------------------------------------------------------------
@@ -3709,6 +4558,9 @@ PAGES = [
     st.Page(page_world, title="World", url_path="world"),
     st.Page(page_india, title="India", url_path="india"),
     st.Page(page_rbi, title="RBI Sentinel", url_path="rbi-sentinel"),
+    # Last, and set apart in the row by a hairline (.st-key-ehnav-analysis):
+    # it reads across the four pages of charts rather than adding a fifth.
+    st.Page(page_analysis, title="Analysis", url_path="analysis"),
 ]
 # Registered so it has a URL of its own to link and share, but kept out of the
 # tab row below: the tabs are the four pages of charts.
@@ -3718,6 +4570,8 @@ if current.url_path:                      # the default page keeps the plain tit
     st.set_page_config(page_title=f"{current.title} · The Economics Hub")
 
 st.markdown(
+    # #ehtop is where the footer's "Back to top" lands.
+    '<div id="ehtop"></div>'
     '<h1 class="insti-masthead">Global Macro &amp; Cross-Asset Monitor</h1>'
     '<p class="insti-descriptor">Research &amp; Maintained by '
     '<a class="insti-author" href="https://shreyasxi.github.io/" target="_blank" rel="noopener">'
@@ -3760,3 +4614,7 @@ current.run()
 _wanted = st.session_state.pop("_scroll_to", "") or st.query_params.get("chart", "")
 if re.fullmatch(r"[a-z0-9-]{2,64}", _wanted or ""):
     components.html(_scroll_to_chart_html(_wanted), height=0)
+
+# Last on every page, so nothing sits under it.
+with st.container(key="ehfoot"):
+    st.markdown(_footer_html(), unsafe_allow_html=True)
