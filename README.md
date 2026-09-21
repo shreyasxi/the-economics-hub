@@ -72,13 +72,14 @@ source ~/.bashrc
 
 ```
 economics_hub/
-├── app.py                       # Streamlit dashboard: 4 pages, each with its own link
+├── app.py                       # Streamlit dashboard: 5 pages and About, each with its own link
 ├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
 ├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
 ├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
 ├── generate_india.py            # India page (16 charts, Saturdays via CI + manual)
 ├── generate_soe.py              # India page: RBI's State of the Economy (briefing + rate transmission history)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
+├── generate_signals.py          # Analysis page: Signal or noise, 52 markets' weekly moves against their typical week
 ├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
 ├── charts/
@@ -90,6 +91,8 @@ economics_hub/
 │   ├── macro_settings.py        # World page: US and emerging-market series (FRED)
 │   ├── world_settings.py        # World page: countries, sources, central bank calendars
 │   ├── news_settings.py         # Headline feeds, themes and filters
+│   ├── analysis.py              # Analysis page: What I'm watching threads and pinned essays (edited by hand)
+│   ├── signals_settings.py      # Analysis page: the 52 series on the Signal or noise board
 │   └── insights.py              # Chart explanations shown under each chart
 ├── data/
 │   ├── fetchers/                # yfinance, FRED and India data fetchers
@@ -98,6 +101,8 @@ economics_hub/
 │   ├── nse_promoter_holdings.csv # Archived filings (rebuild: python -m data.nse_shareholding --rebuild)
 │   ├── world_snapshot.py        # World page data: BIS, OECD, Eurostat, central banks, FRED
 │   ├── news.py                  # Headlines: RSS reading, theme sorting, story ranking
+│   ├── signals.py               # Analysis page: weekly move ÷ typical week, and "largest since"
+│   ├── substack.py              # Analysis page: the newsletter shelf, read from Substack
 │   ├── world_manual_entry.py    # CLI for World figures with no free API (PMIs, Japan CPI, China)
 │   ├── valuations.py            # World page: Shiller CAPE, Damodaran equity risk premium and country risk downloads
 │   ├── india_macro.db           # India SQLite database
@@ -113,6 +118,7 @@ economics_hub/
 │   ├── india/YYYY-MM/
 │   ├── rbi_sentinel/YYYY-MM/
 │   ├── rbi_research/
+│   ├── analysis/                # Charts saved by hand for the Analysis page's threads
 │   ├── brand/                   # Logo
 │   └── readme_showcase/         # Static-named flagship charts (always current)
 ├── output/                      # Local generation output (git-ignored)
