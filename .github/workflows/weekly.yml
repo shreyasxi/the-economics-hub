@@ -109,4 +109,12 @@ jobs:
           git add -A assets/weekly/ assets/readme_showcase/
           git diff --staged --quiet && echo "No changes to commit." && exit 0
           git commit -m "chore: weekly charts $(date -u +%Y-%m-%d)"
-          git push
+          # main may have moved while the charts were generating (e.g. a push
+          # made mid-run); rebase onto it rather than failing the whole edition.
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            echo "Push attempt $attempt failed; retrying"
+            sleep $((attempt * 10))
+          done
+          echo "::error::Could not push after 3 attempts"
+          exit 1

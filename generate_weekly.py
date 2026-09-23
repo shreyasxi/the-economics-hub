@@ -534,6 +534,10 @@ SKIPPED_CHARTS = []
 
 def _bad_fetch(values, requested, min_ratio=0.5, min_ok=2):
     """True if a batch of weekly-change values looks like a fetch outage."""
+    # NaN/inf can't be plotted (one NaN collapses the axis) and would slip
+    # past the checks below, since NaN counts as a value and never equals itself.
+    if not all(math.isfinite(v) for v in values):
+        return True
     if len(values) < max(min_ok, math.ceil(requested * min_ratio)):
         return True
     if len(values) >= 3 and len({round(v, 2) for v in values}) == 1:

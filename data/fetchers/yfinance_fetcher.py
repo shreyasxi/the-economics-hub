@@ -14,6 +14,7 @@ Usage:
     weekly_change = fetcher.weekly_change("^GSPC")
 """
 
+import math
 import random
 import time
 
@@ -92,6 +93,11 @@ class YFinanceFetcher:
             print(f"⚠ {ticker}: fetch failed after retries ({e})")
             return pd.DataFrame()
 
+        # Yahoo sometimes returns a placeholder row for the latest session with
+        # blank prices and only a volume; a NaN last close poisons every weekly
+        # change, YTD figure and chart built on it, so keep priced rows only.
+        df = df.dropna(subset=["Close"])
+
         if df.empty:
             print(f"⚠ No data returned for {ticker} after retries")
             return pd.DataFrame()
@@ -126,7 +132,9 @@ class YFinanceFetcher:
         previous = df["Close"].iloc[-6]  # ~5 trading days
         change_pct = ((current / previous) - 1) * 100
         change_abs = current - previous
-        
+        if not math.isfinite(change_pct):
+            return None
+
         return {
             "current": current,
             "previous": previous,
