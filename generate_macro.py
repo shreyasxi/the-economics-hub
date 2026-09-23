@@ -7,9 +7,9 @@ output/macro/YYYY-MM/, so later runs in a month refresh the same edition.
 
 Writes:
   world_snapshot.json       central bank rates, six-economy scoreboard,
-                            growth/inflation regime, US data calendar
+                            global rate cycle, US data calendar
   01, 02, 07                US inflation, labour, Fed balance sheet
-  10_macro_world_regime     growth vs inflation momentum, six economies
+  10_macro_rate_cycle       central banks hiking and cutting each month (BIS)
   11_macro_oecd_cli         OECD composite leading indicators, one panel per economy
   14_macro_em_borrowing     EM corporate dollar bond yields vs the 10-year Treasury
   15_macro_em_dollar        the dollar against EM currencies and the rupee
@@ -21,14 +21,19 @@ Writes:
 
 Any automatic source that fails or has stopped updating makes the run exit
 non-zero after writing what it could, so the workflow publishes nothing.
+
+--rates-only refreshes just the central bank rates and the rate cycle chart
+in the published edition (assets/macro/<latest month>/); rates.yml runs it
+twice every weekday so a decision shows the day it is announced.
 """
 
 import sys
 import json
+import re
 import argparse
 import warnings
 from pathlib import Path
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 # Suppress harmless Matplotlib date locator warnings
 warnings.filterwarnings("ignore")
@@ -51,8 +56,9 @@ from charts.style import EconStyle
 from data.fetchers.fred_fetcher import FredFetcher
 from config.settings import FRED_API_KEY
 from config.macro_settings import EM_FX_PEERS, MACRO_INDICATORS
-from config.world_settings import COUNTRIES, OECD_CLI_COUNTRIES
-from data.world_snapshot import build_snapshot, monthly, yoy_by_date
+from config.world_settings import OECD_CLI_COUNTRIES
+from data.world_snapshot import (apply_rate_update, build_rate_update, build_snapshot, monthly,
+                                 rates_fingerprint, yoy_by_date)
 from data.world_manual_entry import load_rows as load_world_manual_rows
 from data.valuations import fetch_country_risk, fetch_damodaran_erp, fetch_shiller
 from rbi_sentinel.config import DB_PATH as RBI_SENTINEL_DB
@@ -124,15 +130,15 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "Total assets held by the Fed (WALCL)  ·  QE expansion and QT drawdown",
         ),
     },
-    "world_regime": {
+    "rate_cycle": {
         "dashboard": (
-            "Growth vs. Inflation Momentum",
-            "3-month change in OECD leading indicator (points) vs. 3-month change in CPI inflation (pp)",
+            "The Global Rate Cycle",
+            "Central banks that raised (above the line) or cut (below) their policy rate each month",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Growth vs. Inflation Momentum",
-            "3-month change in OECD leading indicator (points) vs. 3-month change in CPI inflation (pp)",
+            "The Global Rate Cycle",
+            "Central banks that raised (above the line) or cut (below) their policy rate each month",
         ),
     },
     "oecd_cli": {
@@ -954,10 +960,6 @@ def chart_fed_balance_sheet(engine, output_dir, mode="dashboard"):
 # WORLD CHARTS
 # ═══════════════════════════════════════════════
 
-WORLD_LABEL = {cc: meta["label"] for cc, meta in COUNTRIES.items()}
-WORLD_LABEL["EA"] = "Euro area (big 4)"   # OECD CLI has no euro-area aggregate; G4E = DE, FR, IT, ES
-
-
 def _ticks_within_data(ax, last_date):
     """Drop x ticks after the last observation (the right margin holds end labels, not future dates)."""
     last = mdates.date2num(pd.Timestamp(last_date).to_pydatetime())
@@ -975,65 +977,103 @@ def _spread_labels(values, min_gap):
     return [placed[i] for i in range(len(values))]
 
 
-def chart_world_regime(snapshot, output_dir, mode="dashboard"):
-    """Scatter: leading-indicator momentum (x) vs inflation momentum (y), with last month's position."""
-    points = snapshot["regime"]
-    if not points:
-        raise ValueError("no economy has both a leading indicator and CPI history")
+# Hikes red, cuts blue: the Weekly tab's diverging pair, validated on white.
+RATE_HIKE, RATE_CUT = EconStyle.LOSS, EconStyle.GAIN
+BANK_NAMES = {"US": "Fed", "XM": "ECB", "GB": "BoE", "JP": "BoJ", "IN": "RBI"}
+# Episodes named on the chart: (month the label sits over, text, above or below
+# the line, alignment). The 2022 label ends at its peak, leaving the top right
+# corner to the latest month.
+RATE_CYCLE_EPISODES = [
+    ("2001-09", "2001 recession", "cut", "center"),
+    ("2006-06", "2004–06 tightening", "hike", "center"),
+    ("2008-11", "Financial crisis", "cut", "center"),
+    ("2020-03", "Pandemic", "cut", "center"),
+    ("2022-09", "Post-pandemic inflation", "hike", "right"),
+]
+
+
+def chart_rate_cycle(cycle, output_dir, mode="dashboard", today=None):
+    """
+    Diverging monthly bars: how many of the central banks the BIS covers
+    raised their policy rate (up) and how many cut it (down) in each month
+    since 2000. The latest month is marked as partial while it is still
+    running or not every bank has reported it.
+    """
+    if not cycle or not cycle.get("hikes"):
+        raise ValueError("no rate cycle in the snapshot")
+    today = pd.Timestamp(today or date.today())
+    months = pd.period_range(cycle["start"], periods=len(cycle["hikes"]), freq="M")
+    x = months.to_timestamp() + pd.Timedelta(days=14)   # bar centred mid-month
+    hikes, cuts = np.array(cycle["hikes"]), np.array(cycle["cuts"])
+    reporting, banks = np.array(cycle["reporting"]), cycle["banks"]
+    last = months[-1]
+    partial = last >= today.to_period("M") or reporting[-1] < banks
+
     EconStyle.apply_global_style()
     fig, ax = EconStyle.create_figure(size=(9.5, 6.2))
+    alpha = np.where(np.arange(len(months)) == len(months) - 1, 0.55 if partial else 1.0, 1.0)
+    for xi, h, c, a in zip(x, hikes, cuts, alpha):
+        if h:
+            ax.bar(xi, h, width=24, color=RATE_HIKE, alpha=a, linewidth=0, zorder=3)
+        if c:
+            ax.bar(xi, -c, width=24, color=RATE_CUT, alpha=a, linewidth=0, zorder=3)
+    ax.axhline(0, color=INK, linewidth=1.0, zorder=4)
 
-    xs = [p["growth_change"] for p in points] + [p["previous"]["growth_change"] for p in points if "previous" in p]
-    ys = [p["inflation_change"] for p in points] + [p["previous"]["inflation_change"] for p in points if "previous" in p]
-    xlim = max(0.3, max(abs(v) for v in xs) * 1.35)
-    ylim = max(0.3, max(abs(v) for v in ys) * 1.35)
-    ax.set_xlim(-xlim, xlim)
-    ax.set_ylim(-ylim, ylim)
-    ax.axhline(0, color="#000000", linewidth=0.9, zorder=1)
-    ax.axvline(0, color="#000000", linewidth=0.9, zorder=1)
-
-    corner = dict(fontsize=10, fontweight="bold", color="#9CA3AF", zorder=1)
-    ax.text(0.98, 0.97, "OVERHEATING", transform=ax.transAxes, ha="right", va="top", **corner)
-    ax.text(0.02, 0.97, "STAGFLATION", transform=ax.transAxes, ha="left", va="top", **corner)
-    ax.text(0.98, 0.03, "GOLDILOCKS", transform=ax.transAxes, ha="right", va="bottom", **corner)
-    ax.text(0.02, 0.03, "SLOWDOWN", transform=ax.transAxes, ha="left", va="bottom", **corner)
-
-    for p in points:
-        color = COUNTRIES[p["country"]]["color"]
-        x, y = p["growth_change"], p["inflation_change"]
-        if "previous" in p:
-            px, py = p["previous"]["growth_change"], p["previous"]["inflation_change"]
-            ax.annotate("", xy=(x, y), xytext=(px, py), zorder=2,
-                        arrowprops=dict(arrowstyle="-|>", color=color, alpha=0.45, linewidth=1.2, shrinkB=6))
-            ax.scatter(px, py, s=22, color=color, alpha=0.35, zorder=2, edgecolors="none")
-        ax.scatter(x, y, s=110, color=color, zorder=4, edgecolors="white", linewidth=1.5)
-        label = WORLD_LABEL[p["country"]] if p["country"] == "EA" else COUNTRIES[p["country"]]["label"]
-        ax.annotate(label, xy=(x, y), xytext=(8, 7), textcoords="offset points",
-                    fontsize=9.5, fontweight="bold", color="#111111", zorder=5,
-                    path_effects=[pe.withStroke(linewidth=3, foreground="white")])
-
-    ax.grid(True, color=EconStyle.GRID_COLOR, linewidth=0.35)
-    ax.tick_params(length=0, labelsize=EconStyle.FONT_SIZE_TICK)
-    ax.set_xlabel("Leading indicator, change over 3 months (points)  \u2192 growth picking up",
-                  fontsize=EconStyle.FONT_SIZE_AXIS, labelpad=6)
-    ax.set_ylabel("CPI inflation, change over 3 months (pp)  \u2192 rising", fontsize=EconStyle.FONT_SIZE_AXIS, labelpad=6)
-    for spine in ["top", "right", "left", "bottom"]:
+    top = max(hikes.max(), cuts.max())
+    lim = top * 1.28
+    ax.set_ylim(-lim, lim)
+    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=8, steps=[1, 2, 5, 10], integer=True))
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{abs(v):.0f}"))
+    ax.set_yticks([t for t in ax.get_yticks() if abs(t) <= top * 1.05])
+    ax.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=0.5)
+    ax.grid(axis="x", visible=False)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right", "left", "bottom"):
         ax.spines[spine].set_visible(False)
+    ax.tick_params(axis="y", length=0, labelsize=EconStyle.FONT_SIZE_TICK, pad=4)
+    _time_axis(ax, months[0].to_timestamp(), x[-1], right_margin=0.02)
 
-    shown = {p["country"] for p in points}
-    missing = [COUNTRIES[c]["label"] for c in COUNTRIES if c not in shown]
-    notes = ["Faint dot = the same reading a month earlier. Euro area growth uses the OECD's Germany-France-Italy-Spain aggregate."]
-    if missing:
-        notes.append(f"Not shown (no CPI history yet): {', '.join(missing)}.")
-    fig.text(0.04, 0.055, "  ".join(notes), fontsize=7.5, color=EconStyle.TEXT_MUTED, ha="left", va="bottom")
+    side = dict(xycoords="axes fraction", fontsize=9.5, fontweight="bold", ha="left")
+    ax.annotate("Raised rates", xy=(0.005, 0.965), va="top", color=RATE_HIKE, **side)
+    ax.annotate("Cut rates", xy=(0.005, 0.035), va="bottom", color=RATE_CUT, **side)
 
-    _t, _s = MACRO_TITLES["world_regime"][mode]
-    EconStyle.set_title(ax, _t, _s)
+    for when, text, kind, align in RATE_CYCLE_EPISODES:
+        m = pd.Period(when, "M")
+        if m < months[0] or m > last:
+            continue
+        i = months.get_loc(m)
+        window = slice(max(0, i - 3), i + 4)
+        y = (hikes[window].max() + 1.2) if kind == "hike" else -(cuts[window].max() + 1.2)
+        ax.annotate(text, xy=(x[i], y), ha=align, va="bottom" if kind == "hike" else "top",
+                    fontsize=8, color=INK_MUTED, zorder=5,
+                    path_effects=[pe.withStroke(linewidth=2.5, foreground=EconStyle.BACKGROUND)])
+
+    def count(n, word):
+        return f"{n} {word}{'' if n == 1 else 's'}"
+    ax.annotate(f"{last.strftime('%b %Y')}{' so far' if partial else ''}\n{count(hikes[-1], 'hike')}, {count(cuts[-1], 'cut')}",
+                xy=(x[-1], hikes[-1] + 0.5), xytext=(x[-1], lim * 0.92), ha="right", va="top",
+                fontsize=9, fontweight="bold", color=INK, zorder=6,
+                arrowprops=dict(arrowstyle="-", color=INK_MUTED, linewidth=0.8, shrinkA=2, shrinkB=0),
+                path_effects=[pe.withStroke(linewidth=3, foreground=EconStyle.BACKGROUND)])
+
+    extended = [BANK_NAMES[a] for a in cycle.get("extended", []) if a in BANK_NAMES]
+    lines = ["Each bank counts once a month: its rate at the month's end against the month before.",
+             f"A faded bar is a month in progress or not yet reported by every bank ({reporting[-1]} of {banks} so far)."]
+    if extended:
+        names = extended[0] if len(extended) == 1 else ", ".join(extended[:-1]) + " and " + extended[-1]
+        lines.append(f"Moves since the BIS data end ({pd.Timestamp(cycle['bis_through']):%-d %b}) come from the banks' "
+                     f"own announcements ({names}).")
+    fig.text(0.04, 0.055, "\n".join(lines), fontsize=7.5, color=EconStyle.TEXT_MUTED, ha="left", va="bottom",
+             linespacing=1.5)
+
+    _t, _s = MACRO_TITLES["rate_cycle"][mode]
+    EconStyle.set_title(ax, _t, f"{_s}, of the {banks} the BIS tracks")
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.08, 0.98, 0.96])
-    EconStyle.add_source(fig, "OECD, FRED (BLS), Eurostat, MoSPI")
-    EconStyle.save_chart(fig, output_dir / "10_macro_world_regime.png")
-    print("   ✓ Growth vs Inflation Momentum")
+    fig.tight_layout(rect=[0.02, 0.12, 0.98, 0.96])
+    EconStyle.add_source(fig, f"BIS central bank policy rates, data to {pd.Timestamp(cycle['bis_through']):%-d %b %Y}"
+                              f"{'; central bank announcements' if extended else ''}")
+    EconStyle.save_chart(fig, output_dir / "10_macro_rate_cycle.png")
+    print("   ✓ The Global Rate Cycle")
 
 
 CLI_PHASE_COLORS = {"Expansion": "#1E7B45", "Recovery": "#0B8F82", "Downturn": "#C8620A", "Slowdown": "#A61B29"}
@@ -1569,7 +1609,7 @@ def generate_macro_dashboard(mode="dashboard"):
             except Exception as exc:  # noqa: BLE001 — reported below and fails the run
                 problems.append(f"{name} chart: {type(exc).__name__}: {exc}")
 
-    print("\n   Building the World snapshot (central banks, scoreboard, regime, calendar)...")
+    print("\n   Building the World snapshot (central banks, scoreboard, rate cycle, calendar)...")
     snapshot, series, snapshot_problems = build_snapshot(
         FRED_API_KEY, RBI_SENTINEL_DB, load_world_manual_rows()
     )
@@ -1577,7 +1617,7 @@ def generate_macro_dashboard(mode="dashboard"):
 
     print("\n   Generating World charts...")
     for name, draw in [
-        ("growth vs inflation momentum", lambda: chart_world_regime(snapshot, output_dir, mode)),
+        ("global rate cycle", lambda: chart_rate_cycle(snapshot["rate_cycle"], output_dir, mode)),
         ("OECD leading indicators", lambda: chart_oecd_cli(series["cli"], output_dir, mode)),
     ]:
         try:
@@ -1586,8 +1626,7 @@ def generate_macro_dashboard(mode="dashboard"):
             problems.append(f"{name} chart: {type(exc).__name__}: {exc}")
 
     snapshot["problems"] = problems
-    with open(output_dir / "world_snapshot.json", "w") as fh:
-        json.dump(snapshot, fh, indent=1, ensure_ascii=False)
+    write_snapshot(snapshot, output_dir / "world_snapshot.json")
     print("   ✓ world_snapshot.json")
 
     print(f"\n{len(list(output_dir.glob('*.png')))} charts in {output_dir}")
@@ -1599,9 +1638,63 @@ def generate_macro_dashboard(mode="dashboard"):
     print("Finished: all sources current.")
     return 0
 
+def write_snapshot(snapshot, path):
+    """JSON indented one space, with each list of numbers (the rate cycle's monthly counts) kept on one line."""
+    text = json.dumps(snapshot, indent=1, ensure_ascii=False)
+    text = re.sub(r"\[\n\s*(-?\d+(?:,\n\s*-?\d+)*)\n\s*\]",
+                  lambda m: "[" + re.sub(r",\n\s*", ", ", m.group(1)) + "]", text)
+    path.write_text(text + "\n", encoding="utf-8")
+
+
+def refresh_rates(mode="dashboard"):
+    """
+    Central bank rates only, written into the published World edition
+    (assets/macro/<latest month>/): the strip, the scoreboard's policy-rate
+    column and the rate cycle chart. rates.yml runs this twice every weekday,
+    so a decision shows the day it is announced instead of waiting for
+    Saturday's full run. Nothing is written when no rate, last move or
+    monthly count has changed, so the workflow then has nothing to commit.
+    Returns the process exit code.
+    """
+    editions = sorted(p.parent for p in (PROJECT_ROOT / "assets" / "macro").glob("*/world_snapshot.json"))
+    if not editions:
+        print("No published World edition (assets/macro/*/world_snapshot.json) to refresh.")
+        return 1
+    folder = editions[-1]
+    if FRED_API_KEY == "YOUR_FRED_API_KEY":
+        print("FRED_API_KEY is not set (local .env or the GitHub Actions secret). Nothing refreshed.")
+        return 1
+    print(f"Refreshing central bank rates in {folder.relative_to(PROJECT_ROOT)}")
+
+    with open(folder / "world_snapshot.json") as fh:
+        snapshot = json.load(fh)
+    update, problems = build_rate_update(FRED_API_KEY, RBI_SENTINEL_DB)
+    if problems:
+        print("\nFINISHED WITH PROBLEMS (nothing written):")
+        for p in problems:
+            print(f"   - {p}")
+        return 1
+
+    fresh = apply_rate_update(snapshot, update, datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"))
+    for bank in update["central_banks"]:
+        move = bank.get("last_move") or {}
+        print(f"   {bank['id']:<5} {bank.get('display', '-'):>10}   last move {move.get('bps', 0):+d} bps "
+              f"on {move.get('date', '-')}")
+    if rates_fingerprint(fresh) == rates_fingerprint(snapshot):
+        print("\nNo rate or monthly count has changed: nothing written.")
+        return 0
+
+    chart_rate_cycle(fresh["rate_cycle"], folder, mode)
+    write_snapshot(fresh, folder / "world_snapshot.json")
+    print("   ✓ world_snapshot.json")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate the Economics Hub World tab")
     parser.add_argument("--preview", action="store_true", help="Lower DPI for quick test")
+    parser.add_argument("--rates-only", action="store_true",
+                        help="Refresh only the central bank rates and rate cycle chart in the published edition")
     parser.add_argument(
         "--mode",
         choices=["dashboard", "newsletter"],
@@ -1613,6 +1706,8 @@ def main():
     if args.preview:
         EconStyle.DPI = 120
 
+    if args.rates_only:
+        sys.exit(refresh_rates(mode=args.mode))
     sys.exit(generate_macro_dashboard(mode=args.mode))
 
 if __name__ == "__main__":

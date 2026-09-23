@@ -143,7 +143,7 @@ python generate_news.py             # rank the week for the newest weekly editio
 ```
 
 ### 2. World
-Central bank rates and meeting dates, a six-economy scoreboard (US, euro area, UK, Japan, China, India), a growth-vs-inflation regime chart, a five-week calendar, and US, equity valuation, country risk, emerging-market and global growth charts — runs every Saturday via GitHub Actions. Figures with no free API (manufacturing PMIs, Japan CPI, China unemployment and 10-year yield) are entered with a CLI.
+Central bank rates and meeting dates, a six-economy scoreboard (US, euro area, UK, Japan, China, India), the global rate cycle (how many of 38 central banks are hiking or cutting each month), a five-week calendar, and US, equity valuation, country risk, emerging-market and global growth charts — runs every Saturday via GitHub Actions, with central bank rates rechecked twice every weekday from the banks' own announcements. Figures with no free API (manufacturing PMIs, Japan CPI, China unemployment and 10-year yield) are entered with a CLI.
 ```bash
 python -m data.world_manual_entry status
 python generate_macro.py

@@ -204,7 +204,7 @@ _TITLE_OVERRIDES = {
     "macro_inflation":           "US Inflation Metrics",
     "macro_labour":              "US Labour Market",
     "macro_balance_sheet":       "Federal Reserve Balance Sheet",
-    "macro_world_regime":        "Growth vs Inflation Momentum",
+    "macro_rate_cycle":          "The Global Rate Cycle",
     "macro_oecd_cli":            "OECD Composite Leading Indicators",
     "macro_cape":                "Shiller CAPE and Excess CAPE Yield",
     "macro_equity_risk_premium": "US Equity Risk Premium",

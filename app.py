@@ -2479,23 +2479,6 @@ def _fmt_day(d: date) -> str:
     return f"{d.day} {d:%b %Y}"
 
 
-def _next_lpr_date(today: date) -> date:
-    """
-    Next Loan Prime Rate fixing: the 20th, moved to the Monday when it falls on
-    a weekend. Chinese public holidays can move it further, so the page says
-    "around".
-    """
-    def fixing(year: int, month: int) -> date:
-        d = date(year, month, 20)
-        return d + timedelta(days=(7 - d.weekday()) % 7) if d.weekday() >= 5 else d
-
-    this_month = fixing(today.year, today.month)
-    if this_month >= today:
-        return this_month
-    nxt = today.replace(day=1) + timedelta(days=32)
-    return fixing(nxt.year, nxt.month)
-
-
 def _next_meeting(meetings: list[str] | None) -> date | None:
     today = date.today()
     for m in meetings or []:
@@ -2506,8 +2489,10 @@ def _next_meeting(meetings: list[str] | None) -> date | None:
 
 
 def _move_phrase(bps: int, when: date) -> str:
+    """'Last move: hike 25 bps, Sep 2026'. A move announced but not yet in force says when it takes effect."""
     verb, cls = ("hike", "mpc-d-hike") if bps > 0 else ("cut", "mpc-d-cut")
-    return f'Last move: <b class="{cls}">{verb} {abs(bps)} bps</b>, {when:%b %Y}'
+    timing = f"from {when.day} {when:%b}" if when > date.today() else f"{when:%b %Y}"
+    return f'Last move: <b class="{cls}">{verb} {abs(bps)} bps</b>, {timing}'
 
 
 def _central_bank_strip_html(snapshot: dict, brief: dict | None) -> str:
@@ -2537,7 +2522,7 @@ def _central_bank_strip_html(snapshot: dict, brief: dict | None) -> str:
                 if b.get("last_move"):
                     move = _move_phrase(b["last_move"]["bps"], date.fromisoformat(b["last_move"]["date"]))
             if bank["id"] == "pboc":
-                nxt = f"Next: around {_fmt_day(_next_lpr_date(date.today()))}"
+                nxt = "No fixed meeting dates"   # the 7-day reverse repo moves when the PBoC chooses
             else:
                 d = _next_meeting(bank["meetings"])
                 nxt = f"Next: {_fmt_day(d)}" if d else "Next date not yet published"
@@ -2563,9 +2548,6 @@ def _calendar_html(snapshot: dict, brief: dict | None, days: int = 35) -> str:
             d = date.fromisoformat(m)
             if today <= d <= horizon:
                 events.append((d, bank["meeting_label"], "", "wcal-cb"))
-    lpr = _next_lpr_date(today)
-    if lpr <= horizon:
-        events.append((lpr, "China loan prime rate", "around this date", "wcal-cb"))
     if brief:
         nm = (brief.get("facts") or {}).get("next_meeting")
         if nm and today <= nm["end"] <= horizon:
@@ -2597,7 +2579,9 @@ def _scoreboard_html(snapshot: dict) -> str:
             return f"{datetime.strptime(period, '%Y-%m-%d'):%b} MPC"
         if len(period) == 7:
             return datetime.strptime(period, "%Y-%m").strftime("%b")
-        return datetime.strptime(period, "%Y-%m-%d").strftime("%-d %b")
+        day = datetime.strptime(period, "%Y-%m-%d")
+        # A rate announced but not yet in force is dated by the day it takes effect.
+        return f"from {day:%-d %b}" if day.date() > date.today() else day.strftime("%-d %b")
 
     def cell_html(country: str, column: str, cell: dict) -> str:
         title = f' title="{cell.get("source", "")}"'
@@ -3445,19 +3429,24 @@ def page_world() -> None:
         # 1. Central banks
         st.markdown('<p class="w-eyebrow">Central banks</p>', unsafe_allow_html=True)
         st.markdown(_central_bank_strip_html(snapshot, world_brief), unsafe_allow_html=True)
+        # Rates are refreshed on weekdays (rates.yml) between the Saturday runs.
+        if snapshot.get("rates_updated_at", "") > snapshot["generated_at"]:
+            _rates_at = datetime.strptime(snapshot["rates_updated_at"], "%Y-%m-%d %H:%M")
+            st.markdown(f'<p class="w-foot">Rates updated {_fmt_day(_rates_at.date())}, {_rates_at:%H:%M} UTC.</p>',
+                        unsafe_allow_html=True)
 
-        # 2. Regime and calendar
-        regime, charts = _pop_summary(charts, ["world_regime"])
-        col_regime, col_cal = st.columns([3, 2], gap="large")
-        with col_regime:
-            st.markdown('<p class="w-eyebrow">Where each economy is heading</p>', unsafe_allow_html=True)
-            if regime:
-                _chart_anchor(regime)
-                st.image(str(regime), use_container_width=True)
-                _regime_insight = get_insight(regime.name)
-                if _regime_insight:
+        # 2. Global rate cycle and calendar
+        cycle, charts = _pop_summary(charts, ["rate_cycle"])
+        col_cycle, col_cal = st.columns([3, 2], gap="large")
+        with col_cycle:
+            st.markdown('<p class="w-eyebrow">The global rate cycle</p>', unsafe_allow_html=True)
+            if cycle:
+                _chart_anchor(cycle)
+                st.image(str(cycle), use_container_width=True)
+                _cycle_insight = get_insight(cycle.name)
+                if _cycle_insight:
                     with st.expander("Chart insights"):
-                        st.markdown(_regime_insight)
+                        st.markdown(_cycle_insight)
         with col_cal:
             st.markdown('<p class="w-eyebrow is-ruled">Coming up &middot; next five weeks</p>', unsafe_allow_html=True)
             st.markdown(_calendar_html(snapshot, world_brief), unsafe_allow_html=True)

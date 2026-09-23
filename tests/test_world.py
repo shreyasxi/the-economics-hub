@@ -4,6 +4,8 @@ World tab regression tests.
   * US CPI YoY was published as 3.71% for Aug 2026 when it was 3.35%: FRED has
     no October 2025 CPI, and counting 12 rows back crossed the gap.
   * UK CPI from FRED had stopped in March 2025 but kept appearing as current.
+  * The BoJ's 18 Sep 2026 hike was missing for a week: BIS runs about a week
+    behind, so rates are now also read from the banks' own announcements.
 
 No network: fetchers are exercised with canned responses.
 
@@ -58,7 +60,7 @@ def test_value_months_ago_needs_the_exact_month():
     assert ws.value_months_ago(s, 2) == 1.0
 
 
-# ── Central banks, regime, currency ─────────────────────────────────────────
+# ── Central banks, currency ─────────────────────────────────────────────────
 
 def test_last_move_finds_latest_change_and_sign():
     s = pd.Series([4.0, 4.0, 3.75, 3.75, 3.75],
@@ -98,11 +100,181 @@ def test_fomc_decision_fills_the_gap_before_fred_posts_it():
         raise AssertionError("conflicting FRED and FOMC ranges were accepted")
 
 
-def test_regime_quadrants():
-    assert ws.regime_label(0.3, -0.2) == "Goldilocks"
-    assert ws.regime_label(0.3, 0.2) == "Overheating"
-    assert ws.regime_label(-0.3, 0.2) == "Stagflation"
-    assert ws.regime_label(-0.3, -0.2) == "Slowdown"
+def _raises(fn, *args) -> bool:
+    try:
+        fn(*args)
+    except ValueError:
+        return True
+    return False
+
+
+def test_decision_shows_before_it_takes_effect_and_is_checked_later():
+    """BoJ, 18 Sep 2026: 1.00% -> 1.25% from 24 Sep; BIS then ended on 15 Sep."""
+    bis = pd.Series([1.0, 1.0], index=pd.to_datetime(["2026-09-14", "2026-09-15"]))
+    s = ws.apply_decision(bis, 1.25, date(2026, 9, 24), "BoJ statement")
+    assert s.index[-1] == pd.Timestamp("2026-09-24") and s.iloc[-1] == 1.25
+    assert ws.last_move(s) == {"date": "2026-09-24", "bps": 25}
+    # BIS catching up with the same rate adds nothing; a different rate is an error.
+    caught_up = pd.concat([bis, pd.Series([1.0, 1.25], index=pd.to_datetime(["2026-09-23", "2026-09-24"]))])
+    assert len(ws.apply_decision(caught_up, 1.25, date(2026, 9, 24), "BoJ statement")) == len(caught_up)
+    assert _raises(ws.apply_decision, caught_up, 1.5, date(2026, 9, 24), "BoJ statement")
+
+
+BOJ_CHANGE = ("1 September 18, 2026 Bank of Japan Change in the Guideline for Money Market Operations 1. At the "
+              "Monetary Policy Meeting held today, the Policy Board of the Bank of Japan decided, by a 7-2 majority "
+              "vote, to set the following guideline for money market operations for the intermeeting period: [Note] "
+              "The Bank will encourage the uncollateralized overnight call rate to remain at around 1.25 percent.1 "
+              "... 1 The new guideline for money market operations will be effective from September 24, 2026.")
+BOJ_HOLD = ("July 31, 2026 Bank of Japan Statement on Monetary Policy At the Monetary Policy Meeting held today, "
+            "... [Note] The Bank will encourage the uncollateralized overnight call rate to remain at around 1.0 "
+            "percent. [Note] Voting for the action: ... He proposed that the Bank set the guideline for money market "
+            "operations as follows: the Bank would encourage the uncollateralized overnight call rate to remain at "
+            "around 1.25 percent. The proposal was defeated by a majority vote.")
+
+
+def test_boj_statement_reads_the_decision_not_the_dissent():
+    assert ws.parse_boj_statement(BOJ_CHANGE) == {"date": date(2026, 9, 18), "rate": 1.25,
+                                                  "effective": date(2026, 9, 24)}
+    # A hold names no effective day, and the dissent's 1.25% is not the decision.
+    assert ws.parse_boj_statement(BOJ_HOLD) == {"date": date(2026, 7, 31), "rate": 1.0,
+                                                "effective": date(2026, 7, 31)}
+    assert _raises(ws.parse_boj_statement, "The Bank decided to buy more bonds.")
+
+
+def test_boj_decisions_page_skips_the_reference_copy():
+    page = """<table><tr><th>Date</th><th>Title</th></tr>
+      <tr><td>Sept. 18, 2026</td><td><a href="/en/mopo/mpmdeci/mpr_2026/mpr260918a.pdf">Amendment to "Principal
+        Terms"</a></td></tr>
+      <tr><td>Sept. 18, 2026</td><td><a href="/en/mopo/mpmdeci/mpr_2026/k260918b.pdf">(Reference) Change in the
+        Guideline for Money Market Operations (September 2026 MPM)</a></td></tr>
+      <tr><td>Sept. 18, 2026</td><td><a href="/en/mopo/mpmdeci/mpr_2026/k260918a.pdf">Change in the Guideline for
+        Money Market Operations [PDF 204KB]</a></td></tr>
+      <tr><td>July 31, 2026</td><td><a href="/en/mopo/mpmdeci/mpr_2026/k260731a.pdf">Statement on Monetary
+        Policy [PDF 160KB]</a></td></tr></table>"""
+    assert ws.parse_boj_decisions(page) == ["/en/mopo/mpmdeci/mpr_2026/k260918a.pdf",
+                                            "/en/mopo/mpmdeci/mpr_2026/k260731a.pdf"]
+
+
+def test_pboc_notice_both_layouts_and_days_without_a_7_day_operation():
+    new = ("2026年9月23日中国人民银行以固定利率、数量招标方式开展了80亿元7天期逆回购操作，全额满足了一级交易商需求。"
+           "具体情况如下： 逆回购操作情况 期限 操作利率 投标量 中标量 7天 1<span>.</span>40% 80亿元 80亿元")
+    old = "开展了1820亿元逆回购操作。具体情况如下： 逆回购操作情况 期限 操作量 操作利率 7天 1820亿元 1.50%"
+    fourteen_day = "开展了2780亿元逆回购操作。具体情况如下： 逆回购操作情况 期限 操作量 操作利率 14天 2780亿元 1.65%"
+    none = "人民银行不开展逆回购操作。"
+    assert ws.parse_pboc_omo(ws.html_text(new)) == 1.40      # figure split across spans
+    assert ws.parse_pboc_omo(old) == 1.50
+    assert ws.parse_pboc_omo(fourteen_day) is None
+    assert ws.parse_pboc_omo(none) is None
+
+
+def _pboc_site(notices: list[tuple[str, str]]):
+    """A fake PBoC list page (one page, newest first) and its notices: [(date, body)]."""
+    base = "/zhengcehuobisi/125207/125213/125431/125475/"
+    items = "".join(
+        f'<font class="newslist_style"><a href="{base}{i}/index.html" onclick="void(0)" target="_blank" '
+        f'title="公开市场业务交易公告 [2026]第{100 - i}号" istitle="true">公开市场业务交易公告</a></font>'
+        f'<span class="hui12">{d}</span>' for i, (d, _) in enumerate(notices))
+    pages = {ws.PBOC_OMO_LIST + "index.html": items}
+    pages.update({f"https://www.pbc.gov.cn{base}{i}/index.html": body for i, (_, body) in enumerate(notices)})
+
+    class Page:
+        def __init__(self, text):
+            self.content = text.encode("utf-8")
+
+    return lambda url, *a, **k: Page(pages[url])
+
+
+def _omo(rate: str | None) -> str:
+    return "不开展逆回购操作" if rate is None else f"期限 操作利率 投标量 中标量 7天 {rate}% 80亿元 80亿元"
+
+
+def test_pboc_new_move_is_dated_by_the_first_operation_at_the_new_rate():
+    ledger = pd.Series([1.5, 1.4], index=pd.to_datetime(["2024-09-29", "2025-05-08"]))
+    site = _pboc_site([("2026-09-25", _omo("1.30")), ("2026-09-24", _omo(None)), ("2026-09-23", _omo("1.30")),
+                       ("2026-09-22", _omo("1.40")), ("2026-09-21", _omo("1.40"))])
+    original = ws._get
+    ws._get = site
+    try:
+        latest, moves = ws.fetch_pboc_reverse_repo(ledger)
+    finally:
+        ws._get = original
+    assert (latest["date"], latest["rate"]) == ("2026-09-25", 1.3)
+    assert [(m["date"], m["rate"]) for m in moves] == [("2026-09-23", 1.3)]
+
+
+def test_pboc_unchanged_rate_reads_one_notice_and_records_nothing():
+    ledger = pd.Series([1.4], index=pd.to_datetime(["2025-05-08"]))
+    site = _pboc_site([("2026-09-23", _omo("1.40")), ("2026-09-22", _omo("9.99"))])  # the second is never read
+    original = ws._get
+    ws._get = site
+    try:
+        latest, moves = ws.fetch_pboc_reverse_repo(ledger)
+    finally:
+        ws._get = original
+    assert latest["rate"] == 1.4 and moves == []
+
+
+def test_committed_pboc_ledger_is_valid():
+    s = ws.read_pboc_ledger()
+    assert s.index[0] == pd.Timestamp("2019-10-25") and s.iloc[-1] == 1.4
+
+
+def test_ecb_table_reads_blank_years_footnotes_and_minus_signs():
+    page = """<table><tr><th>Date (with effect from)</th><th>Deposit facility</th></tr>
+      <tr><td>2026</td><td>16 Sep.</td><td>2.50</td><td>2.65</td><td>-</td><td>2.90</td></tr>
+      <tr><td>2024</td><td>18 Sep. 5</td><td>3.50</td><td>3.65</td><td>-</td><td>3.90</td></tr>
+      <tr><td>2014</td><td>10 Sep.</td><td>\u22120.20</td><td>0.05</td><td>-</td><td>0.30</td></tr>
+      <tr><td></td><td>11 Jun.</td><td>\u22120.10</td><td>0.15</td><td>-</td><td>0.40</td></tr></table>"""
+    s = ws.parse_ecb_key_rates(page)
+    assert s[pd.Timestamp("2014-06-11")] == -0.10 and s[pd.Timestamp("2024-09-18")] == 3.50
+    assert s.index[-1] == pd.Timestamp("2026-09-16") and s.iloc[-1] == 2.50
+
+
+def test_boe_bank_rate_table():
+    page = ("<table><tr><th>Date Changed</th><th>Rate</th></tr><tr><td> 18 Dec 25 </td><td>3.75</td></tr>"
+            "<tr><td>07 Aug 25</td><td>4.00</td></tr></table>")
+    s = ws.parse_boe_bank_rate(page)
+    assert s.index[-1] == pd.Timestamp("2025-12-18") and s.iloc[-1] == 3.75 and len(s) == 2
+
+
+def test_extend_series_carries_moves_not_levels():
+    """BIS records the middle of the Fed's range (3.625); the page uses its top (4.00)."""
+    bis = pd.Series([3.625], index=pd.to_datetime(["2026-09-15"]))
+    fed_top = pd.Series([3.75, 3.75, 4.0], index=pd.to_datetime(["2026-09-14", "2026-09-15", "2026-09-17"]))
+    s = ws.extend_series(bis, fed_top)
+    assert s.index[-1] == pd.Timestamp("2026-09-17") and abs(s.iloc[-1] - 3.875) < 1e-9
+    assert ws.extend_series(bis, None) is bis
+
+
+def test_rate_moves_by_month_counts_banks_once_and_skips_unreported_months():
+    days = pd.to_datetime(["2026-07-31", "2026-08-10", "2026-08-20", "2026-08-31", "2026-09-10"])
+    series = {
+        "A": pd.Series([1.0, 1.25, 1.5, 1.5, 1.5], index=days),    # hiked twice in August: one bank
+        "B": pd.Series([2.0, 2.0, 1.75, 1.75, 1.75], index=days),  # cut in August
+        "C": pd.Series([3.0, 3.0], index=days[:2]),                # data stop in August
+    }
+    m = ws.rate_moves_by_month(series, "2026-08")
+    assert m.loc[pd.Period("2026-08", "M")].tolist() == [1, 1, 3]
+    assert m.loc[pd.Period("2026-09", "M")].tolist() == [0, 0, 2]    # C has not reported September
+
+
+def test_rates_fingerprint_ignores_observation_dates():
+    snap = {"central_banks": [{"id": "boe", "status": "ok", "display": "3.75", "as_of": "2026-09-21",
+                               "last_move": {"date": "2025-12-18", "bps": -25}}],
+            "scoreboard": [{"country": "UK", "cells": {"policy_rate": {"value": 3.75, "period": "2026-09-21",
+                                                                       "status": "ok"}}}],
+            "rate_cycle": {"hikes": [5], "cuts": [0]}}
+    later = ws.apply_rate_update(snap, {
+        "central_banks": [{**snap["central_banks"][0], "as_of": "2026-09-23"}],
+        "policy_cells": {"UK": {"value": 3.75, "period": "2026-09-23", "status": "ok"}},
+        "rate_cycle": snap["rate_cycle"]}, "2026-09-23 21:04")
+    assert ws.rates_fingerprint(later) == ws.rates_fingerprint(snap)
+    moved = ws.apply_rate_update(snap, {
+        "central_banks": [{**snap["central_banks"][0], "display": "3.50",
+                           "last_move": {"date": "2026-11-05", "bps": -25}}],
+        "policy_cells": {"UK": {"value": 3.5, "period": "2026-11-05", "status": "ok"}},
+        "rate_cycle": snap["rate_cycle"]}, "2026-11-05 21:04")
+    assert ws.rates_fingerprint(moved) != ws.rates_fingerprint(snap)
 
 
 def test_fx_ytd_sign_is_local_currency_strength():

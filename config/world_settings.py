@@ -10,7 +10,10 @@ source; keyed in with `python -m data.world_manual_entry`, shown as "awaiting
 entry" when missing and flagged when old — never guessed).
 
 Central bank calendars are the banks' own published schedules. Update them
-once a year when the next year's dates appear (see MEETING_SOURCES).
+once a year when the next year's dates appear (see MEETING_SOURCES). They set
+what the page shows as the next decision; the rates themselves are checked
+twice every weekday by rates.yml, so a decision on or off the calendar shows
+up the day it is announced.
 """
 
 from __future__ import annotations
@@ -60,7 +63,7 @@ CELL_SOURCES = {
         "mfg_pmi": "manual",
         "cpi_yoy": "Eurostat prc_hicp_minr (HICP)",
         "unemployment": "Eurostat une_rt_m",
-        "policy_rate": "FRED ECBDFR (deposit facility rate)",
+        "policy_rate": "FRED ECBDFR + ECB key interest rates table (deposit facility rate)",
         "ten_year": "Deutsche Bundesbank (German Bund)",
         "fx_ytd": "Yahoo Finance EURUSD=X",
     },
@@ -68,7 +71,7 @@ CELL_SOURCES = {
         "mfg_pmi": "manual",
         "cpi_yoy": "OECD Prices (ONS CPI)",
         "unemployment": "OECD Labour Force Statistics (ONS)",
-        "policy_rate": "Bank of England IUDBEDR (Bank Rate)",
+        "policy_rate": "Bank of England IUDBEDR + Bank Rate history (Bank Rate)",
         "ten_year": "Bank of England IUDMNPY (par yield)",
         "fx_ytd": "Yahoo Finance GBPUSD=X",
     },
@@ -76,7 +79,7 @@ CELL_SOURCES = {
         "mfg_pmi": "manual",
         "cpi_yoy": "manual",
         "unemployment": "OECD Labour Force Statistics",
-        "policy_rate": "BIS central bank policy rates",
+        "policy_rate": "BIS central bank policy rates + BoJ monetary policy statement",
         "ten_year": "Ministry of Finance Japan (JGB)",
         "fx_ytd": "Yahoo Finance JPY=X",
     },
@@ -84,7 +87,7 @@ CELL_SOURCES = {
         "mfg_pmi": "manual",
         "cpi_yoy": "OECD Prices (NBS CPI)",
         "unemployment": "manual",
-        "policy_rate": "BIS central bank policy rates (1Y LPR)",
+        "policy_rate": "PBoC open market operations notices (7-day reverse repo)",
         "ten_year": "manual",
         "fx_ytd": "Yahoo Finance CNY=X",
     },
@@ -132,9 +135,6 @@ MANUAL_RANGES = {
 # ─────────────────────────────────────────────
 OECD_CPI_AREAS = {"UK": "GBR", "CN": "CHN"}
 OECD_UNEMP_AREAS = {"UK": "GBR", "JP": "JPN"}
-# OECD publishes no euro-area CLI; G4E is its aggregate of Germany, France,
-# Italy and Spain and is labelled as such wherever it appears.
-OECD_CLI_AREAS = {"US": "USA", "EA": "G4E", "UK": "GBR", "JP": "JPN", "CN": "CHN", "IN": "IND"}
 # Every country the OECD publishes a leading indicator for, for the ranked
 # chart. Its aggregates (G7, G20, NAFTA, G4E, A5M) are deliberately left out:
 # the chart ranks economies against each other, not blocs against economies.
@@ -145,7 +145,14 @@ OECD_CLI_COUNTRIES = {
     "KOR": "South Korea", "MEX": "Mexico", "TUR": "Turkey",
     "USA": "United States", "ZAF": "South Africa",
 }
-BIS_POLICY_AREAS = {"JP": "JP", "CN": "CN"}   # UK Bank Rate comes from the BoE itself: BIS runs ~9 days behind
+# The global rate cycle chart counts hikes and cuts across every central bank
+# in the BIS policy rate dataset (38 in 2026) from this month on. BIS runs
+# about a week behind, and India's rate further; for these banks, whose own
+# announcements the page already reads, moves after BIS's last day are
+# carried on from those (BIS area -> scoreboard country). China is left to
+# BIS, which records the loan prime rate rather than the 7-day reverse repo.
+RATE_CYCLE_START = "2000-01"
+BIS_EXTENDED_AREAS = {"US": "US", "XM": "EA", "GB": "UK", "JP": "JP", "IN": "IN"}
 FX_TICKERS = {
     # (ticker, quoted as USD per unit of local currency?)
     "US": ("DX-Y.NYB", True),   # DXY: the dollar itself; up = stronger dollar
@@ -220,9 +227,11 @@ CENTRAL_BANKS = [
     },
     {
         "id": "pboc", "country": "CN", "name": "People's Bank of China", "short": "PBoC",
-        "rate_label": "1-year loan prime rate", "meeting_label": "China loan prime rate",
-        # The LPR is fixed on the 20th of each month (moved to the next working
-        # day when the 20th is a holiday) — there is no meeting calendar.
+        "rate_label": "7-day reverse repo rate", "meeting_label": "China loan prime rate",
+        # The PBoC has no meeting calendar: it moves the 7-day reverse repo
+        # rate, its main policy rate, when it chooses. The loan prime rate,
+        # which follows it, is fixed on the 20th of each month (moved to the
+        # next working day when the 20th is a holiday) and stays on the calendar.
         "meetings": None,
     },
     {
