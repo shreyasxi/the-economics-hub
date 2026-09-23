@@ -20,6 +20,8 @@ The script:
 """
 
 import sys
+import os
+import math
 import argparse
 from pathlib import Path
 from datetime import datetime
@@ -518,6 +520,34 @@ def _recession_bands(ax, usrec, note="Shaded: US recessions"):
     return drawn
 
 
+# ---------------------------------------------------------------------------
+# Data-quality guardrail
+# ---------------------------------------------------------------------------
+# Yahoo Finance periodically rate-limits/blocks CI IP ranges. When that
+# happens yfinance doesn't always raise — it can hand back a few tickers
+# with implausible, near-identical values (unrelated markets don't move in
+# lockstep to two decimal places). Publishing that is worse than publishing
+# nothing, so every multi-ticker bar chart is checked before it's saved and
+# skipped — not overwritten with garbage — if the fetch looks broken.
+SKIPPED_CHARTS = []
+
+
+def _bad_fetch(values, requested, min_ratio=0.5, min_ok=2):
+    """True if a batch of weekly-change values looks like a fetch outage."""
+    if len(values) < max(min_ok, math.ceil(requested * min_ratio)):
+        return True
+    if len(values) >= 3 and len({round(v, 2) for v in values}) == 1:
+        return True
+    return False
+
+
+def _flag_skipped(chart_name, got, requested):
+    msg = f"{chart_name} ({got}/{requested} tickers usable, or values looked degenerate)"
+    SKIPPED_CHARTS.append(msg)
+    print(f"   ⚠⚠ SKIPPED — {msg}; Yahoo Finance likely rate-limited this run")
+    print(f"::warning::Weekly dashboard skipped '{chart_name}' this run — {msg}")
+
+
 def generate_with_live_data(output_dir, mode="dashboard"):
     """Generate dashboard with live API data from yfinance + FRED."""
     import pandas as pd
@@ -575,8 +605,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             
             if ind["source"] == "yfinance":
                 # Fetch history since Jan 1
-                ticker = __import__('yfinance').Ticker(ind["ticker"])
-                hist = ticker.history(start=start_date)
+                hist = yf_fetcher.fetch(ind["ticker"], start=start_date)
                 if hist.empty: return None
                 
                 start_price = hist["Close"].iloc[0]
@@ -667,71 +696,74 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     print("\n   [1/8] Equities — Aesthetic Vertical Bar Chart (Weekly)")
     eq_ids = ["sp500", "dow", "nasdaq", "ftse100", "eurostoxx50", "nifty50", "shanghai", "hangseng", "nikkei225"]
     names, values, cks = build_bar_data(eq_ids)
-    
-    # Create the custom figure using your wide template
-    fig, ax = EconStyle.create_figure(size="wide")
-    
-    # Premium Institutional Colors
-    color_pos = "#03AF53" # Deep, authoritative Slate Blue
-    color_neg = "#820E0E" # Deep, striking red for negatives
-    colors = [color_pos if v >= 0 else color_neg for v in values]
-    
-    # Plot the vertical bars
-    bars = ax.bar(names, values, color=colors, width=0.25, zorder=3)
-    
-    # Restore the Y-Axis and Gridlines
-    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-    ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
-    
-    # Clean up the outer box spines
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    
-    # Heavy Zero-Line anchor
-    ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-    
-    # Clean up the X-axis labels
-    ax.xaxis.set_tick_params(length=0) 
-    ax.set_xticklabels(names, fontweight='bold', fontsize=8.5, color="#1C1C1E")
-    
-    # Dynamic Y-Axis Logic (Fixing the gap)
-    min_v = min(values) if values else 0
-    max_v = max(values) if values else 0
-    y_range = max_v - min_v if max_v != min_v else (max_v if max_v != 0 else 1)
-    
-    y_bottom = (min_v - y_range * 0.15) if min_v < 0 else 0
-    y_top = (max_v + y_range * 0.15) if max_v > 0 else 0
-    
-    ax.set_ylim(y_bottom, y_top)
-    
-    for bar, v in zip(bars, values):
-        yval = bar.get_height()
-        offset = y_range * 0.02 
-        
-        if v >= 0:
-            y_pos = yval + offset
-            va = 'bottom'
-        else:
-            y_pos = yval - offset
-            va = 'top'
-            
-        ax.text(
-            bar.get_x() + bar.get_width()/2, 
-            y_pos, 
-            f"{v:+.1f}%", 
-            ha='center', va=va, 
-            fontweight='bold', fontsize=12, color=bar.get_facecolor()
-        )
 
-    # Apply Full EconStyle Branding
-    _t, _s = WEEKLY_TITLES["equities_weekly"][mode]
-    EconStyle.set_title(ax, _t, _s.format(date=date_label))
-    EconStyle.add_top_rule(ax) 
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "Yahoo Finance")
-    
-    EconStyle.save_chart(fig, output_dir / "01_equities_weekly.png")
+    if _bad_fetch(values, len(eq_ids)):
+        _flag_skipped("Equities — Weekly Bar Chart", len(values), len(eq_ids))
+    else:
+        # Create the custom figure using your wide template
+        fig, ax = EconStyle.create_figure(size="wide")
+
+        # Premium Institutional Colors
+        color_pos = "#03AF53" # Deep, authoritative Slate Blue
+        color_neg = "#820E0E" # Deep, striking red for negatives
+        colors = [color_pos if v >= 0 else color_neg for v in values]
+
+        # Plot the vertical bars
+        bars = ax.bar(names, values, color=colors, width=0.25, zorder=3)
+
+        # Restore the Y-Axis and Gridlines
+        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
+
+        # Clean up the outer box spines
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+
+        # Heavy Zero-Line anchor
+        ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+
+        # Clean up the X-axis labels
+        ax.xaxis.set_tick_params(length=0)
+        ax.set_xticklabels(names, fontweight='bold', fontsize=8.5, color="#1C1C1E")
+
+        # Dynamic Y-Axis Logic (Fixing the gap)
+        min_v = min(values)
+        max_v = max(values)
+        y_range = max_v - min_v if max_v != min_v else (max_v if max_v != 0 else 1)
+
+        y_bottom = (min_v - y_range * 0.15) if min_v < 0 else 0
+        y_top = (max_v + y_range * 0.15) if max_v > 0 else 0
+
+        ax.set_ylim(y_bottom, y_top)
+
+        for bar, v in zip(bars, values):
+            yval = bar.get_height()
+            offset = y_range * 0.02
+
+            if v >= 0:
+                y_pos = yval + offset
+                va = 'bottom'
+            else:
+                y_pos = yval - offset
+                va = 'top'
+
+            ax.text(
+                bar.get_x() + bar.get_width()/2,
+                y_pos,
+                f"{v:+.1f}%",
+                ha='center', va=va,
+                fontweight='bold', fontsize=12, color=bar.get_facecolor()
+            )
+
+        # Apply Full EconStyle Branding
+        _t, _s = WEEKLY_TITLES["equities_weekly"][mode]
+        EconStyle.set_title(ax, _t, _s.format(date=date_label))
+        EconStyle.add_top_rule(ax)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Yahoo Finance")
+
+        EconStyle.save_chart(fig, output_dir / "01_equities_weekly.png")
 
     print("   [2/8] Equities — 12-Month Trends")
     trend = TrendLineChart()
@@ -980,13 +1012,17 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             sector_data.sort(key=lambda x: x[1], reverse=True)
             s_names = [s[0] for s in sector_data]
             s_values = [s[1] for s in sector_data]
-            s_colors = [EconStyle.POSITIVE if v >= 0 else EconStyle.NEGATIVE for v in s_values]
 
-            chart = WeeklyBarChart(names=s_names, values=s_values, color_keys=["us"] * len(s_names))
-            chart.render(title="S&P 500 Sector Rotation",
-                         subtitle=f"Weekly performance by sector  ·  {date_label}",
-                         source="Yahoo Finance (SPDR ETFs)")
-            chart.save(output_dir / "10_sector_rotation.png")
+            if _bad_fetch(s_values, len(SECTOR_ETFS)):
+                _flag_skipped("S&P 500 Sector Rotation", len(s_values), len(SECTOR_ETFS))
+            else:
+                s_colors = [EconStyle.POSITIVE if v >= 0 else EconStyle.NEGATIVE for v in s_values]
+
+                chart = WeeklyBarChart(names=s_names, values=s_values, color_keys=["us"] * len(s_names))
+                chart.render(title="S&P 500 Sector Rotation",
+                             subtitle=f"Weekly performance by sector  ·  {date_label}",
+                             source="Yahoo Finance (SPDR ETFs)")
+                chart.save(output_dir / "10_sector_rotation.png")
     except Exception as e:
         print(f"   ⚠ Sector rotation failed: {e}")
 
@@ -1670,7 +1706,10 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             except Exception:
                 pass
 
-        if em_fx_data:
+        values_emfx_check = [d[1] for d in em_fx_data]
+        if em_fx_data and _bad_fetch(values_emfx_check, len(EM_FX_TICKERS)):
+            _flag_skipped("EM FX — Weekly Performance", len(values_emfx_check), len(EM_FX_TICKERS))
+        elif em_fx_data:
             em_fx_data.sort(key=lambda x: x[1])
             names_emfx  = [d[0] for d in em_fx_data]
             values_emfx = [d[1] for d in em_fx_data]
@@ -1727,30 +1766,34 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             em_eq_data.sort(key=lambda x: x[1])
             names_emeq  = [d[0] for d in em_eq_data]
             values_emeq = [d[1] for d in em_eq_data]
-            colors_emeq = ["#03AF53" if v >= 0 else "#820E0E" for v in values_emeq]
 
-            fig, ax = EconStyle.create_figure(size=(10, 6))
-            bars = ax.barh(names_emeq, values_emeq, color=colors_emeq, height=0.5, zorder=3)
+            if _bad_fetch(values_emeq, len(EM_EQUITY_TICKERS)):
+                _flag_skipped("Emerging Market Equities — Weekly Performance", len(values_emeq), len(EM_EQUITY_TICKERS))
+            else:
+                colors_emeq = ["#03AF53" if v >= 0 else "#820E0E" for v in values_emeq]
 
-            for bar, v in zip(bars, values_emeq):
-                x_pos = v + 0.05 if v >= 0 else v - 0.05
-                ha = 'left' if v >= 0 else 'right'
-                ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
-                        f"{v:+.1f}%", va='center', ha=ha,
-                        fontsize=11, fontweight='bold', color=bar.get_facecolor())
+                fig, ax = EconStyle.create_figure(size=(10, 6))
+                bars = ax.barh(names_emeq, values_emeq, color=colors_emeq, height=0.5, zorder=3)
 
-            ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-            ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.set_xlabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
-            for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
-            ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+                for bar, v in zip(bars, values_emeq):
+                    x_pos = v + 0.05 if v >= 0 else v - 0.05
+                    ha = 'left' if v >= 0 else 'right'
+                    ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
+                            f"{v:+.1f}%", va='center', ha=ha,
+                            fontsize=11, fontweight='bold', color=bar.get_facecolor())
 
-            _t, _s = WEEKLY_TITLES["em_equity_weekly"][mode]
-            EconStyle.set_title(ax, _t, _s.format(date=date_label))
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (iShares ETFs)")
-            EconStyle.save_chart(fig, output_dir / "21_em_equity_weekly.png")
+                ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+                ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+                ax.set_xlabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
+                for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
+                ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+
+                _t, _s = WEEKLY_TITLES["em_equity_weekly"][mode]
+                EconStyle.set_title(ax, _t, _s.format(date=date_label))
+                EconStyle.add_top_rule(ax)
+                fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+                EconStyle.add_source(fig, "Yahoo Finance (iShares ETFs)")
+                EconStyle.save_chart(fig, output_dir / "21_em_equity_weekly.png")
     except Exception as e:
         print(f"   ⚠ EM equity weekly failed: {e}")
 
@@ -2294,30 +2337,34 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             agri_data.sort(key=lambda x: x[1])
             names_ag  = [d[0] for d in agri_data]
             values_ag = [d[1] for d in agri_data]
-            colors_ag = ["#03AF53" if v >= 0 else "#820E0E" for v in values_ag]
 
-            fig, ax = EconStyle.create_figure(size=(10, 6))
-            bars = ax.barh(names_ag, values_ag, color=colors_ag, height=0.5, zorder=3)
+            if _bad_fetch(values_ag, len(AGRI_TICKERS)):
+                _flag_skipped("Agricultural Commodities — Weekly", len(values_ag), len(AGRI_TICKERS))
+            else:
+                colors_ag = ["#03AF53" if v >= 0 else "#820E0E" for v in values_ag]
 
-            for bar, v in zip(bars, values_ag):
-                x_pos = v + 0.05 if v >= 0 else v - 0.05
-                ha = 'left' if v >= 0 else 'right'
-                ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
-                        f"{v:+.1f}%", va='center', ha=ha,
-                        fontsize=11, fontweight='bold', color=bar.get_facecolor())
+                fig, ax = EconStyle.create_figure(size=(10, 6))
+                bars = ax.barh(names_ag, values_ag, color=colors_ag, height=0.5, zorder=3)
 
-            ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-            ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.set_xlabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
-            for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
-            ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+                for bar, v in zip(bars, values_ag):
+                    x_pos = v + 0.05 if v >= 0 else v - 0.05
+                    ha = 'left' if v >= 0 else 'right'
+                    ax.text(x_pos, bar.get_y() + bar.get_height() / 2,
+                            f"{v:+.1f}%", va='center', ha=ha,
+                            fontsize=11, fontweight='bold', color=bar.get_facecolor())
 
-            _t, _s = WEEKLY_TITLES["agri_weekly"][mode]
-            EconStyle.set_title(ax, _t, _s.format(date=date_label))
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (CBOT · ICE Futures)")
-            EconStyle.save_chart(fig, output_dir / "24_agri_weekly.png")
+                ax.axvline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
+                ax.xaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+                ax.set_xlabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.TEXT_SECONDARY)
+                for sp in ['top', 'right', 'bottom']: ax.spines[sp].set_visible(False)
+                ax.spines['left'].set_color(EconStyle.AXIS_COLOR)
+
+                _t, _s = WEEKLY_TITLES["agri_weekly"][mode]
+                EconStyle.set_title(ax, _t, _s.format(date=date_label))
+                EconStyle.add_top_rule(ax)
+                fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+                EconStyle.add_source(fig, "Yahoo Finance (CBOT · ICE Futures)")
+                EconStyle.save_chart(fig, output_dir / "24_agri_weekly.png")
     except Exception as e:
         print(f"   ⚠ Agricultural commodities failed: {e}")
 
@@ -2701,6 +2748,29 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     print(f"\n✅ Dashboard complete! {len(list(output_dir.glob('*.png')))} charts saved to:")
     print(f"   {output_dir}")
+
+    if SKIPPED_CHARTS:
+        print(f"\n⚠ {len(SKIPPED_CHARTS)} chart(s) skipped this run — Yahoo Finance data looked incomplete or degenerate:")
+        for m in SKIPPED_CHARTS:
+            print(f"   - {m}")
+
+        summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary_path:
+            with open(summary_path, "a") as f:
+                f.write("### ⚠ Weekly dashboard — charts skipped this run\n")
+                f.write("Likely Yahoo Finance rate-limiting; the rest of the dashboard still published.\n\n")
+                for m in SKIPPED_CHARTS:
+                    f.write(f"- {m}\n")
+
+        # One or two isolated tickers flaking is normal and fine to skip
+        # quietly-ish; this many failing at once means Yahoo is down for
+        # this whole run, not just one series — worth failing the job so a
+        # half-broken edition doesn't get committed and published unnoticed.
+        if len(SKIPPED_CHARTS) >= 3:
+            sys.exit(
+                f"\n❌ {len(SKIPPED_CHARTS)} charts skipped — treating this as a Yahoo Finance "
+                "outage rather than publishing a half-broken edition. Re-run the workflow later."
+            )
 
 
 def main():

@@ -14,9 +14,20 @@ Usage:
     weekly_change = fetcher.weekly_change("^GSPC")
 """
 
+import random
+import time
+
 import pandas as pd
 from datetime import datetime, timedelta
 from pathlib import Path
+from tenacity import (
+    RetryError,
+    retry,
+    retry_if_exception_type,
+    retry_if_result,
+    stop_after_attempt,
+    wait_random_exponential,
+)
 
 try:
     import yfinance as yf
@@ -24,6 +35,10 @@ try:
 except ImportError:
     HAS_YFINANCE = False
     print("⚠ yfinance not installed. Run: pip install yfinance")
+
+
+def _empty(df) -> bool:
+    return df is None or df.empty
 
 
 class YFinanceFetcher:
@@ -34,31 +49,59 @@ class YFinanceFetcher:
             raise ImportError("yfinance is required. Install with: pip install yfinance")
         self.cache_dir = Path(cache_dir) if cache_dir else None
 
-    def fetch(self, ticker, period="1y", interval="1d"):
+    # Yahoo periodically rate-limits/blocks CI IP ranges and hands back an
+    # empty response rather than an error, so an empty result is retried
+    # exactly like an exception — both get jittered backoff before this
+    # ticker is treated as unavailable for the run.
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_random_exponential(multiplier=1.2, max=15),
+        retry=(retry_if_result(_empty) | retry_if_exception_type(Exception)),
+        reraise=True,
+    )
+    def _download(self, ticker, period, interval, start):
+        tk = yf.Ticker(ticker)
+        if start:
+            return tk.history(start=start, interval=interval)
+        return tk.history(period=period, interval=interval)
+
+    def fetch(self, ticker, period="1y", interval="1d", start=None):
         """
         Fetch historical data for a ticker.
-        
+
         Parameters:
             ticker: Yahoo Finance ticker (e.g., "^GSPC")
-            period: "1mo", "3mo", "6mo", "1y", "2y", "5y"
+            period: "1mo", "3mo", "6mo", "1y", "2y", "5y" (ignored if start is set)
             interval: "1d", "1wk", "1mo"
-        
+            start: optional "YYYY-MM-DD" to fetch from a fixed date instead of a period
+
         Returns:
             DataFrame with Date index and OHLCV columns
         """
-        tk = yf.Ticker(ticker)
-        df = tk.history(period=period, interval=interval)
-        
-        if df.empty:
-            print(f"⚠ No data returned for {ticker}")
+        # Spread out the many back-to-back requests a full run makes, so the
+        # burst itself doesn't look like scraping and trip the rate limiter.
+        time.sleep(random.uniform(0.2, 0.6))
+
+        try:
+            df = self._download(ticker, period, interval, start)
+        except RetryError:
+            # Every attempt came back empty (Yahoo rate-limited/blocked this run).
+            print(f"⚠ No data returned for {ticker} after retries")
             return pd.DataFrame()
-        
+        except Exception as e:
+            print(f"⚠ {ticker}: fetch failed after retries ({e})")
+            return pd.DataFrame()
+
+        if df.empty:
+            print(f"⚠ No data returned for {ticker} after retries")
+            return pd.DataFrame()
+
         # Cache if configured
         if self.cache_dir:
             self.cache_dir.mkdir(parents=True, exist_ok=True)
             cache_file = self.cache_dir / f"{ticker.replace('^', '').replace('=', '_')}_{period}.csv"
             df.to_csv(cache_file)
-        
+
         return df
 
     def get_close_series(self, ticker, period="1y"):
