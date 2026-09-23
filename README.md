@@ -1,6 +1,8 @@
 # Automated Macro Dashboard & RBI Sentiment Tracker
 
-An automated Python pipeline tracking Global Equities, Forex, Sovereign Bonds, Commodities, and Indian Markets — published via [The Economics Hub on Substack](https://economicshub.substack.com/).
+Weekly charts and analysis on global markets, the world economy, India and the RBI.
+
+An automated Python pipeline tracking global equities, forex, sovereign bonds, commodities and Indian markets, published via [The Economics Hub on Substack](https://economicshub.substack.com/).
 
 <p align="center">
   <a href="https://weekly-macro-dashboard.streamlit.app/">
