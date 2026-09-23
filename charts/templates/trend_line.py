@@ -86,9 +86,11 @@ class TrendLineChart:
             if show_endpoints and len(values) > 0:
                 last_val, last_date = values[-1], s["dates"][-1]
 
-                # Smart formatting
+                # Smart formatting. An indexed line is labelled with its change
+                # since the start, "Silver (+49.4%)", rather than its index level.
                 if normalize:
-                    vs = f"{last_val:.1f}"
+                    ret = last_val - 100
+                    vs = f"({'+' if ret >= 0 else '−'}{abs(ret):.1f}%)"
                 elif abs(last_val) > 10000:
                     vs = f"{last_val:,.0f}"
                 elif abs(last_val) > 100:
@@ -98,7 +100,8 @@ class TrendLineChart:
                 else:
                     vs = f"{last_val:.4f}"
 
-                label_text = f" {s['name']}  {vs}" if num_series > 1 else f" {vs}"
+                gap = " " if normalize else "  "
+                label_text = f" {s['name']}{gap}{vs}" if num_series > 1 else f" {vs}"
                 label_positions.append({
                     "text": label_text,
                     "x": last_date,
@@ -182,6 +185,11 @@ class TrendLineChart:
         ax.margins(x=0.01)
         xmin, xmax = ax.get_xlim()
         ax.set_xlim(xmin, xmax + (xmax - xmin) * 0.14)
+        # The margin is room for the labels, not future months: no ticks past the
+        # data. None before the axis starts either, as setting one would widen it.
+        ends = [mdates.date2num(s["dates"][-1]) for s in self.series if len(s["dates"])]
+        if ends:
+            ax.set_xticks([t for t in ax.get_xticks() if xmin <= t <= max(ends)])
 
         ax.tick_params(axis="y", length=0)
         ax.tick_params(axis="x", length=0)

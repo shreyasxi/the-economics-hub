@@ -4113,10 +4113,8 @@ def page_about() -> None:
 # (config/analysis.py); and the essays from the newsletter, read from Substack
 # when the page opens. Every word written by hand lives in config/analysis.py.
 
-# Pages a thread can borrow a chart from, and where each one lives.
-_DASHBOARD_PAGES = (("weekly", "/", "Weekly Markets"),
-                    ("macro", "/world", "World"),
-                    ("india", "/india", "India"))
+# Pages a thread can borrow a chart from, by the folder each keeps its charts in.
+_DASHBOARD_PAGES = ("weekly", "macro", "india")
 
 # What each group is called in a sentence ("Currencies take 5 of the top 8 places").
 _SIG_GROUP_NOUNS = {
@@ -4306,13 +4304,13 @@ def _signals_html(sig: dict) -> str:
     )
 
 
-def _dashboard_chart(name: str) -> tuple[Path, str, str] | None:
-    """(file, page link, page title) for one of the site's own charts, from that page's newest edition."""
-    for subdir, href, title in _DASHBOARD_PAGES:
+def _dashboard_chart(name: str) -> Path | None:
+    """One of the site's own charts, from its page's newest edition."""
+    for subdir in _DASHBOARD_PAGES:
         charts, _ = get_charts(subdir)
         for chart in charts:
             if chart_key(chart.name) == name:
-                return chart, href, title
+                return chart
     return None
 
 
@@ -4325,23 +4323,16 @@ def _thread_head_html(thread: dict, number: int) -> str:
     )
 
 
-def _thread_caption_html(chart: dict, link: str | None = None, page: str | None = None) -> str:
-    """Under a thread's chart: where it is from, and the owner's note on it."""
-    if link:
-        title = ""
-        meta = ('<span class="wt-cap-src">From this dashboard</span><span class="an-dot"></span>'
-                '<span>updated with each edition</span><span class="an-dot"></span>'
-                f'<a href="{html.escape(link, quote=True)}" target="_self">Open on {_esc(page)}</a>')
+def _thread_caption_html(chart: dict) -> str:
+    """Under a thread's chart: where it is from, named in words, and the owner's note on it."""
+    if "dashboard" in chart:
+        title, source = "", "From this dashboard"
     else:
-        when = date.fromisoformat(chart["date"])
-        url = _safe_url(chart.get("url"))
         title = f'<div class="wt-cap-title">{_esc(chart.get("title"))}</div>' if chart.get("title") else ""
-        meta = (f'<span class="wt-cap-src">{_esc(chart.get("source"))}</span><span class="an-dot"></span>'
-                f'<span>{when.day} {when:%b %Y}</span>'
-                + (f'<span class="an-dot"></span><a href="{url}" target="_blank" rel="noopener">'
-                   f'Source{_NH_ARROW}</a>' if url else ""))
+        source = chart.get("source")
+    meta = f'<div class="wt-cap-meta"><span class="wt-cap-src">{_esc(source)}</span></div>' if source else ""
     note = f'<div class="wt-cap-note">{_esc(chart["note"])}</div>' if chart.get("note") else ""
-    return f'<div class="wt-cap">{title}<div class="wt-cap-meta">{meta}</div>{note}</div>'
+    return f'<div class="wt-cap">{title}{meta}{note}</div>'
 
 
 def _thread_links_html(links: list[dict]) -> str:
@@ -4372,14 +4363,11 @@ def _render_thread(thread: dict, number: int) -> None:
         shown = []
         for chart in thread.get("charts", []):
             if "dashboard" in chart:
-                found = _dashboard_chart(chart["dashboard"])
-                if found:
-                    path, href, page = found
-                    shown.append((path, _thread_caption_html(chart, f"{href}?chart={_chart_slug(path.name)}", page)))
+                path = _dashboard_chart(chart["dashboard"])
             else:
                 path = PROJECT_ROOT / "assets" / chart["image"]
-                if path.exists():
-                    shown.append((path, _thread_caption_html(chart)))
+            if path and path.exists():
+                shown.append((path, _thread_caption_html(chart)))
         for start in range(0, len(shown), 2):
             pair = shown[start:start + 2]
             columns = st.columns(2, gap="large") if len(pair) == 2 else st.columns([1, 2, 1])[1:2]

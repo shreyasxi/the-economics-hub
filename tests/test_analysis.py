@@ -99,7 +99,7 @@ def test_reading_time():
 
 THREAD_KEYS = {"theme", "why", "charts", "links"}
 DASHBOARD_CHART_KEYS = {"dashboard", "note"}
-SAVED_CHART_KEYS = {"image", "title", "source", "url", "date", "note"}
+SAVED_CHART_KEYS = {"image", "title", "source", "note"}      # the source is named, not linked
 LINK_KEYS = {"title", "source", "url", "date", "note", "paywall", "mine"}
 
 
@@ -116,8 +116,7 @@ def test_every_thread_is_complete():
             if "dashboard" in chart:
                 continue
             assert (ROOT / "assets" / chart["image"]).exists(), f"missing saved chart: {chart['image']}"
-            assert chart["url"].startswith("https://"), chart
-            date.fromisoformat(chart["date"])
+            assert chart.get("source"), f"{thread['theme']}: a saved chart names no source: {chart['image']}"
         for link in thread.get("links", []):
             assert set(link) <= LINK_KEYS, f"{thread['theme']}: unknown link field {sorted(set(link) - LINK_KEYS)}"
             assert link["url"].startswith("https://"), link

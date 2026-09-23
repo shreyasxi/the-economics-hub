@@ -141,7 +141,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     "copper_gold_ratio": {
         "dashboard": (
             "Copper/Gold Ratio & 10Y Treasury Yield",
-            "Growth expectations proxy vs. sovereign yield direction  ·  2-year window",
+            "Growth expectations proxy vs. sovereign yield direction",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
@@ -201,7 +201,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "High-Beta Stocks Are Being Abandoned",
-            "SPHB/SPLV ratio below its 26-week mean signals investors rotating to defensive equities",
+            "A falling SPHB/SPLV ratio signals investors rotating to defensive equities",
         ),
     },
     "market_breadth": {
@@ -212,7 +212,7 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "Only the Magnificent Seven Are Holding Up the Market",
-            "RSP/SPY below its 20-week average confirms the rally is concentrated, not broad-based",
+            "The equal-weight S&P 500 is at its weakest against the cap-weighted index in 20 years",
         ),
     },
     "bond_etf_returns": {
@@ -369,37 +369,37 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
             "ETH/BTC ratio breaking below its 52-week mean signals institutional capital concentrating in Bitcoin",
         ),
     },
-    "btc_gold_ratio": {
-        "dashboard": (
-            "Bitcoin Priced in Gold",
-            "Ounces of gold one bitcoin buys, weekly since 2015  ·  rising = bitcoin gaining on gold",
-        ),
-        "newsletter": (
-            # ── EDIT for each Substack issue ──────────────────────────────
-            "Bitcoin Has Stopped Gaining on Gold",
-            "A decade of ground won against the older store of value, and little of it since 2021",
-        ),
-    },
     "btc_global_m2": {
         "dashboard": (
-            "Bitcoin vs. US M2 Money Supply",
-            "BTC price (log scale, left) vs. US M2 Supply (right)  ·  Trend since 2013",
+            "Bitcoin vs. Global M2 Money Supply",
+            "BTC price (log scale, left) vs. the broad money of seven major economies in US dollars (right)",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
-            "Bitcoin vs. US Liquidity: The M2 Correlation",
-            "The expansion of US M2 remains a structural driver for crypto prices",
+            "Bitcoin vs. Global Liquidity",
+            "Every spell of shrinking global M2 in dollars since 2013 came in a bitcoin bear market",
         ),
     },
-    "btc_mvrv": {
+    "btc_mvrv_zscore": {
         "dashboard": (
-            "Bitcoin's Cycle Gauge: MVRV",
-            "Market value ÷ realised value, roughly what holders paid  ·  daily since {start}",
+            "Bitcoin MVRV Z-Score",
+            "How stretched bitcoin's price is against what holders paid  ·  every major cycle low came below zero",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "Where Bitcoin Sits in Its Cycle",
-            "MVRV compares the market price with what holders paid; past cycles topped above 3.5",
+            "The MVRV Z-score has fallen below zero at every bear-market low; its highs have come lower each cycle",
+        ),
+    },
+    "btc_zscore_global_m2": {
+        "dashboard": (
+            "Bitcoin and Global M2: When the Link Breaks",
+            "MVRV Z-score (top) and bitcoin's 12-month correlation with global M2 (bottom)",
+        ),
+        "newsletter": (
+            # ── EDIT for each Substack issue ──────────────────────────────
+            "Bitcoin Has Stopped Tracking Global Liquidity",
+            "Its correlation with global M2 has broken down as the MVRV Z-score came off its cycle high",
         ),
     },
     "move_index": {
@@ -426,6 +426,11 @@ WEEKLY_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     },
 }
 
+# Where the long-view equity ratios (market breadth and SPHB/SPLV) start:
+# early enough to take in the 2008 crisis. SPHB/SPLV starts later, at the
+# ETFs' launch in May 2011.
+LONG_VIEW_START = "2006-01-01"
+
 def get_output_dir():
     """
     Create and return the output directory for this week.
@@ -445,10 +450,12 @@ def get_output_dir():
     return out_dir
 
 
-def _turning_points(series, swing):
+def _turning_points(series, swing, log=True):
     """
     The highs and lows a series turned from by at least `swing`, measured in
     logs (0.45 is a 57% rise or a 36% fall), as [(date, value, "high"|"low")].
+    With log=False the swing is in the series' own units, for one that
+    crosses zero (a Z-score).
 
     A turn counts only once the reversal has happened, so the latest peak or
     trough is never marked while the market could still carry on past it. The
@@ -457,7 +464,9 @@ def _turning_points(series, swing):
     """
     import numpy as np
 
-    v = np.log(series.to_numpy(dtype=float))
+    v = series.to_numpy(dtype=float)
+    if log:
+        v = np.log(v)
     turns, trend, hi, lo = [], 0, 0, 0
     for i in range(1, len(v)):
         if trend >= 0:
@@ -485,6 +494,67 @@ def _mark_turns(ax, turns, color, label=lambda when, level: when.strftime("%b %Y
         ax.annotate(label(when, level), xy=(when, level), xytext=(0, 8 if high else -8),
                     textcoords="offset points", ha="center", va="bottom" if high else "top",
                     fontsize=8.5, fontweight="bold", color=EconStyle.INK, zorder=6)
+
+
+def _global_m2_weekly(fred_fetcher, start="2009-01"):
+    """
+    Global M2 in US dollar trillions, weekly on Fridays: the broad money of
+    the United States, China, the euro area, Japan, the UK, Canada and
+    Australia, each at that week's exchange rate. These are the economies in
+    the global M2 of Lyn Alden's liquidity report that the OECD publishes;
+    Russia, the eighth, is left out.
+
+    Money supply is monthly and exchange rates daily, so each economy's
+    figure is interpolated between its monthly prints and held at the latest
+    one until the next; the dollar total still moves every week with the
+    exchange rates, as the published composites do.
+    """
+    import pandas as pd
+    from data.fetchers.oecd_fetcher import fetch_broad_money
+    # FRED's H.10 rate for each currency, and whether it is quoted in dollars per unit.
+    RATES = {"CHN": ("DEXCHUS", False), "EA20": ("DEXUSEU", True), "JPN": ("DEXJPUS", False),
+             "GBR": ("DEXUSUK", True), "CAN": ("DEXCAUS", False), "AUS": ("DEXUSAL", True)}
+    money = fetch_broad_money(["USA", *RATES], start=start)
+    weeks = pd.date_range(money.index[0], datetime.now(), freq="W-FRI")
+    local = (money.reindex(money.index.union(weeks)).interpolate(method="time", limit_area="inside")
+             .reindex(weeks).ffill())
+    usd = {"USA": local["USA"]}
+    years = datetime.now().year - int(start[:4]) + 1
+    for area, (series_id, dollars_per_unit) in RATES.items():
+        rate = fred_fetcher.fetch_series(series_id, period_years=years)
+        rate.index = pd.to_datetime(rate.index)
+        if (datetime.now() - rate.index[-1]).days > 30:
+            raise ValueError(f"{series_id} has no exchange rate since {rate.index[-1]:%d %b %Y}")
+        rate = rate.resample("W-FRI").last().reindex(weeks).ffill()
+        usd[area] = local[area] * rate if dollars_per_unit else local[area] / rate
+    return pd.DataFrame(usd).dropna().sum(axis=1) / 1e12
+
+
+def _label_returns(ax, ends, decimals=0):
+    """
+    Each indexed line's change since the start ("+12%"), just right of its end.
+
+    `ends` is [{"x": last date, "y": last level on a start = 100 index,
+    "color": the line's colour}]. Labels are set in ink, joined to their line
+    by a thin leader in its colour, and spread apart where two would collide.
+    The x-axis is widened 7% to make room, without month ticks past the data.
+    """
+    import matplotlib.dates as mdates
+    from generate_macro import _spread_labels_centred
+    x0, x1 = ax.get_xlim()
+    ax.set_xlim(x0, x1 + (x1 - x0) * 0.07)
+    last = max(mdates.date2num(e["x"]) for e in ends)
+    ax.set_xticks([t for t in ax.get_xticks() if x0 <= t <= last])     # a tick outside would widen the axis
+    lo, hi = ax.get_ylim()
+    label_ys = _spread_labels_centred([e["y"] for e in ends], (hi - lo) * 0.055)
+    for e, ly in zip(ends, label_ys):
+        lx = mdates.date2num(e["x"]) + (x1 - x0) * 0.015      # just right of the end dot
+        ret = e["y"] - 100
+        ax.annotate(f"{'+' if ret >= 0 else '−'}{abs(ret):.{decimals}f}%", xy=(e["x"], e["y"]),
+                    xytext=(lx, ly), textcoords="data", va="center", ha="left", fontsize=9.5,
+                    fontweight="semibold", color=EconStyle.INK, zorder=8, annotation_clip=False,
+                    arrowprops=dict(arrowstyle="-", color=e["color"], linewidth=0.9,
+                                    shrinkA=0, shrinkB=2, relpos=(0, 0.5)))
 
 
 def _recession_bands(ax, usrec, note="Shaded: US recessions"):
@@ -732,7 +802,9 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         dates, vals = get_trend(ind_id)
         if dates:
             ind = INDICATORS[ind_id]
-            trend.add_series(ind["name"], dates, vals, color_key=ind["color_key"])
+            # "DXY", as the subtitle has it: the full name would end "(DXY) (+3.7%)".
+            trend.add_series("DXY" if ind_id == "dxy" else ind["name"], dates, vals,
+                             color_key=ind["color_key"])
     trend.render(title="Key FX Rates — Trailing 12 Months",
                  subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, USD/INR, USD/JPY",
                  source="Yahoo Finance", normalize=True, ylabel="Indexed (start = 100)")
@@ -1036,40 +1108,85 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # NOTE: USD/BRL is an ad-hoc narrative chart. Run: python custom/brazil_fx.py
 
     # ── 11. CREDIT SPREADS ──
-    print("   [11] Credit Markets — IG & HY Spreads (2-Year Trend)")
+    # ICE BofA option-adjusted spreads. Since April 2026 FRED carries only the
+    # latest three years of ICE's indices, and its archive (ALFRED) is cut the
+    # same way, so three years is as far back as this chart can go. Each of
+    # the widest points is labelled with the shock behind it: a new spike
+    # needs a line in CREDIT_EVENTS.
+    print("   [11] Credit Markets — IG & HY Spreads (3-Year Trend)")
     try:
-        ig_s = fred_fetcher.fetch_series("BAMLC0A0CM", period_years=2)
-        hy_s = fred_fetcher.fetch_series("BAMLH0A0HYM2", period_years=2)
+        ig_s = fred_fetcher.fetch_series("BAMLC0A0CM", period_years=3)
+        hy_s = fred_fetcher.fetch_series("BAMLH0A0HYM2", period_years=3)
 
         if len(ig_s) > 10 and len(hy_s) > 10:
             # FRED returns OAS in percentage points (e.g. 3.97 = 397 bps).
             # Multiply by 100 so values are in basis points for the axis labels.
-            hy_s = hy_s * 100
-            ig_s = ig_s * 100
+            hy_s = hy_s.dropna() * 100
+            ig_s = ig_s.dropna() * 100
+            hy_s.index, ig_s.index = pd.to_datetime(hy_s.index), pd.to_datetime(ig_s.index)
 
             fig, ax1 = EconStyle.create_figure(size="wide")
             ax2 = ax1.twinx()
 
             color_hy = "#DC2626"
             color_ig = "#1D4ED8"
+            HY_STRESS, IG_STRESS = 400, 150
 
-            hy_dates = hy_s.index.to_pydatetime()
-            ig_dates = ig_s.index.to_pydatetime()
+            # Each key entry carries today's reading.
+            l1, = ax1.plot(hy_s.index.to_pydatetime(), hy_s.values, color=color_hy, linewidth=2.2,
+                           label=f"HY OAS, left  {hy_s.iloc[-1]:,.0f} bps")
+            l2, = ax2.plot(ig_s.index.to_pydatetime(), ig_s.values, color=color_ig, linewidth=2.2, linestyle="--",
+                           label=f"IG OAS, right  {ig_s.iloc[-1]:,.0f} bps")
 
-            l1, = ax1.plot(hy_dates, hy_s.values, color=color_hy, linewidth=2.5, label="HY OAS")
-            l2, = ax2.plot(ig_dates, ig_s.values, color=color_ig, linewidth=2.5, linestyle="--", label="IG OAS")
+            ax1.axhline(HY_STRESS, color=color_hy, linestyle=":", linewidth=1.2, alpha=0.6)
+            ax2.axhline(IG_STRESS, color=color_ig, linestyle=":", linewidth=1.2, alpha=0.6)
 
-            ax1.axhline(400, color=color_hy, linestyle=":", linewidth=1.2, alpha=0.6)
-            ax2.axhline(150, color=color_ig, linestyle=":", linewidth=1.2, alpha=0.6)
+            # Both lines fill the same band of the chart, so their spikes line
+            # up, with room above for the labels.
+            hy_lo, hy_hi = float(hy_s.min()), float(max(hy_s.max(), HY_STRESS))
+            ig_lo, ig_hi = float(ig_s.min()), float(max(ig_s.max(), IG_STRESS))
+            ax1.set_ylim(hy_lo - (hy_hi - hy_lo) * 0.15, hy_hi + (hy_hi - hy_lo) * 0.38)
+            ax2.set_ylim(ig_lo - (ig_hi - ig_lo) * 0.15, ig_hi + (ig_hi - ig_lo) * 0.38)
+
+            # The shock behind each of the widest points, by the month the
+            # high-yield spread peaked in; each is marked at the widest reading
+            # within three weeks of that month.
+            CREDIT_EVENTS = {
+                "2023-10": "10-year Treasury yield hits 5%",
+                "2024-08": "Yen carry-trade unwind",
+                "2025-04": "US tariff shock",
+                "2026-03": "Iran war and oil spike",
+            }
+            first, span = hy_s.index[0], hy_s.index[-1] - hy_s.index[0]
+            for month, event in CREDIT_EVENTS.items():
+                start = pd.Timestamp(month)
+                near = hy_s[start - pd.Timedelta(weeks=3): start + pd.offsets.MonthEnd(0) + pd.Timedelta(weeks=3)]
+                if near.empty:
+                    continue                                    # older than the three years FRED keeps
+                when, peak = near.idxmax(), float(near.max())
+                if when - first < pd.Timedelta(weeks=2):
+                    continue                                    # the peak itself has rolled off the start
+                place = (when - first) / span
+                ha = "left" if place < 0.08 else "right" if place > 0.92 else "center"
+                ax1.plot(when, peak, "o", ms=5, color=color_hy, mec="white", mew=1.2, zorder=6)
+                ax1.annotate(f"{event}\n{peak:,.0f} bps", xy=(when, peak), xytext=(0, 7),
+                             textcoords="offset points", ha=ha, va="bottom", fontsize=8.5,
+                             fontweight="bold", color=EconStyle.INK, linespacing=1.25, zorder=6)
 
             ax1.set_ylabel("HY OAS (bps)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color=color_hy)
             ax2.set_ylabel("IG OAS (bps)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color=color_ig)
 
+            # One set of gridlines, the high-yield axis's.
+            ax1.grid(axis="x", visible=False)
             ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax1.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+            ax2.grid(False)
+            ax1.margins(x=0.01)
+            ax1.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 5, 9)))
             ax1.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-            ax1.spines['top'].set_visible(False)
-            ax2.spines['top'].set_visible(False)
+            for ax in (ax1, ax2):
+                ax.tick_params(axis="y", length=0)
+                for sp in ('top', 'left', 'right'):
+                    ax.spines[sp].set_visible(False)
 
             ax1.legend(handles=[l1, l2], loc="upper right", frameon=False, fontsize=10)
 
@@ -1281,8 +1398,13 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # ── 15b. DEFENSIVES VS CYCLICALS ──
     # Risk appetite read from where money actually sits inside the index, which
     # no rate move can distort. Complements SPHB/SPLV rather than repeating it.
+    # Two years, unlike the long-view ratios beside it: over twenty years this
+    # ratio mostly measures technology's long run, which buries the rotation
+    # signal the chart is for. Each basket is equal-weighted and rebalanced
+    # daily, the mean of its members' daily returns.
     print("   [15b] Defensives vs Cyclicals (2-Year Trend)")
     try:
+        from generate_macro import _end_dot
         DEFENSIVE = {"XLP": "Staples", "XLU": "Utilities", "XLV": "Healthcare"}
         CYCLICAL = {"XLY": "Discretionary", "XLK": "Technology", "XLI": "Industrials"}
         legs = {t: yf_fetcher.get_close_series(t, period="2y") for t in {**DEFENSIVE, **CYCLICAL}}
@@ -1291,27 +1413,30 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             raise ValueError(f"no price history for {', '.join(missing)}")
 
         prices = pd.concat(legs, axis=1).dropna()
-        rebased = prices / prices.iloc[0] * 100
-        ratio_s = (rebased[list(DEFENSIVE)].mean(axis=1) / rebased[list(CYCLICAL)].mean(axis=1) * 100).dropna()
-        mean_26w = ratio_s.rolling(130).mean()
+        daily = prices.pct_change().fillna(0)
+        def basket(tickers):
+            return (1 + daily[tickers].mean(axis=1)).cumprod()
+        ratio_s = basket(list(DEFENSIVE)) / basket(list(CYCLICAL)) * 100
+        mean_26w = ratio_s.rolling(130).mean()          # ~26 weeks of trading days
 
         fig, ax = EconStyle.create_figure(size="wide")
+        color = "#C8620A"
         r_dates = ratio_s.index.to_pydatetime()
-        ax.plot(r_dates, ratio_s.values, color="#C8620A", linewidth=2.5, label="Defensives / cyclicals")
+        ax.plot(r_dates, ratio_s.values, color=color, linewidth=2.5, label="Defensives / cyclicals")
         ax.plot(mean_26w.index.to_pydatetime(), mean_26w.values, color="#6B7280",
                 linewidth=1.5, linestyle="--", label="26-Week Mean")
         ax.axhline(100, color="#1A1A1A", linewidth=1.1, zorder=5)
+        _end_dot(ax, r_dates[-1], float(ratio_s.iloc[-1]), color, zorder=7, size=26)
 
-        ax.annotate(f"{ratio_s.iloc[-1]:.1f}", xy=(r_dates[-1], float(ratio_s.iloc[-1])),
-                    xytext=(8, 0), textcoords="offset points", va="center", ha="left",
-                    fontsize=11, fontweight="bold", color="#C8620A", annotation_clip=False)
         ax.set_ylabel("Index (both baskets = 100 two years ago)", fontsize=EconStyle.FONT_SIZE_AXIS,
                       fontweight="bold", color="#1C1C1E")
         ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax.grid(axis="x", visible=False)
         ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
         for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-        ax.legend(frameon=False, fontsize=10, loc="upper left")
+        ax.legend(frameon=False, fontsize=10, loc="lower left")
+        _label_returns(ax, [{"x": r_dates[-1], "y": float(ratio_s.iloc[-1]), "color": color}], decimals=1)
 
         _t, _s = WEEKLY_TITLES["defensives_cyclicals"][mode]
         EconStyle.set_title(ax, _t, _s)
@@ -1323,69 +1448,88 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         print(f"   ⚠ Defensives vs cyclicals failed: {e}")
 
     # ── 16. SPHB/SPLV RISK APPETITE ──
-    print("   [16] SPHB/SPLV — High Beta vs Low Vol (2-Year Trend)")
+    # Invesco's high-beta and low-volatility S&P 500 ETFs, weekly from their
+    # launch in May 2011: as far back as the pair goes, since Yahoo does not
+    # carry the S&P indices behind them.
+    print("   [16] SPHB/SPLV — High Beta vs Low Vol (since 2011)")
     try:
-        sphb_s = yf_fetcher.get_close_series("SPHB", period="2y")
-        splv_s = yf_fetcher.get_close_series("SPLV", period="2y")
+        from generate_macro import _end_dot
+        sphb_s = yf_fetcher.get_close_series("SPHB", period="max")
+        splv_s = yf_fetcher.get_close_series("SPLV", period="max")
 
         if len(sphb_s) > 50 and len(splv_s) > 50:
-            ratio_s  = (sphb_s / splv_s).dropna()
-            mean_26w = ratio_s.rolling(130).mean()   # ~26 weeks (130 trading days)
+            both = pd.concat({"hb": sphb_s, "lv": splv_s}, axis=1).dropna()
+            both.index = both.index.tz_localize(None)
+            both = both[both.index >= LONG_VIEW_START]
+            ratio_s = (both["hb"] / both["lv"]).resample("W-FRI").last().dropna()
+            ratio_s = ratio_s / ratio_s.iloc[0] * 100
 
             fig, ax = EconStyle.create_figure(size="wide")
             color_line = "#7C3AED"
             r_dates = ratio_s.index.to_pydatetime()
+            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.0, zorder=4)
+            ax.axhline(100, color="#1A1A1A", linewidth=1.1, zorder=5)
+            _end_dot(ax, r_dates[-1], float(ratio_s.iloc[-1]), color_line, zorder=7, size=26)
 
-            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="SPHB/SPLV Ratio")
-            ax.plot(mean_26w.index.to_pydatetime(), mean_26w.values, color="#6B7280",
-                    linewidth=1.5, linestyle="--", label="26-Week Mean")
-
-            ax.set_ylabel("SPHB / SPLV Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.set_ylabel(f"SPHB ÷ SPLV, {both.index[0]:%b %Y} = 100", fontsize=EconStyle.FONT_SIZE_AXIS,
+                          fontweight="bold", color="#1C1C1E")
             ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax.grid(axis="x", visible=False)
+            ax.margins(x=0.01)
+            ax.xaxis.set_major_locator(mdates.YearLocator(2))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
             for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-            ax.legend(frameon=False, fontsize=10)
+            _label_returns(ax, [{"x": r_dates[-1], "y": float(ratio_s.iloc[-1]), "color": color_line}])
+            _recession_bands(ax, fred_fetcher.fetch_series("USREC", period_years=25))
 
             _t, _s = WEEKLY_TITLES["risk_appetite_ratio"][mode]
             EconStyle.set_title(ax, _t, _s)
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (Invesco ETFs)")
+            EconStyle.add_source(fig, "Yahoo Finance (Invesco ETFs) · recession dates NBER via FRED")
             EconStyle.save_chart(fig, output_dir / "16_risk_appetite_ratio.png")
     except Exception as e:
         print(f"   ⚠ SPHB/SPLV ratio failed: {e}")
 
     # ── 17. MARKET BREADTH (RSP/SPY) ──
-    print("   [17] Market Breadth — RSP/SPY Equal vs Cap-Weight (2-Year Trend)")
+    # Equal weight against cap weight, weekly since LONG_VIEW_START (RSP has
+    # traded since 2003), indexed to 100 at the start.
+    print("   [17] Market Breadth — RSP/SPY Equal vs Cap-Weight (since 2006)")
     try:
-        rsp_s  = yf_fetcher.get_close_series("RSP", period="2y")
-        spy2_s = yf_fetcher.get_close_series("SPY", period="2y")
+        from generate_macro import _end_dot
+        rsp_s  = yf_fetcher.get_close_series("RSP", period="max")
+        spy2_s = yf_fetcher.get_close_series("SPY", period="max")
 
         if len(rsp_s) > 50 and len(spy2_s) > 50:
-            ratio_s = (rsp_s / spy2_s).dropna()
-            ma20w   = ratio_s.rolling(100).mean()   # ~20 weeks (100 trading days)
+            both = pd.concat({"rsp": rsp_s, "spy": spy2_s}, axis=1).dropna()
+            both.index = both.index.tz_localize(None)
+            both = both[both.index >= LONG_VIEW_START]
+            ratio_s = (both["rsp"] / both["spy"]).resample("W-FRI").last().dropna()
+            ratio_s = ratio_s / ratio_s.iloc[0] * 100
 
             fig, ax = EconStyle.create_figure(size="wide")
             color_line = "#0F766E"
             r_dates = ratio_s.index.to_pydatetime()
+            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.0, zorder=4)
+            ax.axhline(100, color="#1A1A1A", linewidth=1.1, zorder=5)
+            _end_dot(ax, r_dates[-1], float(ratio_s.iloc[-1]), color_line, zorder=7, size=26)
 
-            ax.plot(r_dates, ratio_s.values, color=color_line, linewidth=2.5, label="RSP/SPY Ratio")
-            ax.plot(ma20w.index.to_pydatetime(), ma20w.values, color="#6B7280",
-                    linewidth=1.5, linestyle="--", label="20-Week Moving Average")
-
-            ax.set_ylabel("RSP / SPY Ratio", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+            ax.set_ylabel(f"RSP ÷ SPY, {both.index[0]:%b %Y} = 100", fontsize=EconStyle.FONT_SIZE_AXIS,
+                          fontweight="bold", color="#1C1C1E")
             ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+            ax.grid(axis="x", visible=False)
+            ax.margins(x=0.01)
+            ax.xaxis.set_major_locator(mdates.YearLocator(2))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
             for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-            ax.legend(frameon=False, fontsize=10)
+            _label_returns(ax, [{"x": r_dates[-1], "y": float(ratio_s.iloc[-1]), "color": color_line}])
+            _recession_bands(ax, fred_fetcher.fetch_series("USREC", period_years=25))
 
             _t, _s = WEEKLY_TITLES["market_breadth"][mode]
             EconStyle.set_title(ax, _t, _s)
             EconStyle.add_top_rule(ax)
             fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance (Invesco · SPDR ETFs)")
+            EconStyle.add_source(fig, "Yahoo Finance (Invesco · SPDR ETFs) · recession dates NBER via FRED")
             EconStyle.save_chart(fig, output_dir / "17_market_breadth.png")
     except Exception as e:
         print(f"   ⚠ Market breadth failed: {e}")
@@ -1399,18 +1543,20 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             "HYG": ("#DC2626", "HYG — High Yield"),
         }
 
+        from generate_macro import _end_dot
         fig, ax = EconStyle.create_figure(size="wide")
-        any_plotted = False
+        ends = []
 
         for ticker, (color, label) in BOND_ETFS.items():
             sr = yf_fetcher.get_close_series(ticker, period="1y")
             if len(sr) > 20:
                 indexed = (sr / sr.iloc[0]) * 100
-                ax.plot(indexed.index.to_pydatetime(), indexed.values,
-                        color=color, linewidth=2.5, label=label)
-                any_plotted = True
+                x = indexed.index.to_pydatetime()
+                ax.plot(x, indexed.values, color=color, linewidth=2.5, label=label)
+                _end_dot(ax, x[-1], indexed.iloc[-1], color, zorder=7)
+                ends.append({"x": x[-1], "y": float(indexed.iloc[-1]), "color": color})
 
-        if any_plotted:
+        if ends:
             ax.axhline(100, color="#6B7280", linestyle="--", linewidth=1.2, alpha=0.7)
             ax.set_ylabel("Total Return (Indexed to 100)", fontsize=EconStyle.FONT_SIZE_AXIS,
                           fontweight="bold", color="#1C1C1E")
@@ -1419,6 +1565,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
             for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
             ax.legend(frameon=False, fontsize=10)
+            _label_returns(ax, ends, decimals=1)      # bond returns are single digits: keep the decimal
 
             _t, _s = WEEKLY_TITLES["bond_etf_returns"][mode]
             EconStyle.set_title(ax, _t, _s)
@@ -1600,7 +1747,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     # A legend names the lines; each line's 12-month return sits at its end.
     print("   [22] India vs EM Peers — Indexed 1-Year Trend")
     try:
-        from generate_macro import _draw_line, _end_dot, _spread_labels_centred
+        from generate_macro import _draw_line, _end_dot
         EM_PEERS = {
             "INDA": ("India (INDA)",         EconStyle.LINE_ORANGE, 3.0),
             "EEM":  ("EM benchmark (EEM)",   "#6B7280",             2.0),
@@ -1634,22 +1781,7 @@ def generate_with_live_data(output_dir, mode="dashboard"):
             for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
             ax.legend(frameon=False, fontsize=9.5, loc="upper left", ncol=2,
                       handlelength=1.8, columnspacing=1.6)
-
-            # Room on the right for the returns, then place them apart from each other.
-            x0, x1 = ax.get_xlim()
-            ax.set_xlim(x0, x1 + (x1 - x0) * 0.07)
-            last = max(mdates.date2num(e["x"]) for e in ends)
-            ax.set_xticks([t for t in ax.get_xticks() if t <= last])   # no month ticks past the data
-            lo, hi = ax.get_ylim()
-            label_ys = _spread_labels_centred([e["y"] for e in ends], (hi - lo) * 0.055)
-            for e, ly in zip(ends, label_ys):
-                lx = mdates.date2num(e["x"]) + (x1 - x0) * 0.015      # just right of the end dot
-                ret = e["y"] - 100
-                ax.annotate(f"{'+' if ret >= 0 else '−'}{abs(ret):.0f}%", xy=(e["x"], e["y"]), xytext=(lx, ly),
-                            textcoords="data", va="center", ha="left", fontsize=9.5,
-                            fontweight="semibold", color=EconStyle.INK, zorder=8, annotation_clip=False,
-                            arrowprops=dict(arrowstyle="-", color=e["color"], linewidth=0.9,
-                                            shrinkA=0, shrinkB=2, relpos=(0, 0.5)))
+            _label_returns(ax, ends)
 
             _t, _s = WEEKLY_TITLES["india_vs_em"][mode]
             EconStyle.set_title(ax, _t, _s)
@@ -2268,223 +2400,333 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ ETH/BTC ratio failed: {e}")
 
-    # ── 27. BITCOIN PRICED IN GOLD ──
-    # How many ounces of gold one bitcoin buys. The chart used to run two years
-    # against a 52-week mean, which showed a wiggle rather than the relationship:
-    # over a decade bitcoin went from a quarter of an ounce to tens of ounces,
-    # and then stopped gaining on gold. Bitcoin's price comes from Coin Metrics,
-    # the same source as the MVRV chart, because Yahoo's BTC-USD only starts in
-    # Sep 2014; gold is the futures contract, the only long series Yahoo carries.
-    print("   [27] Bitcoin Priced in Gold (since 2015)")
+    # ── 28. BITCOIN VS GLOBAL M2 ──
+    # Bitcoin against the broad money of seven major economies in dollars
+    # (_global_m2_weekly), since 2013. The price is Coin Metrics', as Yahoo's
+    # BTC-USD starts only in September 2014. Shaded: each spell of two months
+    # or more with global M2 below its level a year earlier. There have been
+    # three (2015, early 2019, 2022–23), all when a strong dollar shrank the
+    # non-US money in dollar terms (at fixed exchange rates it grew 5–8% a
+    # year throughout), and all with bitcoin in a bear market. Coin Metrics
+    # and global M2 are fetched once, here, and reused by charts 29 and 30.
+    print("   [28] Bitcoin vs. Global M2 (since 2013)")
+    cm = gm2 = None
     try:
         import pandas as pd
         import matplotlib.ticker as mticker
-        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv
-        btc_cm = fetch_btc_mvrv()
-        gold_s = yf_fetcher.get_close_series("GC=F", period="max")
-        gold_s.index = pd.to_datetime(gold_s.index).tz_localize(None)
-        gold_s = pd.to_numeric(gold_s, errors="coerce")
+        from generate_macro import _end_dot
+        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv, mvrv_zscore
+        cm = fetch_btc_mvrv()
+        cm["z"] = mvrv_zscore(cm)
+        gm2 = _global_m2_weekly(fred_fetcher)
+        btc = cm["price"][cm.index >= "2013-01-01"].dropna()
+        m2 = gm2[gm2.index >= "2013-01-01"]
+        if len(btc) < 3000 or len(m2) < 500:
+            raise ValueError(f"only {len(btc)} days of price and {len(m2)} weeks of global M2")
 
-        pair = pd.DataFrame({"btc": btc_cm["price"], "gold": gold_s}).dropna().sort_index()
-        # Weekly closes: eleven years of daily readings draw as a band, not a line.
-        oz_s = (pair["btc"] / pair["gold"]).resample("W-FRI").last().dropna()
-        oz_s = oz_s[oz_s.index >= "2015-01-01"]
-        if len(oz_s) < 400:
-            raise ValueError("no long bitcoin/gold history")
+        # Weeks with global M2 below a year earlier, joined across gaps of
+        # under eight weeks; spells shorter than eight weeks are left out.
+        spells = []
+        for week in m2.index[m2.pct_change(52) < 0]:
+            if spells and (week - spells[-1][1]).days < 56:
+                spells[-1][1] = week
+            else:
+                spells.append([week, week])
+        spells = [(a, b) for a, b in spells if (b - a).days >= 56]
 
-        fig, ax = EconStyle.create_figure(size="wide")
-        color = "#F59E0B"
-        ax.axhline(1, color=EconStyle.INK_MUTED, linewidth=1, linestyle="--", alpha=0.6, zorder=2)
-        ax.annotate("1 bitcoin = 1 ounce", xy=(oz_s.index[0], 1), xytext=(4, 5),
-                    textcoords="offset points", ha="left", va="bottom",
-                    fontsize=8.5, color=EconStyle.INK_MUTED, zorder=6)
-        ax.plot(oz_s.index.to_pydatetime(), oz_s.values, color=color, linewidth=2.5, zorder=4)
-        _mark_turns(ax, _turning_points(oz_s, 0.9), color,
-                    label=lambda when, level: f"{level:,.1f}" if level < 10 else f"{level:,.0f}")
+        c_btc, c_m2 = "#F59E0B", "#1D4ED8"
+        fig, ax1 = EconStyle.create_figure(size="wide")
+        ax2 = ax1.twinx()
+        for a, b in spells:
+            ax1.axvspan(a, b, color="#4B5563", alpha=0.12, lw=0, zorder=0)
+        ax1.plot(btc.index.to_pydatetime(), btc.values, color=c_btc, linewidth=1.8, zorder=3)
+        ax2.plot(m2.index.to_pydatetime(), m2.values, color=c_m2, linewidth=2.2, linestyle="--",
+                 alpha=0.85, zorder=3)
+        _end_dot(ax1, btc.index[-1].to_pydatetime(), float(btc.iloc[-1]), c_btc, zorder=7, size=26)
+        _end_dot(ax2, m2.index[-1].to_pydatetime(), float(m2.iloc[-1]), c_m2, zorder=7, size=26)
+        if spells:
+            ax1.annotate("Shaded: global M2 below its level a year earlier", xy=(0.99, 0.03),
+                         xycoords="axes fraction", ha="right", va="bottom", fontsize=8.5,
+                         color=EconStyle.INK_MUTED, zorder=6)
 
-        latest = float(oz_s.iloc[-1])
-        ax.annotate(f"{latest:,.1f}", xy=(oz_s.index[-1], latest), xytext=(8, 0),
-                    textcoords="offset points", va="center", ha="left", fontsize=11,
-                    fontweight="bold", color=color, annotation_clip=False)
-        peak, peak_when = float(oz_s.max()), oz_s.idxmax()
-        ax.annotate(f"Peak {peak:,.0f} oz in {peak_when:%b %Y}  ·  {(1 - latest / peak) * 100:.0f}% below it now",
-                    xy=(0.01, 0.95), xycoords="axes fraction", ha="left", va="top",
-                    fontsize=9.5, fontweight="bold", color=color)
-
-        ax.set_yscale("log")
-        ax.set_ylim(oz_s.min() / 1.3, peak * 1.9)           # room for the labels above the peaks
-        ax.yaxis.set_major_locator(mticker.FixedLocator([0.25, 0.5, 1, 2, 5, 10, 20, 40]))
-        ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f"{y:g}"))
-        ax.yaxis.set_minor_locator(mticker.NullLocator())
-        ax.set_ylabel("Ounces of gold per bitcoin, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
-                      fontweight="bold", color="#1C1C1E")
-        ax.margins(x=0.01)
-        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-        ax.xaxis.set_major_locator(mdates.YearLocator(2))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-        for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
-
-        _t, _s = WEEKLY_TITLES["btc_gold_ratio"][mode]
-        EconStyle.set_title(ax, _t, _s)
-        EconStyle.add_top_rule(ax)
-        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-        EconStyle.add_source(fig, "Coin Metrics Community API (bitcoin), Yahoo Finance (gold)")
-        EconStyle.save_chart(fig, output_dir / "27_btc_gold_ratio.png")
-    except Exception as e:
-        btc_cm = None
-        print(f"   ⚠ Bitcoin priced in gold failed: {e}")
-    # ── 28. BTC VS US LIQUIDITY (M2 MONEY SUPPLY - SINCE 2013) ──
-    print("   [28] Bitcoin vs. US Liquidity (M2 Money Supply - Since 2013)")
-    try:
-        import pandas as pd
-        import matplotlib.ticker as ticker
-        
-        # Fetch max history to go back to 2013
-        btc_s  = yf_fetcher.get_close_series("BTC-USD", period="max")
-        m2_s = fred_fetcher.fetch_series("M2SL", period_years=15)
-
-        if len(btc_s) > 50 and len(m2_s) > 5:
-            # ── Safe Timezone Stripping ──
-            btc_s.index = pd.to_datetime(btc_s.index)
-            if btc_s.index.tz is not None:
-                btc_s.index = btc_s.index.tz_localize(None)
-                
-            m2_s.index = pd.to_datetime(m2_s.index)
-            if m2_s.index.tz is not None:
-                m2_s.index = m2_s.index.tz_localize(None)
-
-            # Filter both to start from Jan 1, 2013
-            btc_s = btc_s[btc_s.index >= "2013-01-01"]
-            m2_s = m2_s[m2_s.index >= "2013-01-01"]
-
-            m2_usd_t = (m2_s / 1e3).dropna()
-
-            # ── THE FIX: Time-based Interpolation for Smoothing ──
-            # Combine indexes so we don't lose the exact monthly M2 dates
-            combined_idx = btc_s.index.union(m2_usd_t.index).sort_values()
-
-            # Reindex M2 to the combined timeline and interpolate the gaps mathematically
-            m2_smooth = m2_usd_t.reindex(combined_idx).interpolate(method="time")
-
-            # Now filter back down to only the days Bitcoin actually traded
-            m2_aligned = m2_smooth.reindex(btc_s.index).dropna()
-            btc_aligned = btc_s.reindex(m2_aligned.index).dropna()
-
-            fig, ax1 = EconStyle.create_figure(size="wide")
-            ax2 = ax1.twinx()
-
-            color_btc = "#F59E0B"
-            color_m2  = "#1D4ED8"
-
-            l1, = ax1.plot(btc_aligned.index.to_pydatetime(), btc_aligned.values,
-                           color=color_btc, linewidth=2.0, label="Bitcoin (USD)")
-            l2, = ax2.plot(m2_aligned.index.to_pydatetime(), m2_aligned.values,
-                           color=color_m2, linewidth=2.5, linestyle="--", alpha=0.8,
-                           label="US M2 Supply (Trillions)")
-
-            # ── Mandatory Log Scale for 10+ Year Bitcoin Data ──
-            ax1.set_yscale("log")
-            # Format the log axis to show standard numbers (e.g., 10,000) instead of scientific notation (10^4)
-            ax1.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: f"{y:,.0f}"))
-
-            ax1.set_ylabel("Bitcoin Price (USD, Log Scale)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                           fontweight="bold", color=color_btc)
-            ax2.set_ylabel("US M2 Supply ($ Trillions)", fontsize=EconStyle.FONT_SIZE_AXIS,
-                           fontweight="bold", color=color_m2)
-
-            ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            
-            # Format X-Axis for a decade-long view
-            ax1.xaxis.set_major_locator(mdates.YearLocator())
-            ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-            
-            ax1.spines['top'].set_visible(False)
-            ax2.spines['top'].set_visible(False)
-            
-            ax1.legend(handles=[l1, l2], loc="upper left", frameon=False, fontsize=10)
-
-            _t, _s = WEEKLY_TITLES["btc_global_m2"][mode]
-            EconStyle.set_title(ax1, _t, _s)
-            EconStyle.add_top_rule(ax1)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance · FRED (M2SL)")
-            EconStyle.save_chart(fig, output_dir / "28_btc_global_m2.png")
-    except Exception as e:
-        print(f"   ⚠ BTC vs US M2 Liquidity failed: {e}")
-
-    # ── 29. BITCOIN MVRV ──
-    # Where bitcoin sits in its own cycle: the market price against what
-    # holders paid for their coins. From Coin Metrics' free API; Glassnode's
-    # needs a paid plan. The series starts in Jul 2010, but its first months
-    # read up to 146 only because so few coins had changed hands, so the chart
-    # starts in 2011. Above 3.5 was long read as a cycle top, but each cycle
-    # has peaked lower (7.7 in 2011, 4.0 in 2021) and the price tops of Nov
-    # 2021 and 2025 came below 3, so the chart dates the last reading above it
-    # and marks every cycle's peak rather than promising the line still holds.
-    # Below 1, the market prices coins under what holders paid on average.
-    print("   [29] Bitcoin MVRV (since 2011)")
-    try:
-        import matplotlib.ticker as mticker
-        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv
-        cm = btc_cm if btc_cm is not None else fetch_btc_mvrv()   # already fetched for chart 27
-        cm = cm[cm.index >= "2011-01-01"]
-        HOT, COLD = 3.5, 1.0
-
-        fig, (ax1, ax2) = EconStyle.create_figure(
-            size="wide", nrows=2, sharex=True,
-            gridspec_kw={"height_ratios": [1, 1.15], "hspace": 0.12})
-        m_dates = cm.index.to_pydatetime()
-        c_price, c_mvrv = "#F59E0B", "#003366"
-
-        ax1.plot(m_dates, cm["price"].values, color=c_price, linewidth=2.5, zorder=4)
         ax1.set_yscale("log")
-        ax1.yaxis.set_major_locator(mticker.FixedLocator([1, 100, 10_000, 1_000_000]))
-        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f"${y:,.0f}"))
+        ax1.yaxis.set_major_locator(mticker.LogLocator(base=10))
+        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(
+            lambda v, _: f"${v / 1000:,.0f}k" if v >= 1000 else f"${v:,.0f}"))
         ax1.yaxis.set_minor_locator(mticker.NullLocator())
-        ax1.set_ylabel("Price, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
+        ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"${v:,.0f}tn"))
+        ax1.set_ylabel("Bitcoin price, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
                        fontweight="bold", color="#1C1C1E")
-        price = float(cm["price"].iloc[-1])
-        ax1.annotate(f"${price / 1000:,.1f}k" if price >= 1000 else f"${price:,.0f}",
-                     xy=(m_dates[-1], price), xytext=(8, 0), textcoords="offset points",
-                     va="center", ha="left", fontsize=11, fontweight="bold", color=c_price,
-                     annotation_clip=False)
+        ax2.set_ylabel("Global M2, US dollars", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold",
+                       color="#1C1C1E", rotation=270, labelpad=14)
+        # One set of gridlines, bitcoin's: a second set for global M2 would not line up with it.
+        ax2.grid(False)
+        ax1.grid(axis="x", visible=False)
+        ax1.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax1.margins(x=0.01)
+        ax1.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for ax in (ax1, ax2):
+            ax.tick_params(axis="y", length=0)
+            for sp in ['top', 'right', 'left']:
+                ax.spines[sp].set_visible(False)
 
-        top = max(9.0, float(cm["mvrv"].max()) * 1.18)             # room for the peak labels
-        ax2.axhspan(HOT, top, color="#9B1C31", alpha=0.10, lw=0, zorder=0)
-        ax2.axhspan(0, COLD, color="#0B8F82", alpha=0.12, lw=0, zorder=0)
-        ax2.plot(m_dates, cm["mvrv"].values, color=c_mvrv, linewidth=2.5, zorder=4)
-        # Every high the ratio then more than halved from: each cycle's peak,
-        # and the mid-cycle highs that fell as far.
-        peaks = [t for t in _turning_points(cm["mvrv"], 0.9) if t[2] == "high"]
-        _mark_turns(ax2, peaks, c_mvrv, label=lambda when, level: f"{level:.1f}")
-        mvrv = float(cm["mvrv"].iloc[-1])
-        ax2.annotate(f"{mvrv:.2f}", xy=(m_dates[-1], mvrv), xytext=(8, 0),
-                     textcoords="offset points", va="center", ha="left", fontsize=11,
-                     fontweight="bold", color=c_mvrv, annotation_clip=False)
-        last_hot = cm.index[cm["mvrv"] > HOT].max()
-        ax2.annotate(f"Above {HOT:g}: last reached {last_hot:%b %Y}", xy=(0.99, 0.95),
-                     xycoords="axes fraction", ha="right", va="top",
-                     fontsize=9, fontweight="bold", color="#9B1C31")
-        ax2.annotate(f"Below {COLD:g}: the average holder is at a loss", xy=(0.99, COLD / 2),
-                     xycoords=("axes fraction", "data"), ha="right", va="center",
-                     fontsize=9, fontweight="bold", color="#0B8F82")
-        ax2.set_ylim(0, top)
-        ax2.set_ylabel("MVRV", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+        # Each entry carries today's reading.
+        handles = [
+            plt.Line2D([], [], color=c_btc, linewidth=2, label=f"Bitcoin, left axis  ${btc.iloc[-1]:,.0f}"),
+            plt.Line2D([], [], color=c_m2, linewidth=2, linestyle="--",
+                       label=f"Global M2, right axis  ${m2.iloc[-1]:,.1f}tn"),
+        ]
+        ax1.legend(handles=handles, loc="upper left", frameon=False, fontsize=9.5)
+
+        _t, _s = WEEKLY_TITLES["btc_global_m2"][mode]
+        EconStyle.set_title(ax1, _t, _s)
+        EconStyle.add_top_rule(ax1)
+        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
+        EconStyle.add_source(fig, "Coin Metrics  ·  OECD broad money of 7 economies in US dollars (FRED exchange rates)")
+        EconStyle.save_chart(fig, output_dir / "28_btc_global_m2.png")
+    except Exception as e:
+        print(f"   ⚠ Bitcoin vs. global M2 failed: {e}")
+
+    # ── 29. BITCOIN MVRV Z-SCORE ──
+    # Where bitcoin sits in its own cycle: market value against realised value,
+    # roughly what holders paid for their coins, and the Z-score of the gap,
+    # (market value − realised value) ÷ the spread of market value to date.
+    # From Coin Metrics' free API, which carries MVRV but not realised value,
+    # so realised value is derived from the two (see coinmetrics_fetcher).
+    # Two y-axes, as the metric is always drawn: dollars on a log scale (left)
+    # and the Z-score (right). Above 7 (red) marked the tops up to early 2021;
+    # below 0 (green), market value is under realised value, which has marked
+    # every bear-market low. Each cycle has peaked lower (10.7 in 2013, 7.2 in
+    # 2021, 3.4 in 2024), so the peaks are labelled and the last reading in
+    # the red band is dated, rather than the band promising a top.
+    print("   [29] Bitcoin MVRV Z-Score (since 2011)")
+    try:
+        import pandas as pd
+        import matplotlib.ticker as mticker
+        from matplotlib.patches import Rectangle
+        from matplotlib.transforms import blended_transform_factory
+        from generate_macro import _end_dot
+        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv, mvrv_zscore
+        if cm is None:                                  # chart 28 could not fetch it
+            cm = fetch_btc_mvrv()
+            cm["z"] = mvrv_zscore(cm)
+        d = cm[cm.index >= "2011-01-01"]
+        HOT, COLD = 7.0, 0.0
+        # Validated as a set, every pair, since the lines cross: violet, blue, orange.
+        c_mv, c_rv, c_z = "#4A3AA7", "#2A78D6", EconStyle.LINE_ORANGE
+        RED, GREEN = "#E34948", "#22A06B"
+
+        def usd(v, _=None):
+            for size, unit in ((1e12, "tn"), (1e9, "bn"), (1e6, "m")):
+                if v >= size:
+                    n = v / size
+                    return f"${n:,.{0 if n >= 100 or n == round(n) else 2}f}{unit}"
+            return f"${v:,.0f}"
+
+        fig, ax1 = EconStyle.create_figure(size=(EconStyle.SIZE_WIDE[0], 5.4))
+        ax2 = ax1.twinx()
+        x = d.index.to_pydatetime()
+
+        # The bands belong to the Z-score but sit on the dollar axes, behind
+        # every line, so the market-value lines are never tinted by them.
+        z_top = max(HOT + 3, float(d["z"].max()) * 1.18)       # room for the peak labels
+        z_bot = -2.6                                           # room for the lows' labels
+        ax2.set_ylim(z_bot, z_top)
+        on_z = blended_transform_factory(ax1.transAxes, ax2.transData)
+        ax1.add_patch(Rectangle((0, HOT), 1, z_top - HOT, transform=on_z, color=RED, alpha=0.10, lw=0, zorder=0))
+        ax1.add_patch(Rectangle((0, z_bot), 1, COLD - z_bot, transform=on_z, color=GREEN, alpha=0.13, lw=0, zorder=0))
+
+        ax1.plot(x, d["mcap"].values, color=c_mv, linewidth=1.5, zorder=3)
+        ax1.plot(x, d["rcap"].values, color=c_rv, linewidth=1.5, zorder=3)
+        ax2.plot(x, d["z"].values, color=c_z, linewidth=1.8, zorder=4)
+        for ax, col, val in ((ax1, c_mv, d["mcap"].iloc[-1]), (ax1, c_rv, d["rcap"].iloc[-1]),
+                             (ax2, c_z, d["z"].iloc[-1])):
+            _end_dot(ax, x[-1], val, col, zorder=7, size=26)
+
+        # Each cycle's peak, labelled with its value: the turns the weekly
+        # Z-score fell at least 3 from, each placed on the highest day within
+        # six weeks of it (a daily peak can fall between two weekly closes).
+        z_week = d["z"].resample("W-FRI").last().dropna()
+        for when, _, kind in _turning_points(z_week, 3.0, log=False):
+            if kind != "high":
+                continue
+            near = d["z"][when - pd.Timedelta(weeks=6): when + pd.Timedelta(weeks=6)]
+            peak_day, peak = near.idxmax(), float(near.max())
+            ax2.plot(peak_day, peak, "o", ms=5, color=c_z, mec="white", mew=1.2, zorder=6)
+            ax2.annotate(f"{peak:.1f}", xy=(peak_day, peak), xytext=(0, 7), textcoords="offset points",
+                         ha="center", va="bottom", fontsize=8.5, fontweight="bold", color=EconStyle.INK, zorder=6)
+
+        # Every spell below zero, dated at its lowest day (spells under six
+        # months apart count as one). A date within 18 months of the one
+        # before drops a line, so the two never overlap.
+        below = d["z"][d["z"] < COLD]
+        spell = (below.index.to_series().diff() > pd.Timedelta(days=183)).cumsum()
+        prev = None
+        for _, s in below.groupby(spell.values):
+            low_day, low = s.idxmin(), float(s.min())
+            drop = prev is not None and (low_day - prev).days < 548
+            ax2.plot(low_day, low, "o", ms=5, color=c_z, mec="white", mew=1.2, zorder=6)
+            ax2.annotate(f"{low_day:%b %Y}", xy=(low_day, low), xytext=(0, -19 if drop else -7),
+                         textcoords="offset points", ha="center", va="top", fontsize=8.5,
+                         fontweight="bold", color="#0F6B45", zorder=6)
+            prev = low_day
+
+        last_hot = d.index[d["z"] > HOT].max()
+        ax2.annotate(f"Above {HOT:g}: overheated  ·  last reached {last_hot:%b %Y}", xy=(0.99, z_top - 0.35),
+                     xycoords=("axes fraction", "data"), ha="right", va="top",
+                     fontsize=9, fontweight="bold", color="#B42318", zorder=6)
+        ax2.annotate("Below 0: market value\nunder realised value", xy=(0.99, z_bot + 0.3),
+                     xycoords=("axes fraction", "data"), ha="right", va="bottom", linespacing=1.15,
+                     fontsize=9, fontweight="bold", color="#0F6B45", zorder=6)
+
+        # Room past the last day for the end dots; no year ticks past the data.
+        ax1.margins(x=0.01)
+        x0, x1 = ax1.get_xlim()
+        ax1.set_xlim(x0, x1 + (x1 - x0) * 0.015)
+        ax1.set_yscale("log")
+        ax1.set_ylim(d[["mcap", "rcap"]].min().min() / 3, d["mcap"].max() * 6)
+        ax1.yaxis.set_major_locator(mticker.FixedLocator([1e6, 1e8, 1e10, 1e12]))
+        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(usd))
+        ax1.yaxis.set_minor_locator(mticker.NullLocator())
+        ax1.set_ylabel("Market and realised value, log scale", fontsize=EconStyle.FONT_SIZE_AXIS,
+                       fontweight="bold", color="#1C1C1E")
+        ax2.set_ylabel("MVRV Z-score", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold",
+                       color="#1C1C1E", rotation=270, labelpad=14)
+        ax2.yaxis.set_major_locator(mticker.MultipleLocator(2))
+        # One set of gridlines, the Z-score's: a second set for the dollar axis would not line up with it.
+        ax1.grid(False)
+        ax2.grid(axis="x", visible=False)
+        ax2.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
+        ax1.xaxis.set_major_locator(mdates.YearLocator(2))
+        ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        for ax in (ax1, ax2):
+            ax.tick_params(axis="y", length=0)
+            for sp in ['top', 'right', 'left']:
+                ax.spines[sp].set_visible(False)
+
+        # The key sits under the plot, where it covers no data; each entry carries today's reading.
+        handles = [
+            plt.Line2D([], [], color=c_mv, linewidth=2, label=f"Market value (MV)  {usd(d['mcap'].iloc[-1])}"),
+            plt.Line2D([], [], color=c_rv, linewidth=2, label=f"Realised value (RV)  {usd(d['rcap'].iloc[-1])}"),
+            plt.Line2D([], [], color=c_z, linewidth=2.4, label=f"Z-score, right axis  {d['z'].iloc[-1]:.2f}"),
+        ]
+        fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 0.045), ncol=3,
+                   frameon=False, fontsize=9, handlelength=1.8, columnspacing=2.2)
+
+        _t, _s = WEEKLY_TITLES["btc_mvrv_zscore"][mode]
+        EconStyle.set_title(ax1, _t, _s.format(start=d.index[0].year))
+        EconStyle.add_top_rule(ax1)
+        fig.tight_layout(rect=[0.02, 0.085, 0.98, 0.96])
+        EconStyle.add_source(fig, "Coin Metrics Community API  ·  Z-score = (MV − RV) ÷ standard deviation of MV to date")
+        EconStyle.save_chart(fig, output_dir / "29_btc_mvrv_zscore.png")
+    except Exception as e:
+        print(f"   ⚠ Bitcoin MVRV Z-score failed: {e}")
+
+    # ── 30. BITCOIN, GLOBAL M2 AND THE Z-SCORE ──
+    # Inspired by "Bitcoin: A Global Liquidity Barometer" (Sam Callahan for Lyn
+    # Alden, Sep 2024), which found bitcoin moving with global M2 more often
+    # than any other major asset, and its 12-month correlation with it breaking
+    # down as the MVRV Z-score fell from its cycle highs. Global M2 is OECD
+    # broad money in dollars (_global_m2_weekly); the correlation is over 52
+    # weekly closes, in logs. Shaded: each fall of the Z-score from a cycle
+    # high (a turn it fell at least 3 from) to its low, or to today while no
+    # low has formed. The Z-score's overheated and undervalued bands are left
+    # to chart 29, which sits beside this one.
+    print("   [30] Bitcoin's correlation with global M2 vs. the MVRV Z-score")
+    try:
+        import numpy as np
+        import pandas as pd
+        import matplotlib.ticker as mticker
+        from data.fetchers.coinmetrics_fetcher import fetch_btc_mvrv, mvrv_zscore
+        if cm is None:
+            cm = fetch_btc_mvrv()
+            cm["z"] = mvrv_zscore(cm)
+        if gm2 is None:
+            gm2 = _global_m2_weekly(fred_fetcher)
+        wk = pd.DataFrame({"btc": cm["price"].resample("W-FRI").last(), "z": cm["z"].resample("W-FRI").last(),
+                           "m2": gm2}).dropna()
+        wk["corr"] = np.log(wk["btc"]).rolling(52).corr(np.log(wk["m2"]))
+        wk = wk[wk.index >= "2012-01-01"].dropna()
+        if len(wk) < 300:
+            raise ValueError("too little overlapping history")
+
+        falls, turns = [], _turning_points(cm["z"][cm.index >= "2011-01-01"].resample("W-FRI").last().dropna(),
+                                           3.0, log=False)
+        for i, (when, _, kind) in enumerate(turns):
+            if kind == "high":
+                end = next((w for w, _, k in turns[i + 1:] if k == "low"), wk.index[-1])
+                if end > wk.index[0]:                        # not a fall over before the chart starts
+                    falls.append((max(when, wk.index[0]), end))
+        falling = pd.Series(False, index=wk.index)
+        for a, b in falls:
+            falling |= (wk.index >= a) & (wk.index <= b)
+
+        c_z, c_corr = EconStyle.LINE_ORANGE, EconStyle.LINE_BLUE
+        fig, (ax1, ax2) = EconStyle.create_figure(
+            size=(EconStyle.SIZE_WIDE[0], 6.2), nrows=2, sharex=True,
+            gridspec_kw={"height_ratios": [1, 1.1], "hspace": 0.14})
+        x = wk.index.to_pydatetime()
+        for ax in (ax1, ax2):
+            for a, b in falls:
+                ax.axvspan(a, b, color="#4B5563", alpha=0.10, lw=0, zorder=0)
+
+        z_top = max(10.0, float(wk["z"].max()) * 1.15)
+        ax1.plot(x, wk["z"].values, color=c_z, linewidth=1.9, zorder=4)
+        ax1.axhline(0, color=EconStyle.INK_MUTED, linewidth=0.9, zorder=3)
+        ax1.set_ylim(-1.5, z_top)
+        ax1.set_ylabel("MVRV Z-score", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold", color="#1C1C1E")
+        ax1.annotate("Shaded: from each cycle high of the Z-score to the low that followed", xy=(0.99, 0.95),
+                     xycoords="axes fraction", ha="right", va="top", fontsize=8.5,
+                     color=EconStyle.INK_MUTED, zorder=6)
+
+        corr = wk["corr"].values
+        ax2.fill_between(x, corr, 0, where=corr >= 0, interpolate=True, color=EconStyle.GAIN, alpha=0.16, lw=0, zorder=1)
+        ax2.fill_between(x, corr, 0, where=corr < 0, interpolate=True, color=EconStyle.LOSS, alpha=0.20, lw=0, zorder=1)
+        ax2.plot(x, corr, color=c_corr, linewidth=1.7, zorder=4)
+        ax2.axhline(0, color=EconStyle.INK_MUTED, linewidth=0.9, zorder=3)
+        ax2.set_ylim(-1.05, 1.05)
+        ax2.yaxis.set_major_locator(mticker.MultipleLocator(0.5))
+        ax2.set_ylabel("Correlation with global M2", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold",
+                       color="#1C1C1E")
+        now = float(wk["corr"].iloc[-1])
+        ax2.annotate(f"{'−' if now < 0 else ''}{abs(now):.2f}", xy=(x[-1], now), xytext=(6, 0),
+                     textcoords="offset points", va="center", ha="left", fontsize=10.5,
+                     fontweight="bold", color=EconStyle.INK, annotation_clip=False)
+        # The weakest the link has been, labelled on the side with room.
+        low_week, low = wk["corr"].idxmin(), float(wk["corr"].min())
+        right_half = low_week > wk.index[0] + (wk.index[-1] - wk.index[0]) / 2
+        ax2.plot(low_week, low, "o", ms=5, color=c_corr, mec="white", mew=1.2, zorder=6)
+        ax2.annotate(f"Lowest since {wk.index[0].year}: −{abs(low):.2f}, {low_week:%b %Y}" if low < 0 else
+                     f"Lowest since {wk.index[0].year}: {low:.2f}, {low_week:%b %Y}",
+                     xy=(low_week, low), xytext=(-12 if right_half else 12, 30), textcoords="offset points",
+                     ha="right" if right_half else "left", va="bottom", fontsize=8.5, fontweight="bold",
+                     color=EconStyle.INK, zorder=6,
+                     arrowprops=dict(arrowstyle="-", color=c_corr, linewidth=0.8, shrinkA=2, shrinkB=3))
+        in_fall, other = wk["corr"][falling].mean(), wk["corr"][~falling].mean()
+        ax2.annotate(f"Average correlation while the Z-score falls from a cycle high: {in_fall:.2f}  ·  "
+                     f"at other times: {other:.2f}",
+                     xy=(0.01, 0.04), xycoords="axes fraction", ha="left", va="bottom", fontsize=8.5,
+                     fontweight="bold", color=EconStyle.INK, zorder=6)
+
         ax2.xaxis.set_major_locator(mdates.YearLocator(2))
         ax2.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
         for ax in (ax1, ax2):
             ax.margins(x=0.01)
+            ax.grid(axis="x", visible=False)
             ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
+            ax.tick_params(axis="y", length=0)
+            for sp in ['top', 'right', 'left']:
+                ax.spines[sp].set_visible(False)
 
-        _t, _s = WEEKLY_TITLES["btc_mvrv"][mode]
-        EconStyle.set_title(ax1, _t, _s.format(start=cm.index[0].year))
+        _t, _s = WEEKLY_TITLES["btc_zscore_global_m2"][mode]
+        EconStyle.set_title(ax1, _t, _s.format(start=wk.index[0].year))
         EconStyle.add_top_rule(ax1)
         fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-        EconStyle.add_source(fig, "Coin Metrics Community API")
-        EconStyle.save_chart(fig, output_dir / "29_btc_mvrv.png")
+        EconStyle.add_source(fig, "Coin Metrics  ·  OECD broad money of 7 economies in US dollars (FRED exchange rates)")
+        EconStyle.save_chart(fig, output_dir / "30_btc_zscore_global_m2.png")
     except Exception as e:
-        print(f"   ⚠ Bitcoin MVRV failed: {e}")
+        print(f"   ⚠ Bitcoin vs. global M2 correlation failed: {e}")
 
     # ── SUMMARY TABLE ──
     print("   [+] Summary Table")

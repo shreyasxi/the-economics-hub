@@ -48,7 +48,7 @@ WEEKLY_SECTIONS: list[tuple[str, list[str]]] = [
         "commodities_vs_equities",
     ]),
     ("Crypto", [
-        "eth_btc_ratio", "btc_gold_ratio",
-        "btc_global_m2", "btc_mvrv",
+        "btc_mvrv_zscore", "btc_zscore_global_m2",
+        "eth_btc_ratio", "btc_global_m2",
     ]),
 ]

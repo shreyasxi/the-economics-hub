@@ -180,13 +180,12 @@ _ACRONYMS = {
 # These are shortened from the title drawn on the chart itself (WEEKLY_TITLES
 # in generate_weekly.py, MACRO_TITLES in generate_macro.py): a caption sits
 # under a chart that already carries its full title, so it only has to say
-# which chart this is. Where the filename says something the chart does not —
-# btc_global_m2 plots US M2, not global — the chart wins.
+# which chart this is.
 _TITLE_OVERRIDES = {
     # Cross-asset ratios: a slash reads as a ratio, an underscore does not
-    "btc_gold_ratio":            "Bitcoin Priced in Gold",
-    "btc_mvrv":                  "Bitcoin MVRV Ratio",
-    "btc_global_m2":             "Bitcoin vs US M2",
+    "btc_mvrv_zscore":           "Bitcoin MVRV Z-Score",
+    "btc_zscore_global_m2":      "Bitcoin vs Global M2 and the Z-Score",
+    "btc_global_m2":             "Bitcoin vs Global M2",
     "eth_btc_ratio":             "ETH / BTC Ratio",
     "copper_gold_ratio":         "Copper / Gold Ratio",
     "gold_spx_ratio":            "Gold / S&P 500 Ratio",
@@ -223,7 +222,7 @@ def clean_title(filename: str) -> str:
     Derive a human-readable chart title from a filename.
 
     '01_equities_weekly.png'  → 'Equities Weekly'
-    '27_btc_gold_ratio.png'   → 'Bitcoin Priced in Gold'   (an override)
+    '26_eth_btc_ratio.png'    → 'ETH / BTC Ratio'          (an override)
     '18_india_gdp.png'        → 'India GDP'                (the acronym map)
 
     Captions on the site are set in capitals by CSS, so this shows in full only

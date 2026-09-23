@@ -25,9 +25,9 @@ Fields — a thread
                {"dashboard": "<chart name>", "note": "..."}
                    one of this site's own charts, by its file name without the
                    number (crude_oil_curve); always the latest edition
-               {"image": "analysis/<file>", "title": "...", "source": "...",
-                "url": "...", "date": "YYYY-MM-DD", "note": "..."}
-                   a chart you saved, a screenshot included, kept in assets/analysis/
+               {"image": "analysis/<file>", "title": "...", "source": "...", "note": "..."}
+                   a chart you saved, a screenshot included, kept in assets/analysis/;
+                   the source is named in words, with no link or date
     links    each {"title", "source", "url", "date": "YYYY-MM-DD", "note"}
              plus "paywall": True when it is behind a subscription and
              "mine": True for your own writing
@@ -72,8 +72,6 @@ WATCHING = [
                 "image": "analysis/eia_brent_2q26.png",
                 "title": "Brent crude, daily front-month futures, April 2025 to June 2026",
                 "source": "U.S. EIA, Today in Energy (data: Bloomberg L.P.)",
-                "url": "https://www.eia.gov/todayinenergy/detail.php?id=67865",
-                "date": "2026-07-15",
                 "note": ("Brent peaked at $118 on 29 April and fell to $72 by 26 June as ceasefire "
                          "talks advanced."),
             },
@@ -135,8 +133,6 @@ WATCHING = [
                 "image": "analysis/epoch_capex_vs_ocf.png",
                 "title": "Hyperscaler cash capex against operating cash flow",
                 "source": "Epoch AI (CC BY 4.0)",
-                "url": "https://epoch.ai/data-insights/hyperscaler-capex-vs-cash-flow",
-                "date": "2026-06-16",
                 "note": ("Microsoft, Amazon, Alphabet, Meta and Oracle combined: capex on trend to "
                          "overtake operating cash flow in the third quarter of 2026."),
             },
@@ -144,19 +140,14 @@ WATCHING = [
                 "image": "analysis/AI_related_debt.png",
                 "title": "AI-related debt issuance across global credit markets, 2026 year to date",
                 "source": "Morgan Stanley Research · client note",
-                "url": "https://finance.yahoo.com/markets/stocks/articles/morgan-stanley-forecasts-ai-debt-135325015.html",
-                "date": "2026-08-19",
                 "note": ("$445bn issued by 19 August against $72bn a year earlier, $132bn of it US "
                          "investment-grade bonds from the hyperscalers; July and August stayed busy even as "
-                         "spreads widened. The note itself is for Morgan Stanley clients: the source link is "
-                         "Quartz's June report on the same tracker."),
+                         "spreads widened."),
             },
             {
                 "image": "analysis/iea-data-centre-electricity-2025.png",
                 "title": "How much of global electricity is used for data centers?",
                 "source": "Our World in Data (CC BY) · data: IEA, Key Questions on Energy and AI",
-                "url": "https://ourworldindata.org/how-much-energy-do-data-centers-and-artificial-intelligence-use",
-                "date": "2026-07-20",
                 "note": ("485 TWh in 2025, 1.5% of the world's electricity. The IEA's base case nearly "
                          "doubles it to 945 TWh by 2030, and AI-focused data centres account for most of the "
                          "rise, from 155 to 465 TWh."),
