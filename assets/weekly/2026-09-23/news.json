@@ -1,0 +1,160 @@
+{
+ "generated_at": "2026-09-23 05:35 UTC",
+ "reads": {
+  "count": 25,
+  "first": "2026-09-17 19:28 UTC"
+ },
+ "headlines": {
+  "from": "2026-09-16",
+  "to": "2026-09-23",
+  "world": {
+   "items": [
+    {
+     "title": "Trump says he would back ban on diesel exports",
+     "url": "https://www.bbc.co.uk/news/articles/cmkg7560epw0o?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-09-22",
+     "theme": "Trade & tariffs",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 2
+    },
+    {
+     "title": "UK government borrowing surges in blow to Healey ahead of Budget",
+     "url": "https://www.ft.com/content/a17b2217-e49f-432c-8fdb-31e9bc3a4361?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-09-22",
+     "theme": "Public finances",
+     "also": [
+      "BBC News",
+      "The Guardian",
+      "Bloomberg"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Interest rates held but Bank signals rise if energy prices stay high",
+     "url": "https://www.bbc.co.uk/news/articles/cm4gjrxez1q0o?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-09-17",
+     "theme": "Central banks",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Oil prices fall as Saudi Arabia reportedly offers more crude via Hormuz after pipeline attack",
+     "url": "https://www.cnbc.com/2026/09/17/oil-prices-today-wti-brent-hormuz-iran-war.html",
+     "publisher": "CNBC",
+     "date": "2026-09-17",
+     "theme": "Energy & commodities",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Burnham warns of ‘difficult decisions’ in budget as inflation rises to 3.1%",
+     "url": "https://www.theguardian.com/business/2026/sep/16/uk-inflation-rises-pressure-on-households-bank-of-england-interest-rates",
+     "publisher": "The Guardian",
+     "date": "2026-09-16",
+     "theme": "Inflation",
+     "also": [
+      "CNBC",
+      "Financial Times"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "S&P Global Ratings raises India FY27 growth forecast to 7% from 6.6%; expects RBI rate hike",
+     "url": "https://www.livemint.com/economy/sp-global-ratings-raises-india-fy27-growth-forecast-to-7-from-6-6-expects-rbi-rate-hike-11790134784749.html",
+     "publisher": "Mint",
+     "date": "2026-09-23",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 6
+    },
+    {
+     "title": "Oil prices fall 1% on hopes of limited supply disruptions",
+     "url": "https://www.thehindubusinessline.com/markets/commodities/oil-prices-fall-1-on-hopes-of-limited-supply-disruptions/article71479189.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-09-18",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 6
+    },
+    {
+     "title": "Trump’s 100% tariff threat: What Indian investors should do now",
+     "url": "https://www.livemint.com/market/stock-market-news/trumps-100-tariff-threat-what-indian-investors-should-do-now-11790073880709.html",
+     "publisher": "Mint",
+     "date": "2026-09-23",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Moody's raises India FY27 GDP growth forecast to 7% on W Asia resilience",
+     "url": "https://www.business-standard.com/economy/news/moody-s-raises-india-gdp-growth-forecast-to-7-for-current-fiscal-126091800196_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-09-18",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 2
+    },
+    {
+     "title": "India's net direct tax collection rises 13% to ₹12.12 trillion till Sept 17",
+     "url": "https://www.business-standard.com/economy/news/india-s-net-direct-tax-collection-rises-13-to-12-12-trillion-till-sept-17-126091800557_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-09-18",
+     "theme": "Public finances",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 1
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
