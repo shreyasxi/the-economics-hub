@@ -1,8 +1,10 @@
 """
-Economics Hub — Weekly change bars (equities, commodities, FX)
-==============================================================
+Economics Hub — Ranked change bars
+==================================
 One horizontal bar per market, sorted from the largest gain to the largest
-loss, so each chart reads as a ranking of the week.
+loss, so each chart reads as a ranking. Used by every weekly change chart
+(equities, commodities, FX, EM FX, EM equities, agriculture) and by the
+S&P and NIFTY sector rotations, weekly and trailing 12 months.
 
 Design notes
 - Colour carries only the sign: EconStyle.GAIN / EconStyle.LOSS, a blue↔red
@@ -17,6 +19,7 @@ Design notes
 - Bars are thin (capped in pixels, never filling the row), with a rounded
   data end and a square end on the zero baseline.
 """
+import math
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
@@ -68,15 +71,27 @@ def _bar_path(v, y, half_h, rx, ry):
     return MplPath(verts, codes)
 
 
-def render_change_bars(names, values, title, subtitle, source, size="wide"):
-    """Draw the ranked weekly-change bars. Returns the figure, or None if empty."""
-    rows = sorted(zip(names, values), key=lambda r: r[1], reverse=True)
+def render_change_bars(names, values, title, subtitle, source, size=None):
+    """Draw the ranked change bars. Returns the figure, or None if there is nothing to draw.
+
+    Values that aren't finite are left off (one NaN would otherwise break the
+    sort and the axis). The figure is the house "wide" size, made taller once
+    there are more rows than fit it comfortably (the sector charts).
+    """
+    rows = [(nm, float(v)) for nm, v in zip(names, values) if v is not None and math.isfinite(v)]
+    dropped = [nm for nm, v in zip(names, values) if v is None or not math.isfinite(v)]
+    if dropped:
+        print(f"   ⚠ No usable value for: {', '.join(dropped)} — left off the chart")
+    rows.sort(key=lambda r: r[1], reverse=True)
     if not rows:
         return None
     names = [r[0] for r in rows]
     values = [r[1] for r in rows]
     n = len(values)
 
+    if size is None:
+        width, height = EconStyle.SIZE_WIDE
+        size = (width, max(height, 0.36 * n + 1.5))
     fig, ax = EconStyle.create_figure(size=size)
     ys = list(range(n))
 
@@ -134,7 +149,11 @@ def render_change_bars(names, values, title, subtitle, source, size="wide"):
             color = EconStyle.GAIN if v > 0 else EconStyle.LOSS
             ax.add_patch(PathPatch(_bar_path(v, y, half_h, rx, ry),
                                    facecolor=color, edgecolor="none", zorder=3))
-        label.set_x(v + gap if v >= 0 else v - gap)
+            label.set_x(v + gap if v >= 0 else v - gap)
+        else:
+            # No bar: every "0.0%" sits the same distance right of the baseline.
+            label.set_horizontalalignment("left")
+            label.set_x(gap)
 
     # Faint bands on alternate rows carry the eye from a name to its bar
     # across the empty stretch between them (short names, one-sided moves).

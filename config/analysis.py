@@ -140,6 +140,27 @@ WATCHING = [
                 "note": ("Microsoft, Amazon, Alphabet, Meta and Oracle combined: capex on trend to "
                          "overtake operating cash flow in the third quarter of 2026."),
             },
+            {
+                "image": "analysis/AI_related_debt.png",
+                "title": "AI-related debt issuance across global credit markets, 2026 year to date",
+                "source": "Morgan Stanley Research · client note",
+                "url": "https://finance.yahoo.com/markets/stocks/articles/morgan-stanley-forecasts-ai-debt-135325015.html",
+                "date": "2026-08-19",
+                "note": ("$445bn issued by 19 August against $72bn a year earlier, $132bn of it US "
+                         "investment-grade bonds from the hyperscalers; July and August stayed busy even as "
+                         "spreads widened. The note itself is for Morgan Stanley clients: the source link is "
+                         "Quartz's June report on the same tracker."),
+            },
+            {
+                "image": "analysis/iea-data-centre-electricity-2025.png",
+                "title": "How much of global electricity is used for data centers?",
+                "source": "Our World in Data (CC BY) · data: IEA, Key Questions on Energy and AI",
+                "url": "https://ourworldindata.org/how-much-energy-do-data-centers-and-artificial-intelligence-use",
+                "date": "2026-07-20",
+                "note": ("485 TWh in 2025, 1.5% of the world's electricity. The IEA's base case nearly "
+                         "doubles it to 945 TWh by 2030, and AI-focused data centres account for most of the "
+                         "rise, from 155 to 465 TWh."),
+            },
         ],
         "links": [
             {
