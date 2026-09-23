@@ -91,6 +91,12 @@ class EconStyle:
     INK              = "#1A1A1A"   # label values
     INK_MUTED        = "#4B5563"   # label names, reference lines
 
+    # Gain/loss pair for the weekly change bars (equities, commodities, FX).
+    # A blue↔red diverging pair, validated on white like the line palette
+    # (colour-blind ΔE 21.6). Not green↔red: a currency move isn't good or bad.
+    GAIN             = "#2A78D6"
+    LOSS             = "#E34948"
+
     # Specific Mappings
     REGION_COLORS = {
         "us":               "#003366",  # Navy

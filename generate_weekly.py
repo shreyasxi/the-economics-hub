@@ -32,6 +32,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from charts.style import EconStyle
 from charts.templates.weekly_bar import WeeklyBarChart
+from charts.templates.change_bars import render_change_bars
 from charts.templates.trend_line import TrendLineChart
 from charts.templates.yield_curve import YieldCurveChart
 from charts.templates.summary_table import SummaryTable
@@ -697,76 +698,15 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     # ── 1. EQUITIES ──
     # ── 1. EQUITIES ──
-    print("\n   [1/8] Equities — Aesthetic Vertical Bar Chart (Weekly)")
+    print("\n   [1/8] Equities — Weekly Change Bars")
     eq_ids = ["sp500", "dow", "nasdaq", "ftse100", "eurostoxx50", "nifty50", "shanghai", "hangseng", "nikkei225"]
     names, values, cks = build_bar_data(eq_ids)
 
     if _bad_fetch(values, len(eq_ids)):
         _flag_skipped("Equities — Weekly Bar Chart", len(values), len(eq_ids))
     else:
-        # Create the custom figure using your wide template
-        fig, ax = EconStyle.create_figure(size="wide")
-
-        # Premium Institutional Colors
-        color_pos = "#03AF53" # Deep, authoritative Slate Blue
-        color_neg = "#820E0E" # Deep, striking red for negatives
-        colors = [color_pos if v >= 0 else color_neg for v in values]
-
-        # Plot the vertical bars
-        bars = ax.bar(names, values, color=colors, width=0.25, zorder=3)
-
-        # Restore the Y-Axis and Gridlines
-        ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-        ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
-
-        # Clean up the outer box spines
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-
-        # Heavy Zero-Line anchor
-        ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-
-        # Clean up the X-axis labels
-        ax.xaxis.set_tick_params(length=0)
-        ax.set_xticklabels(names, fontweight='bold', fontsize=8.5, color="#1C1C1E")
-
-        # Dynamic Y-Axis Logic (Fixing the gap)
-        min_v = min(values)
-        max_v = max(values)
-        y_range = max_v - min_v if max_v != min_v else (max_v if max_v != 0 else 1)
-
-        y_bottom = (min_v - y_range * 0.15) if min_v < 0 else 0
-        y_top = (max_v + y_range * 0.15) if max_v > 0 else 0
-
-        ax.set_ylim(y_bottom, y_top)
-
-        for bar, v in zip(bars, values):
-            yval = bar.get_height()
-            offset = y_range * 0.02
-
-            if v >= 0:
-                y_pos = yval + offset
-                va = 'bottom'
-            else:
-                y_pos = yval - offset
-                va = 'top'
-
-            ax.text(
-                bar.get_x() + bar.get_width()/2,
-                y_pos,
-                f"{v:+.1f}%",
-                ha='center', va=va,
-                fontweight='bold', fontsize=12, color=bar.get_facecolor()
-            )
-
-        # Apply Full EconStyle Branding
         _t, _s = WEEKLY_TITLES["equities_weekly"][mode]
-        EconStyle.set_title(ax, _t, _s.format(date=date_label))
-        EconStyle.add_top_rule(ax)
-        fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-        EconStyle.add_source(fig, "Yahoo Finance")
-
+        fig = render_change_bars(names, values, _t, _s.format(date=date_label), "Yahoo Finance")
         EconStyle.save_chart(fig, output_dir / "01_equities_weekly.png")
 
     print("   [2/8] Equities — 12-Month Trends")
@@ -839,75 +779,14 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         print(f"   ⚠ Yield curve failed: {e}")
 
     # ── 4. COMMODITIES ──
-    print("   [7/8] Commodities — Aesthetic Vertical Bar Chart (Weekly)")
+    print("   [7/8] Commodities — Weekly Change Bars")
     cm_ids = ["brent", "wti", "gold", "silver", "copper", "natgas", "uranium"]
     names, values, cks = build_bar_data(cm_ids)
-    
-    # Create the custom figure using your wide template
-    fig, ax = EconStyle.create_figure(size="wide")
-    
-    # 1. Premium Institutional Colors
-    color_pos = "#03AF53" # Deep, authoritative Slate Blue
-    color_neg = "#820E0E" # Deep, striking red for negatives
-    colors = [color_pos if v >= 0 else color_neg for v in values]
-    
-    # Plot the vertical bars
-    bars = ax.bar(names, values, color=colors, width=0.4, zorder=3)
-    
-    # 2. Restore the Y-Axis and Gridlines
-    ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-    ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
-    
-    # Clean up the outer box spines
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    
-    # Heavy Zero-Line anchor
-    ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-    
-    # Clean up the X-axis labels
-    ax.xaxis.set_tick_params(length=0) 
-    ax.set_xticklabels(names, fontweight='bold', fontsize=11, color="#1C1C1E")
-    
-    # 3. Dynamic Y-Axis Logic (Fixing the gap)
-    min_v = min(values) if values else 0
-    max_v = max(values) if values else 0
-    y_range = max_v - min_v if max_v != min_v else (max_v if max_v != 0 else 1)
-    
-    # Only pad the bottom if there are actual negative numbers. 
-    y_bottom = (min_v - y_range * 0.15) if min_v < 0 else 0
-    y_top = (max_v + y_range * 0.15) if max_v > 0 else 0
-    
-    ax.set_ylim(y_bottom, y_top)
-    
-    for bar, v in zip(bars, values):
-        yval = bar.get_height()
-        offset = y_range * 0.02 
-        
-        if v >= 0:
-            y_pos = yval + offset
-            va = 'bottom'
-        else:
-            y_pos = yval - offset
-            va = 'top'
-            
-        ax.text(
-            bar.get_x() + bar.get_width()/2, 
-            y_pos, 
-            f"{v:+.1f}%", 
-            ha='center', va=va, 
-            fontweight='bold', fontsize=12, color=bar.get_facecolor()
-        )
 
-    # 4. Apply Full EconStyle Branding
     _t, _s = WEEKLY_TITLES["commodities_weekly"][mode]
-    EconStyle.set_title(ax, _t, _s.format(date=date_label))
-    EconStyle.add_top_rule(ax) 
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "Yahoo Finance")
-    
-    EconStyle.save_chart(fig, output_dir / "07_commodities_weekly.png")
+    fig = render_change_bars(names, values, _t, _s.format(date=date_label), "Yahoo Finance")
+    if fig:
+        EconStyle.save_chart(fig, output_dir / "07_commodities_weekly.png")
 
     print("   [8/8] Commodities — 12-Month Trends")
     trend = TrendLineChart()
@@ -1160,40 +1039,8 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         names_fx, values_fx, cks_fx = build_bar_data(fx_ids)
 
         if names_fx:
-            fig, ax = EconStyle.create_figure(size="wide")
-            color_pos = "#03AF53"
-            color_neg = "#820E0E"
-            colors_fx = [color_pos if v >= 0 else color_neg for v in values_fx]
-            bars = ax.bar(names_fx, values_fx, color=colors_fx, width=0.25, zorder=3)
-
-            ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
-            ax.set_ylabel("Weekly Change (%)", fontsize=EconStyle.FONT_SIZE_AXIS, fontweight='bold', color="#1C1C1E")
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['left'].set_visible(False)
-            ax.axhline(0, color='#1C1C1E', linewidth=1.5, zorder=4)
-            ax.xaxis.set_tick_params(length=0)
-            ax.set_xticklabels(names_fx, fontweight='bold', fontsize=8.5, color="#1C1C1E")
-
-            min_v = min(values_fx) if values_fx else 0
-            max_v = max(values_fx) if values_fx else 0
-            y_range = max_v - min_v if max_v != min_v else 1
-            ax.set_ylim(
-                (min_v - y_range * 0.15) if min_v < 0 else 0,
-                (max_v + y_range * 0.15) if max_v > 0 else 0,
-            )
-            for bar, v in zip(bars, values_fx):
-                offset = y_range * 0.02
-                va = 'bottom' if v >= 0 else 'top'
-                y_pos = bar.get_height() + offset if v >= 0 else bar.get_height() - offset
-                ax.text(bar.get_x() + bar.get_width() / 2, y_pos, f"{v:+.1f}%",
-                        ha='center', va=va, fontweight='bold', fontsize=11, color=bar.get_facecolor())
-
             _t, _s = WEEKLY_TITLES["fx_weekly"][mode]
-            EconStyle.set_title(ax, _t, _s.format(date=date_label))
-            EconStyle.add_top_rule(ax)
-            fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-            EconStyle.add_source(fig, "Yahoo Finance")
+            fig = render_change_bars(names_fx, values_fx, _t, _s.format(date=date_label), "Yahoo Finance")
             EconStyle.save_chart(fig, output_dir / "03_fx_weekly.png")
     except Exception as e:
         print(f"   ⚠ FX weekly bar failed: {e}")
@@ -2308,11 +2155,14 @@ def generate_with_live_data(output_dir, mode="dashboard"):
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
         for sp in ['top', 'right', 'left']: ax.spines[sp].set_visible(False)
 
+        # Last, once the years on screen are settled (see _recession_bands).
+        _recession_bands(ax, fred_fetcher.fetch_series("USREC", period_years=60))
+
         _t, _s = WEEKLY_TITLES["commodity_cycle"][mode]
         EconStyle.set_title(ax, _t, _s.format(start=first, end=last))
         EconStyle.add_top_rule(ax)
         fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-        EconStyle.add_source(fig, "S&P GSCI via Yahoo Finance · FRED (US CPI)")
+        EconStyle.add_source(fig, "S&P GSCI via Yahoo Finance · US CPI via FRED; recession dates NBER via FRED")
         EconStyle.save_chart(fig, output_dir / "23d_commodity_cycle.png")
     except Exception as e:
         print(f"   ⚠ Long commodity cycle failed: {e}")
