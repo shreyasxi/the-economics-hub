@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Economics Hub</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="48x48" href="/the-economics-hub/assets/favicon-48.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap">
+<link rel="stylesheet" href="/the-economics-hub/assets/site.css">
+<style>:root { --mark: url("/the-economics-hub/assets/mark-navy.png"); }
+@media (prefers-color-scheme: dark) { :root { --mark: url("/the-economics-hub/assets/mark-ivory.png"); } }</style>
+</head>
+<body>
+<main class="door">
+  <div class="mark" role="img" aria-label="The Economics Hub logo"></div>
+  <h1 class="wordmark"><span class="the">The</span> <span class="name">Economics Hub</span></h1>
+  <div class="status" id="status" role="status" aria-live="polite">
+    <span class="track" aria-hidden="true"><span></span></span>
+    <span>Opening the dashboard</span>
+  </div>
+  <div class="actions">
+    <a class="cta" id="open" href="https://weekly-macro-dashboard.streamlit.app/">
+      Open the dashboard
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </a>
+  </div>
+</main>
+<noscript><style>#status { display: none; }</style></noscript>
+<script>
+  // A section's address under this site (…/the-economics-hub/rbi-sentinel) goes
+  // to the same section of the dashboard; anything else goes to its front page.
+  (function () {
+    var app = "https://weekly-macro-dashboard.streamlit.app/";
+    var pages = ["weekly", "world", "india", "rbi-sentinel", "analysis", "about"];
+    var rest = location.pathname.replace(/^\/the-economics-hub\/?/, "").replace(/\/+$/, "");
+    var target = pages.indexOf(rest) >= 0 ? app + rest : app;
+    document.getElementById("open").href = target;
+    setTimeout(function () { window.location.replace(target); }, 900);
+  })();
+</script>
+</body>
+</html>

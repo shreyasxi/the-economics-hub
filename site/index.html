@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Economics Hub — Global Macro &amp; Cross-Asset Monitor</title>
+<meta name="description" content="Weekly charts and analysis on global markets, the world economy, India and the RBI.">
+<link rel="canonical" href="https://shreyasxi.github.io/the-economics-hub/">
+<meta name="theme-color" content="#FFFFF0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A1F3D" media="(prefers-color-scheme: dark)">
+
+<!-- What WhatsApp, LinkedIn, X, Facebook and Slack show when this link is shared.
+     They read these tags and never run the script below, so they see the card
+     rather than the dashboard's own Streamlit preview. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Economics Hub">
+<meta property="og:title" content="The Economics Hub — Global Macro &amp; Cross-Asset Monitor">
+<meta property="og:description" content="Weekly charts and analysis on global markets, the world economy, India and the RBI.">
+<meta property="og:url" content="https://shreyasxi.github.io/the-economics-hub/">
+<meta property="og:image" content="https://shreyasxi.github.io/the-economics-hub/og-card.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Economics Hub: Global Macro &amp; Cross-Asset Monitor. Weekly Markets, World, India and RBI Sentinel.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Economics Hub — Global Macro &amp; Cross-Asset Monitor">
+<meta name="twitter:description" content="Weekly charts and analysis on global markets, the world economy, India and the RBI.">
+<meta name="twitter:image" content="https://shreyasxi.github.io/the-economics-hub/og-card.jpg">
+<meta name="twitter:image:alt" content="The Economics Hub: Global Macro &amp; Cross-Asset Monitor.">
+
+<link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://weekly-macro-dashboard.streamlit.app">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<main class="door">
+  <div class="mark" role="img" aria-label="The Economics Hub logo"></div>
+  <h1 class="wordmark"><span class="the">The</span> <span class="name">Economics Hub</span></h1>
+  <p class="descriptor">Global Macro &amp; Cross-Asset Monitor</p>
+  <p class="tagline">Weekly charts and analysis on global markets, the world economy, India and the RBI.</p>
+  <ul class="sections" aria-label="Sections of the dashboard">
+    <li><a href="https://weekly-macro-dashboard.streamlit.app/">Weekly Markets</a></li>
+    <li><a href="https://weekly-macro-dashboard.streamlit.app/world">World</a></li>
+    <li><a href="https://weekly-macro-dashboard.streamlit.app/india">India</a></li>
+    <li><a href="https://weekly-macro-dashboard.streamlit.app/rbi-sentinel">RBI Sentinel</a></li>
+    <li><a href="https://weekly-macro-dashboard.streamlit.app/analysis">Analysis</a></li>
+  </ul>
+  <div class="status" id="status" role="status" aria-live="polite">
+    <span class="track" aria-hidden="true"><span></span></span>
+    <span>Opening the dashboard</span>
+  </div>
+  <div class="actions">
+    <a class="cta" id="open" href="https://weekly-macro-dashboard.streamlit.app/">
+      Open the dashboard
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </a>
+    <a class="sub" href="https://economicshub.substack.com/">
+      Subscribe on Substack
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg>
+    </a>
+  </div>
+</main>
+<p class="byline">Research &amp; maintained by <a href="https://shreyasxi.github.io/">Shreyas Urgunde</a></p>
+
+<svg class="chart" viewBox="0 0 1200 250" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="fadein" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="fade" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="250">
+      <rect width="1200" height="250" fill="url(#fadein)"/>
+    </mask>
+  </defs>
+  <g mask="url(#fade)" fill="none" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke">
+    <g class="grid" stroke-width="1">
+      <line x1="0" y1="62" x2="1200" y2="62" vector-effect="non-scaling-stroke"/>
+      <line x1="0" y1="114" x2="1200" y2="114" vector-effect="non-scaling-stroke"/>
+      <line x1="0" y1="166" x2="1200" y2="166" vector-effect="non-scaling-stroke"/>
+      <line x1="0" y1="218" x2="1200" y2="218" vector-effect="non-scaling-stroke"/>
+    </g>
+    <path class="area" d="M0.0,158.8 L5.2,164.9 L10.5,163.3 L15.7,164.2 L21.0,164.8 L26.2,164.9 L31.4,169.5 L36.7,169.6 L41.9,171.3 L47.2,162.2 L52.4,161.1 L57.6,161.5 L62.9,161.7 L68.1,162.9 L73.4,165.0 L78.6,165.5 L83.8,163.7 L89.1,163.8 L94.3,160.8 L99.6,160.8 L104.8,160.2 L110.0,155.7 L115.3,153.8 L120.5,154.6 L125.8,154.5 L131.0,152.6 L136.2,147.1 L141.5,147.3 L146.7,147.4 L152.0,144.3 L157.2,146.0 L162.4,146.2 L167.7,143.5 L172.9,141.4 L178.2,140.7 L183.4,144.3 L188.6,156.9 L193.9,159.7 L199.1,167.5 L204.4,177.2 L209.6,181.8 L214.8,185.4 L220.1,191.9 L225.3,200.0 L230.6,199.4 L235.8,198.1 L241.0,193.1 L246.3,189.7 L251.5,187.8 L256.8,183.5 L262.0,182.6 L267.2,183.6 L272.5,180.7 L277.7,177.7 L283.0,176.9 L288.2,177.4 L293.4,175.4 L298.7,180.4 L303.9,177.2 L309.2,174.5 L314.4,177.3 L319.7,175.7 L324.9,176.8 L330.1,173.4 L335.4,177.2 L340.6,178.1 L345.9,174.8 L351.1,170.5 L356.3,174.6 L361.6,174.4 L366.8,172.1 L372.1,172.3 L377.3,166.8 L382.5,168.4 L387.8,166.1 L393.0,167.3 L398.3,162.3 L403.5,160.9 L408.7,160.4 L414.0,163.4 L419.2,157.7 L424.5,154.3 L429.7,151.0 L434.9,146.6 L440.2,144.3 L445.4,144.5 L450.7,145.1 L455.9,145.8 L461.1,140.8 L466.4,143.1 L471.6,143.2 L476.9,142.6 L482.1,140.6 L487.3,137.7 L492.6,139.5 L497.8,142.5 L503.1,141.1 L508.3,136.6 L513.5,133.2 L518.8,131.2 L524.0,130.6 L529.3,128.4 L534.5,127.6 L539.7,124.1 L545.0,125.6 L550.2,124.7 L555.5,124.5 L560.7,122.6 L565.9,121.5 L571.2,114.4 L576.4,110.0 L581.7,105.7 L586.9,110.4 L592.1,110.7 L597.4,111.7 L602.6,109.8 L607.9,115.2 L613.1,111.6 L618.3,108.4 L623.6,111.2 L628.8,113.1 L634.1,114.7 L639.3,114.0 L644.5,111.9 L649.8,106.1 L655.0,106.1 L660.3,103.6 L665.5,102.6 L670.7,97.6 L676.0,95.2 L681.2,91.1 L686.5,93.4 L691.7,93.3 L696.9,94.9 L702.2,90.5 L707.4,88.3 L712.7,88.5 L717.9,89.2 L723.1,87.4 L728.4,88.7 L733.6,90.5 L738.9,98.5 L744.1,101.3 L749.3,111.1 L754.6,112.0 L759.8,113.3 L765.1,115.0 L770.3,112.0 L775.5,108.1 L780.8,106.4 L786.0,103.9 L791.3,101.9 L796.5,99.8 L801.7,102.1 L807.0,101.5 L812.2,99.6 L817.5,99.9 L822.7,99.4 L827.9,99.8 L833.2,99.0 L838.4,95.1 L843.7,94.5 L848.9,93.2 L854.1,89.4 L859.4,86.0 L864.6,80.0 L869.9,83.7 L875.1,79.8 L880.3,79.3 L885.6,77.3 L890.8,74.6 L896.1,71.3 L901.3,68.1 L906.6,67.2 L911.8,62.5 L917.0,62.7 L922.3,62.6 L927.5,60.0 L932.8,60.9 L938.0,56.9 L943.2,55.8 L948.5,51.8 L953.7,53.4 L959.0,56.0 L964.2,57.1 L969.4,56.8 L974.7,59.9 L979.9,60.5 L985.2,60.0 L990.4,54.4 L995.6,54.7 L1000.9,50.6 L1006.1,50.8 L1011.4,51.8 L1016.6,52.2 L1021.8,53.9 L1027.1,52.1 L1032.3,48.0 L1037.6,46.1 L1042.8,43.1 L1048.0,37.5 L1053.3,35.4 L1058.5,33.5 L1063.8,32.7 L1069.0,35.4 L1074.2,32.1 L1079.5,35.2 L1084.7,32.1 L1090.0,30.7 L1095.2,26.4 L1100.4,26.0 L1105.7,27.6 L1110.9,26.1 L1116.2,27.0 L1121.4,27.0 L1126.6,26.3 L1131.9,26.2 L1137.1,26.1 L1142.4,27.7 L1147.6,27.7 L1152.8,32.6 L1158.1,32.5 L1163.3,35.1 L1168.6,31.7 L1173.8,27.9 L1179.0,32.4 L1184.3,31.5 L1189.5,31.2 L1194.8,33.4 L1200.0,31.5 L1200,250 L0,250 Z" stroke="none"/>
+    <path class="second" d="M0.0,176.9 L5.2,179.2 L10.5,179.4 L15.7,178.1 L21.0,175.3 L26.2,174.7 L31.4,175.5 L36.7,176.7 L41.9,174.8 L47.2,171.0 L52.4,170.0 L57.6,172.2 L62.9,173.8 L68.1,170.1 L73.4,169.2 L78.6,172.4 L83.8,172.2 L89.1,174.2 L94.3,175.1 L99.6,175.7 L104.8,176.8 L110.0,175.3 L115.3,175.0 L120.5,175.9 L125.8,174.6 L131.0,172.5 L136.2,175.5 L141.5,175.6 L146.7,177.3 L152.0,177.2 L157.2,179.5 L162.4,179.1 L167.7,178.8 L172.9,179.0 L178.2,180.8 L183.4,184.1 L188.6,188.8 L193.9,194.1 L199.1,196.1 L204.4,200.9 L209.6,200.9 L214.8,201.9 L220.1,208.6 L225.3,210.5 L230.6,212.4 L235.8,211.5 L241.0,210.7 L246.3,214.0 L251.5,213.7 L256.8,213.5 L262.0,210.7 L267.2,212.4 L272.5,210.1 L277.7,211.6 L283.0,211.5 L288.2,212.5 L293.4,208.7 L298.7,206.8 L303.9,201.0 L309.2,198.9 L314.4,196.3 L319.7,193.8 L324.9,194.3 L330.1,193.7 L335.4,190.1 L340.6,190.2 L345.9,189.0 L351.1,188.3 L356.3,186.3 L361.6,186.2 L366.8,185.8 L372.1,184.5 L377.3,183.5 L382.5,184.6 L387.8,181.9 L393.0,183.8 L398.3,185.6 L403.5,187.4 L408.7,184.7 L414.0,184.7 L419.2,185.9 L424.5,187.5 L429.7,185.8 L434.9,187.2 L440.2,189.1 L445.4,187.1 L450.7,188.8 L455.9,188.7 L461.1,187.9 L466.4,188.1 L471.6,187.4 L476.9,183.9 L482.1,184.2 L487.3,186.0 L492.6,189.0 L497.8,188.7 L503.1,188.7 L508.3,187.3 L513.5,187.5 L518.8,187.7 L524.0,188.5 L529.3,188.8 L534.5,187.7 L539.7,187.7 L545.0,186.7 L550.2,182.0 L555.5,180.2 L560.7,182.7 L565.9,178.4 L571.2,176.9 L576.4,178.1 L581.7,175.4 L586.9,174.6 L592.1,175.1 L597.4,176.0 L602.6,177.7 L607.9,177.2 L613.1,174.6 L618.3,174.9 L623.6,173.6 L628.8,169.3 L634.1,171.4 L639.3,170.5 L644.5,170.8 L649.8,172.6 L655.0,174.3 L660.3,173.9 L665.5,172.6 L670.7,173.3 L676.0,172.8 L681.2,170.9 L686.5,169.9 L691.7,167.7 L696.9,166.4 L702.2,165.0 L707.4,160.8 L712.7,159.1 L717.9,158.5 L723.1,156.6 L728.4,158.1 L733.6,158.4 L738.9,161.5 L744.1,165.0 L749.3,166.6 L754.6,166.2 L759.8,168.3 L765.1,163.3 L770.3,160.1 L775.5,161.4 L780.8,157.6 L786.0,156.6 L791.3,159.4 L796.5,159.4 L801.7,159.5 L807.0,155.3 L812.2,156.0 L817.5,155.6 L822.7,155.2 L827.9,155.1 L833.2,156.0 L838.4,154.6 L843.7,151.5 L848.9,149.3 L854.1,150.2 L859.4,151.7 L864.6,150.5 L869.9,151.1 L875.1,151.4 L880.3,154.0 L885.6,149.0 L890.8,146.2 L896.1,147.3 L901.3,144.5 L906.6,140.7 L911.8,145.3 L917.0,146.0 L922.3,146.4 L927.5,144.7 L932.8,144.6 L938.0,145.8 L943.2,146.7 L948.5,143.6 L953.7,139.9 L959.0,141.7 L964.2,144.4 L969.4,139.6 L974.7,142.3 L979.9,144.3 L985.2,143.8 L990.4,142.0 L995.6,139.1 L1000.9,137.5 L1006.1,138.5 L1011.4,136.6 L1016.6,135.3 L1021.8,130.6 L1027.1,129.8 L1032.3,131.8 L1037.6,133.1 L1042.8,129.3 L1048.0,129.6 L1053.3,133.2 L1058.5,133.5 L1063.8,132.7 L1069.0,129.5 L1074.2,130.8 L1079.5,128.6 L1084.7,126.1 L1090.0,126.8 L1095.2,126.3 L1100.4,121.9 L1105.7,117.5 L1110.9,114.9 L1116.2,113.4 L1121.4,110.7 L1126.6,110.6 L1131.9,110.4 L1137.1,111.7 L1142.4,111.3 L1147.6,111.1 L1152.8,105.0 L1158.1,105.0 L1163.3,102.0 L1168.6,98.8 L1173.8,98.8 L1179.0,96.0 L1184.3,100.1 L1189.5,99.5 L1194.8,97.3 L1200.0,101.9" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+    <path class="main" d="M0.0,158.8 L5.2,164.9 L10.5,163.3 L15.7,164.2 L21.0,164.8 L26.2,164.9 L31.4,169.5 L36.7,169.6 L41.9,171.3 L47.2,162.2 L52.4,161.1 L57.6,161.5 L62.9,161.7 L68.1,162.9 L73.4,165.0 L78.6,165.5 L83.8,163.7 L89.1,163.8 L94.3,160.8 L99.6,160.8 L104.8,160.2 L110.0,155.7 L115.3,153.8 L120.5,154.6 L125.8,154.5 L131.0,152.6 L136.2,147.1 L141.5,147.3 L146.7,147.4 L152.0,144.3 L157.2,146.0 L162.4,146.2 L167.7,143.5 L172.9,141.4 L178.2,140.7 L183.4,144.3 L188.6,156.9 L193.9,159.7 L199.1,167.5 L204.4,177.2 L209.6,181.8 L214.8,185.4 L220.1,191.9 L225.3,200.0 L230.6,199.4 L235.8,198.1 L241.0,193.1 L246.3,189.7 L251.5,187.8 L256.8,183.5 L262.0,182.6 L267.2,183.6 L272.5,180.7 L277.7,177.7 L283.0,176.9 L288.2,177.4 L293.4,175.4 L298.7,180.4 L303.9,177.2 L309.2,174.5 L314.4,177.3 L319.7,175.7 L324.9,176.8 L330.1,173.4 L335.4,177.2 L340.6,178.1 L345.9,174.8 L351.1,170.5 L356.3,174.6 L361.6,174.4 L366.8,172.1 L372.1,172.3 L377.3,166.8 L382.5,168.4 L387.8,166.1 L393.0,167.3 L398.3,162.3 L403.5,160.9 L408.7,160.4 L414.0,163.4 L419.2,157.7 L424.5,154.3 L429.7,151.0 L434.9,146.6 L440.2,144.3 L445.4,144.5 L450.7,145.1 L455.9,145.8 L461.1,140.8 L466.4,143.1 L471.6,143.2 L476.9,142.6 L482.1,140.6 L487.3,137.7 L492.6,139.5 L497.8,142.5 L503.1,141.1 L508.3,136.6 L513.5,133.2 L518.8,131.2 L524.0,130.6 L529.3,128.4 L534.5,127.6 L539.7,124.1 L545.0,125.6 L550.2,124.7 L555.5,124.5 L560.7,122.6 L565.9,121.5 L571.2,114.4 L576.4,110.0 L581.7,105.7 L586.9,110.4 L592.1,110.7 L597.4,111.7 L602.6,109.8 L607.9,115.2 L613.1,111.6 L618.3,108.4 L623.6,111.2 L628.8,113.1 L634.1,114.7 L639.3,114.0 L644.5,111.9 L649.8,106.1 L655.0,106.1 L660.3,103.6 L665.5,102.6 L670.7,97.6 L676.0,95.2 L681.2,91.1 L686.5,93.4 L691.7,93.3 L696.9,94.9 L702.2,90.5 L707.4,88.3 L712.7,88.5 L717.9,89.2 L723.1,87.4 L728.4,88.7 L733.6,90.5 L738.9,98.5 L744.1,101.3 L749.3,111.1 L754.6,112.0 L759.8,113.3 L765.1,115.0 L770.3,112.0 L775.5,108.1 L780.8,106.4 L786.0,103.9 L791.3,101.9 L796.5,99.8 L801.7,102.1 L807.0,101.5 L812.2,99.6 L817.5,99.9 L822.7,99.4 L827.9,99.8 L833.2,99.0 L838.4,95.1 L843.7,94.5 L848.9,93.2 L854.1,89.4 L859.4,86.0 L864.6,80.0 L869.9,83.7 L875.1,79.8 L880.3,79.3 L885.6,77.3 L890.8,74.6 L896.1,71.3 L901.3,68.1 L906.6,67.2 L911.8,62.5 L917.0,62.7 L922.3,62.6 L927.5,60.0 L932.8,60.9 L938.0,56.9 L943.2,55.8 L948.5,51.8 L953.7,53.4 L959.0,56.0 L964.2,57.1 L969.4,56.8 L974.7,59.9 L979.9,60.5 L985.2,60.0 L990.4,54.4 L995.6,54.7 L1000.9,50.6 L1006.1,50.8 L1011.4,51.8 L1016.6,52.2 L1021.8,53.9 L1027.1,52.1 L1032.3,48.0 L1037.6,46.1 L1042.8,43.1 L1048.0,37.5 L1053.3,35.4 L1058.5,33.5 L1063.8,32.7 L1069.0,35.4 L1074.2,32.1 L1079.5,35.2 L1084.7,32.1 L1090.0,30.7 L1095.2,26.4 L1100.4,26.0 L1105.7,27.6 L1110.9,26.1 L1116.2,27.0 L1121.4,27.0 L1126.6,26.3 L1131.9,26.2 L1137.1,26.1 L1142.4,27.7 L1147.6,27.7 L1152.8,32.6 L1158.1,32.5 L1163.3,35.1 L1168.6,31.7 L1173.8,27.9 L1179.0,32.4 L1184.3,31.5 L1189.5,31.2 L1194.8,33.4 L1200.0,31.5" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  </g>
+</svg>
+
+<noscript><style>#status { display: none; }</style></noscript>
+<script>
+  // People are taken on to the dashboard once the page has shown for a moment;
+  // link-preview crawlers do not run scripts, so they stay and read the tags above.
+  (function () {
+    var target = "https://weekly-macro-dashboard.streamlit.app/";
+    var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var wait = still ? 500 : 1300;
+    document.documentElement.style.setProperty("--wait", wait + "ms");
+    setTimeout(function () { window.location.replace(target); }, wait);
+  })();
+</script>
+</body>
+</html>

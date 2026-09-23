@@ -121,8 +121,9 @@ economics_hub/
 │   ├── rbi_sentinel/YYYY-MM/
 │   ├── rbi_research/
 │   ├── analysis/                # Charts saved by hand for the Analysis page's threads
-│   ├── brand/                   # Logo
+│   ├── brand/                   # Logo, and the source of the link-preview card
 │   └── readme_showcase/         # Static-named flagship charts (always current)
+├── site/                        # Link-preview front door on GitHub Pages: shreyasxi.github.io/the-economics-hub
 ├── output/                      # Local generation output (git-ignored)
 └── .github/                     # GitHub Actions workflows and helper scripts
 ```
