@@ -116,7 +116,7 @@ from matplotlib.patches import FancyBboxPatch
 from matplotlib.colors import LinearSegmentedColormap
 
 # Import your existing style module
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[1]   # this file lives in charts/
 sys.path.insert(0, str(PROJECT_ROOT))
 
 try:

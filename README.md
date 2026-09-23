@@ -12,8 +12,8 @@ An automated Python pipeline tracking Global Equities, Forex, Sovereign Bonds, C
 
 ## Featured research: RBI Sentinel
 
-A tone index for Indian monetary policy, scored from **285 Reserve Bank documents across 61 policy
-cycles since 2016**, with a pre-registered live test running from October 2026 on whether it
+A tone index for Indian monetary policy, built from **285 Reserve Bank documents across 61 policy
+cycles since 2016** (159 of them scored: 61 MPC Resolutions, 61 sets of Minutes and 37 Governor's Statements), with a pre-registered live test running from October 2026 on whether it
 predicts the bond market's reaction to a decision.
 
 It reports its negative results as prominently as its positive one: tone does **not** predict the
@@ -73,7 +73,7 @@ source ~/.bashrc
 ```
 economics_hub/
 ├── app.py                       # Streamlit dashboard: 5 pages and About, each with its own link
-├── generate_weekly.py           # Weekly global dashboard (35 charts, every Saturday via CI)
+├── generate_weekly.py           # Weekly global dashboard (40 charts, every Saturday via CI)
 ├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
 ├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
 ├── generate_india.py            # India page (16 charts, Saturdays via CI + manual)
@@ -130,7 +130,7 @@ economics_hub/
 ## Usage
 
 ### 1. Weekly Global Dashboard
-Generates 35 charts (Equities, Commodities, Yields, FX, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions. Commodities covers the WTI futures curve (contango vs backwardation), gold against real interest rates and a 13-market breadth measure.
+Generates 40 charts (Equities, Commodities, Yields, FX, Cross-Asset, Crypto) — runs automatically every Saturday via GitHub Actions. Commodities covers the WTI futures curve (contango vs backwardation), gold against real interest rates and a 13-market breadth measure.
 
 The same run adds **The Week in Headlines**: the week's top World and India stories from publisher RSS feeds, one per theme (central banks, inflation, trade, energy, growth, markets, public finances), ranked by how many outlets covered each, then by how many days each stayed in the news. Headlines are the publishers' own and link to the original. Some feeds hold only hours of stories, so a separate workflow collects every feed every 4 hours into a pool of the week's headlines. The pool lives in GitHub's Actions cache, never in the repository, and keeps 8 days at most. If the feeds fail, the charts still publish without the strip; if the pool is missing, the feeds are read once instead.
 ```bash
@@ -147,7 +147,7 @@ python generate_macro.py
 ```
 
 ### 3. India
-Generates 14 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
+Generates 16 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
 ```bash
 python -m data.india_manual_entry status
 python generate_india.py
