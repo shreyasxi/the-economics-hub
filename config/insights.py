@@ -278,9 +278,19 @@ CHART_INSIGHTS: dict[str, str] = {
     # ── MACRO: INFLATION ────────────────────────────────────────────────────
 
     "macro_inflation": """\
-**How to read this chart:** US headline CPI inflation (blue) and core PCE inflation (teal), each the % change on a year earlier, with the 5-year, 5-year forward inflation expectation rate (orange): the average inflation bond markets price for the five years starting five years from now, shown as monthly averages. The dashed line is the Federal Reserve's 2% target, which is defined for PCE inflation. Headline CPI includes food and energy and swings with oil; core PCE leaves them out and is the measure the Fed watches most closely. The lines are smooth curves through the published monthly figures, which are unchanged; the labels give the latest reading. CPI has no October 2025 figure because the US government shutdown cancelled that month's survey.
+**How to read this chart:** Each bar splits headline CPI inflation, the % change in US consumer prices on a year earlier, into what each part of the basket contributed, in percentage points: the category's own price change times its share of household spending (the BLS relative importance weights). Bars above zero pushed inflation up and bars below zero held it down; stacked, they add up to the black line. The five categories:
 
-**Practical takeaway:** Core PCE running well above 2% keeps the Fed cautious about cutting, which keeps US yields and the dollar firm and tightens conditions for emerging markets, India included, through portfolio flows and the rupee. The expectations line is the credibility check: while it stays near 2–2.5% as actual inflation swings, markets expect a spike to fade. A sustained move above 2.5% would signal that investors doubt the Fed will bring inflation back to target, the case in which it keeps policy tight even as growth slows.
+1. **Energy:** petrol, fuel oil, electricity and piped gas. The most volatile part of the index.
+2. **Food:** food at home and eating out.
+3. **Core goods:** goods other than food and energy, such as cars, clothing, furniture and medicines.
+4. **Services ex-shelter:** services other than housing and energy, such as medical care, car insurance, airfares and recreation. Labour is a large part of their cost, so the Fed watches them for wage-driven inflation.
+5. **Shelter:** rent and owners' equivalent rent, about a third of the index. It follows market rents with a lag of a year or more.
+
+The black line is headline CPI, not seasonally adjusted: the basis of the rate BLS reports. The maroon line is core PCE, the personal consumption expenditures price index without food and energy and the measure the Fed watches most closely; the dashed line is the Fed's 2% target, which is defined for headline PCE. Core PCE is published a few weeks after CPI, so its line can end a month earlier. October 2025 is blank because the government shutdown cancelled that month's CPI survey.
+
+**Practical takeaway:** In August 2026 headline CPI was 3.4%. Energy added 1.1 points, with energy prices 16% higher than a year earlier, and shelter another 1.1. The rise from 2.4% in February to 4.2% in May was more than four-fifths energy, whose contribution went from next to nothing to 1.6 points. The core categories point the other way: goods and services outside food and energy added 1.95 points in August, down from 2.5 a year earlier and 3.3 in September 2023, as shelter's contribution more than halved. An energy jump drops out of the 12-month rate a year after it arrives unless prices keep climbing, so on the CPI alone the spike looks set to fade.
+
+Core PCE is the complication. At 3.3% in July 2026 it was up from 2.9% a year earlier and nearly a point above core CPI (2.5%). The two weigh the basket differently: shelter, whose slowdown did most of the cooling in the CPI, has less than half the weight in PCE, so the Fed's own gauge shows little of that relief. Core PCE this far above 2% leaves the Fed little room to look through an energy shock, which keeps US yields and the dollar firm and tightens conditions for emerging markets, India included, through portfolio flows and the rupee. Watch the services ex-shelter bar: if the energy shock feeds into wages and service prices, it will grow.
 """,
 
     "macro_labour": """\

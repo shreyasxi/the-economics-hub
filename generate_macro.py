@@ -56,7 +56,7 @@ import matplotlib.image as mpimg
 from charts.style import EconStyle
 from data.fetchers.fred_fetcher import FredFetcher
 from config.settings import FRED_API_KEY
-from config.macro_settings import EM_FX_PEERS, MACRO_INDICATORS
+from config.macro_settings import CPI_INDEXES, CPI_RELATIVE_IMPORTANCE, EM_FX_PEERS, MACRO_INDICATORS
 from config.world_settings import OECD_CLI_COUNTRIES
 from data.world_snapshot import (apply_rate_update, build_rate_update, build_snapshot, monthly,
                                  rates_fingerprint, yoy_by_date)
@@ -90,12 +90,12 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     "inflation": {
         "dashboard": (
             "US Inflation Metrics",
-            "Headline CPI and core PCE, % year on year, vs. 5y5y forward inflation expectations (monthly average)",
+            "What is driving US inflation: each category's contribution to headline CPI, and the Fed's core PCE gauge",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "US Inflation Metrics",
-            "Headline CPI and core PCE, % year on year, vs. 5y5y forward inflation expectations (monthly average)",
+            "What is driving US inflation: each category's contribution to headline CPI, and the Fed's core PCE gauge",
         ),
     },
     "labour": {
@@ -480,19 +480,6 @@ def weekly_average(series, today=None):
     return weekly[starts_in_data & (weekly.index < today)]
 
 
-def complete_month_average(series, today=None):
-    """Mean of each calendar month that is fully inside the data and already over, dated the 1st."""
-    s = series.dropna()
-    if s.empty:
-        return s
-    today = pd.Timestamp(today or date.today())
-    monthly_mean = s.groupby(s.index.to_period("M")).mean()
-    monthly_mean.index = monthly_mean.index.to_timestamp()
-    # A month's first trading day can fall as late as the 4th (weekend plus a holiday).
-    first_full = monthly_mean.index[0] if s.index[0].day <= 4 else monthly_mean.index[0] + pd.DateOffset(months=1)
-    return monthly_mean[(monthly_mean.index >= first_full) & (monthly_mean.index < today.replace(day=1))]
-
-
 def _draw_line(ax, x, y, color, width=2.0, zorder=3, halo=True):
     """A line with a thin white edge, so lines that cross stay distinct (off where a reference line runs along the data)."""
     effects = [pe.Stroke(linewidth=width + 2.0, foreground="white"), pe.Normal()] if halo else None
@@ -619,41 +606,153 @@ def _panel_title(ax, text, badge=None, note=None):
                     bbox=dict(boxstyle="round,pad=0.45", facecolor="#E6EDF6", edgecolor="#B9CBE3", linewidth=0.8))
 
 
+def cpi_contributions(indexes, weights):
+    """
+    Each category's contribution to CPI inflation over 12 months, in percentage
+    points, by the BLS method. `indexes` holds monthly indexes, not seasonally
+    adjusted: an "all_items" column and one column per category. `weights` maps
+    a year to each category's relative importance that December (percent of
+    all items), the weights for the twelve months after it.
+
+    Within a year the CPI is a fixed basket, so a category's share of it in any
+    month is its December share carried forward by its price change relative
+    to all items. BLS brings in new weights each January, so a 12-month change
+    that crosses a December is split there: each part uses its own year's
+    shares, and the part after December is scaled by the change up to it so
+    the two add up. Categories that cover all items once add up to its
+    12-month change. A month is left out if an index it needs is missing
+    (October 2025) or a December it needs has no weights.
+    """
+    idx = indexes.copy()
+    idx.index = pd.to_datetime(idx.index).to_period("M").to_timestamp()
+    total = idx.pop("all_items")
+
+    def link(start, end):
+        """Contributions from `start` to `end` within one weight year; None if anything is missing."""
+        base = start if start.month == 12 else pd.Timestamp(start.year - 1, 12, 1)
+        if base.year not in weights or not all(m in idx.index for m in (base, start, end)):
+            return None
+        at = {m: (idx.loc[m], total[m]) for m in (base, start, end)}
+        if any(row.isna().any() or pd.isna(level) for row, level in at.values()):
+            return None
+        (i_base, a_base), (i_start, a_start), (i_end, _) = at[base], at[start], at[end]
+        share = pd.Series(weights[base.year])[idx.columns] * (i_start / i_base) / (a_start / a_base)
+        return share * (i_end / i_start - 1)
+
+    out = {}
+    for month in idx.index:
+        start = month - pd.DateOffset(months=12)
+        if start.month == 12:
+            parts = link(start, month)
+        else:
+            december = pd.Timestamp(start.year, 12, 1)
+            before, after = link(start, december), link(december, month)
+            parts = None if before is None or after is None else before + after * (total[december] / total[start])
+        if parts is not None:
+            out[month] = parts
+    return pd.DataFrame(list(out.values()), index=pd.DatetimeIndex(list(out.keys())), columns=idx.columns)
+
+
+# CPI categories, stacked from the zero line outwards: the steadiest nearest
+# it, energy (the one that swings) on the outside. Checked with the dataviz
+# palette validator on white (adjacent pairs, and all pairs with the core PCE
+# line's maroon); the light blue and amber are under 3:1, so the legend names them.
+CPI_BARS = [
+    ("shelter", "Shelter", "#1F5596"),
+    ("services_ex_shelter", "Services ex-shelter", "#74A9E3"),
+    ("core_goods", "Core goods", "#8A5CB8"),
+    ("food", "Food", "#4F9D5D"),
+    ("energy", "Energy", "#F0A202"),
+]
+INFLATION_MONTHS = 36
+CPI_ADD_UP_TOLERANCE = 0.05   # points: categories further than this from the headline rate mean a mistyped weight
+
+
 def chart_inflation(engine, output_dir, mode="dashboard"):
-    """US headline CPI and core PCE inflation, market inflation expectations and the Fed's 2% target."""
-    cpi = engine.get_transformed("us_cpi_yoy")
-    pce = engine.get_transformed("us_core_pce")
-    # The daily 5y5y rate as averages of complete months, so all three lines are monthly.
-    expectations = complete_month_average(engine.get_transformed("us_inflation_exp"))
-    lines = [(s, name, color) for s, name, color in [
-        (cpi, "Headline CPI", LINE_BLUE), (pce, "Core PCE", LINE_TEAL), (expectations, "5y5y expectations", LINE_ORANGE),
-    ] if not s.empty]
-    if not lines:
-        raise ValueError("no US inflation series")
+    """
+    What is driving US inflation: stacked bars of each CPI category's
+    contribution to the 12-month headline rate (above zero it added to
+    inflation, below it held it down), with headline CPI and core PCE as lines
+    and the Fed's 2% target.
+    """
+    indexes = pd.DataFrame({key: monthly(engine.fetch_raw(f"us_cpi_{key}")) for key in CPI_INDEXES})
+    headline = yoy_by_date(indexes["all_items"])
+    if headline.empty:
+        raise ValueError("no US CPI")
+    latest = headline.index[-1]
+    contributions = cpi_contributions(indexes, CPI_RELATIVE_IMPORTANCE)
+    if latest not in contributions.index:
+        missing = [y for y in (latest.year - 2, latest.year - 1) if y not in CPI_RELATIVE_IMPORTANCE]
+        raise ValueError(f"US CPI for {latest:%B %Y} cannot be split by category: " + (
+            f"add BLS relative importance for December {missing[-1]} to CPI_RELATIVE_IMPORTANCE "
+            f"(config/macro_settings.py)" if missing else "a category index is missing that month"))
+
+    months = pd.period_range(latest - pd.DateOffset(months=INFLATION_MONTHS - 1), latest, freq="M")
+    in_window = lambda s: s[(s.index >= months[0].to_timestamp()) & (s.index <= latest)]
+    parts, headline = in_window(contributions), in_window(headline)
+    off = (parts.drop(columns="shelter").sum(axis=1) - headline).abs()
+    if off.max() > CPI_ADD_UP_TOLERANCE:
+        raise ValueError(f"US CPI categories miss the headline rate by {off.max():.2f} points in "
+                         f"{off.idxmax():%B %Y}: check CPI_RELATIVE_IMPORTANCE (config/macro_settings.py)")
+    parts["services_ex_shelter"] = parts.pop("core_services") - parts["shelter"]
+    pce = in_window(yoy_by_date(engine.fetch_raw("us_core_pce")))
 
     EconStyle.apply_global_style()
     fig, ax = EconStyle.create_figure(size="wide")
-    start = min(s.index[0] for s, _, _ in lines)
-    end = max(s.index[-1] for s, _, _ in lines)
+    mid_month = lambda index: index.to_period("M").to_timestamp() + pd.Timedelta(days=14)
+    x = mid_month(parts.index)
+    above, below = np.zeros(len(parts)), np.zeros(len(parts))
+    for key, _, color in CPI_BARS:
+        v = parts[key].to_numpy()
+        for base, part in ((above, np.clip(v, 0, None)), (below, np.clip(v, None, 0))):
+            ax.bar(x, part, bottom=base, width=20, color=color, edgecolor=EconStyle.BACKGROUND, linewidth=0.5,
+                   zorder=3)
+            base += part
+    ax.hlines(2.0, mdates.date2num(months[0].to_timestamp()), mdates.date2num(x[-1] + pd.Timedelta(days=16)),
+              colors=INK_MUTED, linewidth=1.2, linestyles=(0, (4, 2.5)), zorder=4)
 
-    labels = []
-    for s, name, color in lines:
-        _draw_line(ax, *monotone_curve(s.index, s.values), color, width=HEAVY_LINE)
-        _end_dot(ax, s.index[-1], s.iloc[-1], color, size=58)
-        labels.append({"y": float(s.iloc[-1]), "name": name, "value": f"{s.iloc[-1]:.2f}%", "color": color})
-    ax.hlines(2.0, start, end, colors=INK_MUTED, linewidth=1.6, linestyles=(0, (4, 2.5)), zorder=2)
-    labels.append({"y": 2.0, "name": "Fed target", "value": "2%", "color": INK_MUTED})
+    # Headline CPI is what the bars add up to, so it is the heavier line, with a
+    # dot on each month to tie it to its bar; core PCE is the comparison.
+    labels = [{"y": 2.0, "name": "Fed target", "value": "2%", "color": INK_MUTED}]
+    for s, name, color, width, dots in [(headline, "Headline CPI", INK, 2.2, True),
+                                        (pce, "Core PCE", LINE_MAROON, 1.7, False)]:
+        if s.empty:
+            continue
+        _draw_line(ax, *monotone_curve(mid_month(s.index), s.values), color, width=width, zorder=5)
+        if dots:
+            ax.scatter(mid_month(s.index), s.values, s=11, color=color, edgecolors="white", linewidths=0.6, zorder=6)
+        _end_dot(ax, mid_month(s.index)[-1], s.iloc[-1], color, zorder=7, size=40)
+        labels.append({"y": float(s.iloc[-1]), "name": name, "value": f"{s.iloc[-1]:.1f}%", "color": color})
 
-    _style_line_axes(ax, lambda v, _: f"{v:.1f}%")
-    _padded_ylim(ax, [s.min() for s, _, _ in lines] + [2.0], [s.max() for s, _, _ in lines])
-    _time_axis(ax, start, end, right_margin=0.24)
-    _margin_labels(ax, labels, end)
+    top = max(above.max(), headline.max(), pce.max() if not pce.empty else 0, 2.0)
+    bottom = below.min() - top * 0.06
+    if below.min() < 0:
+        bottom = min(bottom, np.floor(below.min()))    # a labelled gridline under the bars below zero
+    ax.set_ylim(bottom, top * 1.16)       # headroom for the legend above the tallest bar
+    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=7, steps=[1, 2, 5, 10]))
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(
+        lambda v, _: (f"{v:.0f}%" if v == round(v) else f"{v:.1f}%").replace("-", "\u2212")))
+    ax.set_yticks([t for t in ax.get_yticks() if bottom <= t <= top * 1.03])
+    _rate_cycle_frame(ax, months, x, right_margin=0.2)
+
+    for m in months:                     # a month with no CPI (October 2025) is marked, not left unexplained
+        if m.to_timestamp() not in parts.index:
+            ax.text(m.to_timestamp() + pd.Timedelta(days=14), top * 0.04, "No data", rotation=90, ha="center",
+                    va="bottom", fontsize=7, color=EconStyle.TEXT_MUTED, zorder=4)
+    _margin_labels(ax, labels, x[-1] + pd.Timedelta(days=10))
+    ax.legend([_bar_key(color) for _, _, color in reversed(CPI_BARS)], [name for _, name, _ in reversed(CPI_BARS)],
+              loc="upper left", ncol=len(CPI_BARS), frameon=False, fontsize=9, handlelength=1.1, handleheight=0.9,
+              handletextpad=0.5, columnspacing=1.4, borderaxespad=0.1)
+
+    note = ("Bars: each category's price change times its share of the CPI basket. They add up to headline CPI, "
+            "not seasonally adjusted.")
+    fig.text(0.04, 0.058, note, fontsize=7.5, color=EconStyle.TEXT_MUTED, ha="left", va="bottom")
 
     _t, _s = MACRO_TITLES["inflation"][mode]
     EconStyle.set_title(ax, _t, _s)
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "FRED (BLS, BEA, Federal Reserve Bank of St. Louis)")
+    fig.tight_layout(rect=[0.02, 0.09, 0.98, 0.96])
+    EconStyle.add_source(fig, "BLS (CPI and its relative importance weights), BEA (core PCE), via FRED")
     EconStyle.save_chart(fig, output_dir / "01_macro_inflation.png")
     print("   ✓ US Inflation Metrics")
 

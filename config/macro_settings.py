@@ -12,9 +12,10 @@ data/valuations.py.
 Series retired in Sep 2026 because Weekly Markets already charts them, or
 they carried little signal: HY/EM credit spreads, EMLC, NFCI, M2, 2s10s,
 10y–3m, 10Y real yield, mortgage rate, housing starts, Michigan sentiment,
-and (with the United States summary table and the Sahm rule chart) the Sahm
-rule. Eurozone and UK CPI/unemployment moved to the scoreboard (the FRED
-copies had stopped updating). The Emerging Markets section uses EM bond
+(with the United States summary table and the Sahm rule chart) the Sahm
+rule, and the 5y5y forward inflation expectation rate (Weekly charts the 5-
+and 10-year breakevens). Eurozone and UK CPI/unemployment moved to the
+scoreboard (the FRED copies had stopped updating). The Emerging Markets section uses EM bond
 YIELDS and the EM dollar index against the rupee, so it does not repeat
 Weekly's EM stress monitor (spreads against the EM dollar index).
 """
@@ -30,16 +31,8 @@ MACRO_INDICATORS = {
     # ═══════════════════════════════════════════
     # INFLATION
     # ═══════════════════════════════════════════
-    "us_cpi_yoy": {
-        "series": "CPIAUCSL",
-        "name": "US CPI (All Items)",
-        "frequency": "monthly",
-        "transform": "yoy_pct",
-        "unit": "% YoY",
-        "group": "inflation",
-        "history_years": 3,
-        "max_age": 75,
-    },
+    # The CPI indexes (all items and the categories in CPI_CATEGORIES below)
+    # are added after this dict.
     "us_core_pce": {
         "series": "PCEPILFE",
         "name": "US Core PCE",
@@ -49,16 +42,6 @@ MACRO_INDICATORS = {
         "group": "inflation",
         "history_years": 3,
         "max_age": 100,
-    },
-    "us_inflation_exp": {
-        "series": "T5YIFR",
-        "name": "5Y5Y Inflation Expectations",
-        "frequency": "daily",
-        "transform": "level",
-        "unit": "%",
-        "group": "inflation",
-        "history_years": 3,
-        "max_age": 10,
     },
 
     # ═══════════════════════════════════════════
@@ -190,4 +173,50 @@ MACRO_INDICATORS.update({
         "unit": "FX", "group": "emerging_markets", "history_years": 3, "max_age": 16,
     }
     for key, (series, name) in EM_FX_PEERS.items()
+})
+
+# ─────────────────────────────────────────────
+# US CPI BY CATEGORY
+# ─────────────────────────────────────────────
+# The inflation chart splits headline CPI inflation into what each category
+# contributed. The indexes are NOT seasonally adjusted: those are the ones BLS
+# aggregates (seasonally adjusted indexes do not add up), and their 12-month
+# change is the headline rate BLS publishes. Food, energy, core goods and core
+# services cover all items exactly once; shelter is part of core services, and
+# the chart shows it and the rest of core services as separate bars.
+#   key: (FRED series, name); each becomes indicator "us_cpi_<key>"
+CPI_INDEXES = {
+    "all_items":     ("CPIAUCNS", "US CPI, all items (NSA)"),
+    "food":          ("CPIUFDNS", "US CPI, food (NSA)"),
+    "energy":        ("CPIENGNS", "US CPI, energy (NSA)"),
+    "core_goods":    ("CUUR0000SACL1E", "US CPI, commodities less food and energy commodities (NSA)"),
+    "core_services": ("CUUR0000SASLE", "US CPI, services less energy services (NSA)"),
+    "shelter":       ("CUUR0000SAH1", "US CPI, shelter (NSA)"),
+}
+
+# BLS relative importance in December (CPI-U, U.S. city average, percent of
+# all items), keyed by year: each December's figures are the weights for the
+# twelve months after it. A 12-month change starts up to two Decembers back,
+# so the chart's three years need five Decembers.
+#
+# UPDATE EVERY FEBRUARY: BLS publishes the December figures with January's
+# CPI, at https://www.bls.gov/cpi/tables/relative-importance/<year>.htm (the
+# rows Food, Energy, Commodities less food and energy commodities, Services
+# less energy services, Shelter). Until the new year is added, the run fails
+# and names what is missing. A mistyped figure fails it too: the chart checks
+# that the categories add up to the headline rate.
+CPI_RELATIVE_IMPORTANCE = {
+    2021: {"food": 13.370, "energy": 7.348, "core_goods": 21.699, "core_services": 57.583, "shelter": 32.946},
+    2022: {"food": 13.531, "energy": 6.921, "core_goods": 21.361, "core_services": 58.187, "shelter": 34.413},
+    2023: {"food": 13.555, "energy": 6.655, "core_goods": 18.891, "core_services": 60.899, "shelter": 36.191},
+    2024: {"food": 13.691, "energy": 6.216, "core_goods": 19.388, "core_services": 60.705, "shelter": 35.483},
+    2025: {"food": 13.698, "energy": 6.383, "core_goods": 19.176, "core_services": 60.744, "shelter": 35.625},
+}
+
+MACRO_INDICATORS.update({
+    f"us_cpi_{key}": {
+        "series": series, "name": name, "frequency": "monthly", "transform": "level",
+        "unit": "index", "group": "inflation", "history_years": 5, "max_age": 75,
+    }
+    for key, (series, name) in CPI_INDEXES.items()
 })

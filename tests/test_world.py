@@ -24,9 +24,10 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import data.world_snapshot as ws
+from config.macro_settings import CPI_RELATIVE_IMPORTANCE
 from config.world_settings import CENTRAL_BANKS, MANUAL_FIELDS
 from data.world_manual_entry import HEADER, ManualDataError, load_rows, validate_row
-from generate_macro import _spread_labels_centred, complete_month_average, monotone_curve, weekly_average, write_snapshot
+from generate_macro import _spread_labels_centred, cpi_contributions, monotone_curve, weekly_average, write_snapshot
 
 
 def _monthly(values: dict) -> pd.Series:
@@ -438,11 +439,59 @@ def test_end_labels_never_overlap_and_stay_centred():
     assert ys[2] == 2.31 and ys[3] == 2.0                    # labels with room stay beside their lines
 
 
-def test_complete_month_average_drops_part_months():
-    days = pd.bdate_range("2026-06-15", "2026-09-15")
-    s = pd.Series(1.0, index=days)
-    m = complete_month_average(s, today=date(2026, 9, 15))
-    assert list(m.index.strftime("%Y-%m")) == ["2026-07", "2026-08"]
+# ── CPI by category ─────────────────────────────────────────────────────────
+
+def _cpi_basket(weights):
+    """
+    Two categories priced monthly from Dec 2024 to Dec 2026, and all items
+    built from them the way BLS builds it: a fixed basket within each year,
+    re-weighted each January from the December relative importance.
+    """
+    months = pd.date_range("2024-12-01", "2026-12-01", freq="MS")
+    a = pd.Series([100 * 1.004 ** i for i in range(len(months))], index=months)          # steady
+    b = pd.Series([100 * (1 + 0.03 * ((i % 7) - 3) / 3) for i in range(len(months))], index=months)  # swings
+    total, level = {}, 100.0
+    for year in (2025, 2026):
+        dec = pd.Timestamp(year - 1, 12, 1)
+        w = weights[year - 1]
+        for m in months[(months.year == year)]:
+            total[m] = level * (w["a"] * a[m] / a[dec] + w["b"] * b[m] / b[dec]) / 100
+        level = total[pd.Timestamp(year, 12, 1)]
+    total[months[0]] = 100.0
+    return pd.DataFrame({"all_items": pd.Series(total), "a": a, "b": b}).sort_index()
+
+
+def test_cpi_contributions_add_up_across_a_weight_update():
+    """Every 12-month change in 2026 crosses the January re-weighting; the parts must still add up."""
+    weights = {2024: {"a": 60.0, "b": 40.0}, 2025: {"a": 45.0, "b": 55.0}}
+    basket = _cpi_basket(weights)
+    c = cpi_contributions(basket, weights)
+    yoy = ws.yoy_by_date(basket["all_items"])
+    assert list(c.index.strftime("%Y-%m")) == [f"2025-{m:02d}" for m in (12,)] + [f"2026-{m:02d}" for m in range(1, 13)]
+    for month, row in c.iterrows():
+        assert abs(row.sum() - yoy[month]) < 1e-9, f"{month:%b %Y}: {row.sum()} vs {yoy[month]}"
+    # December to December is one weight year: the new December shares times each price change.
+    dec, prior = pd.Timestamp("2026-12-01"), pd.Timestamp("2025-12-01")
+    assert abs(c.loc[dec, "a"] - 45.0 * (basket.loc[dec, "a"] / basket.loc[prior, "a"] - 1)) < 1e-9
+
+
+def test_cpi_contributions_leave_out_months_they_cannot_split():
+    weights = {2024: {"a": 60.0, "b": 40.0}, 2025: {"a": 45.0, "b": 55.0}}
+    basket = _cpi_basket(weights).drop(pd.Timestamp("2025-10-01"))          # no October 2025 CPI
+    months = cpi_contributions(basket, weights).index.strftime("%Y-%m")
+    assert "2026-10" not in months and "2026-09" in months
+    without_2025 = cpi_contributions(basket, {2024: weights[2024]}).index      # December 2025 weights missing
+    assert list(without_2025.strftime("%Y-%m")) == ["2025-12"]                  # only the month they are not needed
+
+
+def test_committed_cpi_weights_cover_all_items_once():
+    """Catches a mistyped BLS figure: food, energy, core goods and core services are all items."""
+    for year, w in CPI_RELATIVE_IMPORTANCE.items():
+        parts = w["food"] + w["energy"] + w["core_goods"] + w["core_services"]
+        assert abs(parts - 100) < 0.01, f"December {year} weights add up to {parts:.3f}, not 100"
+        assert 0 < w["shelter"] < w["core_services"], f"December {year}: shelter must be part of core services"
+    years = sorted(CPI_RELATIVE_IMPORTANCE)
+    assert years == list(range(years[0], years[-1] + 1)), "a December is missing between the first and last"
 
 
 # ── Manual entry ────────────────────────────────────────────────────────────
