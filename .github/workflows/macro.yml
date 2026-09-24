@@ -64,7 +64,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/macro/ assets/readme_showcase/
+          git add -A assets/macro/ assets/readme_showcase/ data/gdp_ppp.csv   # GDP weights for the rate cycle
           git diff --staged --quiet && echo "No changes to commit." && exit 0
           git commit -m "chore: World charts $(date -u +%Y-%m-%d)"
           git push

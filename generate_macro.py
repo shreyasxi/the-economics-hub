@@ -9,7 +9,8 @@ Writes:
   world_snapshot.json       central bank rates, six-economy scoreboard,
                             global rate cycle, US data calendar
   01, 02, 07                US inflation, labour, Fed balance sheet
-  10_macro_rate_cycle       central banks hiking and cutting each month (BIS)
+  10_macro_rate_cycle       the global rate cycle: central banks' moves each month (BIS),
+                            in basis points weighted by GDP
   11_macro_oecd_cli         OECD composite leading indicators, one panel per economy
   14_macro_em_borrowing     EM corporate dollar bond yields vs the 10-year Treasury
   15_macro_em_dollar        the dollar against EM currencies and the rupee
@@ -133,12 +134,12 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     "rate_cycle": {
         "dashboard": (
             "The Global Rate Cycle",
-            "Central banks that raised (above the line) or cut (below) their policy rate each month",
+            "How hard the world is tightening: each move in basis points, weighted by the size of the economy",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "The Global Rate Cycle",
-            "Central banks that raised (above the line) or cut (below) their policy rate each month",
+            "How hard the world is tightening: each move in basis points, weighted by the size of the economy",
         ),
     },
     "oecd_cli": {
@@ -980,98 +981,160 @@ def _spread_labels(values, min_gap):
 # Hikes red, cuts blue: the Weekly tab's diverging pair, validated on white.
 RATE_HIKE, RATE_CUT = EconStyle.LOSS, EconStyle.GAIN
 BANK_NAMES = {"US": "Fed", "XM": "ECB", "GB": "BoE", "JP": "BoJ", "IN": "RBI"}
-# Episodes named on the chart: (month the label sits over, text, above or below
-# the line, alignment). The 2022 label ends at its peak, leaving the top right
-# corner to the latest month.
+RATE_BALANCE_MONTHS = 6     # the lines: net of hikes and cuts, averaged over this many months
+# Episodes named on the chart: (first month, last month, text, hike or cut
+# side, alignment). Each label sits on a rail just beyond the tallest bar on
+# its side, with a leader down (or up) to the tallest bar in its months; the
+# alignment keeps neighbouring labels apart.
 RATE_CYCLE_EPISODES = [
-    ("2001-09", "2001 recession", "cut", "center"),
-    ("2006-06", "2004–06 tightening", "hike", "center"),
-    ("2008-11", "Financial crisis", "cut", "center"),
-    ("2020-03", "Pandemic", "cut", "center"),
-    ("2022-09", "Post-pandemic inflation", "hike", "right"),
+    ("2001-01", "2001-12", "2001 recession", "cut", "center"),
+    ("2004-06", "2006-06", "Fed's 17 straight hikes", "hike", "right"),
+    ("2008-02", "2008-08", "2008: mostly emerging markets", "hike", "left"),
+    ("2008-09", "2009-03", "Financial crisis", "cut", "center"),
+    ("2020-01", "2020-06", "Pandemic", "cut", "center"),
+    ("2021-06", "2023-09", "Post-pandemic inflation", "hike", "right"),
+    ("2026-05", "2026-08", "Hikes return", "hike", "right"),
 ]
 
 
-def chart_rate_cycle(cycle, output_dir, mode="dashboard", today=None):
+def _rate_cycle_frame(ax, months, x, right_margin=0.16):
     """
-    Diverging monthly bars: how many of the central banks the BIS covers
-    raised their policy rate (up) and how many cut it (down) in each month
-    since 2000. The latest month is marked as partial while it is still
-    running or not every bank has reported it.
+    Recessive y grid, no spines, dates only within the data, and a zero line
+    that stops at the latest bar: the margin beyond it holds that month's figures.
     """
-    if not cycle or not cycle.get("hikes"):
-        raise ValueError("no rate cycle in the snapshot")
-    today = pd.Timestamp(today or date.today())
-    months = pd.period_range(cycle["start"], periods=len(cycle["hikes"]), freq="M")
-    x = months.to_timestamp() + pd.Timedelta(days=14)   # bar centred mid-month
-    hikes, cuts = np.array(cycle["hikes"]), np.array(cycle["cuts"])
-    reporting, banks = np.array(cycle["reporting"]), cycle["banks"]
-    last = months[-1]
-    partial = last >= today.to_period("M") or reporting[-1] < banks
-
-    EconStyle.apply_global_style()
-    fig, ax = EconStyle.create_figure(size=(9.5, 6.2))
-    alpha = np.where(np.arange(len(months)) == len(months) - 1, 0.55 if partial else 1.0, 1.0)
-    for xi, h, c, a in zip(x, hikes, cuts, alpha):
-        if h:
-            ax.bar(xi, h, width=24, color=RATE_HIKE, alpha=a, linewidth=0, zorder=3)
-        if c:
-            ax.bar(xi, -c, width=24, color=RATE_CUT, alpha=a, linewidth=0, zorder=3)
-    ax.axhline(0, color=INK, linewidth=1.0, zorder=4)
-
-    top = max(hikes.max(), cuts.max())
-    lim = top * 1.28
-    ax.set_ylim(-lim, lim)
-    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=8, steps=[1, 2, 5, 10], integer=True))
-    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{abs(v):.0f}"))
-    ax.set_yticks([t for t in ax.get_yticks() if abs(t) <= top * 1.05])
     ax.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=0.5)
     ax.grid(axis="x", visible=False)
     ax.set_axisbelow(True)
     for spine in ("top", "right", "left", "bottom"):
         ax.spines[spine].set_visible(False)
     ax.tick_params(axis="y", length=0, labelsize=EconStyle.FONT_SIZE_TICK, pad=4)
-    _time_axis(ax, months[0].to_timestamp(), x[-1], right_margin=0.02)
+    _time_axis(ax, months[0].to_timestamp(), x[-1], right_margin=right_margin)
+    ax.hlines(0, ax.get_xlim()[0], mdates.date2num(x[-1] + pd.Timedelta(days=16)), color=INK, linewidth=1.0,
+              zorder=4)
 
-    side = dict(xycoords="axes fraction", fontsize=9.5, fontweight="bold", ha="left")
-    ax.annotate("Raised rates", xy=(0.005, 0.965), va="top", color=RATE_HIKE, **side)
-    ax.annotate("Cut rates", xy=(0.005, 0.035), va="bottom", color=RATE_CUT, **side)
 
-    for when, text, kind, align in RATE_CYCLE_EPISODES:
-        m = pd.Period(when, "M")
-        if m < months[0] or m > last:
+def _bar_key(color):
+    return plt.Rectangle((0, 0), 1, 1, color=color, linewidth=0)
+
+
+def _label_rate_episodes(fig, ax, x, months, hikes, cuts, lines, gap):
+    """
+    Name the RATE_CYCLE_EPISODES. Hike-side labels share one rail above the
+    tallest bar, cut-side labels one rail below the deepest, each with a thin
+    leader to the tallest bar (or line) in its months. A label that would run
+    into one already on its rail drops to a second rail further out.
+    """
+    renderer = fig.canvas.get_renderer()
+    centres = mdates.date2num(x.to_pydatetime())
+    rails = {"hike": hikes.max() + gap, "cut": -(cuts.max() + gap)}
+    placed = []
+    for first, last, text, kind, align in RATE_CYCLE_EPISODES:
+        m0, m1 = pd.Period(first, "M"), pd.Period(last, "M")
+        if m0 < months[0] or m1 > months[-1]:
             continue
-        i = months.get_loc(m)
-        window = slice(max(0, i - 3), i + 4)
-        y = (hikes[window].max() + 1.2) if kind == "hike" else -(cuts[window].max() + 1.2)
-        ax.annotate(text, xy=(x[i], y), ha=align, va="bottom" if kind == "hike" else "top",
-                    fontsize=8, color=INK_MUTED, zorder=5,
-                    path_effects=[pe.withStroke(linewidth=2.5, foreground=EconStyle.BACKGROUND)])
+        up = kind == "hike"
+        sign = 1 if up else -1
+        i0, i1 = months.get_loc(m0), months.get_loc(m1)
+        bars = (hikes if up else cuts)[i0:i1 + 1]
+        at = i0 + int(np.argmax(bars))
+        tip = bars.max()
+        for line in lines:                      # a line passing above the bar: the leader stops at the line
+            if x[at] in line.index:
+                tip = max(tip, line[x[at]] * sign)
+        y = rails[kind]
+        label = ax.text(centres[at], y, text, ha=align, va="bottom" if up else "top", fontsize=8.5,
+                        color=INK_MUTED, zorder=7)
+        box = label.get_window_extent(renderer)
+        while any(b.overlaps(box) for b in placed):
+            y += sign * gap * 1.6
+            label.set_y(y)
+            box = label.get_window_extent(renderer)
+        placed.append(box.expanded(1.04, 1.0))
+        ax.annotate("", xy=(centres[at], sign * (tip + gap * 0.25)), xytext=(centres[at], y),
+                    textcoords="data", arrowprops=dict(arrowstyle="-", color=INK_MUTED, linewidth=0.6,
+                                                       shrinkA=1.5, shrinkB=0), zorder=6)
+
+
+def chart_rate_cycle(cycle, output_dir, mode="dashboard", today=None):
+    """
+    The global rate cycle, weighted by the size of each economy: each month's
+    GDP-weighted average move in the policy rates the BIS covers, in basis
+    points, with hikes up and cuts down, the net as a line, and the same net
+    with every bank weighted equally as a dashed line. Where the two lines
+    part, big and small economies are moving differently. The latest month is
+    faded while it is still running or not every bank has reported it, and
+    stays out of the lines until it is complete.
+    """
+    w = (cycle or {}).get("weighted")
+    if not w or not cycle.get("hikes"):
+        raise ValueError("no GDP-weighted rate cycle in the snapshot")
+    months = pd.period_range(cycle["start"], periods=len(cycle["hikes"]), freq="M")
+    x = months.to_timestamp() + pd.Timedelta(days=14)   # bar centred mid-month
+    last = months[-1]
+    reporting, banks = cycle["reporting"], cycle["banks"]
+    partial = last >= pd.Timestamp(today or date.today()).to_period("M") or reporting[-1] < banks
+    done = len(months) - 1 if partial else len(months)   # months that are over and fully reported
+    hikes, cuts, equal = (np.array(w[k]) for k in ("hikes_bp", "cuts_bp", "equal_bp"))
+    balance = pd.Series(hikes - cuts, index=x)[:done].rolling(RATE_BALANCE_MONTHS).mean().dropna()
+    by_bank = pd.Series(equal, index=x)[:done].rolling(RATE_BALANCE_MONTHS).mean().dropna()
+
+    EconStyle.apply_global_style()
+    fig, ax = EconStyle.create_figure(size=(9.5, 6.4))
+    for part, fade in ((slice(None, done), 1.0), (slice(done, None), 0.45)):
+        ax.bar(x[part], hikes[part], width=26, color=RATE_HIKE, alpha=fade, linewidth=0, zorder=3)
+        ax.bar(x[part], -cuts[part], width=26, color=RATE_CUT, alpha=fade, linewidth=0, zorder=3)
+    dashed = dict(color=INK_MUTED, linewidth=1.2, linestyle=(0, (3, 2)))
+    ax.plot(*monotone_curve(by_bank.index, by_bank.values), zorder=5, **dashed)
+    _draw_line(ax, *monotone_curve(balance.index, balance.values), INK, width=1.8, zorder=5)
+
+    top = max(hikes.max(), cuts.max(), by_bank.abs().max())
+    ax.set_ylim(-(max(cuts.max(), -by_bank.min()) + top * 0.2), max(hikes.max(), by_bank.max()) + top * 0.3)
+    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=7, steps=[1, 2, 5, 10]))
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.0f} bp".replace("-", "−") if v else "0"))
+    ax.set_yticks([t for t in ax.get_yticks() if -cuts.max() - top * 0.05 <= t <= hikes.max() + top * 0.05])
+    _rate_cycle_frame(ax, months, x, right_margin=0.17)
+    ax.legend([_bar_key(RATE_HIKE), _bar_key(RATE_CUT), plt.Line2D([], [], color=INK, linewidth=1.8), plt.Line2D([], [], **dashed)],
+              ["Hikes", "Cuts", f"Net, {RATE_BALANCE_MONTHS}-month average", "Same, every bank weighted equally"],
+              loc="upper left", ncol=4, frameon=False, fontsize=9, handlelength=1.1, handleheight=0.9,
+              handletextpad=0.5, columnspacing=1.6, borderaxespad=0.1)
+
+    # The latest month, beside its bar: the month, the net move, and how many banks moved.
+    net = hikes[-1] - cuts[-1]
+    tip = hikes[-1] if net >= 0 else -cuts[-1]
+    beside = mdates.date2num(x[-1] + pd.Timedelta(days=70))
+    ax.plot([mdates.date2num(x[-1] + pd.Timedelta(days=18)), beside - 30], [tip, tip], color=INK_MUTED,
+            linewidth=0.6, zorder=6)
 
     def count(n, word):
         return f"{n} {word}{'' if n == 1 else 's'}"
-    ax.annotate(f"{last.strftime('%b %Y')}{' so far' if partial else ''}\n{count(hikes[-1], 'hike')}, {count(cuts[-1], 'cut')}",
-                xy=(x[-1], hikes[-1] + 0.5), xytext=(x[-1], lim * 0.92), ha="right", va="top",
-                fontsize=9, fontweight="bold", color=INK, zorder=6,
-                arrowprops=dict(arrowstyle="-", color=INK_MUTED, linewidth=0.8, shrinkA=2, shrinkB=0),
-                path_effects=[pe.withStroke(linewidth=3, foreground=EconStyle.BACKGROUND)])
+    lines_out = [(f"{last.strftime('%b %Y')}{' so far' if partial else ''}", INK, "bold"),
+                 ("No net change" if not round(net) else f"Net {net:+.0f} bp".replace("-", "−"), INK, "normal"),
+                 (f"{count(cycle['hikes'][-1], 'hike')}, {count(cycle['cuts'][-1], 'cut')}", INK_MUTED, "normal")]
+    for i, (text, color, weight) in enumerate(lines_out):
+        ax.annotate(text, xy=(beside, tip), xytext=(0, 12 - 12 * i), textcoords="offset points", ha="left",
+                    va="center", fontsize=8.5, color=color, fontweight=weight)
 
+    lo, hi = min(reporting[:done]), max(reporting[:done])
+    gdp_year = w["gdp_year"]
+    notes = [f"Moves in basis points by the {lo} to {hi} central banks the BIS tracks, capped at {w['cap_bp']} a month, "
+             f"weighted by GDP at purchasing power parity{f' ({last.year} uses {gdp_year} GDP)' if last.year > gdp_year else ''}."]
     extended = [BANK_NAMES[a] for a in cycle.get("extended", []) if a in BANK_NAMES]
-    lines = ["Each bank counts once a month: its rate at the month's end against the month before.",
-             f"A faded bar is a month in progress or not yet reported by every bank ({reporting[-1]} of {banks} so far)."]
-    if extended:
-        names = extended[0] if len(extended) == 1 else ", ".join(extended[:-1]) + " and " + extended[-1]
-        lines.append(f"Moves since the BIS data end ({pd.Timestamp(cycle['bis_through']):%-d %b}) come from the banks' "
-                     f"own announcements ({names}).")
-    fig.text(0.04, 0.055, "\n".join(lines), fontsize=7.5, color=EconStyle.TEXT_MUTED, ha="left", va="bottom",
+    names = (extended[0] if len(extended) == 1 else ", ".join(extended[:-1]) + " and " + extended[-1]) if extended else ""
+    if partial:
+        notes.append(f"Faded bar: {last.strftime('%B')} so far ({reporting[-1]} of {banks} banks reported"
+                     f"{f'; {names} from their own announcements' if names else ''}).")
+    elif names:
+        notes.append(f"{names} moves since the BIS data end are from their own announcements.")
+    fig.text(0.04, 0.06, "\n".join(notes), fontsize=7.5, color=EconStyle.TEXT_MUTED, ha="left", va="bottom",
              linespacing=1.5)
 
     _t, _s = MACRO_TITLES["rate_cycle"][mode]
-    EconStyle.set_title(ax, _t, f"{_s}, of the {banks} the BIS tracks")
+    EconStyle.set_title(ax, _t, _s)
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.12, 0.98, 0.96])
+    fig.tight_layout(rect=[0.02, 0.06 + 0.028 * len(notes), 0.98, 0.96])
+    _label_rate_episodes(fig, ax, x, months, hikes, cuts, [balance, by_bank], gap=top * 0.05)
     EconStyle.add_source(fig, f"BIS central bank policy rates, data to {pd.Timestamp(cycle['bis_through']):%-d %b %Y}"
-                              f"{'; central bank announcements' if extended else ''}")
+                              f"{'; central bank announcements' if extended else ''}; World Bank GDP")
     EconStyle.save_chart(fig, output_dir / "10_macro_rate_cycle.png")
     print("   ✓ The Global Rate Cycle")
 
@@ -1639,9 +1702,10 @@ def generate_macro_dashboard(mode="dashboard"):
     return 0
 
 def write_snapshot(snapshot, path):
-    """JSON indented one space, with each list of numbers (the rate cycle's monthly counts) kept on one line."""
+    """JSON indented one space, with each list of numbers (the rate cycle's monthly figures) kept on one line."""
     text = json.dumps(snapshot, indent=1, ensure_ascii=False)
-    text = re.sub(r"\[\n\s*(-?\d+(?:,\n\s*-?\d+)*)\n\s*\]",
+    number = r"-?\d+(?:\.\d+)?"
+    text = re.sub(rf"\[\n\s*({number}(?:,\n\s*{number})*)\n\s*\]",
                   lambda m: "[" + re.sub(r",\n\s*", ", ", m.group(1)) + "]", text)
     path.write_text(text + "\n", encoding="utf-8")
 

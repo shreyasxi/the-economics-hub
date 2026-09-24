@@ -19,7 +19,7 @@ Rules (see docs/project_context.md §10):
     "awaiting entry" / "stale" on the page; that is not a problem.
 
 The pure helpers at the top (yoy_by_date, last_move, the announcement
-parsers, rate_moves_by_month, …) are covered by tests/test_world.py.
+parsers, rate_moves_by_month, gdp_weighted_moves, …) are covered by tests/test_world.py.
 """
 
 from __future__ import annotations
@@ -45,6 +45,7 @@ from config.world_settings import (
     BIS_EXTENDED_AREAS,
     CELL_SOURCES,
     COUNTRIES,
+    EURO_MEMBERS_IN_BIS,
     FRED_RELEASES,
     FX_TICKERS,
     HAND_REFRESHED,
@@ -52,7 +53,9 @@ from config.world_settings import (
     OECD_CLI_COUNTRIES,
     OECD_CPI_AREAS,
     OECD_UNEMP_AREAS,
+    RATE_CYCLE_GDP_CODES,
     RATE_CYCLE_START,
+    RATE_MOVE_CAP_BP,
     SCOREBOARD_COLUMNS,
 )
 
@@ -60,6 +63,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 INDIA_DB = PROJECT_ROOT / "data" / "india_macro.db"
 DBIE_WORKBOOK = PROJECT_ROOT / "data" / "50 Macroeconomic Indicators.xlsx"
 PBOC_LEDGER = PROJECT_ROOT / "data" / "pboc_reverse_repo.csv"
+GDP_LEDGER = PROJECT_ROOT / "data" / "gdp_ppp.csv"
 HEADERS = {"User-Agent": "Mozilla/5.0 (EconomicsHub data pipeline; +https://github.com/shreyasxi/the-economics-hub)"}
 
 
@@ -325,14 +329,12 @@ def extend_series(base: pd.Series, fresher: pd.Series | None) -> pd.Series:
     return pd.concat([base, float(base.iloc[-1]) + (after - float(before.iloc[-1]))])
 
 
-def rate_moves_by_month(series: dict[str, pd.Series], start: str) -> pd.DataFrame:
+def month_end_moves(series: dict[str, pd.Series], start: str) -> pd.DataFrame:
     """
-    For each month from `start`: how many central banks ended it with a
-    higher policy rate than they ended the month before (hikes), how many
-    lower (cuts), and how many have data for both month ends (reporting).
-    A bank counts once a month however often it moved. A bank whose data stop
-    early is not counted for the months it has not reported, so the latest
-    month holds only what has been published so far.
+    Each bank's change in policy rate from one month end to the next, in
+    percentage points: one column per bank, one row per month from `start`.
+    NaN where a bank has no data for both month ends, so a bank whose data
+    stop early is left out of the months it has not reported.
     """
     moves = {}
     for area, s in series.items():
@@ -343,12 +345,82 @@ def rate_moves_by_month(series: dict[str, pd.Series], start: str) -> pd.DataFram
         month_end = month_end.reindex(pd.period_range(month_end.index[0], month_end.index[-1], freq="M"))
         moves[area] = month_end.diff()
     df = pd.DataFrame(moves)
-    df = df[df.index >= pd.Period(start, "M")]
+    return df[df.index >= pd.Period(start, "M")]
+
+
+def rate_moves_by_month(series: dict[str, pd.Series], start: str) -> pd.DataFrame:
+    """
+    For each month from `start`: how many central banks ended it with a
+    higher policy rate than they ended the month before (hikes), how many
+    lower (cuts), and how many have data for both month ends (reporting).
+    A bank counts once a month however often it moved. A bank whose data stop
+    early is not counted for the months it has not reported, so the latest
+    month holds only what has been published so far.
+    """
+    df = month_end_moves(series, start)
     return pd.DataFrame({
         "hikes": (df > 1e-6).sum(axis=1),
         "cuts": (df < -1e-6).sum(axis=1),
         "reporting": df.notna().sum(axis=1),
     })
+
+
+def gdp_weighted_moves(moves: pd.DataFrame, gdp: pd.DataFrame, cap_bp: float,
+                       euro_members: tuple[str, ...] = EURO_MEMBERS_IN_BIS) -> pd.DataFrame:
+    """
+    For each month: the average move in policy rates, in basis points,
+    weighted by GDP and split into the part from hikes (`hikes_bp`, >= 0)
+    and from cuts (`cuts_bp`, <= 0); and the same average, net, with every
+    bank weighted equally (`equal_bp`).
+
+    `moves` is month_end_moves (percentage points); `gdp` has one row per
+    year and one column per area (the ledger). A bank's weight is its share
+    of the GDP of the banks reporting that month, from that year's GDP or the
+    latest year there is. A move bigger than `cap_bp` in a month counts as
+    `cap_bp`. The euro area's GDP excludes members reported on their own.
+    """
+    missing = sorted(set(moves.columns) - set(gdp.columns))
+    if missing:
+        raise ValueError(f"no GDP for {', '.join(missing)}: add the World Bank code to RATE_CYCLE_GDP_CODES")
+    years = [min(p.year, gdp.index.max()) for p in moves.index]
+    if years and min(years) < gdp.index.min():
+        raise ValueError(f"GDP starts in {gdp.index.min()}, after the rate cycle's first year {min(years)}")
+    weights = gdp.loc[years, list(moves.columns)].set_axis(moves.index).where(moves.notna())
+    if "XM" in weights:
+        for member in euro_members:
+            if member in weights:
+                weights["XM"] = weights["XM"] - weights[member].fillna(0)
+    weights = weights.div(weights.sum(axis=1), axis=0)
+    bp = (moves * 100).clip(-cap_bp, cap_bp)
+    return pd.DataFrame({
+        "hikes_bp": (bp.clip(lower=0) * weights).sum(axis=1),
+        "cuts_bp": (bp.clip(upper=0) * weights).sum(axis=1),
+        "equal_bp": bp.mean(axis=1),
+    })
+
+
+def parse_worldbank(payload, codes: dict[str, str]) -> pd.DataFrame:
+    """
+    A World Bank indicator response (format=json) as one row per year and
+    one column per area, named by `codes` ({area: World Bank code}). Only
+    years with a value for every area are kept, and those must run without
+    a gap: the latest year is often published for some economies first.
+    """
+    if not isinstance(payload, list) or len(payload) < 2 or not payload[1]:
+        raise ValueError(f"World Bank: no data in the response ({str(payload)[:200]})")
+    if payload[0].get("pages", 1) > 1:
+        raise ValueError("World Bank: the response runs to more than one page; raise per_page")
+    area_of = {code: area for area, code in codes.items()}
+    rows = [(int(r["date"]), area_of[r["countryiso3code"]], r["value"])
+            for r in payload[1] if r.get("countryiso3code") in area_of]
+    df = pd.DataFrame(rows, columns=["year", "area", "value"]).pivot(index="year", columns="area", values="value")
+    absent = sorted(set(codes) - set(df.columns))
+    if absent:
+        raise ValueError(f"World Bank: nothing for {', '.join(absent)}")
+    df = df.sort_index()[sorted(codes)].dropna()
+    if df.empty or (np.diff(df.index) != 1).any():
+        raise ValueError("World Bank: no run of years with GDP for every economy")
+    return df
 
 
 def fx_ytd_pct(closes: pd.Series, usd_per_local: bool, today: date) -> tuple[float, str] | None:
@@ -412,6 +484,38 @@ def fetch_bis_policy(start: str) -> dict[str, pd.Series]:
     if len(out) < 30:
         raise ValueError(f"BIS policy rates: only {len(out)} central banks returned")
     return out
+
+
+WORLD_BANK_GDP_PPP = "https://api.worldbank.org/v2/country/{codes}/indicator/NY.GDP.MKTP.PP.CD"
+
+
+def fetch_worldbank_gdp_ppp(codes: dict[str, str], first_year: int) -> pd.DataFrame:
+    """GDP at purchasing power parity, current international dollars, by year and area (parse_worldbank)."""
+    r = _get(WORLD_BANK_GDP_PPP.format(codes=";".join(codes.values())),
+             {"format": "json", "date": f"{first_year}:{date.today().year}", "per_page": 5000})
+    return parse_worldbank(r.json(), codes)
+
+
+def read_gdp_ledger(path: Path = GDP_LEDGER) -> pd.DataFrame:
+    """The GDP weights for the rate cycle: billions of international dollars at PPP, one row per year."""
+    df = pd.read_csv(path, index_col="year")
+    if df.empty or df.isna().any().any() or (np.diff(df.index) != 1).any():
+        raise ValueError(f"{path.name}: needs a value for every area in every year, years in order without a gap")
+    return df
+
+
+def refresh_gdp_ledger(path: Path = GDP_LEDGER) -> bool:
+    """
+    Rewrite the ledger from the World Bank. The weekday rates refresh only
+    reads it, so a World Bank outage can never hold up a rate decision.
+    Returns True when the figures changed.
+    """
+    fresh = fetch_worldbank_gdp_ppp(RATE_CYCLE_GDP_CODES, int(RATE_CYCLE_START[:4]))
+    text = (fresh / 1e9).round(1).to_csv(index_label="year")
+    if path.exists() and path.read_text() == text:
+        return False
+    path.write_text(text)
+    return True
 
 
 BOJ_DECISIONS = "https://www.boj.or.jp/en/mopo/mpmdeci/mpr_{year}/index.htm"
@@ -825,8 +929,10 @@ def _rate_cycle(bis: dict[str, pd.Series], fresher: dict[str, pd.Series | None],
                 c: _Collector) -> dict | None:
     """
     Hikes and cuts per month across the central banks the BIS covers, as
-    JSON for the chart. For the big banks whose own announcements are read
-    (BIS_EXTENDED_AREAS), moves after BIS's last day are carried on from those.
+    JSON for the charts: how many banks moved, and ("weighted") the GDP-
+    weighted average move in basis points. For the big banks whose own
+    announcements are read (BIS_EXTENDED_AREAS), moves after BIS's last day
+    are carried on from those.
     """
     if not bis:
         return None
@@ -845,7 +951,7 @@ def _rate_cycle(bis: dict[str, pd.Series], fresher: dict[str, pd.Series | None],
             if (tail.diff().abs() > 1e-6).any():
                 extended.append(area)
     moves = rate_moves_by_month(series, RATE_CYCLE_START)
-    return {
+    cycle = {
         "start": str(moves.index[0]),
         "hikes": [int(v) for v in moves["hikes"]],
         "cuts": [int(v) for v in moves["cuts"]],
@@ -854,6 +960,20 @@ def _rate_cycle(bis: dict[str, pd.Series], fresher: dict[str, pd.Series | None],
         "bis_through": through.strftime("%Y-%m-%d"),
         "extended": extended,
     }
+    gdp = c.run(f"GDP ledger ({GDP_LEDGER.name})", read_gdp_ledger)
+    weighted = None if gdp is None else c.run("GDP-weighted rate cycle", gdp_weighted_moves,
+                                              month_end_moves(series, RATE_CYCLE_START), gdp, RATE_MOVE_CAP_BP)
+    if weighted is not None:
+        def bp(values):
+            return [round(float(v), 2) + 0.0 for v in values]    # + 0.0: no "-0.0" in the JSON
+        cycle["weighted"] = {
+            "hikes_bp": bp(weighted["hikes_bp"]),
+            "cuts_bp": bp(-weighted["cuts_bp"]),
+            "equal_bp": bp(weighted["equal_bp"]),
+            "gdp_year": int(gdp.index.max()),
+            "cap_bp": RATE_MOVE_CAP_BP,
+        }
+    return cycle
 
 
 def _policy_cell(cc: str, rates: dict, today: date, problems: list[str]) -> dict:
@@ -935,6 +1055,8 @@ def build_snapshot(fred_api_key: str, sentinel_db: Path, manual_rows: list[dict]
     us_cpi = c.run("FRED CPIAUCSL", fred_series, "CPIAUCSL", "2022-01-01")
     us_unemp = c.run("FRED UNRATE", fred_series, "UNRATE", "2024-01-01")
     us_10y = c.run("FRED DGS10", fred_series, "DGS10", f"{today.year - 1}-01-01")
+    if c.run("World Bank GDP (PPP)", refresh_gdp_ledger):
+        print(f"   World Bank GDP has changed: {GDP_LEDGER.name} rewritten")
     rates = _policy_rates(fred_series, sentinel_db, today, c)
 
     oecd_cpi = c.run("OECD CPI", fetch_oecd, "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",

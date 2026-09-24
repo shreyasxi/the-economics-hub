@@ -153,6 +153,25 @@ OECD_CLI_COUNTRIES = {
 # BIS, which records the loan prime rate rather than the 7-day reverse repo.
 RATE_CYCLE_START = "2000-01"
 BIS_EXTENDED_AREAS = {"US": "US", "XM": "EA", "GB": "UK", "JP": "JP", "IN": "IN"}
+# The GDP-weighted rate cycle sizes each bank's move in basis points and
+# weights it by its economy's GDP at purchasing power parity (World Bank,
+# data/gdp_ppp.csv). Every BIS area needs its World Bank code here. The
+# euro area is the World Bank's EMU aggregate, which counts today's members
+# in every year, so members the BIS still reports on their own (Greece to
+# 2000, Croatia to 2022) are taken out of it while they do. A move bigger
+# than the cap in a month counts as the cap: no big central bank has moved
+# more than 175bp in a month since 2000, and beyond that are currency crises
+# (Argentina 2001, Russia 2014 and 2022) that would otherwise swamp the Fed.
+RATE_CYCLE_GDP_CODES = {
+    "AR": "ARG", "AU": "AUS", "BR": "BRA", "CA": "CAN", "CH": "CHE", "CL": "CHL", "CN": "CHN",
+    "CO": "COL", "CZ": "CZE", "DK": "DNK", "GB": "GBR", "GR": "GRC", "HK": "HKG", "HR": "HRV",
+    "HU": "HUN", "ID": "IDN", "IL": "ISR", "IN": "IND", "IS": "ISL", "JP": "JPN", "KR": "KOR",
+    "KW": "KWT", "MA": "MAR", "MK": "MKD", "MX": "MEX", "MY": "MYS", "NO": "NOR", "NZ": "NZL",
+    "PE": "PER", "PH": "PHL", "PL": "POL", "RO": "ROU", "RS": "SRB", "RU": "RUS", "SA": "SAU",
+    "SE": "SWE", "TH": "THA", "TR": "TUR", "US": "USA", "XM": "EMU", "ZA": "ZAF",
+}
+EURO_MEMBERS_IN_BIS = ("GR", "HR")
+RATE_MOVE_CAP_BP = 200
 FX_TICKERS = {
     # (ticker, quoted as USD per unit of local currency?)
     "US": ("DX-Y.NYB", True),   # DXY: the dollar itself; up = stronger dollar

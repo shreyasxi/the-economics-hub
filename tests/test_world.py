@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import data.world_snapshot as ws
 from config.world_settings import CENTRAL_BANKS, MANUAL_FIELDS
 from data.world_manual_entry import HEADER, ManualDataError, load_rows, validate_row
-from generate_macro import _spread_labels_centred, complete_month_average, monotone_curve, weekly_average
+from generate_macro import _spread_labels_centred, complete_month_average, monotone_curve, weekly_average, write_snapshot
 
 
 def _monthly(values: dict) -> pd.Series:
@@ -256,6 +256,66 @@ def test_rate_moves_by_month_counts_banks_once_and_skips_unreported_months():
     m = ws.rate_moves_by_month(series, "2026-08")
     assert m.loc[pd.Period("2026-08", "M")].tolist() == [1, 1, 3]
     assert m.loc[pd.Period("2026-09", "M")].tolist() == [0, 0, 2]    # C has not reported September
+
+
+def _moves(rows: dict) -> pd.DataFrame:
+    """Month-end moves in percentage points: {month: {bank: move}}, NaN = not reported."""
+    return pd.DataFrame.from_dict(rows, orient="index").set_axis(pd.PeriodIndex(list(rows), freq="M"))
+
+
+def test_gdp_weighted_moves_weight_by_reporting_gdp_and_cap_big_moves():
+    moves = _moves({"2026-01": {"A": 0.25, "B": -0.50}, "2026-02": {"A": 3.00, "B": None}})
+    gdp = pd.DataFrame({"A": [300.0], "B": [100.0]}, index=pd.Index([2025], name="year"))  # 2026 uses 2025
+    w = ws.gdp_weighted_moves(moves, gdp, cap_bp=200)
+    jan, feb = w.loc[pd.Period("2026-01", "M")], w.loc[pd.Period("2026-02", "M")]
+    assert abs(jan.hikes_bp - 25 * 0.75) < 1e-9 and abs(jan.cuts_bp - -50 * 0.25) < 1e-9
+    assert abs(jan.equal_bp - -12.5) < 1e-9                  # every bank equal: (25 - 50) / 2
+    assert feb.hikes_bp == 200 and feb.cuts_bp == 0          # B has not reported; A's 300bp counts as 200
+
+
+def test_gdp_weighted_moves_take_separately_reported_members_out_of_the_euro_area():
+    moves = _moves({"2020-01": {"XM": 0.25, "HR": 0.0, "US": 0.0}, "2023-01": {"XM": 0.25, "HR": None, "US": 0.0}})
+    gdp = pd.DataFrame({"XM": [110.0] * 4, "HR": [10.0] * 4, "US": [100.0] * 4},
+                       index=pd.Index(range(2020, 2024), name="year"))   # XM = today's members, Croatia included
+    w = ws.gdp_weighted_moves(moves, gdp, cap_bp=200)
+    assert abs(w.hikes_bp.iloc[0] - 25 * 100 / 210) < 1e-9   # Croatia on its own: out of the euro area
+    assert abs(w.hikes_bp.iloc[1] - 25 * 110 / 210) < 1e-9   # Croatia in the euro: back in
+
+
+def test_gdp_weighted_moves_need_gdp_for_every_bank():
+    moves = _moves({"2026-01": {"A": 0.25, "NEW": 0.25}})
+    gdp = pd.DataFrame({"A": [1.0]}, index=pd.Index([2025], name="year"))
+    try:
+        ws.gdp_weighted_moves(moves, gdp, cap_bp=200)
+    except ValueError as e:
+        assert "NEW" in str(e)
+    else:
+        raise AssertionError("a bank without GDP was weighted anyway")
+
+
+def test_parse_worldbank_keeps_only_years_with_every_economy():
+    payload = [{"page": 1, "pages": 1}, [
+        {"countryiso3code": "USA", "date": "2025", "value": None},     # published for the euro area first
+        {"countryiso3code": "USA", "date": "2024", "value": 2.0},
+        {"countryiso3code": "EMU", "date": "2025", "value": 3.0},
+        {"countryiso3code": "EMU", "date": "2024", "value": 1.0},
+    ]]
+    df = ws.parse_worldbank(payload, {"US": "USA", "XM": "EMU"})
+    assert df.index.tolist() == [2024] and df.loc[2024].to_dict() == {"US": 2.0, "XM": 1.0}
+    for bad in ([{"message": [{"id": "120", "value": "Invalid value"}]}], [{"page": 1, "pages": 1}, None]):
+        try:
+            ws.parse_worldbank(bad, {"US": "USA"})
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("an error response was parsed as data")
+
+
+def test_write_snapshot_keeps_number_lists_on_one_line():
+    path = Path(tempfile.mkdtemp()) / "snap.json"
+    write_snapshot({"rate_cycle": {"hikes": [1, 2], "weighted": {"hikes_bp": [4.98, -0.5, 3]}}}, path)
+    text = path.read_text()
+    assert '"hikes": [1, 2]' in text and '"hikes_bp": [4.98, -0.5, 3]' in text
 
 
 def test_rates_fingerprint_ignores_observation_dates():
