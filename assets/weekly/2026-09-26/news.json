@@ -1,0 +1,160 @@
+{
+ "generated_at": "2026-09-26 10:46 UTC",
+ "reads": {
+  "count": 30,
+  "first": "2026-09-19 12:40 UTC"
+ },
+ "headlines": {
+  "from": "2026-09-19",
+  "to": "2026-09-26",
+  "world": {
+   "items": [
+    {
+     "title": "Trump says he would back ban on diesel exports",
+     "url": "https://www.bbc.co.uk/news/articles/cmkg7560epw0o?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-09-22",
+     "theme": "Trade & tariffs",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Oil price rise creates more pressure on UK policymakers before budget",
+     "url": "https://www.theguardian.com/business/2026/sep/24/global-bond-sell-off-pressures-uk-borrowing-costs-budget",
+     "publisher": "The Guardian",
+     "date": "2026-09-24",
+     "theme": "Energy & commodities",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "UK government borrowing surges in blow to Healey ahead of Budget",
+     "url": "https://www.ft.com/content/a17b2217-e49f-432c-8fdb-31e9bc3a4361?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-09-22",
+     "theme": "Public finances",
+     "also": [
+      "BBC News",
+      "The Guardian",
+      "Bloomberg"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Fed's Collins warns inflation could be 'notably' higher after backing rate hike",
+     "url": "https://www.cnbc.com/2026/09/23/federal-reserve-inflation-interest-rates-ecb.html",
+     "publisher": "CNBC",
+     "date": "2026-09-23",
+     "theme": "Central banks",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 6
+    },
+    {
+     "title": "30-year Treasury yield hits highest level since 2004 as bond market rout continues",
+     "url": "https://www.cnbc.com/2026/09/24/us-treasury-yields-bonds-fed-inflation.html",
+     "publisher": "CNBC",
+     "date": "2026-09-24",
+     "theme": "Markets",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Crude oil price falls as Iran signals diplomacy to end war",
+     "url": "https://www.thehindubusinessline.com/markets/commodities/crude-oil-futures-decline-on-report-of-iran-favouring-diplomacy-to-end-war/article71502732.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-09-24",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 6
+    },
+    {
+     "title": "S&P Global Ratings raises India FY27 growth forecast to 7% from 6.6%; expects RBI rate hike",
+     "url": "https://www.livemint.com/economy/sp-global-ratings-raises-india-fy27-growth-forecast-to-7-from-6-6-expects-rbi-rate-hike-11790134784749.html",
+     "publisher": "Mint",
+     "date": "2026-09-23",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Canada upbeat on concluding trade talks with India by year-end: Minister",
+     "url": "https://www.business-standard.com/economy/news/canada-upbeat-on-concluding-trade-talks-with-india-by-year-end-minister-126091900985_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-09-19",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Nasdaq reaches record high close, AI stocks rally",
+     "url": "https://www.livemint.com/market/nasdaq-reaches-record-high-close-ai-stocks-rally-11790107377665.html",
+     "publisher": "Mint",
+     "date": "2026-09-23",
+     "theme": "Markets",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 3
+    },
+    {
+     "title": "India has strongest growth outlook globally; 74% chief economists expect strong growth: WEF",
+     "url": "https://www.thehindubusinessline.com/economy/india-has-strongest-growth-outlook-globally-74-chief-economists-expect-strong-growth-wef/article71507724.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-09-25",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
