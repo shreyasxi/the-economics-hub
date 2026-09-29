@@ -10,10 +10,11 @@ Bulletin around the 22nd-25th. Two things are taken from it:
      lending rates, which becomes `data/rbi_transmission.csv` and the
      pass-through chart on the India tab.
 
-Access (checked 17 Sep 2026): the web page on rbi.org.in serves a normal request.
-The PDF and the Current Statistics spreadsheets live on rbidocs.rbi.org.in, which
-answers scripts with a CAPTCHA, so nothing here ever asks for them. Past editions
-come from the Bulletin page's own month archive, an ASP.NET postback.
+Access: prefer the HTML article linked from the Bulletin contents. When HTML is
+absent or cannot be parsed, use the PDF linked in that same article row. RBI's
+PDF server sometimes returns a CAPTCHA; that is reported, never cached as a PDF.
+A manually downloaded report can be supplied with generate_soe.py --pdf-file.
+Past editions come from the Bulletin page's month archive, an ASP.NET postback.
 
 Nothing in the article is summarised or rewritten: the dashboard shows RBI's own
 sentences or it shows nothing.

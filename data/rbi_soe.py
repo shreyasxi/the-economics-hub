@@ -26,6 +26,7 @@ tests/test_soe.py against saved editions; only the fetchers touch the network.
 from __future__ import annotations
 
 import logging
+from urllib.parse import urljoin, urlparse
 import re
 import time
 from dataclasses import dataclass, asdict
@@ -59,6 +60,7 @@ class Edition:
     month: str          # "2026-08", the Bulletin's month
     article_id: str
     url: str
+    pdf_url: str | None = None
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -129,6 +131,9 @@ def find_month(session: requests.Session, month: str) -> Edition | None:
     _check_month(month)
     year, mon = month.split("-")
     page = _request(session, "GET", BULLETIN_URL)
+    latest = _edition_from_contents(page)
+    if latest is not None and latest.month == month:
+        return latest
     data = {
         **_hidden_fields(page),
         "__EVENTTARGET": "",
@@ -141,15 +146,61 @@ def find_month(session: requests.Session, month: str) -> Edition | None:
     return _edition_from_contents(archive, month=month)
 
 
-def fetch_article(session: requests.Session, edition: Edition, *, use_cache: bool = True) -> str:
-    """The article's HTML, from the cache when it is already there (editions never change)."""
+def fetch_article(session: requests.Session, edition: Edition, *, use_cache: bool = True,
+                  pdf_file: Path | None = None) -> str:
+    """Prefer validated HTML; fall back to the edition's PDF, never a CAPTCHA page.
+
+    A supplied PDF is for a manual download when RBI blocks automated access.
+    Both formats are validated before being cached or returned.
+    """
     cached = CACHE_DIR / f"{edition.month}.html"
-    if use_cache and cached.exists():
-        return cached.read_text(encoding="utf-8")
-    page = _request(session, "GET", edition.url)
+    error = "no HTML article linked"
+    if not edition.url.lower().endswith(".pdf"):
+        try:
+            page = (cached.read_text(encoding="utf-8") if use_cache and cached.exists()
+                    else _request(session, "GET", edition.url))
+            parse_briefing(page, edition)
+            parse_transmission(page)
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            cached.write_text(page, encoding="utf-8")
+            return page
+        except SoeError as exc:
+            error = str(exc)
+            log.warning("HTML article unavailable or unreadable: %s; trying PDF", exc)
+    pdf_url = edition.pdf_url or (edition.url if edition.url.lower().endswith(".pdf") else None)
+    if not pdf_url:
+        raise SoeError(f"{error}; no PDF linked for {edition.month}")
+    pdf_cache = CACHE_DIR / f"{edition.month}.pdf"
+    if pdf_file is not None:
+        payload = pdf_file.read_bytes()
+    elif use_cache and pdf_cache.exists():
+        payload = pdf_cache.read_bytes()
+    else:
+        payload = _request_pdf(session, pdf_url)
+    from data.rbi_soe_pdf import pdf_to_article
+    page = pdf_to_article(payload, edition.month, pdf_url)
+    parse_briefing(page, edition)
+    parse_transmission(page)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cached.write_text(page, encoding="utf-8")
+    pdf_cache.write_bytes(payload)
     return page
+
+
+def _request_pdf(session: requests.Session, url: str) -> bytes:
+    last = None
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            resp = session.get(url, timeout=REQUEST_TIMEOUT)
+            resp.raise_for_status()
+            if not resp.content.startswith(b"%PDF-"):
+                raise SoeError("RBI returned a non-PDF response (possibly a CAPTCHA). "
+                               "Download the report in your browser and use --pdf-file with --month.")
+            return resp.content
+        except requests.RequestException as exc:
+            last = exc
+            if attempt < MAX_ATTEMPTS:
+                time.sleep(PAUSE_SECONDS * attempt)
+    raise SoeError(f"could not download {url}: {last}")
 
 
 def _check_month(month: str) -> None:
@@ -170,18 +221,28 @@ def _soup(page: str) -> BeautifulSoup:
 def _edition_from_contents(page: str, month: str | None = None) -> Edition | None:
     """Find the State of the Economy link on a Bulletin contents page."""
     soup = _soup(page)
-    for link in soup.find_all("a", href=True):
-        if link.get_text(" ", strip=True).lower() != ARTICLE_TITLE.lower():
+    # The article title can be plain text when RBI publishes only a PDF.
+    for row in soup.find_all("tr"):
+        cells = row.find_all(["td", "th"], recursive=False)
+        if not cells or cells[0].get_text(" ", strip=True).casefold() != ARTICLE_TITLE.casefold():
             continue
-        m = re.search(r"Id=(\d+)", link["href"])
-        if not m:
-            continue
-        article_id = m.group(1)
-        return Edition(
-            month=month or _bulletin_month(page),
-            article_id=article_id,
-            url=ARTICLE_URL.format(article_id=article_id),
-        )
+        html_url = None
+        pdf_url = None
+        article_id = ""
+        for link in row.find_all("a", href=True):
+            url = urljoin(BULLETIN_URL, link["href"])
+            host = urlparse(url).hostname or ""
+            if host != "rbi.org.in" and not host.endswith(".rbi.org.in"):
+                continue
+            match = re.search(r"[?&]Id=(\d+)", url, re.I)
+            if match:
+                article_id = match.group(1)
+                html_url = ARTICLE_URL.format(article_id=article_id)
+            elif urlparse(url).path.lower().endswith(".pdf"):
+                pdf_url = url
+        if html_url or pdf_url:
+            return Edition(month or _bulletin_month(page), article_id,
+                           html_url or pdf_url, pdf_url)
     return None
 
 
@@ -351,7 +412,7 @@ def parse_briefing(page: str, edition: Edition) -> dict:
     return {
         "month": edition.month,
         "published": published.isoformat(),
-        "url": edition.url,
+        "url": (_soup(page).find("meta", attrs={"name": "soe-source"}) or {}).get("content", edition.url),
         "summary": parse_summary(page),
         "conclusion": parse_conclusion(page),
         "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),

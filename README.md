@@ -151,6 +151,14 @@ python generate_macro.py
 
 ### 3. India
 Generates 16 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
+
+The RBI State of the Economy reader prefers HTML and falls back to the PDF
+linked alongside the article in the Bulletin contents. PDF dates and transmission
+table columns are validated before use. If RBI returns a CAPTCHA instead of the
+PDF, download it in your browser and run
+`python generate_soe.py --month YYYY-MM --pdf-file /path/to/report.pdf`.
+The official source URL is still discovered from the Bulletin contents page.
+Unrecognised PDF layouts require review; no figures are inferred from them.
 ```bash
 python -m data.india_manual_entry status
 python generate_india.py

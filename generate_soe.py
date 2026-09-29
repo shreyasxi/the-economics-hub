@@ -151,7 +151,7 @@ def history_rows(edition: Edition, briefing: dict, transmission: dict) -> list[d
         {
             "month": edition.month,
             "published": briefing["published"],
-            "url": edition.url,
+            "url": briefing["url"],
             **{c: cycle.get(c, "") for c in CSV_COLUMNS
                if c not in {"month", "published", "url"}},
         }
@@ -218,7 +218,10 @@ def main() -> int:
                         help="with --history, the first edition to read (default: the editions "
                              "the current cycle covers)")
     parser.add_argument("--no-cache", action="store_true", help="re-read pages instead of using the local cache")
+    parser.add_argument("--pdf-file", type=Path, help="Manually downloaded PDF fallback; requires --month")
     args = parser.parse_args()
+    if args.pdf_file and not args.month:
+        parser.error("--pdf-file requires --month")
 
     session = build_session()
     use_cache = not args.no_cache
@@ -230,7 +233,7 @@ def main() -> int:
         if edition is None:
             print(f"No State of the Economy in the {args.month} Bulletin.")
             return 1
-        page = fetch_article(session, edition, use_cache=use_cache)
+        page = fetch_article(session, edition, use_cache=use_cache, pdf_file=args.pdf_file)
         briefing = parse_briefing(page, edition)
         transmission = parse_transmission(page)
         changes, compared_with = read_changes(session, edition, page, use_cache=use_cache)
