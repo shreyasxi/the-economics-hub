@@ -190,7 +190,9 @@ def _request_pdf(session: requests.Session, url: str) -> bytes:
     last = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
-            resp = session.get(url, timeout=REQUEST_TIMEOUT)
+            resp = session.get(url, timeout=REQUEST_TIMEOUT, headers={
+                "Referer": BULLETIN_URL, "Accept": "application/pdf,*/*",
+            })
             resp.raise_for_status()
             if not resp.content.startswith(b"%PDF-"):
                 raise SoeError("RBI returned a non-PDF response (possibly a CAPTCHA). "
@@ -422,12 +424,23 @@ def parse_briefing(page: str, edition: Edition) -> dict:
 # ── Table IV.3: transmission to deposit and lending rates ──────────────────
 
 def _table_rows(table) -> list[list[str]]:
-    rows = []
-    for tr in table.find_all("tr"):
-        cells = [_clean(td) for td in tr.find_all(["td", "th"])]
-        if any(cells):
-            rows.append(cells)
-    return rows
+    """Expand rowspan/colspan so header words stay above their actual column."""
+    grid: dict[tuple[int, int], str] = {}
+    for r, tr in enumerate(table.find_all("tr")):
+        c = 0
+        for cell in tr.find_all(["td", "th"], recursive=False):
+            while (r, c) in grid:
+                c += 1
+            text = _clean(cell)
+            rowspan, colspan = int(cell.get("rowspan", 1)), int(cell.get("colspan", 1))
+            for dr in range(rowspan):
+                for dc in range(colspan):
+                    grid[r + dr, c + dc] = text
+            c += colspan
+    if not grid:
+        return []
+    return [[grid.get((r, c), "") for c in range(max(c for row, c in grid if row == r) + 1)]
+            for r in range(max(r for r, _ in grid) + 1)]
 
 
 def _find_transmission_table(page: str):
@@ -447,30 +460,33 @@ def _find_transmission_table(page: str):
 
 
 def _column_order(rows: list[list[str]]) -> list[str]:
-    """
-    Match the table's header cells to the eight columns RBI prints.
-
-    The header is spread over two or three rows and the wording drifts between
-    editions, so cells are matched by pattern. If the columns come back in a
-    different order, or any is missing, this raises: the alternative is reading
-    the deposit figure as a lending figure.
-    """
-    found: list[str] = []
+    """Map each leaf column by its stacked header, never by traversal order."""
+    headers = []
     for row in rows:
-        for cell in row:
-            for field, pattern in TRANSMISSION_COLUMNS:
-                if re.search(pattern, cell, re.I) and field not in found:
-                    found.append(field)
-    expected = [field for field, _ in TRANSMISSION_COLUMNS]
-    # Trailing optional columns (the "overall interest rate effect", added during
-    # 2025) may be absent; everything else must be present and in RBI's order.
-    while expected and expected[-1] in TRANSMISSION_OPTIONAL and expected[-1] not in found:
-        expected = expected[:-1]
+        label = row[0].strip()
+        if re.match(CYCLE_ROW, label) or re.match(CYCLE_LABEL_ROW, label) or re.match(PERIOD_ROW, label) or re.match(MONTHLY_ROW, label):
+            break
+        # Full-width caption and unit rows convey no column identity.
+        if len(set(row)) > 1:
+            headers.append(row)
+    found = []
+    for c in range(1, max(map(len, headers), default=1)):
+        cell = " ".join(dict.fromkeys(r[c] for r in headers if c < len(r)))
+        # The effect is a subcolumn of fresh WALR, so test it before that parent.
+        if re.search(r"interest\s*rate\s*effect", cell, re.I):
+            field = "overall_bps"  # historical CSV name retained for compatibility
+        else:
+            matches = [f for f, pattern in TRANSMISSION_COLUMNS
+                       if f != "overall_bps" and re.search(pattern, cell, re.I)]
+            if len(matches) != 1:
+                raise SoeError(f"the transmission table's columns have changed: {cell!r}")
+            field = matches[0]
+        found.append(field)
+    expected = [f for f, _ in TRANSMISSION_COLUMNS
+                if f not in TRANSMISSION_OPTIONAL or f in found]
     if found != expected:
-        missing = [f for f in expected if f not in found]
-        raise SoeError("the transmission table's columns have changed "
-                       f"(read {found}, expected {expected}, missing {missing})")
-    return expected
+        raise SoeError(f"the transmission table's columns have changed (read {found}, expected {expected})")
+    return found
 
 
 def _to_bps(cell: str) -> int | None:

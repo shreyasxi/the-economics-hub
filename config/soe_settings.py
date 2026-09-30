@@ -101,7 +101,7 @@ TOPIC_SECTIONS: list[tuple[str, str]] = [
 # Chart pointers are dropped from a quoted sentence: "(Chart III.5a)" is a
 # direction to look at a picture that is not on this page. Nothing else in the
 # sentence is touched.
-CHART_REFERENCE = r"\s*\((?:see\s+)?(?:Chart|Table)[^)]*\)"
+CHART_REFERENCE = r"\s*[\[(](?:see\s+)?(?:Chart|Table)[^\])]*[\])]"
 
 # Rows shown at most; five topics is the whole set.
 CHANGES_MAX = 5
@@ -117,12 +117,13 @@ CHANGES_MIN_WORDS = 8
 # Table 5 (2021), Table 4 (2023) and Table IV.3 (2026), and the wording moves
 # between "Transmission to Banks' Deposit and Lending Rates" and "Banks' Deposit
 # and Lending Rates during the Ongoing Easing Cycle".
-TRANSMISSION_CAPTION = r"(transmission|deposit and lending rates)"
+TRANSMISSION_CAPTION = r"(transmission|pass-through|deposit and lending rates)"
 
 # The eight numeric columns, in the order RBI prints them. The parser matches
 # each header cell to one of these patterns and fails if the order or the count
 # changes, so a renamed or inserted column stops the run instead of quietly
 # shifting every value one place.
+
 TRANSMISSION_COLUMNS: list[tuple[str, str]] = [
     ("repo_bps",               r"repo\s*rate"),
     ("wadtdr_fresh_bps",       r"wadtdr.*fresh"),
@@ -130,13 +131,15 @@ TRANSMISSION_COLUMNS: list[tuple[str, str]] = [
     ("eblr_bps",               r"\beblr\b"),
     ("mclr_bps",               r"mclr"),
     ("walr_fresh_bps",         r"walr.*fresh"),
+    ("overall_bps",            r"interest\s*rate\s*effect"),
     ("walr_outstanding_bps",   r"walr.*outstanding"),
-    ("overall_bps",            r"overall|interest\s*rate\s*effect"),
 ]
 
-# "Overall interest rate effect" was added to the table during 2025; editions
-# before that end at the outstanding-loans column. Trailing columns listed here
-# may be absent. Any other missing or reordered column stops the run.
+# "Fresh loans: interest rate effect" was added to the table during 2025; editions
+# before that have no effect subcolumn. Columns listed here may be absent.
+# Any other missing or reordered column stops the run.
+# overall_bps is the legacy CSV key for the fresh-loan interest-rate effect;
+# it is NOT the Overall fresh WALR column or the outstanding-loan column.
 TRANSMISSION_OPTIONAL: set[str] = {"overall_bps"}
 
 # What each column is, for the chart and the dashboard's insight text.
@@ -147,8 +150,8 @@ COLUMN_LABELS: dict[str, str] = {
     "eblr_bps":               "External benchmark lending rate",
     "mclr_bps":               "1-year MCLR (median)",
     "walr_fresh_bps":         "Fresh rupee loans",
+    "overall_bps":            "Fresh loans: interest rate effect",
     "walr_outstanding_bps":   "Outstanding rupee loans",
-    "overall_bps":            "Overall interest rate effect",
 }
 
 # How a cycle's row is labelled. RBI writes it three ways, all seen between

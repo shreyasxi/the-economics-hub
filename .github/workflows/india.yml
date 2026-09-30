@@ -83,6 +83,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Verify RBI HTML and PDF parsers
+        run: |
+          python tests/test_soe.py
+          python tests/test_soe_pdf.py
+
       # RBI's State of the Economy, part 1 of 2: the transmission history the
       # pass-through chart is drawn from. continue-on-error — rbi.org.in being
       # slow or reshaping its table must not stop the charts; the chart is then

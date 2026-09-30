@@ -41,7 +41,7 @@ def make_table_pdf():
     page = doc.new_page(width=1100, height=800)
     xs = [30, 270, 360, 450, 540, 630, 720, 810, 900, 990]
     rows = [
-        ['Period', 'Repo Rate', 'WADTDR Fresh', 'WADTDR Outstanding', 'EBLR', 'MCLR', 'WALR Fresh', 'WALR Outstanding', 'Overall effect'],
+        ['Period', 'Repo Rate', 'WADTDR Fresh', 'WADTDR Outstanding', 'EBLR', 'MCLR', 'WALR Fresh', 'Interest Rate Effect', 'WALR Outstanding'],
         ['Easing Cycle Feb 2025 to Jul 2026', '-125', '-65', '-52', '-125', '-50', '-80', '-79', '-91'],
         ['Jul 2026', '0', '-2', '-1', '0', '0', '-3', '-2', '-2'],
     ]
@@ -110,6 +110,32 @@ class PdfFallbackTests(unittest.TestCase):
         self.assertEqual(transmission['cycles'][0]['walr_fresh_bps'], -80)
         self.assertEqual(transmission['cycles'][0]['cycle_end'], '2026-07')
         self.assertEqual(transmission['monthly'][0]['repo_bps'], 0)
+
+    def test_real_september_pdf_summary_conclusion_and_columns(self):
+        source = 'https://rbidocs.rbi.org.in/rdocs/Bulletin/PDFs/1ARTICLE25092026551C90FB61784218909A840A2A4F1E39.PDF'
+        payload = Path('tests/fixtures/soe/2026-09.pdf').read_bytes()
+        page = pdf_to_article(payload, '2026-09', source)
+        brief = soe.parse_briefing(page, soe.Edition('2026-09', '', source))
+        self.assertTrue(brief['summary'].startswith('With geopolitical tensions re-escalating'))
+        self.assertTrue(brief['summary'].endswith('foreign exchange reserves reached an all time high.'))
+        self.assertEqual(len(brief['summary'].split()), 125)
+        self.assertEqual(len(brief['conclusion']), 1)
+        self.assertTrue(brief['conclusion'][0].endswith('Overall, the economy performed strongly despite external headwinds.'))
+        self.assertIn('System liquidity remained in surplus', brief['conclusion'][0])
+        self.assertNotIn('Chart', brief['conclusion'][0])
+        self.assertNotIn('Source:', brief['conclusion'][0])
+        topics = soe.parse_topics(page)
+        self.assertEqual(len(topics), 5)
+        self.assertIn('4.8 per cent', topics['Inflation'])
+        self.assertNotIn('Chart', topics['Inflation'])
+        table = soe.parse_transmission(page)
+        easing = table['cycles'][-1]
+        self.assertEqual(easing['walr_outstanding_bps'], -90)  # last printed column
+        self.assertEqual(easing['overall_bps'], -75)          # interest-rate effect
+        self.assertEqual(easing['walr_fresh_bps'], -81)
+        self.assertEqual(easing['wadtdr_fresh_bps'], -72)
+        self.assertEqual(table['monthly'][-1]['repo_bps'], 0)
+        self.assertEqual(table['monthly'][-1]['wadtdr_fresh_bps'], -9)
 
     def test_latest_month_needs_no_archive_post(self):
         page = f'<h1>Bulletin - September 2026</h1><table><tr><td>State of the Economy</td><td><a href="{URL}">PDF</a></td></tr></table>'

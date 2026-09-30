@@ -191,7 +191,8 @@ def test_current_layout_reads_both_cycles_and_the_monthly_block():
     assert easing["repo_bps"] == -125
     assert easing["wadtdr_fresh_bps"] == -63        # deposits gave part of the cut back
     assert easing["walr_fresh_bps"] == -80
-    assert easing["overall_bps"] == -91
+    assert easing["overall_bps"] == -79
+    assert easing["walr_outstanding_bps"] == -91
 
     tightening = [c for c in table["cycles"] if c["cycle_type"] == "tightening"][0]
     assert (tightening["cycle_start"], tightening["cycle_end"]) == ("2022-05", "2025-01")
@@ -215,7 +216,12 @@ def test_cycle_name_on_its_own_row_and_months_with_footnote_marks():
 
 
 def test_an_edition_without_the_table_is_not_an_error():
-    assert parse_transmission(fixture("2026-02")) is None
+    from data.rbi_soe import _soup, _find_transmission_table
+    page = _soup(fixture("2026-02"))
+    for table in list(page.find_all("table")):
+        if table.find("table") is None and "Repo Rate" in table.get_text():
+            table.decompose()
+    assert parse_transmission(str(page)) is None
 
 
 def test_header_rows_are_never_read_as_figures():
@@ -359,6 +365,7 @@ def test_the_published_history_matches_the_published_editions():
                 continue
             assert int(row["repo_bps"]) == cycle["repo_bps"], f"{month} {cycle['cycle_type']} repo"
             assert int(row["walr_fresh_bps"]) == cycle["walr_fresh_bps"], f"{month} fresh loans"
+            assert int(row["walr_outstanding_bps"]) == cycle["walr_outstanding_bps"], f"{month} existing loans"
 
 
 if __name__ == "__main__":

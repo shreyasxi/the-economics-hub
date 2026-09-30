@@ -159,6 +159,11 @@ PDF, download it in your browser and run
 `python generate_soe.py --month YYYY-MM --pdf-file /path/to/report.pdf`.
 The official source URL is still discovered from the Bulletin contents page.
 Unrecognised PDF layouts require review; no figures are inferred from them.
+The PDF request uses the Bulletin page as its referrer. Regression tests include
+RBI's September 2026 PDF and verify the conclusion across pages and columns,
+plus the distinction between fresh-loan interest-rate effects and outstanding
+loan rates. Existing loans use the final table column; HTML merged headers and
+PDF column boundaries determine the mapping.
 ```bash
 python -m data.india_manual_entry status
 python generate_india.py
