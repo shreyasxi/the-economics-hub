@@ -1,0 +1,162 @@
+{
+ "generated_at": "2026-10-03 11:03 UTC",
+ "reads": {
+  "count": 24,
+  "first": "2026-09-26 13:22 UTC"
+ },
+ "headlines": {
+  "from": "2026-09-26",
+  "to": "2026-10-03",
+  "world": {
+   "items": [
+    {
+     "title": "UK tries to stop Trump's diesel export ban",
+     "url": "https://www.bbc.co.uk/news/articles/cmx2z3vgy5xwo?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-09-29",
+     "theme": "Trade & tariffs",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Traders now see little chance of a Fed rate hike in October after weak jobs report",
+     "url": "https://www.cnbc.com/2026/10/02/fed-rate-hike-odds-decline-after-september-jobs-report.html",
+     "publisher": "CNBC",
+     "date": "2026-10-02",
+     "theme": "Central banks",
+     "also": [
+      "The Guardian",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "G7 to release millions of barrels of oil and diesel after Trump threat",
+     "url": "https://www.bbc.co.uk/news/articles/ck87zg8jnwngo?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-10-03",
+     "theme": "Energy & commodities",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "US economy adds just 29,000 jobs in September as hiring slows sharply",
+     "url": "https://www.ft.com/content/7fc80097-1926-4306-81e0-83d90a3d8a1d?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-02",
+     "theme": "Growth & jobs",
+     "also": [
+      "The Guardian",
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 2
+    },
+    {
+     "title": "30-year Treasury bond yield scales to highest level since 2002",
+     "url": "https://www.cnbc.com/2026/09/29/treasury-yields-bonds.html",
+     "publisher": "CNBC",
+     "date": "2026-09-29",
+     "theme": "Markets",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 4
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Gold, silver prices rebound as crude oil prices fall on supply boost",
+     "url": "https://www.business-standard.com/markets/commodities/gold-silver-prices-rebound-as-crude-oil-prices-fall-on-supply-boost-126093000340_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-09-30",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "India sunflower oil imports may jump 30% after import duty cut",
+     "url": "https://www.thehindubusinessline.com/economy/agri-business/india-sunflower-oil-imports-may-jump-30-after-import-duty-cut/article71527913.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-09-30",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Forex reserves plunge record $18.3 billion as RBI steps in to support rupee",
+     "url": "https://www.livemint.com/economy/forex-reserves-plunge-record-18-3-billion-as-rbi-steps-in-to-support-rupee-11790953518458.html",
+     "publisher": "Mint",
+     "date": "2026-10-02",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Adani stocks today: Adani Power, Adani Energy, Adani Enterprises slip after ₹1.48 crore SEBI settlement",
+     "url": "https://www.livemint.com/market/stock-market-news/adani-stocks-today-adani-power-adani-energy-adani-enterprises-slip-after-rs-1-48-crore-sebi-settlement-11790656271285.html",
+     "publisher": "Mint",
+     "date": "2026-09-29",
+     "theme": "Markets",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 3
+    },
+    {
+     "title": "India's manufacturing PMI rises to 55.1 in September, hits 7-month high",
+     "url": "https://www.business-standard.com/economy/news/india-s-manufacturing-pmi-rises-to-55-1-in-september-hits-7-month-high-126100100299_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-01",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 1
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
