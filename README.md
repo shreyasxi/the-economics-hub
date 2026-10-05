@@ -210,6 +210,9 @@ Refresh the saved investment-rate snapshot explicitly with
 MoSPI GVA refreshes through the India fetcher's append step, or independently
 with `python -m data.fetchers.mospi_gva`; `--dry-run` validates without writing.
 The chart reads the validated quarterly series in `data/india_macro.db`.
+If the MoSPI API reports `UNSAFE_LEGACY_RENEGOTIATION_DISABLED`, its client
+retries once with legacy-server TLS compatibility restricted to
+`api.mospi.gov.in`; certificate and hostname verification remain enabled.
 
 Pushing code updates the application, but does not run the India generator.
 To publish fresh charts immediately, open GitHub Actions → **India Dashboard

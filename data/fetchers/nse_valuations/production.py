@@ -108,6 +108,8 @@ def update(root=ROOT, cutoff=None):
             results.append(dict(month=month, status=entry['status'], source=source or {}, rows=rows,
                                 attempts=entry.get('attempts',[]), partial_month=month==current_month))
         # Build summaries in staging; mark success only after all hashes validate.
+        # Git ignores run logs, so a fresh checkout has no destination directory.
+        (root/'runs').mkdir(exist_ok=True)
         with TemporaryDirectory(prefix='update-',dir=root) as staging:
             staged = Path(staging)
             audit(results, staged, cutoff, start_month=previous["start_month"])

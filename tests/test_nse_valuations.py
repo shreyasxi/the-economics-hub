@@ -224,6 +224,18 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(status['finalized_months'],[])
         self.assertEqual(len(get.call_args_list),4)
 
+    def test_fresh_checkout_without_ignored_run_logs_updates_successfully(self):
+        logs = self.root/'runs'
+        for log in logs.iterdir():
+            log.unlink()
+        logs.rmdir()
+        found={'01102026':payload(date(2026,10,1)), '29092026':payload(date(2026,9,29))}
+        with patch.object(c.requests,'get',side_effect=replies(found)):
+            _,status=p.update(self.root,date(2026,10,4))
+        self.assertEqual(status['status'],'ready')
+        self.assertTrue(list(logs.glob('*.json')))
+        c.verify(self.root)
+
     def test_html_latest_is_not_csv_and_does_not_fall_back(self):
         before=(self.root/'monthly.csv').read_bytes()
         with patch.object(c.requests,'get',side_effect=replies({'04102026':b'<html>blocked</html>'})), patch.object(c.time,'sleep'):

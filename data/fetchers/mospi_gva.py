@@ -230,9 +230,10 @@ def load(db=DB_PATH):
 
 
 def fetch(dry_run=False, db=DB_PATH):
+    from data.fetchers.mospi_http import get as verified_get
     with requests.Session() as session:
         def get(url, **kwargs):
-            response = session.get(url, timeout=(15, 90), **kwargs)
+            response = verified_get(session, url, timeout=(15, 90), **kwargs)
             response.raise_for_status()
             return response
         # Newest catalogue records come first. Reject pagination uncertainty instead of
