@@ -1,10 +1,7 @@
 {
-  "status": "ready",
-  "requested_cutoff": "2026-10-04",
-  "started_at": "2026-10-04T18:10:30.080243+00:00",
-  "observation_date": "2026-10-01",
-  "finalized_months": [],
-  "current_sha256": "20653fca5db3be597b983077e70e9367d25a91eef373084f099cd6a03ac14188",
-  "monthly_sha256": "5ff51179584db0581ab22dc7080c4b7e28c5a2f684c16bf2672af4674ad11844",
-  "finished_at": "2026-10-04T18:10:31.989582+00:00"
+  "status": "failed_chart_must_be_omitted",
+  "requested_cutoff": "2026-10-05",
+  "started_at": "2026-10-05T05:11:03.470021+00:00",
+  "error": "[Errno 2] No such file or directory: '/home/runner/work/the-economics-hub/the-economics-hub/data/nse_valuations/update-mtivoj42/runs/75188d98262aa82ef78718c1d652c20af32af20aa41de781ed98bb6c2a816da8.json' -> '/home/runner/work/the-economics-hub/the-economics-hub/data/nse_valuations/runs/75188d98262aa82ef78718c1d652c20af32af20aa41de781ed98bb6c2a816da8.json'",
+  "finished_at": "2026-10-05T05:11:05.504864+00:00"
 }

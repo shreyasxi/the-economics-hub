@@ -8,7 +8,7 @@
   "last_date": "2026-10-01",
   "matched_dates": 2478,
   "unmatched_dates": [],
-  "imported_at": "2026-10-04T13:29:07.224504+00:00",
+  "imported_at": "2026-10-05T05:11:03.266940+00:00",
   "sources": [
     {
       "role": "smallcap",
@@ -357,26 +357,197 @@
       "date": "2026-10-01",
       "rows": 1,
       "retrieved_at": "2026-10-04T13:29:06.382339+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/5adbffd5e9372256df0d5be5a5db4da5b12ec389d79909ff2aefdaf050cc30d5.csv",
+      "sha256": "5adbffd5e9372256df0d5be5a5db4da5b12ec389d79909ff2aefdaf050cc30d5",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_17092026.csv",
+      "format": "daily",
+      "date": "2026-09-17",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:57.104063+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/5adbffd5e9372256df0d5be5a5db4da5b12ec389d79909ff2aefdaf050cc30d5.csv",
+      "sha256": "5adbffd5e9372256df0d5be5a5db4da5b12ec389d79909ff2aefdaf050cc30d5",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_17092026.csv",
+      "format": "daily",
+      "date": "2026-09-17",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:57.104079+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/16e77c60ff230e92573f887d6bb78a6823dfc4f620e45d7ef664772635db8047.csv",
+      "sha256": "16e77c60ff230e92573f887d6bb78a6823dfc4f620e45d7ef664772635db8047",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_18092026.csv",
+      "format": "daily",
+      "date": "2026-09-18",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:57.339045+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/16e77c60ff230e92573f887d6bb78a6823dfc4f620e45d7ef664772635db8047.csv",
+      "sha256": "16e77c60ff230e92573f887d6bb78a6823dfc4f620e45d7ef664772635db8047",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_18092026.csv",
+      "format": "daily",
+      "date": "2026-09-18",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:57.339061+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/4e173caf37edb1a0c681d5c3bf9bb9e330e90a27d1ac2cadfcf40d80996e4314.csv",
+      "sha256": "4e173caf37edb1a0c681d5c3bf9bb9e330e90a27d1ac2cadfcf40d80996e4314",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_21092026.csv",
+      "format": "daily",
+      "date": "2026-09-21",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:58.304263+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/4e173caf37edb1a0c681d5c3bf9bb9e330e90a27d1ac2cadfcf40d80996e4314.csv",
+      "sha256": "4e173caf37edb1a0c681d5c3bf9bb9e330e90a27d1ac2cadfcf40d80996e4314",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_21092026.csv",
+      "format": "daily",
+      "date": "2026-09-21",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:58.304278+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/40226efad34cb149a6a4b6bce14dd8442c9399f414c3048c23a38148293f9836.csv",
+      "sha256": "40226efad34cb149a6a4b6bce14dd8442c9399f414c3048c23a38148293f9836",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_22092026.csv",
+      "format": "daily",
+      "date": "2026-09-22",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:58.648361+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/40226efad34cb149a6a4b6bce14dd8442c9399f414c3048c23a38148293f9836.csv",
+      "sha256": "40226efad34cb149a6a4b6bce14dd8442c9399f414c3048c23a38148293f9836",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_22092026.csv",
+      "format": "daily",
+      "date": "2026-09-22",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:58.648375+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/de1aa34349bcc2fafc2ff46992da9268c9d727e8c59fc46080941093a1cbd4ee.csv",
+      "sha256": "de1aa34349bcc2fafc2ff46992da9268c9d727e8c59fc46080941093a1cbd4ee",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_23092026.csv",
+      "format": "daily",
+      "date": "2026-09-23",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:59.057140+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/de1aa34349bcc2fafc2ff46992da9268c9d727e8c59fc46080941093a1cbd4ee.csv",
+      "sha256": "de1aa34349bcc2fafc2ff46992da9268c9d727e8c59fc46080941093a1cbd4ee",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_23092026.csv",
+      "format": "daily",
+      "date": "2026-09-23",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:59.057154+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/1294af772ccb9331c6a10fd7578171fca151344032e481eefe805bbb768474a2.csv",
+      "sha256": "1294af772ccb9331c6a10fd7578171fca151344032e481eefe805bbb768474a2",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_24092026.csv",
+      "format": "daily",
+      "date": "2026-09-24",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:59.602375+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/1294af772ccb9331c6a10fd7578171fca151344032e481eefe805bbb768474a2.csv",
+      "sha256": "1294af772ccb9331c6a10fd7578171fca151344032e481eefe805bbb768474a2",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_24092026.csv",
+      "format": "daily",
+      "date": "2026-09-24",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:59.602391+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/a8d84e9836956bb152b7b49652b790ae746b6a5bf1ce406e19e9c1e699dae3d1.csv",
+      "sha256": "a8d84e9836956bb152b7b49652b790ae746b6a5bf1ce406e19e9c1e699dae3d1",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_25092026.csv",
+      "format": "daily",
+      "date": "2026-09-25",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:59.893953+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/a8d84e9836956bb152b7b49652b790ae746b6a5bf1ce406e19e9c1e699dae3d1.csv",
+      "sha256": "a8d84e9836956bb152b7b49652b790ae746b6a5bf1ce406e19e9c1e699dae3d1",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_25092026.csv",
+      "format": "daily",
+      "date": "2026-09-25",
+      "rows": 1,
+      "retrieved_at": "2026-10-05T05:10:59.893967+00:00"
     }
   ],
   "refresh": {
-    "started_at": "2026-10-04T13:29:05.291419+00:00",
-    "requested_start": "2026-09-28",
-    "requested_end": "2026-10-03",
+    "started_at": "2026-10-05T05:10:56.735432+00:00",
+    "requested_start": "2026-09-17",
+    "requested_end": "2026-10-04",
     "received_dates": [
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-23",
+      "2026-09-24",
+      "2026-09-25",
       "2026-09-28",
       "2026-09-29",
       "2026-09-30",
       "2026-10-01"
     ],
     "unavailable_dates": [
+      "2026-09-19",
+      "2026-09-20",
+      "2026-09-26",
+      "2026-09-27",
       "2026-10-02",
-      "2026-10-03"
+      "2026-10-03",
+      "2026-10-04"
     ],
     "status": "validated_with_unavailable_reports",
     "unresolved_report_dates": [
+      "2026-09-19",
+      "2026-09-20",
+      "2026-09-26",
+      "2026-09-27",
       "2026-10-02",
-      "2026-10-03"
+      "2026-10-03",
+      "2026-10-04"
     ]
   },
   "signal_path": "signals/84fef376c51ec7e54188cb4cab07c3c08483f97bc635732a8a3c891906057493.csv",
