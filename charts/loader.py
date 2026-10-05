@@ -75,6 +75,10 @@ def get_charts(subdir: str) -> tuple[list[Path], str | None]:
         folder.glob("*.png"),
         key=lambda p: _natural_sort_key(p.name),
     )
+    # Retired India charts can still exist in archived or local editions.
+    if subdir == "india":
+        retired = {"india_money_supply", "india_promoter_holdings"}
+        pngs = [p for p in pngs if chart_key(p.name) not in retired]
     return pngs, label
 
 
@@ -198,6 +202,11 @@ _TITLE_OVERRIDES = {
     "india_sector_rotation_12m": "NIFTY Sector Rotation (12 Months)",
     "nifty_it_trend_custom":     "NIFTY IT Trend",
     "india_vix_vs_us":           "India VIX vs US VIX",
+    "india_sector_rotation_12m_benchmark": "NIFTY Sector Rotation — Trailing 12 Months",
+    "india_sector_valuations":    "NIFTY Sector Valuations",
+    "india_risk_appetite":        "Indian Risk Appetite",
+    "india_investment_rate":      "India’s Investment Rate vs Emerging Asia",
+    "india_gva_contributions":    "What Is Driving India’s Growth?",
     "india_fiscal_deficit_gdp":  "India's Fiscal Deficit, % of GDP",
     "india_inflation_bar":       "India Inflation",
     # World page: "macro_" is a file prefix, and these say more than it does

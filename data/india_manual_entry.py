@@ -112,7 +112,11 @@ def read_month(conn, month):
 
 
 def fmt(value):
-    return "—" if value is None else f"{value:g}"
+    if value is None:
+        return "—"
+    if isinstance(value, (int, float)):
+        return f"{value:g}"
+    return str(value)
 
 
 # ── set ─────────────────────────────────────────────────────────────────────
@@ -127,10 +131,23 @@ def cmd_set(args):
         for d, v in vars(args).items()
         if d in BY_DEST and v is not None
     }
-    if not supplied:
+
+    # FPI MTD is optional and deliberately kept outside FIELDS because it
+    # should not count as a missing recurring observation in `status`.
+    fpi_mtd = args.fpi_mtd
+    fpi_mtd_asof = args.fpi_mtd_asof
+
+    if fpi_mtd is None and fpi_mtd_asof is not None:
+        sys.exit("--fpi-mtd-asof requires --fpi-mtd.")
+
+    if fpi_mtd is not None and fpi_mtd_asof is None:
+        sys.exit("--fpi-mtd requires --fpi-mtd-asof YYYY-MM-DD.")
+
+    if not supplied and fpi_mtd is None:
         sys.exit("Nothing to set. Pass at least one value — see --help.")
 
     errors = []
+
     for field, value in supplied.items():
         if not (field.low <= value <= field.high):
             errors.append(
@@ -139,9 +156,33 @@ def cmd_set(args):
             )
         elif field.min_magnitude and 0 < abs(value) < field.min_magnitude:
             errors.append(
-                f"  {field.flag} {value} is too small for {field.unit} — was it typed in "
-                f"a larger unit? {field.help_text}"
+                f"  {field.flag} {value} is too small for {field.unit} — "
+                f"was it typed in a larger unit? {field.help_text}"
             )
+
+    if fpi_mtd is not None:
+        if not (-300000 <= fpi_mtd <= 300000):
+            errors.append(
+                f"  --fpi-mtd {fpi_mtd} is outside -300000–300000 Rs crore."
+            )
+        elif 0 < abs(fpi_mtd) < 50:
+            errors.append(
+                f"  --fpi-mtd {fpi_mtd} looks too small for Rs crore."
+            )
+
+        try:
+            asof_dt = datetime.strptime(fpi_mtd_asof, "%Y-%m-%d")
+        except ValueError:
+            errors.append(
+                f"  --fpi-mtd-asof must be YYYY-MM-DD, got {fpi_mtd_asof!r}."
+            )
+        else:
+            if asof_dt.strftime("%Y-%m") != month:
+                errors.append(
+                    f"  FPI MTD as-of date {fpi_mtd_asof} does not belong "
+                    f"to target month {month}."
+                )
+
     if errors:
         sys.exit("Refusing to write — values look wrong:\n" + "\n".join(errors))
 
@@ -156,47 +197,71 @@ def cmd_set(args):
 
     updates = {f.column: v for f, v in supplied.items()}
 
+    if fpi_mtd is not None:
+        updates["india_fpi_mtd_inr_cr"] = float(fpi_mtd)
+        updates["india_fpi_mtd_asof"] = fpi_mtd_asof
+
     # Derive composite PMI whenever both inputs are known after this write.
-    merged_mfg = updates.get("india_mfg_pmi",
-                             existing["india_mfg_pmi"] if existing else None)
-    merged_svc = updates.get("india_svc_pmi",
-                             existing["india_svc_pmi"] if existing else None)
+    merged_mfg = updates.get(
+        "india_mfg_pmi",
+        existing["india_mfg_pmi"] if existing else None,
+    )
+    merged_svc = updates.get(
+        "india_svc_pmi",
+        existing["india_svc_pmi"] if existing else None,
+    )
+
     if merged_mfg is not None and merged_svc is not None:
         updates[COMPOSITE_COLUMN] = round(
-            COMPOSITE_MFG_WEIGHT * merged_mfg + COMPOSITE_SVC_WEIGHT * merged_svc, 2
+            COMPOSITE_MFG_WEIGHT * merged_mfg
+            + COMPOSITE_SVC_WEIGHT * merged_svc,
+            2,
         )
 
-    # Merge provenance rather than replacing it, so a later fetcher run that
-    # writes DBIE columns does not erase the record of what was hand-entered.
+    # Preserve provenance for every hand-entered field.
     flags = {}
+
     if existing is not None and existing["source_flags"]:
         try:
             flags = json.loads(existing["source_flags"])
         except (ValueError, TypeError):
             flags = {}
+
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
     for field in supplied:
         flags[field.column] = f"manual:{field.source}:{stamp}"
+
+    if fpi_mtd is not None:
+        flags["india_fpi_mtd_inr_cr"] = f"manual:nsdl_mtd:{stamp}"
+        flags["india_fpi_mtd_asof"] = f"manual:nsdl_mtd:{stamp}"
+
     if COMPOSITE_COLUMN in updates:
         flags[COMPOSITE_COLUMN] = f"derived:pmi_weighted:{stamp}"
 
-    if existing is not None:              # show the stored value for derived columns too
+    if existing is not None:
         before = {column: existing[column] for column in updates}
 
     print(f"\n  {month}")
     print(f"  {'column':<28} {'before':>10}  {'after':>10}")
+
     for column, value in updates.items():
-        print(f"  {column:<28} {fmt(before.get(column)):>10}  {fmt(value):>10}")
+        print(
+            f"  {column:<28} "
+            f"{fmt(before.get(column)):>10}  {fmt(value):>10}"
+        )
 
     if args.dry_run:
         print("\n  --dry-run: nothing written.")
         return
 
     cols = list(updates) + ["source_flags", "fetched_at"]
+
     vals = list(updates.values()) + [
         json.dumps(flags),
         datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
     ]
+
     if existing is None:
         conn.execute(
             f"INSERT INTO india_monthly (month, {', '.join(cols)}) "
@@ -205,12 +270,18 @@ def cmd_set(args):
         )
     else:
         conn.execute(
-            f"UPDATE india_monthly SET {', '.join(f'{c} = ?' for c in cols)} "
+            f"UPDATE india_monthly SET "
+            f"{', '.join(f'{c} = ?' for c in cols)} "
             f"WHERE month = ?",
             vals + [month],
         )
+
     conn.commit()
-    print(f"\n  Written. Regenerate with:  PYTHONPATH=. python generate_india.py")
+
+    print(
+        "\n  Written. Regenerate with:  "
+        "PYTHONPATH=. python generate_india.py"
+    )
 
 
 # ── status ──────────────────────────────────────────────────────────────────
@@ -266,6 +337,17 @@ def cmd_show(args):
           f"{flags.get(COMPOSITE_COLUMN, '—')}")
     print(f"\n  last write: {row['fetched_at']}")
 
+    print(
+        f"  {'india_fpi_mtd_inr_cr':<28} "
+        f"{fmt(row['india_fpi_mtd_inr_cr']):>10}   "
+        f"{flags.get('india_fpi_mtd_inr_cr', '—')}"
+    )
+    print(
+        f"  {'india_fpi_mtd_asof':<28} "
+        f"{fmt(row['india_fpi_mtd_asof']):>10}   "
+        f"{flags.get('india_fpi_mtd_asof', '—')}"
+    )
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
@@ -281,8 +363,25 @@ def main(argv=None):
     p_set.add_argument("--dry-run", action="store_true",
                        help="show the change without writing")
     for field in FIELDS:
-        p_set.add_argument(field.flag, type=float, metavar=field.unit.upper(),
-                           help=field.help_text)
+        p_set.add_argument(
+            field.flag,
+            type=float,
+            metavar=field.unit.upper(),
+            help=field.help_text,
+        )
+
+    p_set.add_argument(
+        "--fpi-mtd",
+        type=float,
+        metavar="RS_CRORE",
+        help="Current-month NSDL FPI net investment MTD, in Rs crore",
+    )
+
+    p_set.add_argument(
+        "--fpi-mtd-asof",
+        metavar="YYYY-MM-DD",
+        help="As-of date for --fpi-mtd, e.g. 2026-10-01",
+    )
     p_set.set_defaults(func=cmd_set)
 
     p_status = sub.add_parser("status", help="show which values are missing")

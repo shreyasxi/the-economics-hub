@@ -26,3 +26,9 @@
 *.xls   binary
 *.pdf   binary
 *.ico   binary
+
+# Audited NSE CSV bytes are checksum-verified; preserve source line endings.
+data/nse_indices/raw/*.csv -text
+data/nse_indices/signals/*.csv -text
+data/nse_valuations/*.csv -text
+data/nse_valuations/sources/**/raw.csv -text

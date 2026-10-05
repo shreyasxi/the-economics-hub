@@ -1,0 +1,4053 @@
+{
+  "audit_only": true,
+  "cutoff": "2026-10-04",
+  "generated_at": "2026-10-04T18:10:31.906724+00:00",
+  "start_month": "2016-10",
+  "expected_months": 121,
+  "validated_months": 121,
+  "partial_month_note": "Current month is latest available as of cutoff, not a completed month-end.",
+  "full_10_year_definition": "120 complete monthly observations October 2016\u2013September 2026; evaluated separately for each metric",
+  "provisional_metric_choices": {
+    "Nifty Auto": "P/E",
+    "Nifty FMCG": "P/E",
+    "Nifty IT": "P/E",
+    "Nifty Pharma": "P/E",
+    "Nifty Bank": "P/B",
+    "Nifty Private Bank": "P/B",
+    "Nifty PSU Bank": "P/B",
+    "Nifty Financial Services": "P/B"
+  },
+  "sources": [
+    {
+      "month": "2016-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30102016.csv",
+        "observation_date": "2016-10-30",
+        "retrieved_at": "2026-10-04T17:25:32.083070+00:00",
+        "sha256": "8d33f3b1e4d5e924dbaf0fa0a93acc2edb7184e36522340b9659ec35a7b10ec3",
+        "bytes": 6250,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102016.csv",
+          "requested_date": "2016-10-31",
+          "retrieved_at": "2026-10-04T17:33:01.112279+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2016-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112016.csv",
+        "observation_date": "2016-11-30",
+        "retrieved_at": "2026-10-04T17:25:31.629553+00:00",
+        "sha256": "a26a37fbedb5466185e59f71fbc019d38b67cd27f470ce9fe66293589b24f950",
+        "bytes": 6469,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2016-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30122016.csv",
+        "observation_date": "2016-12-30",
+        "retrieved_at": "2026-10-04T17:25:32.098923+00:00",
+        "sha256": "05c95473f8cca451d26b6c044de7ca53d0591824cc6e4ffa286433bbc8896ce2",
+        "bytes": 6438,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122016.csv",
+          "requested_date": "2016-12-31",
+          "retrieved_at": "2026-10-04T17:33:01.112529+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2017-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012017.csv",
+        "observation_date": "2017-01-31",
+        "retrieved_at": "2026-10-04T17:25:31.629747+00:00",
+        "sha256": "5e12419b3f6720a59d70085e2f9d7dd250c4de62779d911ac09019ae0845096d",
+        "bytes": 6562,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022017.csv",
+        "observation_date": "2017-02-28",
+        "retrieved_at": "2026-10-04T17:25:32.054929+00:00",
+        "sha256": "ccfaa37303a2d420cffc58f96aaa05f97c55473a5f3ac878726f2e2d3fb33a68",
+        "bytes": 6468,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032017.csv",
+        "observation_date": "2017-03-31",
+        "retrieved_at": "2026-10-04T17:25:32.059581+00:00",
+        "sha256": "5bb8452eec6f908d09e0de8ffe7a653e0c850f48b8b0e694cf73eb006ca90c52",
+        "bytes": 6427,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28042017.csv",
+        "observation_date": "2017-04-28",
+        "retrieved_at": "2026-10-04T17:25:32.692549+00:00",
+        "sha256": "a19af30a31e3dcf0ed0cc535065a2c17bda3be4cc2717f69572b824380a1e1b4",
+        "bytes": 6581,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042017.csv",
+          "requested_date": "2017-04-30",
+          "retrieved_at": "2026-10-04T17:33:01.116497+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29042017.csv",
+          "requested_date": "2017-04-29",
+          "retrieved_at": "2026-10-04T17:33:01.574413+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2017-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052017.csv",
+        "observation_date": "2017-05-31",
+        "retrieved_at": "2026-10-04T17:25:32.293147+00:00",
+        "sha256": "02d0355ed48a654f92b0e326854a6ab748461d5e6ac7c1a53ce5372a0258745e",
+        "bytes": 6549,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062017.csv",
+        "observation_date": "2017-06-30",
+        "retrieved_at": "2026-10-04T17:25:32.325413+00:00",
+        "sha256": "2c2f34630464147b8031dfd2ddb85783fde0054d69680a45641c021f4b36bec1",
+        "bytes": 6543,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072017.csv",
+        "observation_date": "2017-07-31",
+        "retrieved_at": "2026-10-04T17:25:32.344274+00:00",
+        "sha256": "b25ef78fa1b82b61b6f95d875d484ca5cee580cae168fda1f2ea328f9a0cb954",
+        "bytes": 7003,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082017.csv",
+        "observation_date": "2017-08-31",
+        "retrieved_at": "2026-10-04T17:25:32.502789+00:00",
+        "sha256": "c808c24218f3adce50ae294a1cef07f8d3ef0f04a95c21fe3075fa7e8b8a1e8f",
+        "bytes": 6947,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29092017.csv",
+        "observation_date": "2017-09-29",
+        "retrieved_at": "2026-10-04T17:25:32.756619+00:00",
+        "sha256": "eb3389207ead3d1b3ad8360420fc11d559777d0c813409c4b1ff64cccbcc7479",
+        "bytes": 6964,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092017.csv",
+          "requested_date": "2017-09-30",
+          "retrieved_at": "2026-10-04T17:33:01.119931+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2017-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102017.csv",
+        "observation_date": "2017-10-31",
+        "retrieved_at": "2026-10-04T17:25:32.579836+00:00",
+        "sha256": "694044250a8e067c949f1e9e925474f60f5280af74ac2443cd72ba3c470373f6",
+        "bytes": 7010,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112017.csv",
+        "observation_date": "2017-11-30",
+        "retrieved_at": "2026-10-04T17:25:32.741790+00:00",
+        "sha256": "b6a37ed8ac6a2e68942a7a6af8e9200982afc10cc84ab66eb4186521d4094a31",
+        "bytes": 7315,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2017-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29122017.csv",
+        "observation_date": "2017-12-29",
+        "retrieved_at": "2026-10-04T17:25:33.626619+00:00",
+        "sha256": "de8ce11a37680217103449d7a00e9432e6b2c84d573698a97b6a03dc30fc0870",
+        "bytes": 7140,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122017.csv",
+          "requested_date": "2017-12-31",
+          "retrieved_at": "2026-10-04T17:33:01.513720+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30122017.csv",
+          "requested_date": "2017-12-30",
+          "retrieved_at": "2026-10-04T17:33:01.796623+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2018-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012018.csv",
+        "observation_date": "2018-01-31",
+        "retrieved_at": "2026-10-04T17:25:32.953058+00:00",
+        "sha256": "c54475800715e4cf18228c21fe5b492f2c34a59de2f4a19e8e65921c45ad1292",
+        "bytes": 7269,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022018.csv",
+        "observation_date": "2018-02-28",
+        "retrieved_at": "2026-10-04T17:25:32.984381+00:00",
+        "sha256": "52fdf258eeed03463f19c81b09cca4045c361961c5e7dfaac0cee1ed5a56d7fb",
+        "bytes": 7300,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28032018.csv",
+        "observation_date": "2018-03-28",
+        "retrieved_at": "2026-10-04T17:25:34.236223+00:00",
+        "sha256": "55b3e222ccf83302d587556786ddfe87214ffa72ce804828b593ec06a19e0f62",
+        "bytes": 7483,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032018.csv",
+          "requested_date": "2018-03-31",
+          "retrieved_at": "2026-10-04T17:33:01.518562+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30032018.csv",
+          "requested_date": "2018-03-30",
+          "retrieved_at": "2026-10-04T17:33:01.834113+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29032018.csv",
+          "requested_date": "2018-03-29",
+          "retrieved_at": "2026-10-04T17:33:02.051033+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2018-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042018.csv",
+        "observation_date": "2018-04-30",
+        "retrieved_at": "2026-10-04T17:25:33.548311+00:00",
+        "sha256": "f884d90ce04de8ca4c5f511932478acefa91da02778489b886a45c8f858cfd5d",
+        "bytes": 7197,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052018.csv",
+        "observation_date": "2018-05-31",
+        "retrieved_at": "2026-10-04T17:25:33.557515+00:00",
+        "sha256": "957ec763c02894c95c1510246a156d63f8c88e6f7803ed67759d5051bb39ab02",
+        "bytes": 7364,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29062018.csv",
+        "observation_date": "2018-06-29",
+        "retrieved_at": "2026-10-04T17:25:34.303499+00:00",
+        "sha256": "7d1dd07fb4a4d6e348b847d64a4af0acb249ec99bd1cb0dd51b87ab2b0b134c0",
+        "bytes": 7348,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062018.csv",
+          "requested_date": "2018-06-30",
+          "retrieved_at": "2026-10-04T17:33:01.524589+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2018-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072018.csv",
+        "observation_date": "2018-07-31",
+        "retrieved_at": "2026-10-04T17:25:33.937042+00:00",
+        "sha256": "a00184ed212d0950dfa25f1b20041cb316ff67665c651f14878d6d709a8c0270",
+        "bytes": 7284,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082018.csv",
+        "observation_date": "2018-08-31",
+        "retrieved_at": "2026-10-04T17:25:33.942050+00:00",
+        "sha256": "56b72bfa43dc313ed305a25ee88597de48a0338294b49580de24ecbf1e8d79f2",
+        "bytes": 7308,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28092018.csv",
+        "observation_date": "2018-09-28",
+        "retrieved_at": "2026-10-04T17:25:34.935486+00:00",
+        "sha256": "57ebbdb7593a02c98407a7334be4bd81b0296953451dfc8dc79fe7578a05d5a6",
+        "bytes": 7523,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092018.csv",
+          "requested_date": "2018-09-30",
+          "retrieved_at": "2026-10-04T17:33:01.785214+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29092018.csv",
+          "requested_date": "2018-09-29",
+          "retrieved_at": "2026-10-04T17:33:01.979309+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2018-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102018.csv",
+        "observation_date": "2018-10-31",
+        "retrieved_at": "2026-10-04T17:25:34.310315+00:00",
+        "sha256": "9cd17387f48dee2af9c5229ae69d32816fbf0f03b9a995b551940e76707bc558",
+        "bytes": 7532,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112018.csv",
+        "observation_date": "2018-11-30",
+        "retrieved_at": "2026-10-04T17:25:34.561774+00:00",
+        "sha256": "733c696c5bb63468c1c2a507d4b0a3d618ab098314556eed69efdd0f78c74f75",
+        "bytes": 7481,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2018-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122018.csv",
+        "observation_date": "2018-12-31",
+        "retrieved_at": "2026-10-04T17:25:34.814811+00:00",
+        "sha256": "55c9ffcfff092455e2836d3b1e734c1ab9f920d8188590a07dfc05359615e950",
+        "bytes": 7396,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012019.csv",
+        "observation_date": "2019-01-31",
+        "retrieved_at": "2026-10-04T17:25:34.818886+00:00",
+        "sha256": "e43982d1f7985d533575a821688ac62e39a6988c90a03d6cd8704bbbc14112a7",
+        "bytes": 7617,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022019.csv",
+        "observation_date": "2019-02-28",
+        "retrieved_at": "2026-10-04T17:25:34.917761+00:00",
+        "sha256": "5134d1340bd4601e25cd54964be48d049e56e6d0921fe989b44f308a4783d45b",
+        "bytes": 7589,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29032019.csv",
+        "observation_date": "2019-03-29",
+        "retrieved_at": "2026-10-04T17:25:35.731735+00:00",
+        "sha256": "cc3e0aadce72a258da8007e4557210b7c41613372375185dec0e531a9f10b0a3",
+        "bytes": 7536,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032019.csv",
+          "requested_date": "2019-03-31",
+          "retrieved_at": "2026-10-04T17:33:01.841820+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30032019.csv",
+          "requested_date": "2019-03-30",
+          "retrieved_at": "2026-10-04T17:33:02.034521+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2019-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042019.csv",
+        "observation_date": "2019-04-30",
+        "retrieved_at": "2026-10-04T17:25:35.032206+00:00",
+        "sha256": "cf9674460b2b05c94e269937edca938846eee534b2612146e697c14ef23d880c",
+        "bytes": 7632,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052019.csv",
+        "observation_date": "2019-05-31",
+        "retrieved_at": "2026-10-04T17:25:35.389904+00:00",
+        "sha256": "14348c36372d3e2869d39559ff5cff99e320cc8ba1e00a42d7fb85fb6c933247",
+        "bytes": 7569,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28062019.csv",
+        "observation_date": "2019-06-28",
+        "retrieved_at": "2026-10-04T17:25:36.057783+00:00",
+        "sha256": "21369b812ef9d3ee957e72b00fc7e616d93352ce8d8fc68c55cda56698556867",
+        "bytes": 7688,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062019.csv",
+          "requested_date": "2019-06-30",
+          "retrieved_at": "2026-10-04T17:33:02.013907+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29062019.csv",
+          "requested_date": "2019-06-29",
+          "retrieved_at": "2026-10-04T17:33:02.278804+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2019-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072019.csv",
+        "observation_date": "2019-07-31",
+        "retrieved_at": "2026-10-04T17:25:35.438684+00:00",
+        "sha256": "f3ecf774caba4323826d2fc0ba0d8d65611ce49c7015b9ddf50cc459d7701566",
+        "bytes": 7638,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30082019.csv",
+        "observation_date": "2019-08-30",
+        "retrieved_at": "2026-10-04T17:25:36.081386+00:00",
+        "sha256": "d9b871a8e7519bf5b0f01326adbf0a07b27a9f9d843ae5d3d92b198a2dd4ec43",
+        "bytes": 7642,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082019.csv",
+          "requested_date": "2019-08-31",
+          "retrieved_at": "2026-10-04T17:33:02.177198+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2019-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092019.csv",
+        "observation_date": "2019-09-30",
+        "retrieved_at": "2026-10-04T17:25:35.705649+00:00",
+        "sha256": "fba181891cd9a6d7bad8d6be55b4380b924374bd2eabc8ffa108e35075272cf4",
+        "bytes": 7739,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102019.csv",
+        "observation_date": "2019-10-31",
+        "retrieved_at": "2026-10-04T17:25:36.097321+00:00",
+        "sha256": "8d5b9c7b13cf3ca9b0bd66b5bde884a640d0bbcb97a33eeae2672111d6fe7c69",
+        "bytes": 7667,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2019-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29112019.csv",
+        "observation_date": "2019-11-29",
+        "retrieved_at": "2026-10-04T17:25:36.499571+00:00",
+        "sha256": "79d4dca79669c68765c90d55047e7f5537b350ff6d1adf25e193b0a68047637b",
+        "bytes": 7742,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112019.csv",
+          "requested_date": "2019-11-30",
+          "retrieved_at": "2026-10-04T17:33:02.222121+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2019-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122019.csv",
+        "observation_date": "2019-12-31",
+        "retrieved_at": "2026-10-04T17:25:36.359484+00:00",
+        "sha256": "7192ccce3d419b361839033609f76b325962542610109de0124c8170d862bb4e",
+        "bytes": 7698,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012020.csv",
+        "observation_date": "2020-01-31",
+        "retrieved_at": "2026-10-04T17:25:36.374276+00:00",
+        "sha256": "1716245e18a80ae92e1e9c0c00587482cdef38d537e08460b4ea0da176b00e4f",
+        "bytes": 7935,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022020.csv",
+        "observation_date": "2020-02-28",
+        "retrieved_at": "2026-10-04T17:25:36.664806+00:00",
+        "sha256": "e97e3f1a43a0fe1799020dd57fa542cb5e196047399fb5967c608f9b7e52d6bc",
+        "bytes": 8065,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29022020.csv",
+          "requested_date": "2020-02-29",
+          "retrieved_at": "2026-10-04T17:33:02.254216+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2020-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032020.csv",
+        "observation_date": "2020-03-31",
+        "retrieved_at": "2026-10-04T17:25:36.628185+00:00",
+        "sha256": "773ad9edfe4b80ae0221aa2e041ea290f4587fbeb1eb885f2f84b3389cd8620a",
+        "bytes": 7864,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042020.csv",
+        "observation_date": "2020-04-30",
+        "retrieved_at": "2026-10-04T17:25:36.721319+00:00",
+        "sha256": "5e254a5e76ad2aead23204fd8ef8703ac2747c4219efad16bf7768f8fbf1b8bc",
+        "bytes": 7903,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29052020.csv",
+        "observation_date": "2020-05-29",
+        "retrieved_at": "2026-10-04T17:25:38.081510+00:00",
+        "sha256": "b0c8cb43855dd591461acab8765431050082f8e8c73ba2e857c74348cbf65e31",
+        "bytes": 7886,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052020.csv",
+          "requested_date": "2020-05-31",
+          "retrieved_at": "2026-10-04T17:33:02.427333+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30052020.csv",
+          "requested_date": "2020-05-30",
+          "retrieved_at": "2026-10-04T17:33:02.623692+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2020-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062020.csv",
+        "observation_date": "2020-06-30",
+        "retrieved_at": "2026-10-04T17:25:37.549537+00:00",
+        "sha256": "bf70ed853a99fae1aa3e974a1a1ac7c49aa08a91c605d474a238243ddfbd394b",
+        "bytes": 7852,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072020.csv",
+        "observation_date": "2020-07-31",
+        "retrieved_at": "2026-10-04T17:25:37.565472+00:00",
+        "sha256": "3c540f650931009042b681ed7a296f942adffa5df635a59defb09174d4955656",
+        "bytes": 7876,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082020.csv",
+        "observation_date": "2020-08-31",
+        "retrieved_at": "2026-10-04T17:25:37.584899+00:00",
+        "sha256": "fd8d09bfe971e9d51e88e857c0a100b9a49cf9b7c471cbed8cb22fe087c670c2",
+        "bytes": 8422,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092020.csv",
+        "observation_date": "2020-09-30",
+        "retrieved_at": "2026-10-04T17:25:37.870796+00:00",
+        "sha256": "3f17e0112fc0f18db45c0647042efa7373fd1ea79f33bff91376b5de42884475",
+        "bytes": 8139,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2020-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30102020.csv",
+        "observation_date": "2020-10-30",
+        "retrieved_at": "2026-10-04T17:25:38.150232+00:00",
+        "sha256": "a77102d466a9bb5e9fd7cd44808e6b0b0cd809d4dda4a90872bc22dbd84ea944",
+        "bytes": 8229,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102020.csv",
+          "requested_date": "2020-10-31",
+          "retrieved_at": "2026-10-04T17:33:02.440877+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2020-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_27112020.csv",
+        "observation_date": "2020-11-27",
+        "retrieved_at": "2026-10-04T17:25:38.575031+00:00",
+        "sha256": "d0ec50eacbb414f3a2849b99969b4335b096b9fd41190dfc03f6d072a486edd0",
+        "bytes": 8393,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112020.csv",
+          "requested_date": "2020-11-30",
+          "retrieved_at": "2026-10-04T17:33:02.466288+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29112020.csv",
+          "requested_date": "2020-11-29",
+          "retrieved_at": "2026-10-04T17:33:02.678995+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28112020.csv",
+          "requested_date": "2020-11-28",
+          "retrieved_at": "2026-10-04T17:33:02.863185+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2020-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122020.csv",
+        "observation_date": "2020-12-31",
+        "retrieved_at": "2026-10-04T17:25:38.171538+00:00",
+        "sha256": "e2a39a31c6ed2a239c84d141a8bdfda641c96f8578bcaabae768b445c31b3cfd",
+        "bytes": 8391,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29012021.csv",
+        "observation_date": "2021-01-29",
+        "retrieved_at": "2026-10-04T17:25:38.762846+00:00",
+        "sha256": "11c27dfedb2d99bc0af03dc1b2480fde4bd276c31babcccb36ed5b651f379861",
+        "bytes": 8644,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012021.csv",
+          "requested_date": "2021-01-31",
+          "retrieved_at": "2026-10-04T17:33:02.482850+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30012021.csv",
+          "requested_date": "2021-01-30",
+          "retrieved_at": "2026-10-04T17:33:02.670943+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2021-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_26022021.csv",
+        "observation_date": "2021-02-26",
+        "retrieved_at": "2026-10-04T17:25:38.827259+00:00",
+        "sha256": "0985afaca9da4a2dc84fe11e8d9e852a69f0332efd8102098d2f9930523eee4f",
+        "bytes": 8708,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022021.csv",
+          "requested_date": "2021-02-28",
+          "retrieved_at": "2026-10-04T17:33:02.716162+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_27022021.csv",
+          "requested_date": "2021-02-27",
+          "retrieved_at": "2026-10-04T17:33:02.921414+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2021-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032021.csv",
+        "observation_date": "2021-03-31",
+        "retrieved_at": "2026-10-04T17:29:41.856892+00:00",
+        "sha256": "dba33db817ec818cc7b3dc0098c3c09eaeacf09415d351dd8e1bb36b48708429",
+        "bytes": 8429,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042021.csv",
+        "observation_date": "2021-04-30",
+        "retrieved_at": "2026-10-04T17:29:41.958749+00:00",
+        "sha256": "a215f4f31d07a800f748a2c3c93b8ca1311d4cac1b75eba5480bbbd488273af6",
+        "bytes": 8559,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052021.csv",
+        "observation_date": "2021-05-31",
+        "retrieved_at": "2026-10-04T17:29:42.120472+00:00",
+        "sha256": "a1c57aa2b3abccbd0cd782108ecb33c4d644bf37029e3bdc92fb366795416995",
+        "bytes": 8528,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062021.csv",
+        "observation_date": "2021-06-30",
+        "retrieved_at": "2026-10-04T17:25:39.039943+00:00",
+        "sha256": "139b66cb959c44ee34cfeb8a9af08e6e3ba7c596dae780e241b60e723ac5d51e",
+        "bytes": 8543,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30072021.csv",
+        "observation_date": "2021-07-30",
+        "retrieved_at": "2026-10-04T17:25:39.504902+00:00",
+        "sha256": "5c5b3837e618b8b495aadf78b2450333a4d39cad161fb3875b29e532f8c4441b",
+        "bytes": 8556,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072021.csv",
+          "requested_date": "2021-07-31",
+          "retrieved_at": "2026-10-04T17:33:02.861163+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2021-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082021.csv",
+        "observation_date": "2021-08-31",
+        "retrieved_at": "2026-10-04T17:25:39.901586+00:00",
+        "sha256": "c3e62461e9413ca5bb4225db61fbd3435ef08e58d5d3ff088d6ac9744a08018a",
+        "bytes": 8736,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092021.csv",
+        "observation_date": "2021-09-30",
+        "retrieved_at": "2026-10-04T17:25:40.115020+00:00",
+        "sha256": "2bb3d0bf7b3a40288fddfc5212901a639ef012f9024f571fc8b1d4ebcc4bf6d5",
+        "bytes": 8887,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29102021.csv",
+        "observation_date": "2021-10-29",
+        "retrieved_at": "2026-10-04T17:25:40.747695+00:00",
+        "sha256": "5527784e590cadf65940450ab438761a914c098dc72ac118762923a5821b4fc3",
+        "bytes": 8975,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102021.csv",
+          "requested_date": "2021-10-31",
+          "retrieved_at": "2026-10-04T17:33:02.893145+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30102021.csv",
+          "requested_date": "2021-10-30",
+          "retrieved_at": "2026-10-04T17:33:03.125090+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2021-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112021.csv",
+        "observation_date": "2021-11-30",
+        "retrieved_at": "2026-10-04T17:25:40.984475+00:00",
+        "sha256": "efcb631e03b7188199cf4fc187fff2bf754d2f3a0c78463adb07f955f4b19545",
+        "bytes": 9048,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2021-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122021.csv",
+        "observation_date": "2021-12-31",
+        "retrieved_at": "2026-10-04T17:25:41.214506+00:00",
+        "sha256": "d91f3b16595539a2dff29b9408e83e6c7ba9168cbc9c394474c7cea8431bcb6e",
+        "bytes": 9157,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012022.csv",
+        "observation_date": "2022-01-31",
+        "retrieved_at": "2026-10-04T17:25:41.437456+00:00",
+        "sha256": "f5cc5349380ca07edb2d8c1fced7f6c18f31bf470a2bc37994ec18bd5d504d28",
+        "bytes": 9435,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022022.csv",
+        "observation_date": "2022-02-28",
+        "retrieved_at": "2026-10-04T17:25:41.648944+00:00",
+        "sha256": "4780cde3887c80e8911cceeb4304c150378456b5dd6b2fd64b40edb8bdbb0a8d",
+        "bytes": 9617,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank",
+          "Nifty Healthcare Index"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032022.csv",
+        "observation_date": "2022-03-31",
+        "retrieved_at": "2026-10-04T17:25:41.869704+00:00",
+        "sha256": "b169e2950ff3d86feeb9f52cde44c3370ed370e130049db89fea1041ff99ecdf",
+        "bytes": 9633,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Healthcare Index",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29042022.csv",
+        "observation_date": "2022-04-29",
+        "retrieved_at": "2026-10-04T17:25:42.438409+00:00",
+        "sha256": "2449fc1659f630978087cfa527bc2fbd782da22a34abd4ec288815a4f9c50113",
+        "bytes": 9866,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042022.csv",
+          "requested_date": "2022-04-30",
+          "retrieved_at": "2026-10-04T17:33:03.091827+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2022-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052022.csv",
+        "observation_date": "2022-05-31",
+        "retrieved_at": "2026-10-04T17:25:42.250345+00:00",
+        "sha256": "89a35491e296e4698eb75bf8411142c9cb9b1d3d0169996f44607aee49fbe998",
+        "bytes": 9721,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062022.csv",
+        "observation_date": "2022-06-30",
+        "retrieved_at": "2026-10-04T17:25:42.520905+00:00",
+        "sha256": "28d2a9efbcaf1352c6b468d97aa870a85960b58e2f98134ff8478a4b0fd0e248",
+        "bytes": 9758,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables",
+          "Nifty Oil & Gas",
+          "Nifty Private Bank"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29072022.csv",
+        "observation_date": "2022-07-29",
+        "retrieved_at": "2026-10-04T17:25:43.002504+00:00",
+        "sha256": "37817814e53b8f47210c0a9c7bb7b4e680d996420d25479d240968d89d8093e1",
+        "bytes": 9811,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072022.csv",
+          "requested_date": "2022-07-31",
+          "retrieved_at": "2026-10-04T17:33:03.098037+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30072022.csv",
+          "requested_date": "2022-07-30",
+          "retrieved_at": "2026-10-04T17:33:03.292377+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2022-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30082022.csv",
+        "observation_date": "2022-08-30",
+        "retrieved_at": "2026-10-04T17:25:42.898975+00:00",
+        "sha256": "fd5c3e4be49c00f654b97491b5e27c33b949e9d71d13133a21423ac081a57b0a",
+        "bytes": 10249,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082022.csv",
+          "requested_date": "2022-08-31",
+          "retrieved_at": "2026-10-04T17:33:03.141503+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2022-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092022.csv",
+        "observation_date": "2022-09-30",
+        "retrieved_at": "2026-10-04T17:25:42.661885+00:00",
+        "sha256": "af844847ec431f949f2aa7aa4a3ad213bc526a473c6ab60daa0599f1eb9a065f",
+        "bytes": 10160,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102022.csv",
+        "observation_date": "2022-10-31",
+        "retrieved_at": "2026-10-04T17:25:42.738220+00:00",
+        "sha256": "51ba8522d760d31cda70c26d0a58f164fb5e4951732eb62d93df3b0aeb454f35",
+        "bytes": 10284,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112022.csv",
+        "observation_date": "2022-11-30",
+        "retrieved_at": "2026-10-04T17:25:42.937402+00:00",
+        "sha256": "6ad5a19c729232b69f0e4f037310584e88a25ff0230e5c2cbe9bcc001b71a096",
+        "bytes": 10306,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2022-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30122022.csv",
+        "observation_date": "2022-12-30",
+        "retrieved_at": "2026-10-04T17:25:43.179230+00:00",
+        "sha256": "be267ea5b6a27b4914a39601fe8d8fca732b649aee0139dcdd5ca594f8b44004",
+        "bytes": 10279,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122022.csv",
+          "requested_date": "2022-12-31",
+          "retrieved_at": "2026-10-04T17:33:03.398237+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2023-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012023.csv",
+        "observation_date": "2023-01-31",
+        "retrieved_at": "2026-10-04T17:25:43.116675+00:00",
+        "sha256": "d6c8f73d5d8e613ab95a350ea9e17bcd2dbfd5f016c416b034a3fbda54035b98",
+        "bytes": 10271,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022023.csv",
+        "observation_date": "2023-02-28",
+        "retrieved_at": "2026-10-04T17:25:43.140908+00:00",
+        "sha256": "4f015c0291eeeede6dffca8fd78a55118ca080113148263ba18ce38b2e81939c",
+        "bytes": 10276,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032023.csv",
+        "observation_date": "2023-03-31",
+        "retrieved_at": "2026-10-04T17:25:43.237568+00:00",
+        "sha256": "e2b2eca54617afe75f3c936240acb23414fc1436d83507958e6c19060ae8f3bd",
+        "bytes": 10421,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28042023.csv",
+        "observation_date": "2023-04-28",
+        "retrieved_at": "2026-10-04T17:25:43.843827+00:00",
+        "sha256": "ae59945d07a911c467ea69f9636121573d1d75851961d46edc55b1d7f070b117",
+        "bytes": 10451,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042023.csv",
+          "requested_date": "2023-04-30",
+          "retrieved_at": "2026-10-04T17:33:03.410465+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29042023.csv",
+          "requested_date": "2023-04-29",
+          "retrieved_at": "2026-10-04T17:33:03.638638+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2023-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052023.csv",
+        "observation_date": "2023-05-31",
+        "retrieved_at": "2026-10-04T17:25:43.371198+00:00",
+        "sha256": "451adc51ebb2ce7ca56982bc88d3d8d399b3d0b87841d75feac82a6f509d4dd6",
+        "bytes": 10568,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062023.csv",
+        "observation_date": "2023-06-30",
+        "retrieved_at": "2026-10-04T17:25:43.406636+00:00",
+        "sha256": "f771e743c457724f0b8e31db8637f377ea5404dccf059ef22929d1d292040551",
+        "bytes": 10562,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072023.csv",
+        "observation_date": "2023-07-31",
+        "retrieved_at": "2026-10-04T17:25:43.434980+00:00",
+        "sha256": "1ba393e28d5eec776117b18c15c1a6d036580adb5f53c5b17b1accf571a7516a",
+        "bytes": 10571,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082023.csv",
+        "observation_date": "2023-08-31",
+        "retrieved_at": "2026-10-04T17:25:43.616061+00:00",
+        "sha256": "0e3c1ac0b8031092ee6d6459421b711ebde2fbd4f5e38b5733f8e3674db8c659",
+        "bytes": 10667,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29092023.csv",
+        "observation_date": "2023-09-29",
+        "retrieved_at": "2026-10-04T17:25:43.822896+00:00",
+        "sha256": "2a16d212991a3866b32e4e7a5d852057b5130324644908e6c462761aeff8f4b7",
+        "bytes": 10562,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank",
+          "Nifty Healthcare Index",
+          "Nifty Oil & Gas"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092023.csv",
+          "requested_date": "2023-09-30",
+          "retrieved_at": "2026-10-04T17:33:03.418373+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2023-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102023.csv",
+        "observation_date": "2023-10-31",
+        "retrieved_at": "2026-10-04T17:25:43.646670+00:00",
+        "sha256": "43f5ce22c87eb2a748ace4e2b87e938b5dc0ad8865a09750785dcca354931868",
+        "bytes": 10527,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112023.csv",
+        "observation_date": "2023-11-30",
+        "retrieved_at": "2026-10-04T17:25:43.842783+00:00",
+        "sha256": "ef04c9a779e2f9b2efe1d7dffd861238c1c875b8435b44bbe18d2dadce081211",
+        "bytes": 10640,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2023-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29122023.csv",
+        "observation_date": "2023-12-29",
+        "retrieved_at": "2026-10-04T17:25:44.263573+00:00",
+        "sha256": "1b45e89ff4527e88f0a85827ea5af9fa7c5f182e8623515995ceb4fb61924a85",
+        "bytes": 10727,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122023.csv",
+          "requested_date": "2023-12-31",
+          "retrieved_at": "2026-10-04T17:33:03.517008+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30122023.csv",
+          "requested_date": "2023-12-30",
+          "retrieved_at": "2026-10-04T17:33:03.718499+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2024-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012024.csv",
+        "observation_date": "2024-01-31",
+        "retrieved_at": "2026-10-04T17:25:44.043819+00:00",
+        "sha256": "464ca8623560169d017b010cf366509a3b4346a53fda599840dd47f38f3cdc48",
+        "bytes": 10820,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29022024.csv",
+        "observation_date": "2024-02-29",
+        "retrieved_at": "2026-10-04T17:25:44.061024+00:00",
+        "sha256": "ee728220093ee61779a137d5b47b0c46b40411a17893ee22b25040d6f0434437",
+        "bytes": 10852,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28032024.csv",
+        "observation_date": "2024-03-28",
+        "retrieved_at": "2026-10-04T17:25:44.701025+00:00",
+        "sha256": "7ec765c6471452a73773293f9a7519ba7ed336343276efe16fedca65e493f443",
+        "bytes": 11118,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032024.csv",
+          "requested_date": "2024-03-31",
+          "retrieved_at": "2026-10-04T17:33:03.583921+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30032024.csv",
+          "requested_date": "2024-03-30",
+          "retrieved_at": "2026-10-04T17:33:03.806048+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29032024.csv",
+          "requested_date": "2024-03-29",
+          "retrieved_at": "2026-10-04T17:33:04.022234+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2024-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042024.csv",
+        "observation_date": "2024-04-30",
+        "retrieved_at": "2026-10-04T17:25:44.243489+00:00",
+        "sha256": "5c2b0b9d43e2bb46bb672035a469c01809a4df7bb4b43a90e390615a599a507f",
+        "bytes": 11303,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052024.csv",
+        "observation_date": "2024-05-31",
+        "retrieved_at": "2026-10-04T17:25:44.277678+00:00",
+        "sha256": "0fb364cbe92966b93cc864e9cefea2fed30895be30e9f47fe9aa3a733cc77222",
+        "bytes": 11444,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28062024.csv",
+        "observation_date": "2024-06-28",
+        "retrieved_at": "2026-10-04T17:25:44.885822+00:00",
+        "sha256": "2278ffd990efab7e2f5d12162aca6388a6ce3b0883ce06ead166a1b2c10bfc52",
+        "bytes": 11983,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062024.csv",
+          "requested_date": "2024-06-30",
+          "retrieved_at": "2026-10-04T17:33:03.644095+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29062024.csv",
+          "requested_date": "2024-06-29",
+          "retrieved_at": "2026-10-04T17:33:03.847586+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2024-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072024.csv",
+        "observation_date": "2024-07-31",
+        "retrieved_at": "2026-10-04T17:25:44.471585+00:00",
+        "sha256": "ae29fae8df3c7ec0b878681448d568d994f04440014349a22156bfed82a03aa0",
+        "bytes": 12114,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30082024.csv",
+        "observation_date": "2024-08-30",
+        "retrieved_at": "2026-10-04T17:25:44.696867+00:00",
+        "sha256": "2ea2b651e234187ac3c5b8b5cefa334a755afad3f142a550d803b8a1a2ad3ff3",
+        "bytes": 12123,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082024.csv",
+          "requested_date": "2024-08-31",
+          "retrieved_at": "2026-10-04T17:33:03.853394+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2024-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092024.csv",
+        "observation_date": "2024-09-30",
+        "retrieved_at": "2026-10-04T17:25:44.678049+00:00",
+        "sha256": "ab005d9248c72fa259e564db2c128dc015197bf4210fd097015d85899a42e387",
+        "bytes": 12552,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102024.csv",
+        "observation_date": "2024-10-31",
+        "retrieved_at": "2026-10-04T17:25:44.891578+00:00",
+        "sha256": "124749f92932193b02aa48a2c59400c52305926dda3438f24c6cdef13c3a2b8a",
+        "bytes": 12773,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2024-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29112024.csv",
+        "observation_date": "2024-11-29",
+        "retrieved_at": "2026-10-04T17:25:45.174561+00:00",
+        "sha256": "50fed36c0c4966be9fcedec11d3b156cf6cf5eef79a87136a316f0fb7b30a8d2",
+        "bytes": 12945,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112024.csv",
+          "requested_date": "2024-11-30",
+          "retrieved_at": "2026-10-04T17:33:03.902893+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2024-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122024.csv",
+        "observation_date": "2024-12-31",
+        "retrieved_at": "2026-10-04T17:25:44.940416+00:00",
+        "sha256": "c2963a73b2dc8578ae61d102073fcc49c292834cab3a4fb562010af5c91403ff",
+        "bytes": 13636,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012025.csv",
+        "observation_date": "2025-01-31",
+        "retrieved_at": "2026-10-04T17:25:45.141993+00:00",
+        "sha256": "57c2629e79300388d3e871c587180af32b0a5a760d926c1ef947184701b05c87",
+        "bytes": 14306,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022025.csv",
+        "observation_date": "2025-02-28",
+        "retrieved_at": "2026-10-04T17:25:45.142483+00:00",
+        "sha256": "a03fcdb6269b58c01f9db32f7c2b8fb601fe1e790b591966cff1fffc3e9e3020",
+        "bytes": 14712,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28032025.csv",
+        "observation_date": "2025-03-28",
+        "retrieved_at": "2026-10-04T17:25:46.145931+00:00",
+        "sha256": "83eb82badff97256f430d17ca361b3a5abbff4eba2fce3bf584472a617850fb5",
+        "bytes": 14696,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032025.csv",
+          "requested_date": "2025-03-31",
+          "retrieved_at": "2026-10-04T17:33:04.081902+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30032025.csv",
+          "requested_date": "2025-03-30",
+          "retrieved_at": "2026-10-04T17:33:04.272920+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29032025.csv",
+          "requested_date": "2025-03-29",
+          "retrieved_at": "2026-10-04T17:33:04.456808+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2025-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042025.csv",
+        "observation_date": "2025-04-30",
+        "retrieved_at": "2026-10-04T17:25:45.366829+00:00",
+        "sha256": "ff12a0bb13de7757aa164a347a14fc705602abad0cc4183970cd988b7ef7e725",
+        "bytes": 14663,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30052025.csv",
+        "observation_date": "2025-05-30",
+        "retrieved_at": "2026-10-04T17:25:45.827933+00:00",
+        "sha256": "ccf430ddeadb732699ca28bebf7e4edab603580d257f5ee50afe380b076d8625",
+        "bytes": 14816,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Consumer Durables",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052025.csv",
+          "requested_date": "2025-05-31",
+          "retrieved_at": "2026-10-04T17:33:04.088219+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2025-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062025.csv",
+        "observation_date": "2025-06-30",
+        "retrieved_at": "2026-10-04T17:25:45.485517+00:00",
+        "sha256": "48bf309dec5572d82aa6b705596b748626f54070ebe0d5618163bf33a6a6c6a0",
+        "bytes": 14743,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072025.csv",
+        "observation_date": "2025-07-31",
+        "retrieved_at": "2026-10-04T17:25:45.718625+00:00",
+        "sha256": "347fa031fa453fd2faa558b37e6c9b797415b36cca2e7bee330a0b30c9eabe36",
+        "bytes": 14952,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29082025.csv",
+        "observation_date": "2025-08-29",
+        "retrieved_at": "2026-10-04T17:25:46.472531+00:00",
+        "sha256": "167e8e02a90374fecb861724a044ccfad840449773543813208b9a6e9b4a0502",
+        "bytes": 15096,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082025.csv",
+          "requested_date": "2025-08-31",
+          "retrieved_at": "2026-10-04T17:33:04.150474+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30082025.csv",
+          "requested_date": "2025-08-30",
+          "retrieved_at": "2026-10-04T17:33:04.342134+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2025-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092025.csv",
+        "observation_date": "2025-09-30",
+        "retrieved_at": "2026-10-04T17:25:46.021177+00:00",
+        "sha256": "9c784930a9c42ddd9298f218faf1d3275698ec88179be1dd5cbd25e19c258b92",
+        "bytes": 15129,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102025.csv",
+        "observation_date": "2025-10-31",
+        "retrieved_at": "2026-10-04T17:25:46.109445+00:00",
+        "sha256": "26e623330c9ddaa0ee3c5cc01d33a7e08517d724ff17aa1fcea91d189ffdefb0",
+        "bytes": 15320,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2025-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28112025.csv",
+        "observation_date": "2025-11-28",
+        "retrieved_at": "2026-10-04T17:25:47.016745+00:00",
+        "sha256": "2fa7594a6a31361e492a59af6485c9f646bfce7f239dfe3e9c96cb941b41f6ff",
+        "bytes": 15261,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30112025.csv",
+          "requested_date": "2025-11-30",
+          "retrieved_at": "2026-10-04T17:33:04.192643+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29112025.csv",
+          "requested_date": "2025-11-29",
+          "retrieved_at": "2026-10-04T17:33:04.383787+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2025-12",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31122025.csv",
+        "observation_date": "2025-12-31",
+        "retrieved_at": "2026-10-04T17:25:46.378467+00:00",
+        "sha256": "fdb9532652fcc47a10bc4b0729bd69d7c5c4fa4227bdee36176502b6e6609c8b",
+        "bytes": 15318,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2026-01",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30012026.csv",
+        "observation_date": "2026-01-30",
+        "retrieved_at": "2026-10-04T17:25:46.810254+00:00",
+        "sha256": "8c275e5bf62c5d4efe61efa38f4b22bb34456fff29b8cee512bfb9e01e8a5ddb",
+        "bytes": 15495,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31012026.csv",
+          "requested_date": "2026-01-31",
+          "retrieved_at": "2026-10-04T17:33:04.274206+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2026-02",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_27022026.csv",
+        "observation_date": "2026-02-27",
+        "retrieved_at": "2026-10-04T17:25:47.007133+00:00",
+        "sha256": "bf55aefbc9953ca372886689c7d48717dc632682282c6603d924fab437058366",
+        "bytes": 15901,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_28022026.csv",
+          "requested_date": "2026-02-28",
+          "retrieved_at": "2026-10-04T17:33:04.467258+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2026-03",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30032026.csv",
+        "observation_date": "2026-03-30",
+        "retrieved_at": "2026-10-04T17:25:47.084008+00:00",
+        "sha256": "251525859c448dd911073f95db447f21495b1cb422b93558f226f3135e6f9cf9",
+        "bytes": 16100,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31032026.csv",
+          "requested_date": "2026-03-31",
+          "retrieved_at": "2026-10-04T17:33:04.530030+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2026-04",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30042026.csv",
+        "observation_date": "2026-04-30",
+        "retrieved_at": "2026-10-04T17:25:47.123464+00:00",
+        "sha256": "e5f696b8110b60574a4a08d1a820bb921a1f4c44d0e6aa736eb59518dde6efe5",
+        "bytes": 15902,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2026-05",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_29052026.csv",
+        "observation_date": "2026-05-29",
+        "retrieved_at": "2026-10-04T17:25:47.772127+00:00",
+        "sha256": "7c3c581f37719fcb3d5027b35cd5a2b4ef4b494dd882326e0aacbf3342945ff2",
+        "bytes": 16184,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31052026.csv",
+          "requested_date": "2026-05-31",
+          "retrieved_at": "2026-10-04T17:33:04.590795+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30052026.csv",
+          "requested_date": "2026-05-30",
+          "retrieved_at": "2026-10-04T17:33:04.793978+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2026-06",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30062026.csv",
+        "observation_date": "2026-06-30",
+        "retrieved_at": "2026-10-04T17:25:47.311751+00:00",
+        "sha256": "0c5866bad9e96e6cc711fbe08eb1a384c10f8c9b46e76572ed5ddda5b71942a0",
+        "bytes": 16933,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2026-07",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31072026.csv",
+        "observation_date": "2026-07-31",
+        "retrieved_at": "2026-10-04T17:25:47.390357+00:00",
+        "sha256": "7fc62673ea2c7bee0993f9ef2a32c51b12c7b529bddac4d3c1eee9d8bdda4488",
+        "bytes": 17110,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2026-08",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31082026.csv",
+        "observation_date": "2026-08-31",
+        "retrieved_at": "2026-10-04T17:25:47.411899+00:00",
+        "sha256": "fa17c80312dfa3e591a141c142c6706b2275781f627363a38a344ea55a0a85f7",
+        "bytes": 17481,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2026-09",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30092026.csv",
+        "observation_date": "2026-09-30",
+        "retrieved_at": "2026-10-04T17:25:47.581857+00:00",
+        "sha256": "7b3d0e049ca855bbe51f9e0a8afce106bfd0fef927122b60db46a5572183dcae",
+        "bytes": 17451,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": []
+    },
+    {
+      "month": "2026-10",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_01102026.csv",
+        "observation_date": "2026-10-01",
+        "retrieved_at": "2026-10-04T17:25:48.391777+00:00",
+        "sha256": "b79b5e5c401578b41b44f7bad032e4865a3cd9aa7475a527766c06d134d3b85d",
+        "bytes": 17852,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_04102026.csv",
+          "requested_date": "2026-10-04",
+          "retrieved_at": "2026-10-04T18:10:30.195722+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_03102026.csv",
+          "requested_date": "2026-10-03",
+          "retrieved_at": "2026-10-04T18:10:31.080285+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_02102026.csv",
+          "requested_date": "2026-10-02",
+          "retrieved_at": "2026-10-04T18:10:31.324139+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_01102026.csv",
+          "requested_date": "2026-10-01",
+          "retrieved_at": "2026-10-04T18:10:31.557269+00:00",
+          "http_status": 200,
+          "content_type": "text/csv",
+          "sha256": "b79b5e5c401578b41b44f7bad032e4865a3cd9aa7475a527766c06d134d3b85d",
+          "outcome": "validated_csv"
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "monthly.csv": "5ff51179584db0581ab22dc7080c4b7e28c5a2f684c16bf2672af4674ad11844",
+    "extracted.csv": "2df3dc8a8ba594406a16d2d1badc8c09fd7f282fc278b1ba0333be777a408829",
+    "coverage.csv": "9649b739f20c2aa4afc2fdab23a971c1bc07c90e218efa0b309aae7c7967d2c9",
+    "metric_details.json": "e9c9caeefe4d54ba8d45aee2cacfd1f4fcaa35fe77deb8e49a24c470d51ddc12"
+  }
+}

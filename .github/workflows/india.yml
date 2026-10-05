@@ -99,9 +99,31 @@ jobs:
           PYTHONPATH: "."
         run: python generate_soe.py --history
 
+      - name: Verify NSE risk-appetite pipeline
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_nse*.py'
+
+      - name: Refresh official NSE risk-appetite indices
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_risk_appetite
+
+      # Optional chart: fail this update on bad source data, then omit valuations.
+      - name: Refresh official NSE sector valuations
+        id: nse-valuations
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_valuations.collector --update
+
       - name: Generate India charts
         env:
           PYTHONPATH: "."
+          NSE_VALUATIONS_UPDATE_FAILED: ${{ steps.nse-valuations.outcome != 'success' }}
         run: python generate_india.py --mode dashboard
 
       # Part 2 of 2: the briefing shown at the top of the tab, written into the
@@ -126,6 +148,14 @@ jobs:
           fi
           echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
           mkdir -p "assets/india/$MONTH_FOLDER"
+          # Remove only the optional valuation artifact when this run omitted it.
+          if [ ! -f "output/india/$MONTH_FOLDER/22_india_sector_valuations.png" ]; then
+            rm -f "assets/india/$MONTH_FOLDER/22_india_sector_valuations.png"
+          fi
+          # A failed official rotation snapshot must not leave a prior chart published.
+          if [ ! -f "output/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png" ]; then
+            rm -f "assets/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png"
+          fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
           if [ -f "output/india/$MONTH_FOLDER/soe.json" ]; then
             cp "output/india/$MONTH_FOLDER/soe.json" "assets/india/$MONTH_FOLDER/"
@@ -150,7 +180,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/india/ assets/readme_showcase/ data/rbi_transmission.csv
+          git add -A assets/india/ assets/readme_showcase/ data/rbi_transmission.csv data/nse_indices/ data/nse_valuations/
           git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
           git push

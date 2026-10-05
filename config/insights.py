@@ -390,10 +390,41 @@ The nearest parallel is mid-2008, another wave of hikes into an oil and food pri
 
     # ── INDIA DASHBOARD ─────────────────────────────────────────────────────
 
-    "india_pmi": """\
-**How to read this chart:** India's Manufacturing PMI and Services PMI plotted together over the trailing period. Both are diffusion indices — a reading above 50 signals expansion in that sector; below 50 signals contraction. The composite (blended) line reveals whether growth is broadening or narrowing. India's services PMI carries more structural weight than manufacturing, given services represent over 55% of GDP, but the manufacturing PMI is a more sensitive cycle indicator given its exposure to global trade and inventory cycles.
+    "india_sector_rotation_12m_benchmark": """\
+**How to read this chart:** Bars show trailing-12-month **price returns**, using official NSE allIndices levels from the same observation date. NIFTY 50 is the benchmark row at the top; sectors below it are sorted strongest to weakest. These are price indices, so dividends are excluded.
 
-**Practical takeaway:** Sustained PMI readings above 55 in both manufacturing and services — India's structural norm in recent cycles — reflect robust domestic demand and solid business confidence. Watch for divergence: services PMI holding above 55 while manufacturing dips below 52 typically signals external headwinds (export slowdown, input cost pressure) without a domestic demand problem. A manufacturing PMI falling below 50 for two or more consecutive months has historically preceded a 10–15% correction in cyclical NIFTY sectors. The PMI print relative to consensus expectation — the "surprise" — drives the market reaction more than the absolute level.
+**Relative leadership:** A sector outperforming NIFTY 50 shows relative leadership; one underperforming it shows relative weakness. A positive absolute return does not necessarily mean outperformance: compare each sector's return with the benchmark, not just with zero.
+""",
+
+    "india_sector_valuations": """\
+Each point ranks the current official NSE Indices valuation against that index's **own completed monthly history**. Higher percentiles mean richer relative to its history; lower percentiles mean cheaper. Raw P/E and P/B multiples are not compared across sectors. NIFTY 50 is the benchmark; sectors are sorted by percentile.
+
+**Metrics and history:** NIFTY 50, Auto, FMCG, IT and Pharma use P/E from **April 2021 onward**, following NSE's methodology change effective 31 March 2021. Bank, Metal, Realty and Oil & Gas use P/B with up to ten years of available history. Oil & Gas begins **January 2020**, its first available monthly archive in this dataset. The current observation's month is excluded from every reference distribution; missing values stay missing. Rows require at least 60 valid completed monthly observations.
+
+The percentile is the share of valid historical multiples at or below the current multiple. This is a relative historical valuation measure, not a forecast or an automatic buy/sell signal. Source: official NSE Indices daily archives.
+""",
+
+    "india_risk_appetite": """\
+**How to read this chart:** The official NIFTY Smallcap 250 closing price index divided by the NIFTY 50 closing price index, rebased to 100 on the first matching date shown. A rising line means small caps outperform large caps over that interval. Above 100 means cumulative relative outperformance since the base date; it does not mean momentum is currently rising.
+
+**Method:** Only matching trading dates enter the calculation. No forward-filling, smoothing or constituent reconstruction. These are price indices, excluding dividend reinvestment. Raw official NSE Indices CSV exports, their checksums and source dates are retained separately from the calculated signal. This is a relative-leadership proxy for risk appetite, not market-wide breadth or a pure measure of investor sentiment.
+""",
+    "india_gross_fixed_capital_formation": """\
+**How to read this chart:** The orange line shows India's annual gross fixed capital formation (GFCF) as a share of GDP — investment in fixed assets such as machinery, buildings and infrastructure. A higher ratio means a larger share of current economic output is being devoted to expanding or replacing the economy's productive capital stock. The dashed line is the long-run average, while the shaded band highlights the mid-2000s investment boom. The series is annual and unsmoothed.
+
+**Practical takeaway:** For a developing economy, the investment rate is an important indicator of future productive capacity, but the level alone is not enough — the productivity and allocation of that investment matter too. India's sharp rise during the mid-2000s was followed by a prolonged decline as the corporate investment cycle weakened and balance-sheet stress constrained private capex. The recent recovery therefore matters: a sustained move above the long-run average would indicate that capital formation is again becoming a stronger engine of growth. Read this alongside credit growth, public capex and the GVA contribution chart to judge whether the investment recovery is broadening through the economy.
+""",
+
+    "india_gva_contributions": """\
+**How to read this chart:** Each stacked bar decomposes India's year-on-year real GVA growth into the contributions made by the official broad-sector groups shown in the legend, measured in percentage points. A larger positive segment means that sector contributed more to overall growth; a negative segment means it pulled growth lower. The black line is headline real GVA growth. Contributions are calculated from constant-price sector GVA levels, so the stacked bars reconcile with the headline rather than being approximated from sector growth rates.
+
+**Practical takeaway:** The composition of growth matters as much as the headline rate. When several sectors contribute positively at the same time, growth is broad-based and generally more resilient; when most of the increase comes from one segment, the headline can look strong while the underlying expansion is narrow. Watch whether the contribution mix is becoming more balanced across successive quarters, and whether weaker sectors begin adding to growth rather than merely becoming less negative. Because this uses the new 2022-23 constant-price national accounts series only, it should be read as a clean view of the current growth cycle rather than a long historical comparison.
+""",
+
+    "india_pmi": """\
+**How to read this chart:** Manufacturing and services appear in separate panels on the same scale. Each line connects observed monthly PMI readings, with gaps where data is missing; the dot marks the latest reading. Above 50 indicates expansion versus the previous month; below 50 indicates contraction. The end labels show each sector's latest reading; the panel captions give its observation month and change from the immediately preceding month in index points.
+
+**Practical takeaway:** Compare the direction and persistence of the two series. Rising readings indicate a broader balance of firms reporting improvement, not a directly measurable GDP growth rate. A falling PMI above 50 still indicates expansion. Separate panels make sector divergence visible without overlapping lines or smoothing away monthly changes.
 """,
 
     "india_gst": """\
@@ -415,9 +446,11 @@ The nearest parallel is mid-2008, another wave of hikes into an oil and food pri
 """,
 
     "india_fpi_monthly": """\
-**How to read this chart:** Each bar is one month's net portfolio investment into India in US$ billion: foreign investors' purchases of Indian equities and debt minus their sales, as reported by the RBI. Green bars are net inflows, red bars net outflows. The badge shows the cumulative total for the 24 months on the chart. The RBI publishes this series about two to three months after the month ends and revises recent months, so the latest bars can change.
+**How to read this chart:** Each bar is one month's net foreign portfolio investment into India, in ₹ lakh crore, using NSDL's official monthly FPI net-investment data. Green bars are net inflows and red bars are net outflows. The badge shows the cumulative total over the 24 completed months plotted. If a grey bar appears, it represents the current month-to-date observation rather than a completed month.
 
-**Practical takeaway:** Portfolio flows are the most volatile part of India's capital account. Sustained outflows put pressure on the rupee and on liquidity in Indian markets, and have typically coincided with periods of global risk aversion or a strong US dollar; sustained inflows ease both. A run of outflows while the trade deficit widens is the combination most likely to weaken the rupee and draw RBI intervention, visible in the forex reserves chart.
+**Practical takeaway:** This is one of the cleanest high-frequency gauges of external risk appetite toward India. Persistent outflows usually coincide with a stronger US dollar, rising global yields, tighter financial conditions, or domestic equity-market underperformance, while sustained inflows ease pressure on the rupee and support domestic liquidity. A sequence of red bars matters more than any single month: repeated outflows often show that global investors are de-risking EM exposure rather than reacting to one isolated event. Read this chart together with USD/INR, forex reserves, and India VIX for a fuller picture of whether stress is external, domestic, or both.
+
+**Source:** NSDL FPI Net Investment Details (Calendar Year) — https://www.fpi.nsdl.co.in/Reports/Yearwise.aspx?RptType=6
 """,
 
     "india_inflation_bar": """\
@@ -452,12 +485,6 @@ The nearest parallel is mid-2008, another wave of hikes into an oil and food pri
 **Practical takeaway:** The rate cycle context determines everything downstream in India macro. Identify whether the RBI is in a tightening cycle (2022–23), a prolonged hold (2023–24), or an easing cycle (2024-onwards). Each phase has a distinct transmission: tightening compresses credit growth and slows home loans; easing stimulates both. India's neutral real rate is estimated at 1–1.5%, meaning a repo rate above 5.5–6% is restrictive. Watch the gap between the repo rate and current CPI — when the real rate turns positive and persistent, the preconditions for a rate cut cycle are satisfied.
 """,
 
-    "india_money_supply": """\
-**How to read this chart:** Two lines showing M3 (broad money supply) growth YoY % versus aggregate bank credit growth YoY %. The gap between the two is the monetary transmission signal: when credit growth exceeds M3 growth, banks are expanding loan books faster than deposits are accumulating — a structural tightening of liquidity; when M3 grows faster than credit, excess money creation is sitting idle (risk-off environment) or being deployed into government securities rather than private credit.
-
-**Practical takeaway:** The credit-M3 spread is one of the cleanest leading indicators of RBI liquidity operations. A sustained positive spread (credit > M3) precedes CRR/SLR adjustments and OMO purchases by the RBI to inject liquidity. A negative spread (M3 > credit) signals monetary accommodation in excess of private credit demand — consistent with a rate cut cycle or low investment sentiment. India's historical "normal" for bank credit growth is 12–15% YoY; below 10% is a soft-credit regime; above 16% risks asset quality concerns in the medium term.
-""",
-
     "india_credit_deposit": """\
 **How to read this chart:** Grouped bars showing bank credit growth YoY % and deposit growth YoY % side-by-side each month, with the Credit-Deposit (CD) ratio overlaid as a secondary-axis line. The CD ratio (total credit ÷ total deposits) is the core liquidity health metric for India's banking system: a rising CD ratio means the system is lending more of every deposit rupee, compressing the liquidity buffer.
 
@@ -490,12 +517,6 @@ The nearest parallel is mid-2008, another wave of hikes into an oil and food pri
 **How to read this chart:** Monthly merchandise exports and imports in USD billions shown as grouped bars, with the trade deficit plotted as a secondary-axis line. Data sourced from DGCI&S via RBI DBIE. India is structurally a trade deficit country — imports (primarily crude oil, gold, electronics) consistently exceed exports — making the deficit magnitude a key variable for the current account balance and INR pressure.
 
 **Practical takeaway:** India's merchandise trade deficit typically runs at $20–25B per month under stable conditions. Deficits below $20B signal either weak import demand (slowdown) or strong export performance; deficits above $28–30B signal commodity price surges (crude oil being the dominant driver — every $10/barrel rise in Brent adds approximately $12–14B to India's annual import bill) or gold import spikes. The services trade surplus (software exports, remittances) partially offsets the merchandise deficit but is not captured here — for the full current account picture, note that India's services surplus of ~$150B/year (FY24) structurally cushions the merchandise gap.
-""",
-
-    "india_promoter_holdings": """\
-**How to read this chart:** Every listed Indian company files a shareholding pattern with the exchange within 21 days of each quarter end. This counts how much of each company its promoter holds — the founding family, the parent company or, for state-owned firms, the government — and groups the companies into 2.5-point bands. The bars are the latest quarter; the grey outline is the earliest quarter NSE keeps, drawn over exactly the same companies, so the change is promoters buying and selling rather than the market listing new firms. Two rules shape the picture: control passes at 50%, and no promoter may hold more than 75%, because at least a quarter of every listed company must sit with the public. The handful of companies above 75% are recent listings and state holdings still being brought down to it.
-
-**Practical takeaway:** This is the single biggest structural difference between Indian equities and American ones. The median Indian company is majority-owned by one identifiable owner, and the tallest bar on the chart is the group parked within touching distance of the legal ceiling — promoters holding every share the law allows. For an investor it means minority shareholders rarely decide anything, and the governance question is not whether management is accountable to owners but whether the owner treats the minority fairly; for the market it means a large share of the register never trades, so free float is thinner than market capitalisation suggests. The slow leftward drift is the story to watch: promoters have been selling into a strong market, at roughly half a point of the median company a year, which gradually deepens the free float. Note that the like-for-like comparison excludes companies listed since the earlier quarter; including today's newer listings, which come to market with higher promoter stakes, lifts the current median by about two points.
 """,
 
     # ── WEEKLY: CRYPTO ASSETS ────────────────────────────────────────────────

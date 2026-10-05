@@ -1,0 +1,15 @@
+index,first_available_month,last_available_month,expected_months,months_present,pe_valid,pe_missing,pe_longest_gap,pe_coverage_pct,pe_coverage_since_first_pct,pe_at_least_60,pe_full_10_years,pb_valid,pb_missing,pb_longest_gap,pb_coverage_pct,pb_coverage_since_first_pct,pb_at_least_60,pb_full_10_years
+Nifty 50,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty Auto,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty Bank,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty Financial Services,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty FMCG,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty IT,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty Metal,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty Pharma,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty PSU Bank,2016-10,2026-10,121,121,79,42,35,65.29,65.29,True,False,121,0,0,100.0,100.0,True,True
+Nifty Realty,2016-10,2026-10,121,121,119,2,1,98.35,98.35,True,False,121,0,0,100.0,100.0,True,True
+Nifty Private Bank,2016-10,2026-10,121,121,121,0,0,100.0,100.0,True,True,121,0,0,100.0,100.0,True,True
+Nifty Oil & Gas,2020-01,2026-10,121,82,82,39,39,67.77,100.0,True,False,82,39,39,67.77,100.0,True,False
+Nifty Healthcare Index,2020-11,2026-10,121,72,72,49,49,59.5,100.0,True,False,72,49,49,59.5,100.0,True,False
+Nifty Consumer Durables,2020-01,2026-10,121,82,82,39,39,67.77,100.0,True,False,82,39,39,67.77,100.0,True,False

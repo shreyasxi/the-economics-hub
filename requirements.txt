@@ -11,6 +11,7 @@ xlrd>=2.0.1              # required by pandas.read_excel for legacy .xls (Shille
 yfinance>=0.2.36
 fredapi>=0.5.1
 dbnomics>=0.4.0
+global_macro_data==2.0.0 # official GMD package; explicit investment snapshot refresh
 jugaad-data>=0.26.0
 
 # Charts

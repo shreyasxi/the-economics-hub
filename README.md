@@ -78,13 +78,13 @@ economics_hub/
 ├── generate_weekly.py           # Weekly global dashboard (40 charts, every Saturday via CI)
 ├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
 ├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
-├── generate_india.py            # India page (16 charts, Saturdays via CI + manual)
+├── generate_india.py            # India charts, Saturdays via CI + manual
 ├── generate_soe.py              # India page: RBI's State of the Economy (briefing + rate transmission history)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
 ├── generate_signals.py          # Analysis page: Signal or noise, 52 markets' weekly moves against their typical week
-├── make_chart.py                # CLI tool for ad-hoc charts from any CSV
 │
 ├── charts/
+│   ├── make_chart.py            # CLI tool for ad-hoc charts from CSV/Excel
 │   ├── style.py                 # EconStyle — all visual constants and chart methods
 │   ├── loader.py                # Finds the latest published charts for the dashboard
 │   └── templates/               # Reusable chart template classes
@@ -97,10 +97,13 @@ economics_hub/
 │   ├── signals_settings.py      # Analysis page: the 52 series on the Signal or noise board
 │   └── insights.py              # Chart explanations shown under each chart
 ├── data/
-│   ├── fetchers/                # yfinance, FRED and India data fetchers
+│   ├── fetchers/                # yfinance, FRED, India, GMD, MoSPI and NSE fetchers
+│   │   └── nse_valuations/      # NSE valuation collector and production calculations
+│   ├── nse_indices.py          # Validated NSE price-index import and signal loading
+│   ├── nse_indices/            # NSE raw sources, manifest and risk-appetite signal
+│   ├── nse_valuations/         # Valuation data only: source archives, tables and readiness
+│   ├── gmd_investment.csv/json  # Saved India investment-rate data and provenance
 │   ├── india_manual_entry.py    # CLI for monthly India figures (PMI, GST, CPI, IIP)
-│   ├── nse_shareholding.py      # India page: promoter holdings from NSE's quarterly filings
-│   ├── nse_promoter_holdings.csv # Archived filings (rebuild: python -m data.nse_shareholding --rebuild)
 │   ├── world_snapshot.py        # World page data: BIS, OECD, Eurostat, central banks, FRED
 │   ├── news.py                  # Headlines: RSS reading, theme sorting, story ranking
 │   ├── signals.py               # Analysis page: weekly move ÷ typical week, and "largest since"
@@ -150,7 +153,7 @@ python generate_macro.py
 ```
 
 ### 3. India
-Generates 16 India-specific charts (FPI, NIFTY IT, GST, Fiscal, Credit, Trade) — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
+Generates India charts covering FPI, risk appetite, sector valuations and rotation, investment, GVA growth contributions, GST, fiscal accounts, credit and trade — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
 
 The RBI State of the Economy reader prefers HTML and falls back to the PDF
 linked alongside the article in the Bulletin contents. PDF dates and transmission
@@ -171,6 +174,50 @@ python generate_soe.py              # RBI's State of the Economy: briefing + tra
 python generate_soe.py --history    # read any editions missing from data/rbi_transmission.csv
 ```
 
+### India data refresh and publication
+
+Run these commands from the repository root after installing `requirements.txt`:
+
+```bash
+python -m data.fetchers.nse_risk_appetite
+python -m data.fetchers.nse_valuations.collector --update
+python -m data.fetchers.nse_valuations.collector --verify
+python -m unittest discover -s tests -p "test_nse*.py" -v
+python generate_india.py --mode dashboard
+```
+
+The committed NSE stores provide the starting history for a fresh checkout; normal
+updates do not need the original annual export folders. For a new risk-appetite
+store, place official annual price-index exports in `data/NIFTY 50/` and
+`data/NIFTY Small Cap 250/` (local, gitignored), then run
+`python -m data.fetchers.nse_risk_appetite --bootstrap --seed-only`.
+Risk appetite rebases the Smallcap 250 / NIFTY 50 price-index ratio to 100 on
+4 October 2016, using matching dates without filling gaps.
+
+NSE valuation code lives in `data/fetchers/nse_valuations/`; its default store
+remains `data/nse_valuations/`. Keep raw `sources/`, source manifests, normalized
+tables and current/readiness snapshots tracked: the loader validates their
+checksums and exact source values. Run logs under both NSE stores are local only.
+Valuation refreshes catch up missing months and revalidate the latest archive.
+P/E reference history starts April 2021; P/B uses up to 120 completed months
+(Oil & Gas starts January 2020). The current source month is excluded, at least
+60 valid observations are required, and percentile is the percentage of valid
+historical values at or below the current multiple. Failed refreshes omit the
+optional valuation chart rather than publish stale values.
+
+Refresh the saved investment-rate snapshot explicitly with
+`python -m data.fetchers.gmd_investment`; keep both its CSV and JSON provenance.
+MoSPI GVA refreshes through the India fetcher's append step, or independently
+with `python -m data.fetchers.mospi_gva`; `--dry-run` validates without writing.
+The chart reads the validated quarterly series in `data/india_macro.db`.
+
+Pushing code updates the application, but does not run the India generator.
+To publish fresh charts immediately, open GitHub Actions → **India Dashboard
+Generator** → **Run workflow**, choose `main`, and leave `skip_fetch` as `false`
+for the full refresh. The workflow generates charts, copies them from ignored
+`output/` to tracked `assets/india/`, and commits the published data and assets.
+It also runs automatically on Saturdays at 13:30 IST.
+
 ### 4. Reserve Bank of India Policy Related Charts
 Scores the tone of RBI Monetary Policy Committee documents and charts it against rate decisions — runs automatically via GitHub Actions (needs an `ANTHROPIC_API_KEY`).
 ```bash
@@ -180,7 +227,7 @@ python generate_rbi_sentinel.py
 ### 5. Ad-Hoc Chart Tool
 Quickly generate a styled chart from any CSV without modifying the codebase.
 ```bash
-python make_chart.py
+python charts/make_chart.py
 ```
 
 ---
@@ -190,7 +237,7 @@ python make_chart.py
 | Source | Type | Access | Used by |
 |--------|------|--------|---------|
 | Yahoo Finance | Equities, FX, commodities, ETFs, VIX, NIFTY IT | Free, no key | `generate_weekly.py`, `generate_india.py` |
-| NSE (nseindia.com) | NIFTY sector index levels and their 1-week and 1-year changes; quarterly shareholding filings (promoter holdings of every listed company) | Free, no key | `generate_weekly.py`, `generate_india.py` |
+| NSE (nseindia.com) | NIFTY sector index levels and their 1-week and 1-year changes; official price-index archives and sector valuation histories | Free, no key | `generate_weekly.py`, `generate_india.py` |
 | Coin Metrics Community API | Bitcoin MVRV, price and market value, daily since 2010 | Free, no key | `generate_weekly.py` |
 | OECD Data Explorer (SDMX) | Monthly broad money of the US, China, euro area, Japan, UK, Canada and Australia, summed in dollars as global M2 | Free, no key | `generate_weekly.py` |
 | FRED | US yields, CPI, PCE, unemployment, credit spreads (ICE BofA, latest three years only since April 2026), EM corporate bond yields, EM dollar index, exchange rates, US recession dates, Fed and ECB rates, US release calendar | Free API key | `generate_weekly.py`, `generate_macro.py` |

@@ -40,8 +40,12 @@ Desktop.ini
 # ── Jupyter (if you ever use it) ──
 .ipynb_checkpoints/
 
-# ── RBI Sentinel — local data, cache, logs ──
+# ── local data, cache, logs ──
 data/rbi_sentinel_cache/
+data/nse_valuations/runs/
+data/nse_indices/runs/
+data/NIFTY 50/
+data/NIFTY Small Cap 250/
 
 # ── RBI Bulletin, State of the Economy — downloaded article pages ──
 data/rbi_soe_cache/

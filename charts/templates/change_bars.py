@@ -71,12 +71,15 @@ def _bar_path(v, y, half_h, rx, ry):
     return MplPath(verts, codes)
 
 
-def render_change_bars(names, values, title, subtitle, source, size=None):
+def render_change_bars(names, values, title, subtitle, source, size=None, *,
+                       benchmark=None, source_date=None, bottom_margin=.04):
     """Draw the ranked change bars. Returns the figure, or None if there is nothing to draw.
 
     Values that aren't finite are left off (one NaN would otherwise break the
     sort and the axis). The figure is the house "wide" size, made taller once
     there are more rows than fit it comfortably (the sector charts).
+    Optional benchmark pins one named row above the ranking with a divider.
+    Default arguments retain the weekly charts' original layout and ordering.
     """
     rows = [(nm, float(v)) for nm, v in zip(names, values) if v is not None and math.isfinite(v)]
     dropped = [nm for nm, v in zip(names, values) if v is None or not math.isfinite(v)]
@@ -85,6 +88,11 @@ def render_change_bars(names, values, title, subtitle, source, size=None):
     rows.sort(key=lambda r: r[1], reverse=True)
     if not rows:
         return None
+    if benchmark is not None:
+        matches = [r for r in rows if r[0] == benchmark]
+        if len(matches) != 1:
+            raise ValueError("Exactly one valid benchmark row is required")
+        rows = matches + [r for r in rows if r[0] != benchmark]
     names = [r[0] for r in rows]
     values = [r[1] for r in rows]
     n = len(values)
@@ -93,12 +101,12 @@ def render_change_bars(names, values, title, subtitle, source, size=None):
         width, height = EconStyle.SIZE_WIDE
         size = (width, max(height, 0.36 * n + 1.5))
     fig, ax = EconStyle.create_figure(size=size)
-    ys = list(range(n))
+    ys = [i + (.25 if benchmark is not None and i > 0 else 0) for i in range(n)]
 
     # Rows, largest gain at the top. Names are drawn inside the plot as a
     # left-aligned column (not tick labels), so they share one left edge with
     # the title and the source line whatever the names are.
-    ax.set_ylim(n - 0.5, -0.5)
+    ax.set_ylim(ys[-1] + 0.5, -0.5)
     ax.set_yticks([])
     ax.set_xticks([])
     ax.grid(visible=False)
@@ -110,6 +118,10 @@ def render_change_bars(names, values, title, subtitle, source, size=None):
         for y, name in zip(ys, names)
     ]
 
+    if benchmark is not None:
+        name_texts[0].set_fontweight("bold")
+        ax.axhline(.625, color=EconStyle.RULE_LIGHT, linewidth=.6, zorder=1)
+
     lo, hi = min(min(values), 0.0), max(max(values), 0.0)
     if hi - lo == 0:
         hi = 1.0
@@ -117,8 +129,8 @@ def render_change_bars(names, values, title, subtitle, source, size=None):
 
     EconStyle.set_title(ax, title, subtitle)
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, source)
+    fig.tight_layout(rect=[0.02, bottom_margin, 0.98, 0.96])
+    EconStyle.add_source(fig, source, date_text=source_date)
 
     # Value labels, measured so the x-range leaves exactly enough room for them.
     labels = [
@@ -138,7 +150,7 @@ def render_change_bars(names, values, title, subtitle, source, size=None):
     span = (hi - lo) / (1 - (pad_left + pad_right) / box.width)
     px_per_x = box.width / span
     ax.set_xlim(lo - pad_left / px_per_x, hi + pad_right / px_per_x)
-    px_per_y = box.height / n
+    px_per_y = box.height / (ys[-1] + 1)
 
     half_h = min(BAR_ROW_SHARE / 2, BAR_MAX_PX / 2 / px_per_y)
     rx, ry = CORNER_PX / px_per_x, CORNER_PX / px_per_y

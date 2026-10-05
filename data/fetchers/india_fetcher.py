@@ -281,7 +281,7 @@ def fetch_weekly_fpi_jugaad(dry_run: bool = False) -> dict[str, dict]:
 
 _NSE_ALL_INDICES_URL = "https://www.nseindia.com/api/allIndices"
 
-def fetch_nifty_sector_changes(index_names: list[str]) -> dict[str, dict]:
+def fetch_nifty_sector_changes(index_names: list[str], *, include_snapshot=False):
     """
     Weekly and one-year % change for NSE sector indices, from NSE's allIndices snapshot.
 
@@ -294,6 +294,8 @@ def fetch_nifty_sector_changes(index_names: list[str]) -> dict[str, dict]:
     chart is never drawn with a silently shortened sector list.
     Returns { index_name: {"last", "week_ago", "week_ago_date", "change_pct",
                            "year_ago", "year_ago_date", "change_pct_1y"} }
+    include_snapshot=True additionally returns the original payload so India
+    can validate common observation dates without another network request.
     """
     import requests
 
@@ -307,7 +309,8 @@ def fetch_nifty_sector_changes(index_names: list[str]) -> dict[str, dict]:
     s.get("https://www.nseindia.com/", headers=headers, timeout=15)  # sets cookies
     resp = s.get(_NSE_ALL_INDICES_URL, headers=headers, timeout=15)
     resp.raise_for_status()
-    rows = {r["index"]: r for r in resp.json()["data"]}
+    snapshot = resp.json()
+    rows = {r["index"]: r for r in snapshot["data"]}
 
     missing = [n for n in index_names
                if n not in rows or not rows[n].get("oneWeekAgoVal") or not rows[n].get("oneYearAgoVal")]
@@ -327,8 +330,7 @@ def fetch_nifty_sector_changes(index_names: list[str]) -> dict[str, dict]:
             "year_ago_date": r.get("date365dAgo"),
             "change_pct_1y": round((last / year_ago - 1) * 100, 2),
         }
-    return out
-
+    return (out, snapshot) if include_snapshot else out
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # SOURCE 3: RBI DBIE — Local Excel File (manual drop)
@@ -584,6 +586,9 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
       Source 2b (jugaad)   — weekly FPI net flows → india_weekly.fpi_net_flows_usd_bn
       Source 3 (DBIE Excel)— monthly trade, FPI (net portfolio), credit, M3 + weekly forex reserves
     """
+    # Quarterly production data is fetched here; chart generation stays offline.
+    from data.fetchers.mospi_gva import fetch as fetch_gva
+    fetch_gva(dry_run=dry_run)  # Propagate schema/reconciliation failures.
     init_db()
 
     monthly_data: dict[str, dict] = {}
@@ -592,7 +597,7 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     # Source 2a: jugaad-data repo rate (diagnostic only)
     fetch_repo_rate_current(dry_run=dry_run)
 
-    # Source 3: DBIE Excel
+        # Source 3: DBIE Excel
     dbie_monthly, forex_weekly = fetch_dbie_all(dry_run=dry_run)
     for month, vals in dbie_monthly.items():
         monthly_data.setdefault(month, {}).update(vals)
@@ -615,13 +620,6 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
         for week_ending, row in forex_weekly.items():
             upsert_weekly(week_ending, row)
         log.info("Upserted %d weeks (forex) into india_weekly", len(forex_weekly))
-
-    # Source 2b: jugaad-data FPI flows → india_weekly
-    fpi_weekly = fetch_weekly_fpi_jugaad(dry_run=dry_run)
-    if not dry_run and fpi_weekly:
-        for week_ending, row in fpi_weekly.items():
-            upsert_weekly(week_ending, row)
-        log.info("Upserted %d weeks (FPI) into india_weekly", len(fpi_weekly))
 
     # ── Summary ───────────────────────────────────────────────────────────────
     if not dry_run:

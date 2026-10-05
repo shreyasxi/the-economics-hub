@@ -3508,6 +3508,8 @@ def page_world() -> None:
 
 def page_india() -> None:
     charts, date_label = get_charts("india")
+    # Hide retired charts from existing editions as well as future runs.
+    charts = [c for c in charts if "india_nifty_it_trend" not in c.name]
 
     if not charts:
         st.warning(
@@ -3548,54 +3550,126 @@ def page_india() -> None:
         elif changed:
             st.markdown(changed, unsafe_allow_html=True)
 
-        # 1. High-Frequency Growth Indicators
-        growth_kws = ["pmi", "iip"]
-        growth = [c for c in charts if any(k in c.name for k in growth_kws)]
-        charts = [c for c in charts if c not in growth]
-        if growth:
-            _section("Growth Indicators")
-            _render_grid(growth)
+        # 1. Growth & Activity
+        activity_kws = [
+            "pmi",
+            "iip",
+            "india_gross_fixed_capital_formation",
+            "india_gva_contributions",
+        ]
 
-        # 2. Inflation Dynamics
-        inflation_kws = ["inflation", "cpi", "wpi"]
-        inflation = [c for c in charts if any(k in c.name for k in inflation_kws)]
-        charts = [c for c in charts if c not in inflation]
-        if inflation:
-            _section("Inflation Dynamics")
-            _render_grid(inflation)
+        activity = [
+            c for c in charts
+            if any(k in c.name for k in activity_kws)
+        ]
 
-        # 3. Monetary Conditions
-        monetary_kws = ["money", "supply", "credit", "deposit", "m3", "transmission"]
-        monetary = [c for c in charts if any(k in c.name for k in monetary_kws)]
-        charts = [c for c in charts if c not in monetary]
-        if monetary:
-            _section("Monetary Conditions")
-            _render_grid(monetary)
+        charts = [
+            c for c in charts
+            if c not in activity
+        ]
+
+        if activity:
+            _section("Growth & Activity")
+
+            # Row 1: high-frequency activity
+            # Row 2: realised growth and structural investment
+            activity = sorted(
+                activity,
+                key=lambda c: (
+                    0 if "pmi" in c.name else
+                    1 if "iip" in c.name else
+                    2 if "india_gross_fixed_capital_formation" in c.name else
+                    3 if "india_gva_contributions" in c.name else
+                    4
+                )
+            )
+
+            _render_grid(activity)
+
+                # 2. Equity Markets
+        fpi = [
+            c for c in charts
+            if "fpi_monthly" in c.name
+        ]
+        charts = [c for c in charts if c not in fpi]
+
+        risk_appetite = [
+            c for c in charts
+            if "india_risk_appetite" in c.name
+        ]
+        charts = [c for c in charts if c not in risk_appetite]
+
+        sector_valuations = [
+            c for c in charts
+            if "sector_valuations" in c.name
+        ]
+        charts = [c for c in charts if c not in sector_valuations]
+
+        sector_rotation = [
+            c for c in charts
+            if "sector_rotation_12m" in c.name
+        ]
+        charts = [c for c in charts if c not in sector_rotation]
+
+        equity_markets = (
+            fpi
+            + risk_appetite
+            + sector_valuations
+            + sector_rotation
+        )
+
+        if equity_markets:
+            _section("Equity Markets")
+            _render_grid(equity_markets, cols=2)
+
+        # 3. Prices & Monetary Conditions
+        prices_monetary_kws = [
+            "inflation",
+            "cpi",
+            "wpi",
+            "credit_deposit",
+            "rate_transmission",
+        ]
+
+        prices_monetary = [
+            c for c in charts
+            if any(k in c.name for k in prices_monetary_kws)
+        ]
+
+        charts = [
+            c for c in charts
+            if c not in prices_monetary
+        ]
+
+        if prices_monetary:
+            _section("Inflation & Monetary Conditions")
+
+            # Prices first, then credit and monetary transmission
+            prices_monetary = sorted(
+                prices_monetary,
+                key=lambda c: (
+                    0 if any(k in c.name for k in ("inflation", "cpi", "wpi")) else
+                    1 if "credit_deposit" in c.name else
+                    2 if "rate_transmission" in c.name else
+                    3
+                )
+            )
+
+            _render_grid(prices_monetary)
 
         # 4. External Sector
         external_kws = ["forex", "reserves", "trade", "export", "import"]
-        external = [c for c in charts if any(k in c.name for k in external_kws)]
+        external = [
+            c for c in charts
+            if any(k in c.name for k in external_kws)
+        ]
         charts = [c for c in charts if c not in external]
+
         if external:
             _section("External Sector")
             _render_grid(external)
 
-        # 5. Capital Flows (FPI flows, and the NIFTY IT index moved here from Weekly Markets)
-        flows_kws = ["flows", "fii", "fpi", "portfolio", "nifty"]
-        flows = [c for c in charts if any(k in c.name for k in flows_kws)]
-        charts = [c for c in charts if c not in flows]
-        if flows:
-            _section("Capital Flows")
-            _render_grid(flows)
-
-        # Corporate ownership: who holds the shares of listed India (NSE filings)
-        ownership = [c for c in charts if any(k in c.name for k in ["promoter", "shareholding"])]
-        charts = [c for c in charts if c not in ownership]
-        if ownership:
-            _section("Corporate Ownership")
-            _render_grid(ownership, center_odd=True)
-
-        # 6. Fiscal Policy & Public Finances
+        # 5. Fiscal Policy & Public Finances
         fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
         fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
         charts = [c for c in charts if c not in fiscal]

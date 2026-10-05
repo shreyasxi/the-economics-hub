@@ -56,7 +56,9 @@ CREATE TABLE IF NOT EXISTS india_monthly (
     india_fpi_flows         REAL,               -- RBI net portfolio investment USD bn (DBIE; fallback)
 
     -- MANUAL: NSDL
-    india_fpi_net_inr_cr    REAL,               -- FPI net investment, all segments, ₹ crore (NSDL)
+    india_fpi_net_inr_cr    REAL,               -- Completed month, ₹ crore
+    india_fpi_mtd_inr_cr    REAL,               -- Current-month MTD, ₹ crore
+    india_fpi_mtd_asof      TEXT,               -- MTD observation date, YYYY-MM-DD
 
     -- Audit
     source_flags            TEXT,               -- JSON: {"cpi_yoy": "fred", ...}
@@ -96,6 +98,8 @@ _ADDED_COLUMNS = {
     "india_monthly": {
         "india_fpi_flows": "REAL",
         "india_fpi_net_inr_cr": "REAL",
+        "india_fpi_mtd_inr_cr": "REAL",
+        "india_fpi_mtd_asof": "TEXT",
     },
 }
 

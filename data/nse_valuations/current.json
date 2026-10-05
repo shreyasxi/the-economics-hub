@@ -1,0 +1,165 @@
+{
+  "observation_date": "2026-10-01",
+  "source": {
+    "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_01102026.csv",
+    "observation_date": "2026-10-01",
+    "retrieved_at": "2026-10-04T17:25:48.391777+00:00",
+    "sha256": "b79b5e5c401578b41b44f7bad032e4865a3cd9aa7475a527766c06d134d3b85d",
+    "bytes": 17852,
+    "content_type": "text/csv",
+    "exact_target_names": [
+      "Nifty 50",
+      "Nifty Auto",
+      "Nifty Bank",
+      "Nifty Financial Services",
+      "Nifty FMCG",
+      "Nifty IT",
+      "Nifty Metal",
+      "Nifty Pharma",
+      "Nifty PSU Bank",
+      "Nifty Realty",
+      "Nifty Private Bank",
+      "Nifty Oil & Gas",
+      "Nifty Healthcare Index",
+      "Nifty Consumer Durables"
+    ]
+  },
+  "rows": {
+    "Nifty 50": {
+      "Index Name": "Nifty 50",
+      "Index Date": "01-10-2026",
+      "P/E": "19.19",
+      "P/B": "2.75",
+      "Div Yield": "1.23"
+    },
+    "Nifty Auto": {
+      "Index Name": "Nifty Auto",
+      "Index Date": "01-10-2026",
+      "P/E": "29.5",
+      "P/B": "3.97",
+      "Div Yield": "1.15"
+    },
+    "Nifty Bank": {
+      "Index Name": "Nifty Bank",
+      "Index Date": "01-10-2026",
+      "P/E": "12.91",
+      "P/B": "1.64",
+      "Div Yield": ".73"
+    },
+    "Nifty Financial Services": {
+      "Index Name": "Nifty Financial Services",
+      "Index Date": "01-10-2026",
+      "P/E": "15.05",
+      "P/B": "2.27",
+      "Div Yield": "1.01"
+    },
+    "Nifty FMCG": {
+      "Index Name": "Nifty FMCG",
+      "Index Date": "01-10-2026",
+      "P/E": "30.37",
+      "P/B": "7.27",
+      "Div Yield": "1.08"
+    },
+    "Nifty IT": {
+      "Index Name": "Nifty IT",
+      "Index Date": "01-10-2026",
+      "P/E": "17.8",
+      "P/B": "4.96",
+      "Div Yield": "2.83"
+    },
+    "Nifty Metal": {
+      "Index Name": "Nifty Metal",
+      "Index Date": "01-10-2026",
+      "P/E": "16.34",
+      "P/B": "2.65",
+      "Div Yield": "1.47"
+    },
+    "Nifty Pharma": {
+      "Index Name": "Nifty Pharma",
+      "Index Date": "01-10-2026",
+      "P/E": "40.7",
+      "P/B": "4.95",
+      "Div Yield": ".54"
+    },
+    "Nifty PSU Bank": {
+      "Index Name": "Nifty PSU Bank",
+      "Index Date": "01-10-2026",
+      "P/E": "7.15",
+      "P/B": "1.1",
+      "Div Yield": ".81"
+    },
+    "Nifty Realty": {
+      "Index Name": "Nifty Realty",
+      "Index Date": "01-10-2026",
+      "P/E": "35.36",
+      "P/B": "3.65",
+      "Div Yield": ".5"
+    },
+    "Nifty Private Bank": {
+      "Index Name": "Nifty Private Bank",
+      "Index Date": "01-10-2026",
+      "P/E": "16.49",
+      "P/B": "1.91",
+      "Div Yield": ".68"
+    },
+    "Nifty Oil & Gas": {
+      "Index Name": "Nifty Oil & Gas",
+      "Index Date": "01-10-2026",
+      "P/E": "10.44",
+      "P/B": "1.29",
+      "Div Yield": "1.88"
+    },
+    "Nifty Healthcare Index": {
+      "Index Name": "Nifty Healthcare Index",
+      "Index Date": "01-10-2026",
+      "P/E": "41.91",
+      "P/B": "5.32",
+      "Div Yield": ".48"
+    },
+    "Nifty Consumer Durables": {
+      "Index Name": "Nifty Consumer Durables",
+      "Index Date": "01-10-2026",
+      "P/E": "57.73",
+      "P/B": "9.26",
+      "Div Yield": ".42"
+    }
+  },
+  "attempts": [
+    {
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_04102026.csv",
+      "requested_date": "2026-10-04",
+      "retrieved_at": "2026-10-04T18:10:30.195722+00:00",
+      "http_status": 404,
+      "content_type": "text/html;charset=UTF-8",
+      "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+      "outcome": "archive_not_found"
+    },
+    {
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_03102026.csv",
+      "requested_date": "2026-10-03",
+      "retrieved_at": "2026-10-04T18:10:31.080285+00:00",
+      "http_status": 404,
+      "content_type": "text/html;charset=UTF-8",
+      "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+      "outcome": "archive_not_found"
+    },
+    {
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_02102026.csv",
+      "requested_date": "2026-10-02",
+      "retrieved_at": "2026-10-04T18:10:31.324139+00:00",
+      "http_status": 404,
+      "content_type": "text/html;charset=UTF-8",
+      "sha256": "3215cb6dd01dd82fd239b96d7ab568a6c5a5e548b3f3cc5401f964033ac6a976",
+      "outcome": "archive_not_found"
+    },
+    {
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_01102026.csv",
+      "requested_date": "2026-10-01",
+      "retrieved_at": "2026-10-04T18:10:31.557269+00:00",
+      "http_status": 200,
+      "content_type": "text/csv",
+      "sha256": "b79b5e5c401578b41b44f7bad032e4865a3cd9aa7475a527766c06d134d3b85d",
+      "outcome": "validated_csv"
+    }
+  ]
+}

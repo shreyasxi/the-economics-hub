@@ -68,15 +68,12 @@ TRANSMISSION_CSV = Path(__file__).parent / "data" / "rbi_transmission.csv"
 OUTPUT_BASE   = Path(__file__).parent / "output" / "india"
 
 # Colors
-C_MFG_PMI       = "#003366"     # Navy — manufacturing
-C_SVC_PMI       = "#CC0066"     # Magenta — services
 C_COMPOSITE     = "#FF9933"     # Saffron — composite/India
 C_GST           = "#2ca02c"     # Green — revenue
 C_CREDIT        = "#003366"     # Navy — credit
 C_UNEMPLOYMENT  = "#CC0000"     # Red — unemployment
 C_FPI_POS       = "#065F46"     # Dark green — inflows
 C_FPI_NEG       = "#991B1B"     # Dark red — outflows
-C_PMI_50        = "#999999"     # Grey — expansion/contraction line
 
 # Fiscal chart colors
 C_CAPEX         = "#1E40AF"     # Blue — capital expenditure
@@ -101,7 +98,6 @@ SECTION_COLORS = {
 
 # New chart colors for additions
 C_DEPOSIT      = "#0EA5E9"    # Sky blue — deposit growth
-C_M3           = "#8B5CF6"    # Violet — money supply
 C_EXPORTS      = "#059669"    # Green — exports
 C_IMPORTS      = "#DC2626"    # Red — imports
 C_DEFICIT_LINE = "#991B1B"    # Dark red — trade deficit line
@@ -133,15 +129,36 @@ def load_india_data(csv_path=DEFAULT_CSV, months=None):
                 )
             if not df.empty:
                 df["date"] = pd.to_datetime(df["month"])
-                df = df.drop(columns=["month", "source_flags", "fetched_at"], errors="ignore")
-                if "india_fpi_net_inr_cr" in df.columns:          # NSDL, Rs crore -> Rs lakh crore
-                    df["india_fpi_nsdl_lcr"] = df["india_fpi_net_inr_cr"] / CRORE_PER_LAKH_CRORE
+                df = df.drop(
+                    columns=["month", "source_flags", "fetched_at"],
+                    errors="ignore",
+                )
+
+                if "india_fpi_net_inr_cr" in df.columns:
+                    df["india_fpi_nsdl_lcr"] = (
+                        df["india_fpi_net_inr_cr"] / CRORE_PER_LAKH_CRORE
+                    )
+
+                if "india_fpi_mtd_inr_cr" in df.columns:
+                    df["india_fpi_mtd_lcr"] = (
+                        df["india_fpi_mtd_inr_cr"] / CRORE_PER_LAKH_CRORE
+                    )
+
+                if "india_fpi_mtd_asof" in df.columns:
+                    df["india_fpi_mtd_asof"] = pd.to_datetime(
+                        df["india_fpi_mtd_asof"],
+                        errors="coerce",
+                    )
+
                 df = df.sort_values("date").reset_index(drop=True)
+
                 if months:
                     cutoff = df["date"].max() - pd.DateOffset(months=months)
                     df = df[df["date"] >= cutoff].reset_index(drop=True)
+
                 print(f"   Loaded {len(df)} months from india_macro.db")
                 print(f"   Range: {df['date'].min():%b %Y} to {df['date'].max():%b %Y}")
+
                 return df
         except Exception as e:
             print(f"   Warning: SQLite load failed ({e}), falling back to CSV")
@@ -618,81 +635,895 @@ def _format_date_axis(ax, n_points: int = 0):
 # ═══════════════════════════════════════════
 
 def chart_pmi(df, output_dir):
-    """Manufacturing + Services PMI with expansion/contraction zones.
-    Includes custom horizontal X-axis logic that forces the latest date to appear,
-    optimized for higher label density.
-    """
-    fig, ax = EconStyle.create_figure(size="wide")
+    """Single-panel India PMI chart: manufacturing vs services, no smoothing."""
+    series = [
+        ("india_mfg_pmi", "Manufacturing", EconStyle.LINE_BLUE, "-"),
+        ("india_svc_pmi", "Services", EconStyle.LINE_TEAL, (0, (5, 3))),  # shorter dashed
+    ]
 
-    dates = df["date"].tolist()
+    data = df.copy()
+    data["date"] = pd.to_datetime(data["date"])
+    data = data.dropna(subset=["date"]).sort_values("date")
 
-    # Manufacturing PMI
-    if "india_mfg_pmi" in df.columns:
-        vals = df["india_mfg_pmi"].values
-        ax.plot(dates, vals, color=C_MFG_PMI, linewidth=2.5,
-                label="Manufacturing", zorder=5, solid_capstyle="round")
-        # Shadow for depth
-        ax.plot(dates, vals, color=C_MFG_PMI, linewidth=3.7,
-                alpha=0.07, zorder=4, solid_capstyle="round")
-        _add_end_label(ax, dates, vals, "Mfg", C_MFG_PMI)
+    for key, _, _, _ in series:
+        data[key] = pd.to_numeric(data.get(key, np.nan), errors="coerce")
+        data[key] = data[key].replace([np.inf, -np.inf], np.nan)
 
-    # Services PMI
-    if "india_svc_pmi" in df.columns:
-        vals = df["india_svc_pmi"].values
-        ax.plot(dates, vals, color=C_SVC_PMI, linewidth=2.2,
-                label="Services", zorder=5, solid_capstyle="round")
-        # Shadow for depth
-        ax.plot(dates, vals, color=C_SVC_PMI, linewidth=3.4,
-                alpha=0.07, zorder=4, solid_capstyle="round")
-        _add_end_label(ax, dates, vals, "Svc", C_SVC_PMI, offset_y=-14)
+    data = data.dropna(subset=[s[0] for s in series], how="all")
+    if data.empty:
+        print("   ⚠ Skipping PMI — no observations")
+        return None
 
-    # Expansion/contraction line at 50
-    ax.axhline(y=50, color=C_PMI_50, linewidth=1.2, linestyle="--", zorder=1)
+    # Preserve missing months as gaps rather than joining across absent releases
+    data["date"] = data["date"].dt.to_period("M").dt.to_timestamp()
+    data = data.drop_duplicates("date", keep="last").set_index("date")
+    data = data.reindex(pd.date_range(data.index.min(), data.index.max(), freq="MS"))
 
-    # Light fill: green above 50, red below 50 for manufacturing
-    if "india_mfg_pmi" in df.columns:
-        mfg = df["india_mfg_pmi"].values
-        ax.fill_between(dates, 50, mfg, where=(mfg >= 50),
-                        color=C_FPI_POS, alpha=0.04, interpolate=True)
-        ax.fill_between(dates, 50, mfg, where=(mfg < 50),
-                        color=C_FPI_NEG, alpha=0.04, interpolate=True)
+    values = data[[s[0] for s in series]].to_numpy(dtype=float)
+    bottom = min(49.0, float(np.nanmin(values)) - 1.0)
+    top = max(55.0, float(np.nanmax(values)) + 1.5)
 
-    # ── CUSTOM X-AXIS OVERRIDE (DENSE HORIZONTAL) ──
-    # 1. More aggressive interval: Every 1 month if < 18 months, 2 months if < 36, etc.
-    interval = 1 if len(dates) <= 18 else (2 if len(dates) <= 36 else (4 if len(dates) <= 72 else 6))
-    locator = mdates.MonthLocator(interval=interval)
-    
-    # 2. Get the mathematical ticks Matplotlib *wants* to use
-    locs = locator.tick_values(dates[0], dates[-1])
-    last_date_num = mdates.date2num(dates[-1])
-    
-    # 3. Shorter exclusion zone: Keep ticks at least ~40 days away from the last date
-    new_locs = [loc for loc in locs if (last_date_num - loc) > 40 and loc >= mdates.date2num(dates[0])]
-    
-    # 4. Strictly append the absolute latest date
-    new_locs.append(last_date_num) 
-    
-    # 5. Apply the custom ticks with perfectly horizontal formatting
-    ax.xaxis.set_ticks(new_locs)
+    # Compact single-panel layout
+    fig, ax = EconStyle.create_figure(size=(8.2, 4.9))
+
+    # Leave modest room on the right for latest-value labels
+    x_left = data.index[0] - pd.Timedelta(days=10)
+    x_right = data.index[-1] + pd.Timedelta(days=45)
+    ax.set_xlim(x_left, x_right)
+    ax.set_ylim(bottom, top)
+
+    # Grid styling
+    ax.set_axisbelow(True)
+    ax.yaxis.grid(
+        True,
+        linestyle="-",
+        linewidth=0.6,
+        alpha=0.30,
+        color="#9CA3AF",
+        zorder=0,
+    )
+    ax.xaxis.grid(
+        True,
+        linestyle="-",
+        linewidth=0.7,
+        alpha=0.30,
+        color="#9CA3AF",
+        zorder=0,
+    )
+
+    # Expansion threshold
+    ax.axhline(
+        50,
+        color=EconStyle.INK_MUTED,
+        linewidth=1.0,
+        linestyle=(0, (4, 4)),
+        alpha=0.75,
+        zorder=2,
+    )
+
+    for spine in ["top", "right", "left", "bottom"]:
+        ax.spines[spine].set_visible(False)
+
+    ax.tick_params(axis="both", length=0, pad=6)
+    ax.yaxis.set_major_locator(mticker.MultipleLocator(2.5))
+    ax.set_ylabel(
+        "PMI",
+        fontsize=EconStyle.FONT_SIZE_AXIS,
+        fontweight="bold",
+        color=EconStyle.INK,
+    )
+
+    # Plot series
+    latest_points = []
+
+    for key, label, color, linestyle in series:
+        valid = data[key].dropna()
+        if valid.empty:
+            continue
+
+        latest_date = valid.index[-1]
+        latest_val = float(valid.iloc[-1])
+
+        line, = ax.plot(
+            data.index.to_pydatetime(),
+            data[key].values,
+            color=color,
+            linewidth=2.2,
+            linestyle=linestyle,
+            zorder=4,
+            antialiased=True,
+            solid_capstyle="round",
+            solid_joinstyle="round",
+            dash_capstyle="round",
+            dash_joinstyle="round",
+        )
+
+        # Subtle white under-stroke for cleaner, sharper line appearance
+        line.set_path_effects([
+            pe.Stroke(linewidth=3.2, foreground="white"),
+            pe.Normal(),
+        ])
+
+        ax.scatter(
+            [latest_date],
+            [latest_val],
+            s=38,
+            color=color,
+            edgecolors="white",
+            linewidths=1.0,
+            zorder=6,
+        )
+
+        latest_points.append({
+            "label": label,
+            "date": latest_date,
+            "value": latest_val,
+            "color": color,
+        })
+
+    if not latest_points:
+        print("   ⚠ Skipping PMI — no valid series")
+        return None
+
+    # Separate latest labels slightly if the two values are very close
+    latest_points = sorted(latest_points, key=lambda x: x["value"], reverse=True)
+
+    if len(latest_points) == 2:
+        y1 = latest_points[0]["value"]
+        y2 = latest_points[1]["value"]
+
+        if abs(y1 - y2) < 1.0:
+            latest_points[0]["label_y"] = y1 + 0.40
+            latest_points[1]["label_y"] = y2 - 0.40
+        else:
+            latest_points[0]["label_y"] = y1
+            latest_points[1]["label_y"] = y2
+    else:
+        for p in latest_points:
+            p["label_y"] = p["value"]
+
+    # Latest values only — names now sit in the subtitle area
+    label_x = data.index[-1] + pd.Timedelta(days=21)
+
+    for p in latest_points:
+        ax.annotate(
+            f"{p['value']:.1f}",
+            xy=(p["date"], p["value"]),
+            xytext=(label_x, p["label_y"]),
+            textcoords="data",
+            fontsize=11,
+            fontweight="bold",
+            color=p["color"],
+            ha="left",
+            va="center",
+            arrowprops=dict(
+                arrowstyle="-",
+                color=p["color"],
+                linewidth=0.9,
+                shrinkA=0,
+                shrinkB=4,
+            ),
+            annotation_clip=False,
+            zorder=7,
+        )
+
+    # Threshold label
+    ax.annotate(
+        "50 = expansion threshold",
+        xy=(0.01, 50),
+        xycoords=("axes fraction", "data"),
+        xytext=(0, 4),
+        textcoords="offset points",
+        fontsize=8.5,
+        color=EconStyle.INK_MUTED,
+        ha="left",
+        va="bottom",
+    )
+
+    # X-axis formatting
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-    plt.setp(ax.get_xticklabels(), rotation=0, ha="center", fontsize=8)
+    ax.tick_params(axis="x", pad=10, labelsize=EconStyle.FONT_SIZE_TICK)
+    plt.setp(ax.get_xticklabels(), rotation=0, ha="center")
 
-    ax.set_ylabel("PMI Index", fontsize=EconStyle.FONT_SIZE_AXIS)
-    
-    # Legend at top-right, inline with subtitle
-    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
-              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+    # Main title with blank subtitle to preserve spacing
+    EconStyle.set_title(
+        ax,
+        "India PMI — Growth Momentum",
+        " "
+    )
 
-    EconStyle.set_title(ax, "India PMI Dashboard",
-                        "S&P Global Manufacturing & Services PMI")
+    # Indicator row in subtitle area
+    point_map = {p["label"]: p for p in latest_points}
+    mfg = point_map.get("Manufacturing")
+    svc = point_map.get("Services")
+
+    if mfg is not None:
+        ax.text(
+            0.00,
+            1.01,
+            f"Manufacturing  ·  {mfg['date']:%b %Y}  ·  {mfg['value']:.1f}",
+            transform=ax.transAxes,
+            fontsize=10,
+            fontweight="bold",
+            color=EconStyle.LINE_BLUE,
+            ha="left",
+            va="bottom",
+        )
+
+    if svc is not None:
+        ax.text(
+            0.52,
+            1.01,
+            f"Services  ·  {svc['date']:%b %Y}  ·  {svc['value']:.1f}",
+            transform=ax.transAxes,
+            fontsize=10,
+            fontweight="bold",
+            color=EconStyle.LINE_TEAL,
+            ha="left",
+            va="bottom",
+        )
+
     EconStyle.add_top_rule(ax)
+
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "S&P Global (IHS Markit)")
+
+    EconStyle.add_source(
+        fig,
+        "S&P Global · monthly PMI",
+        date_text=f"Latest observation: {data.index[-1]:%b %Y}",
+    )
 
     fp = output_dir / "01_india_pmi.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ PMI Dashboard")
+
+    print("   ✓ PMI")
     return fp
+
+def chart_gva_contributions(output_dir, db_path=DEFAULT_DB):
+    """Official broad-sector contributions from the validated offline SQLite snapshot."""
+    from matplotlib.lines import Line2D
+    from data.fetchers.mospi_gva import load, SECTORS, LEVEL_KEYS
+
+    records = load(db_path)
+    panel = pd.DataFrame(
+        r for r in records
+        if r["headline_yoy"] is not None
+    )
+
+    if panel.empty:
+        raise ValueError(
+            "MoSPI GVA: no complete YoY comparisons; run the GVA fetcher first"
+        )
+
+    latest = panel.iloc[-1]
+    x = np.arange(len(panel))
+
+    # Editorial palette
+    colors = (
+        "#4F8A86",  # Primary — muted teal
+        "#9B4A52",  # Secondary — maroon
+        "#6F5A78",  # Tertiary — muted plum
+    )
+
+    fig, ax = EconStyle.create_figure(size="wide")
+
+    above = np.zeros(len(panel))
+    below = np.zeros(len(panel))
+
+    latest_sector_values = []
+
+    # ── Sector contributions ───────────────────────────────────────────
+    for key, name, color in zip(LEVEL_KEYS[:3], SECTORS, colors):
+        values = panel[key + "_pp"].to_numpy()
+
+        base = np.where(values >= 0, above, below).copy()
+
+        ax.bar(
+            x,
+            values,
+            bottom=base,
+            width=0.68,
+            color=color,
+            edgecolor="white",
+            linewidth=0.5,
+            zorder=3,
+        )
+
+        latest_sector_values.append(
+            (name, float(values[-1]), color)
+        )
+
+        above += np.clip(values, 0, None)
+        below += np.clip(values, None, 0)
+
+    # ── Headline Real GVA ─────────────────────────────────────────────
+    headline = panel["headline_yoy"].to_numpy()
+    latest_gva = float(headline[-1])
+
+    ax.plot(
+        x,
+        headline,
+        color="#000000",
+        linewidth=2.2,
+        marker="o",
+        markersize=3.7,
+        markeredgecolor="white",
+        markeredgewidth=0.5,
+        zorder=5,
+    )
+
+    ax.scatter(
+        [x[-1]],
+        [latest_gva],
+        s=42,
+        color="black",
+        edgecolors="white",
+        linewidths=0.8,
+        zorder=6,
+    )
+
+    # Only direct label retained in the plotting area
+    ax.annotate(
+        f"{latest_gva:.2f}%",
+        xy=(x[-1], latest_gva),
+        xytext=(0, 11),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+        fontsize=10.5,
+        fontweight="bold",
+        color="black",
+        annotation_clip=False,
+        zorder=7,
+    )
+
+    # Zero-growth reference
+    ax.axhline(
+        0,
+        color=EconStyle.INK,
+        linewidth=0.8,
+        zorder=4,
+    )
+
+    # ── Axes ──────────────────────────────────────────────────────────
+    top = max(above.max(), headline.max())
+
+    ax.set_ylim(
+        min(below.min(), 0) - 0.2,
+        top * 1.30,
+    )
+
+    # No longer need the large right-hand margin for direct labels
+    ax.set_xlim(-0.65, x[-1] + 0.65)
+
+    ax.yaxis.set_major_locator(
+        mticker.MultipleLocator(2)
+    )
+
+    ax.set_ylabel(
+        "Contribution to YoY growth (percentage points)",
+        fontsize=9,
+    )
+
+    ax.grid(
+        axis="x",
+        visible=False,
+    )
+
+    ax.grid(
+        axis="y",
+        color=EconStyle.GRID_COLOR,
+        linewidth=0.6,
+        alpha=0.5,
+        zorder=0,
+    )
+
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    ax.tick_params(
+        axis="both",
+        length=0,
+    )
+
+    # ── Quarter labels ────────────────────────────────────────────────
+    ax.set_xticks(x)
+
+    ax.set_xticklabels(
+        [f"Q{r.fiscal_quarter}" for r in panel.itertuples()],
+        fontsize=8,
+    )
+
+    # Fiscal-year labels centred beneath each group
+    for fy, group in panel.groupby("fiscal_year", sort=False):
+        positions = group.index.to_numpy()
+
+        ax.text(
+            positions.mean(),
+            -0.10,
+            f"FY{fy}",
+            transform=ax.get_xaxis_transform(),
+            ha="center",
+            va="top",
+            fontsize=8,
+            color=EconStyle.INK_MUTED,
+        )
+
+    # ── Latest-quarter indicator row ─────────────────────────────────
+    legend_handles = []
+    legend_labels = []
+
+    for name, value, color in latest_sector_values:
+        legend_handles.append(
+            mpatches.Patch(
+                facecolor=color,
+                edgecolor="none",
+            )
+        )
+
+        legend_labels.append(
+            f"{name} ({value:+.2f} pp)"
+        )
+
+    # Real GVA as fourth indicator
+    legend_handles.append(
+        Line2D(
+            [0],
+            [0],
+            color="black",
+            linewidth=2.2,
+            marker="o",
+            markersize=4,
+            markerfacecolor="black",
+            markeredgecolor="white",
+            markeredgewidth=0.6,
+        )
+    )
+
+    legend_labels.append(
+        f"Real GVA ({latest_gva:.2f}%)"
+    )
+
+    ax.legend(
+    legend_handles,
+    legend_labels,
+    loc="upper left",
+    bbox_to_anchor=(0.0, 0.985),
+    bbox_transform=ax.transAxes,
+    ncol=4,
+    frameon=False,
+    fontsize=8.5,
+    handlelength=1.0,
+    handleheight=0.9,
+    handletextpad=0.45,
+    columnspacing=1.25,
+    borderaxespad=0,
+)
+
+    # ── Title ─────────────────────────────────────────────────────────
+    EconStyle.set_title(
+        ax,
+        "What Is Driving India’s Growth?",
+        "Quarterly real GVA · Constant 2022-23 prices",
+    )
+
+    EconStyle.add_top_rule(ax)
+
+    # Larger plotting area; only source remains below
+    fig.tight_layout(
+        rect=[0.02, 0.075, 0.98, 0.96]
+    )
+
+    EconStyle.add_source(
+        fig,
+        "MoSPI / NSO · eSankhyiki; NAS 2026",
+        date_text=(
+            f"Release "
+            f"{pd.Timestamp(latest['release_date']):%d %b %Y}"
+        ),
+    )
+
+    fp = output_dir / "22_india_gva_contributions.png"
+    EconStyle.save_chart(fig, fp)
+
+    print("   ✓ What Is Driving India’s Growth?")
+    return fp
+
+
+def chart_investment_rate(output_dir):
+    """India gross fixed capital formation as a share of GDP, annual and unsmoothed."""
+    from data.fetchers.gmd_investment import load_snapshot
+
+    values, meta = load_snapshot()
+    valid = values.dropna()
+
+    if valid.empty:
+        print("   ⚠ Skipping India Investment Rate — no observations")
+        return None
+
+    first_year = int(valid.index[0])
+    latest_year = int(valid.index[-1])
+    latest_value = float(valid.iloc[-1])
+
+    color = EconStyle.LINE_RUPEE
+
+    # Keep a wide source canvas. On the dashboard this should ultimately
+    # be rendered in the same two-column grid as the GVA chart.
+    fig, ax = EconStyle.create_figure(size="wide")
+
+    ax.set_axisbelow(True)
+
+    # Horizontal + vertical structure
+    ax.yaxis.grid(
+        True,
+        linestyle="-",
+        linewidth=0.6,
+        alpha=0.30,
+        color="#9CA3AF",
+        zorder=0,
+    )
+
+    ax.xaxis.grid(
+        True,
+        linestyle="-",
+        linewidth=0.7,
+        alpha=0.30,
+        color="#9CA3AF",
+        zorder=0,
+    )
+
+    # ── India's mid-2000s investment boom ───────────────────────────────
+    # Highlight the sustained high-investment regime, not merely one peak.
+    boom_start = 2004
+    boom_end = 2012
+
+    ax.axvspan(
+        boom_start,
+        boom_end,
+        color="#16A34A",
+        alpha=0.075,
+        zorder=1,
+    )
+
+    ax.text(
+        (boom_start + boom_end) / 2,
+        0.965,
+        "Investment boom",
+        transform=ax.get_xaxis_transform(),
+        ha="center",
+        va="top",
+        fontsize=8.5,
+        fontweight="bold",
+        color="#477A57",
+        zorder=2,
+    )
+
+    # ── Long-run average ────────────────────────────────────────────────
+    long_run_avg = float(valid.mean())
+
+    ax.axhline(
+        long_run_avg,
+        color=EconStyle.INK_MUTED,
+        linewidth=1.0,
+        linestyle=(0, (4, 4)),
+        alpha=0.70,
+        zorder=2,
+    )
+
+    # ── Main series ────────────────────────────────────────────────────
+    line, = ax.plot(
+        valid.index,
+        valid.values,
+        color=color,
+        linewidth=2.5,
+        zorder=5,
+        antialiased=True,
+        solid_capstyle="round",
+        solid_joinstyle="round",
+    )
+
+    # Subtle separation from grid / shaded regime
+    line.set_path_effects([
+        pe.Stroke(linewidth=3.5, foreground="white"),
+        pe.Normal(),
+    ])
+
+    # Latest point only
+    ax.scatter(
+        [latest_year],
+        [latest_value],
+        s=46,
+        color=color,
+        edgecolors="white",
+        linewidths=1.1,
+        zorder=7,
+    )
+
+    # Latest direct label
+    ax.annotate(
+        f"{latest_value:.1f}%",
+        xy=(latest_year, latest_value),
+        xytext=(10, 0),
+        textcoords="offset points",
+        fontsize=11,
+        fontweight="bold",
+        color=color,
+        ha="left",
+        va="center",
+        annotation_clip=False,
+        zorder=8,
+    )
+
+    # Long-run average label
+    ax.annotate(
+        f"Long-run avg  {long_run_avg:.1f}%",
+        xy=(latest_year, long_run_avg),
+        xytext=(10, 0),
+        textcoords="offset points",
+        fontsize=8.5,
+        color=EconStyle.INK_MUTED,
+        ha="left",
+        va="center",
+        annotation_clip=False,
+        zorder=6,
+    )
+
+    # ── Axes ───────────────────────────────────────────────────────────
+    spread = float(valid.max() - valid.min())
+
+    lower = np.floor((valid.min() - max(1.0, spread * 0.08)) / 2) * 2
+    upper = np.ceil((valid.max() + max(1.0, spread * 0.10)) / 2) * 2
+
+    ax.set_ylim(lower, upper)
+
+    # Modest right margin only for direct labels
+    ax.set_xlim(first_year - 0.5, latest_year + 3.0)
+
+    xticks = list(range(
+        int(np.ceil(first_year / 5) * 5),
+        latest_year + 1,
+        5
+    ))
+
+    if latest_year not in xticks:
+        xticks.append(latest_year)
+
+    ax.set_xticks(sorted(set(xticks)))
+
+    ax.yaxis.set_major_locator(mticker.MultipleLocator(2))
+
+    ax.set_ylabel(
+        "Gross fixed capital formation (% of GDP)",
+        fontsize=EconStyle.FONT_SIZE_AXIS,
+        fontweight="bold",
+        color=EconStyle.INK,
+    )
+
+    for spine in ["top", "right", "left"]:
+        ax.spines[spine].set_visible(False)
+
+    ax.tick_params(axis="both", length=0)
+
+    # ── Title ──────────────────────────────────────────────────────────
+    EconStyle.set_title(
+        ax,
+        "India's Gross Fixed Capital Formation Trend",
+        "Gross fixed capital formation · % of GDP · annual",
+    )
+
+    EconStyle.add_top_rule(ax)
+
+    fig.tight_layout(
+        rect=[0.02, 0.04, 0.98, 0.96]
+    )
+
+    EconStyle.add_source(
+        fig,
+        "Global Macro Database · Müller et al. (2025)",
+        date_text=f"Vintage {meta['vintage']}",
+    )
+
+    fp = output_dir / "20_india_gross_fixed_capital_formation.png"
+    EconStyle.save_chart(fig, fp)
+
+    print(
+        f"   ✓ India’s Gross Fixed Capital Formation Trend "
+        f"({first_year}–{latest_year}, latest {latest_value:.1f}%)"
+    )
+
+    return fp
+
+
+def chart_risk_appetite(output_dir):
+    """Smallcap/large-cap price-index ratio; no network calls or imputed dates."""
+    from data.nse_indices import ROOT, load_risk_appetite
+    if not (ROOT / "manifest.json").exists():
+        print("   ⚠ Skipping Indian Risk Appetite — official NSE CSV exports not imported")
+        return None
+    panel, meta = load_risk_appetite()
+    values = panel["relative_100"]
+    first, last = values.index[0], values.index[-1]
+    fig, ax = EconStyle.create_figure(size="wide")
+    color = "#B91C1C"
+    # Use the union only for rendering gaps: no value exists on an unmatched date.
+    dates = values.index.union(pd.DatetimeIndex(meta["unmatched_dates"]))
+    ax.plot(dates, values.reindex(dates), color=color, linewidth=2.35,
+            solid_capstyle="round", solid_joinstyle="round", zorder=4)
+    ax.axhline(100, color=EconStyle.INK_MUTED, linewidth=0.8,
+               linestyle=(0, (4, 4)), alpha=0.65, zorder=2)
+    ax.scatter([last], [values.iloc[-1]], s=46, color=color,
+               edgecolors="white", linewidths=1.1, zorder=6)
+    ax.annotate(f"{values.iloc[-1]:.1f}", (last, values.iloc[-1]), xytext=(9, 0),
+                textcoords="offset points", fontsize=11, fontweight="bold",
+                color=color, va="center", annotation_clip=False)
+    ax.text(0.015, 0.96, "Rising = small caps outperform", transform=ax.transAxes,
+            va="top", fontsize=9, color=EconStyle.INK_MUTED)
+    ax.set_xlim(first - pd.Timedelta(days=45), last + pd.Timedelta(days=220))
+    ax.set_ylim(np.floor(values.min() / 10) * 10 - 5, np.ceil(values.max() / 10) * 10 + 10)
+    ax.xaxis.set_major_locator(mdates.YearLocator(2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    ax.set_ylabel("Relative performance", fontsize=EconStyle.FONT_SIZE_AXIS,
+                  fontweight="bold", color=EconStyle.INK)
+    for sp in ("top", "right", "left"):
+        ax.spines[sp].set_visible(False)
+    EconStyle.set_title(ax, "Indian Risk Appetite",
+                        f"NIFTY Smallcap 250 / NIFTY 50 · price indices · {first:%d %b %Y} = 100")
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[.02, .04, .98, .96])
+    EconStyle.add_source(fig, "NSE Indices · daily closing values",
+                         date_text=f"Through {last:%d %b %Y}")
+    fp = output_dir / "21_india_risk_appetite.png"
+    EconStyle.save_chart(fig, fp)
+    print("   ✓ Indian Risk Appetite")
+    return fp
+
+
+def chart_sector_rotation_12m(output_dir):
+    """Independent India allIndices chart; optional-source failures remove old output."""
+    import json
+    from data.fetchers.nse_sector_rotation import load_rotation_data
+    from charts.templates.change_bars import render_change_bars
+
+    fp = output_dir / "23_india_sector_rotation_12m_benchmark.png"
+    try:
+        rows, metadata = load_rotation_data()
+    except Exception as exc:
+        fp.unlink(missing_ok=True)
+        fp.with_suffix(".json").unlink(missing_ok=True)
+        print(f"   ⚠ WARNING: NIFTY Sector Rotation omitted — {exc}")
+        return None
+    observed = datetime.strptime(metadata["observation_date"], "%Y-%m-%d")
+    fig = render_change_bars(
+        [r["label"] for r in rows], [r["return_pct"] for r in rows],
+        "NIFTY Sector Rotation — Trailing 12 Months",
+        f"Price return over the past year, not total return · {observed:%d %b %Y}",
+        "NSE (allIndices, price indices)", size=(EconStyle.SIZE_WIDE[0], 5.1),
+        benchmark="NIFTY 50", source_date=f"{observed:%d %b %Y}", bottom_margin=.09,
+    )
+    EconStyle.save_chart(fig, fp)
+    metadata["rows"] = rows
+    fp.with_suffix(".json").write_text(json.dumps(metadata, indent=2) + "\n")
+    print(f"   ✓ NIFTY Sector Rotation (NSE through {observed:%d %b %Y})")
+    return fp
+
+
+def chart_sector_valuations(output_dir):
+    """Own-history percentiles; approved metrics, completed reference months only."""
+    import json
+    import os
+    from data.fetchers.nse_valuations.production import load_chart_data
+    fp = output_dir / "22_india_sector_valuations.png"
+    metadata_path = fp.with_suffix(".json")
+    # An optional-data failure must not leave an older chart in this edition.
+    def omit(reason):
+        fp.unlink(missing_ok=True)
+        metadata_path.unlink(missing_ok=True)
+        print(f"   ⚠ WARNING: Indian Sector Valuations omitted — {reason}")
+        return None
+    if os.environ.get("NSE_VALUATIONS_UPDATE_FAILED") == "true":
+        return omit("official NSE valuation update failed in this workflow")
+    try:
+        rows, metadata = load_chart_data()
+    except (ValueError, OSError, KeyError) as exc:
+        return omit(str(exc))
+    for warning in metadata["warnings"]:
+        print(f"   ⚠ WARNING: {warning}")
+    if not rows:
+        return omit("no index has a current metric and 60 completed valid months")
+
+    from charts.templates.change_bars import (
+        ROW_BAND, CORNER_PX, BAR_MAX_PX, _bar_path,
+    )
+    from matplotlib.patches import PathPatch
+
+    # Presentation only: keep loader order and exact statistics in metadata.
+    # Names, a fixed 0–100 percentile span, then two separate numeric columns.
+    fig, ax = EconStyle.create_figure(size=(EconStyle.SIZE_WIDE[0], 5.1))
+    ax.set_xlim(-82, 105)
+    benchmark_first = rows[0]["index"] == "Nifty 50"
+    positions = [i + (.25 if benchmark_first and i > 0 else 0)
+                 for i in range(len(rows))]
+    bottom = positions[-1] + .5
+    ax.set_ylim(bottom, -1.5)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.grid(False)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    EconStyle.set_title(
+        ax, "NIFTY Sector Valuations",
+        "Current P/E or P/B percentile versus own history · 50 = median",
+    )
+    EconStyle.add_top_rule(ax)
+    fig.tight_layout(rect=[.02, .09, .98, .96])
+    for position in positions[1::2]:
+        ax.axhspan(position - .5, position + .5, color=ROW_BAND,
+                   linewidth=0, zorder=0)
+    if benchmark_first:
+        ax.axhline(.625, color=EconStyle.RULE_LIGHT, linewidth=.6, zorder=1)
+    for guide in (-25, 25):
+        ax.plot([guide, guide], [-.5, bottom], color=EconStyle.GRID_COLOR,
+                linewidth=.55, zorder=1)
+    ax.plot([0, 0], [-.5, bottom], color=EconStyle.INK_MUTED,
+            linewidth=1.1, zorder=4)
+    for x, cue, align in [(-50, "CHEAPER ←", "left"),
+                           (50, "→ RICHER", "right")]:
+        ax.text(x, -1.12, cue, ha=align, va="center", fontsize=7,
+                color=EconStyle.INK_MUTED)
+    for x, label in [(-25, "25"), (0, "50 MEDIAN"), (25, "75")]:
+        ax.text(x, -.7, label, ha="center", va="center", fontsize=7,
+                color=EconStyle.INK_MUTED,
+                fontweight="semibold" if x == 0 else "normal")
+    transform = ax.get_yaxis_transform()
+    for x, label, align in [(.815, "PERCENTILE", "center"),
+                             (.995, "VALUATION", "right")]:
+        ax.text(x, -.7, label, transform=transform, ha=align, va="center",
+                fontsize=7, color=EconStyle.INK_MUTED)
+
+    box = ax.get_window_extent(fig.canvas.get_renderer())
+    px_per_x = box.width / (ax.get_xlim()[1] - ax.get_xlim()[0])
+    px_per_y = box.height / (bottom + 1.5)
+    half_h = min(.24, BAR_MAX_PX / 2 / px_per_y)
+    rx, ry = CORNER_PX / px_per_x, CORNER_PX / px_per_y
+    for position, row in zip(positions, rows):
+        benchmark = row["index"] == "Nifty 50"
+        display_position = row["percentile"] - 50
+        # Equally weighted ink blue and muted teal; neither side signals good/bad.
+        color = "#355C7D" if display_position >= 0 else "#397974"
+        if display_position != 0:
+            ax.add_patch(PathPatch(
+                _bar_path(display_position, position, half_h, rx, ry),
+                facecolor=color, edgecolor="none", zorder=3,
+            ))
+        ax.text(0, position, row["label"], transform=transform,
+                ha="left", va="center", fontsize=EconStyle.FONT_SIZE_CATEGORY + 2,
+                color=EconStyle.INK, fontweight="bold" if benchmark else "normal")
+        # Ordinal rounding is typography only; bar length uses the exact value.
+        percentile_label = int(round(row["percentile"]))
+        suffix = ("th" if 10 <= percentile_label % 100 <= 20 else
+                  {1: "st", 2: "nd", 3: "rd"}.get(percentile_label % 10, "th"))
+        ax.text(.815, position, f"{percentile_label}{suffix}", transform=transform,
+                ha="center", va="center", fontsize=EconStyle.FONT_SIZE_BAR_LABEL + 1,
+                fontweight="bold", color=EconStyle.INK, zorder=5)
+        precision = 1 if row["metric"] == "P/E" else 2
+        ax.text(.995, position,
+                f'{row["current_multiple"]:.{precision}f}× {row["metric"]}',
+                transform=transform, ha="right", va="center", fontsize=9,
+                color=EconStyle.INK_MUTED, zorder=5)
+    observed = datetime.strptime(metadata['source']['observation_date'], '%Y-%m-%d')
+    # Two compact lines leave the house credit its usual corner.
+    fig.text(.04, .065, "Source: NSE Indices · P/E: Apr 2021 onward · P/B: up to 10Y",
+             fontsize=EconStyle.FONT_SIZE_SOURCE, color=EconStyle.TEXT_MUTED)
+    fig.text(.04, .025, f"Through {observed:%d %b %Y} · Current month excluded from reference history",
+             fontsize=7, color=EconStyle.TEXT_MUTED)
+    EconStyle.draw_credit(fig)
+    EconStyle.save_chart(fig, fp)
+    metadata["rows"] = rows
+    metadata_path.write_text(json.dumps(metadata, indent=2)+"\n")
+    print(f"   ✓ Indian Sector Valuations (NSE through {observed:%d %b %Y})")
+    return fp
+
 
 # ═══════════════════════════════════════════
 # CHART 2: GST REVENUE
@@ -818,91 +1649,331 @@ def chart_nifty_it_trend(output_dir):
 # CHART: FOREIGN PORTFOLIO FLOWS (MONTHLY)
 # ═══════════════════════════════════════════
 
+def fpi_freshness(df, today=None):
+    """
+    Assess freshness of the canonical NSDL monthly FPI series.
+
+    Policy:
+      - Expected observation = previous completed calendar month.
+      - One month behind during days 1–6: warning only.
+      - One month behind from day 7 onward: strong stale warning.
+      - Two or more completed months behind: critical; omit the FPI chart/row.
+    """
+    col = "india_fpi_nsdl_lcr"
+
+    now = pd.Timestamp(
+        today if today is not None else datetime.now()
+    ).normalize()
+
+    expected_month = (
+        now.to_period("M") - 1
+    ).to_timestamp()
+
+    manual_command = (
+        "python -m data.india_manual_entry set "
+        f"{expected_month:%Y-%m} --fpi <Rs crore>"
+    )
+
+    if col not in df.columns:
+        return {
+            "status": "critical",
+            "latest_month": None,
+            "expected_month": expected_month,
+            "lag_months": None,
+            "manual_command": manual_command,
+        }
+
+    valid = df.loc[
+        df[col].notna(),
+        ["date", col],
+    ].copy()
+
+    if valid.empty:
+        return {
+            "status": "critical",
+            "latest_month": None,
+            "expected_month": expected_month,
+            "lag_months": None,
+            "manual_command": manual_command,
+        }
+
+    latest_month = (
+        pd.Timestamp(valid["date"].max())
+        .to_period("M")
+        .to_timestamp()
+    )
+
+    lag_months = (
+        (expected_month.year - latest_month.year) * 12
+        + expected_month.month
+        - latest_month.month
+    )
+
+    if lag_months <= 0:
+        status = "ok"
+    elif lag_months >= 2:
+        status = "critical"
+    elif now.day <= 6:
+        status = "warning"
+    else:
+        status = "stale"
+
+    return {
+        "status": status,
+        "latest_month": latest_month,
+        "expected_month": expected_month,
+        "lag_months": lag_months,
+        "manual_command": manual_command,
+    }
+
 def fpi_series(df):
     """
-    The FPI series to publish, never a mix of the two:
-      NSDL net investment (Rs lakh crore), entered monthly with
-        python -m data.india_manual_entry set YYYY-MM --fpi <Rs crore>
-      otherwise RBI's net portfolio investment (US$ bn) from the DBIE workbook.
+    Canonical published FPI series.
+
+    Completed months come only from NSDL net investment, manually entered
+    in Rs crore. RBI DBIE portfolio investment remains in the database for
+    reference but is never substituted into this chart.
     """
-    if "india_fpi_nsdl_lcr" in df.columns and df["india_fpi_nsdl_lcr"].notna().any():
-        return {
-            "col": "india_fpi_nsdl_lcr", "unit": "₹L Cr", "axis": "Net FPI Flows (₹ Lakh Crore)",
-            "subtitle": "Monthly net FPI investment in India (₹ lakh crore) — last 24 months",
-            "source": "NSDL (FPI net investment, all segments)",
-            "fmt": lambda v: f"{'−' if v < 0 else ''}₹{abs(v):.2f}L Cr",
-        }
     return {
-        "col": "india_fpi_flows", "unit": "$B", "axis": "Net FPI Flows ($B)",
-        "subtitle": "Monthly net portfolio investment into India ($B) — last 24 months",
-        "source": "RBI DBIE (Net Portfolio Investment)",
-        "fmt": lambda v: f"{'−' if v < 0 else ''}${abs(v):.1f}B",
+        "col": "india_fpi_nsdl_lcr",
+        "unit": "₹L Cr",
+        "axis": "Net FPI Flows (₹ Lakh Crore)",
+        "subtitle": (
+            "Monthly net FPI investment in India (₹ lakh crore); "
+        ),
+        "source": "NSDL (FPI net investment, all segments)",
+        "fmt": lambda v: (
+            f"{'−' if v < 0 else ''}₹{abs(v):.2f}L Cr"
+        ),
     }
 
 
 def chart_fpi_flows(df, output_dir):
     """
-    Monthly net FPI flows, last 24 months: NSDL figures when entered, otherwise
-    RBI's net portfolio investment (see fpi_series).
+    NSDL monthly FPI flows.
+
+    Completed months use india_fpi_nsdl_lcr.
+    An optional current-month MTD observation is shown as a grey bar and is
+    excluded from the completed-month cumulative calculation.
     """
     series = fpi_series(df)
     col = series["col"]
-    if col not in df.columns or not df[col].notna().any():
-        print("   ⚠ Skipping FPI Flows — no monthly data found")
+
+    has_completed = (
+        col in df.columns
+        and df[col].notna().any()
+    )
+
+    has_mtd_columns = all(
+        c in df.columns
+        for c in ["india_fpi_mtd_lcr", "india_fpi_mtd_asof"]
+    )
+
+    has_any_mtd = (
+        has_mtd_columns
+        and df["india_fpi_mtd_lcr"].notna().any()
+        and df["india_fpi_mtd_asof"].notna().any()
+    )
+
+    if not has_completed and not has_any_mtd:
+        print("   ⚠ Skipping FPI Flows — no NSDL data found")
         return None
 
-    # Drop empty rows and get the last 24 months
-    df_fpi = df.dropna(subset=[col]).tail(24).copy()
-    
-    if df_fpi.empty:
-        return None
+    # Last 24 completed NSDL months.
+    if has_completed:
+        df_completed = (
+            df.dropna(subset=[col])
+            .tail(24)
+            .copy()
+        )
+    else:
+        df_completed = pd.DataFrame()
+
+    # Optional current-month MTD observation.
+    mtd_row = None
+
+    if has_any_mtd:
+        mtd_candidates = df[
+            df["india_fpi_mtd_lcr"].notna()
+            & df["india_fpi_mtd_asof"].notna()
+        ].copy()
+
+        # Defensive check: stored MTD date must belong to the same month row.
+        mtd_candidates = mtd_candidates[
+            mtd_candidates["date"].dt.to_period("M")
+            == mtd_candidates["india_fpi_mtd_asof"].dt.to_period("M")
+        ]
+
+        if not mtd_candidates.empty:
+            candidate = mtd_candidates.iloc[-1]
+
+            candidate_period = candidate["date"].to_period("M")
+
+            # Once a final NSDL figure exists for this month, the grey MTD bar
+            # automatically disappears.
+            completed_same_month = (
+                has_completed
+                and (
+                    (
+                        df["date"].dt.to_period("M")
+                        == candidate_period
+                    )
+                    & df[col].notna()
+                ).any()
+            )
+
+            if not completed_same_month:
+                mtd_row = candidate
 
     fig, ax = EconStyle.create_figure(size="wide")
-    
-    dates = df_fpi["date"].tolist()
-    vals = df_fpi[col].values
 
-    # Subtle horizontal grid
-    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
+    # Subtle horizontal grid.
+    ax.yaxis.grid(
+        True,
+        linestyle="-",
+        alpha=0.15,
+        color="#9CA3AF",
+        zorder=0,
+    )
     ax.set_axisbelow(True)
 
-    # Clean Spines
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
 
-    # Colors: Green for Inflows, Red for Outflows
-    try:
-        colors = [C_FPI_POS if v >= 0 else C_FPI_NEG for v in vals]
-    except NameError:
-        colors = ["#10B981" if v >= 0 else "#EF4444" for v in vals]
+    all_dates = []
 
-    # Draw the bars (width=20 days looks perfectly spaced for monthly data)
-    ax.bar(dates, vals, width=20, color=colors, alpha=0.9, edgecolor="none", zorder=3)
+    # Completed monthly bars.
+    if not df_completed.empty:
+        completed_dates = df_completed["date"].tolist()
+        completed_vals = df_completed[col].values
 
-    # Bold Zero Line
-    ax.axhline(y=0, color="#000000", linewidth=1.2, zorder=4)
+        try:
+            completed_colors = [
+                C_FPI_POS if v >= 0 else C_FPI_NEG
+                for v in completed_vals
+            ]
+        except NameError:
+            completed_colors = [
+                "#10B981" if v >= 0 else "#EF4444"
+                for v in completed_vals
+            ]
 
-    # Labels & Formatting
-    _format_date_axis(ax, len(dates))
-    ax.set_ylabel(series["axis"], fontsize=EconStyle.FONT_SIZE_AXIS)
+        ax.bar(
+            completed_dates,
+            completed_vals,
+            width=20,
+            color=completed_colors,
+            alpha=0.9,
+            edgecolor="none",
+            zorder=3,
+        )
 
-    # Calculate Cumulative 24M for the floating badge
-    cum_flow = df_fpi[col].sum()
-    
-    # Custom floating badge in the top right
-    bbox_props = dict(boxstyle="round,pad=0.4", fc="white", ec="#0F172A", lw=1.5)
-    ax.text(0.98, 1.05, f"24M Cumulative: {'+' if cum_flow >= 0 else ''}{series['fmt'](cum_flow)}", 
-            transform=ax.transAxes, fontsize=10, fontweight='bold', 
-            color="#0F172A", ha="right", va="bottom", bbox=bbox_props)
+        all_dates.extend(completed_dates)
 
-    EconStyle.set_title(ax, "Foreign Portfolio Flows", series["subtitle"])
+    # Current month-to-date bar.
+    if mtd_row is not None:
+        mtd_date = mtd_row["date"]
+        mtd_val = float(mtd_row["india_fpi_mtd_lcr"])
+        mtd_asof = mtd_row["india_fpi_mtd_asof"]
+
+        ax.bar(
+            [mtd_date],
+            [mtd_val],
+            width=20,
+            color="#9CA3AF",
+            alpha=0.9,
+            edgecolor="none",
+            zorder=3,
+        )
+
+        all_dates.append(mtd_date)
+
+        asof_text = mtd_asof.strftime("%d %b").lstrip("0")
+
+        ax.annotate(
+            "*",
+            xy=(mtd_date, mtd_val),
+            xytext=(0, 8 if mtd_val >= 0 else -8),
+            textcoords="offset points",
+            ha="center",
+            va="bottom" if mtd_val >= 0 else "top",
+            fontsize=14,
+            fontweight="bold",
+            color="#475569",
+            zorder=5,
+        )
+
+    # Zero line.
+    ax.axhline(
+        y=0,
+        color="#000000",
+        linewidth=1.2,
+        zorder=4,
+    )
+
+    if all_dates:
+        _format_date_axis(ax, len(all_dates))
+
+    ax.set_ylabel(
+        series["axis"],
+        fontsize=EconStyle.FONT_SIZE_AXIS,
+    )
+
+    # Cumulative badge includes COMPLETED observations only.
+    if not df_completed.empty:
+        cum_flow = df_completed[col].sum()
+        n_completed = len(df_completed)
+
+        bbox_props = dict(
+            boxstyle="round,pad=0.4",
+            fc="white",
+            ec="#0F172A",
+            lw=1.5,
+        )
+
+        ax.text(
+            0.98,
+            1.05,
+            (
+                f"{n_completed}M Cumulative: "
+                f"{'+' if cum_flow >= 0 else ''}"
+                f"{series['fmt'](cum_flow)}"
+            ),
+            transform=ax.transAxes,
+            fontsize=10,
+            fontweight="bold",
+            color="#0F172A",
+            ha="right",
+            va="bottom",
+            bbox=bbox_props,
+        )
+
+    EconStyle.set_title(
+        ax,
+        "Foreign Portfolio Flows",
+        series["subtitle"],
+    )
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, series["source"])
+
+    fig.tight_layout(
+        rect=[0.02, 0.04, 0.98, 0.96]
+    )
+
+    source_text = series["source"]
+
+    if mtd_row is not None:
+        mtd_asof = mtd_row["india_fpi_mtd_asof"]
+        source_text += (
+            f" · * Grey bar: MTD through "
+            f"{mtd_asof.strftime('%d %b %Y').lstrip('0')}"
+        )
+
+    EconStyle.add_source(fig, source_text)
 
     fp = output_dir / "03_india_fpi_monthly.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ FPI Flows (Monthly)")
+
+    print("   ✓ FPI Flows (Monthly, NSDL)")
     return fp
 
 
@@ -923,6 +1994,34 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
 
     # Determine CAG availability
     has_cag = cag_data is not None
+
+        # FPI is NSDL-only. Do not show a materially stale FPI value beside
+    # newer indicators in the Economic Snapshot.
+    fpi_info = fpi_freshness(df)
+
+    credit_flow_items = [
+        (
+            "Bank Credit Growth",
+            "india_bank_credit_yoy",
+            "% YoY",
+            lambda v: f"{v:.1f}%",
+        ),
+    ]
+
+    if (
+        fpi_info["status"] != "critical"
+        and fpi_info["latest_month"] is not None
+    ):
+        fpi_cfg = fpi_series(df)
+
+        credit_flow_items.append(
+            (
+                "Net FPI Flows",
+                fpi_cfg["col"],
+                fpi_cfg["unit"],
+                fpi_cfg["fmt"],
+            )
+        )
 
     # ═══════════════════════════════════════════
     # DEFINE TABLE STRUCTURE
@@ -1276,70 +2375,6 @@ def chart_inflation_bar(df, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 13: MONEY SUPPLY vs CREDIT
-# ═══════════════════════════════════════════
-
-def chart_money_supply(df, output_dir):
-    """
-    M3 YoY % vs Bank Credit YoY % dual-line trend chart.
-    M3 data populated when DBIE endpoints are configured in india_fetcher.py.
-    Falls back to credit-only chart if M3 not yet available.
-    """
-    has_credit = "india_bank_credit_yoy" in df.columns
-    has_m3 = "india_m3_yoy" in df.columns and df["india_m3_yoy"].notna().any()
-
-    if not has_credit:
-        print("   ⚠ Skipping Money Supply — no credit data")
-        return None
-
-    fig, ax = EconStyle.create_figure(size="wide")
-    dates = df["date"].tolist()
-
-    # Bank Credit YoY
-    credit = df["india_bank_credit_yoy"].values
-    ax.plot(dates, credit, color=C_CREDIT, linewidth=2.5, label="Bank Credit YoY",
-            zorder=5, solid_capstyle="round")
-    ax.plot(dates, credit, color=C_CREDIT, linewidth=3.7, alpha=0.07,
-            zorder=4, solid_capstyle="round")
-    ax.fill_between(dates, 0, credit, color=C_CREDIT, alpha=0.04)
-    _add_end_label(ax, dates, credit, "Credit", C_CREDIT, offset_y=6)
-
-    # M3 YoY (when available)
-    if has_m3:
-        m3 = df["india_m3_yoy"].values
-        ax.plot(dates, m3, color=C_M3, linewidth=2.2, linestyle="--",
-                label="M3 Money Supply YoY", zorder=5, solid_capstyle="round")
-        _add_end_label(ax, dates, m3, "M3", C_M3, offset_y=-14)
-    else:
-        ax.text(0.02, 0.04, "M3 data pending DBIE configuration",
-                transform=ax.transAxes, fontsize=8, color="#94A3B8",
-                style="italic", va="bottom")
-
-    # Reference line
-    ax.axhline(y=15, color="#999999", linewidth=0.8, linestyle="--", zorder=1, alpha=0.5)
-    ax.text(dates[0], 15.2, "15%", fontsize=7, color="#888888",
-            va="bottom", fontfamily=EconStyle.FONT_FAMILY)
-
-    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
-              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
-
-    _format_date_axis(ax, len(dates))
-    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
-    ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
-
-    EconStyle.set_title(ax, "Monetary Conditions — Credit & Money Supply",
-                        "Bank Credit YoY vs M3 Money Supply YoY (%)")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI DBIE")
-
-    fp = output_dir / "13_india_money_supply.png"
-    EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Money Supply vs Credit")
-    return fp
-
-
-# ═══════════════════════════════════════════
 # CHART 14: CREDIT vs DEPOSIT GROWTH
 # ═══════════════════════════════════════════
 
@@ -1420,167 +2455,193 @@ def chart_credit_deposit(df, output_dir):
 
 
 # ═══════════════════════════════════════════
-# CHART 15: IIP — INDUSTRIAL PRODUCTION
+# CHART 17: INDUSTRIAL PRODUCTION (IIP)
 # ═══════════════════════════════════════════
 
 def chart_iip(df, output_dir):
     """
-    IIP (Index of Industrial Production) YoY % — bar chart with 3M MA.
-    Filtered to start from March 2022 to remove pandemic base-effect spikes.
+    IIP (Index of Industrial Production) YoY % — monthly bars with 3M average.
+    Filtered to the post-pandemic period to remove extreme base-effect distortions.
     """
     if "india_iip_yoy" not in df.columns or not df["india_iip_yoy"].notna().any():
         print("   ⚠ Skipping IIP — data pending DBIE configuration")
         return None
 
-    # ── NEW FILTER: Start from March 2022 ──
-    df_iip = df[(df["date"] >= "2022-01-01") & (df["india_iip_yoy"].notna())].copy()
-    
+    # Preserve existing data window
+    df_iip = df[
+        (df["date"] >= "2022-01-01") &
+        (df["india_iip_yoy"].notna())
+    ].copy()
+
     if df_iip.empty:
         return None
 
-    fig, ax = EconStyle.create_figure(size="wide")
-    dates = df_iip["date"].tolist()
-    vals  = df_iip["india_iip_yoy"].values
+    # Preserve original wide width, but match the new PMI chart height
+    fig, ax = EconStyle.create_figure(size=(9.5, 4.9))
 
-    ax.yaxis.grid(True, linestyle="-", alpha=0.12, color="#9CA3AF", zorder=0)
+    dates = df_iip["date"].tolist()
+    vals = df_iip["india_iip_yoy"].values
+
+    # ── Grid ───────────────────────────────────────────────────────────────
     ax.set_axisbelow(True)
 
-    colors = [C_IIP_POS if v >= 0 else C_IIP_NEG for v in vals]
-    ax.bar(dates, vals, width=20, color=colors, alpha=0.8,
-           edgecolor="none", zorder=3, label="IIP YoY")
+    ax.yaxis.grid(
+        True,
+        linestyle="-",
+        linewidth=0.6,
+        alpha=0.13,
+        color="#9CA3AF",
+        zorder=0,
+    )
 
-    # 3-month moving average
+    # Vertical gridlines to match the cleaner PMI treatment
+    ax.xaxis.grid(
+        True,
+        linestyle="-",
+        linewidth=0.7,
+        alpha=0.18,
+        color="#9CA3AF",
+        zorder=0,
+    )
+
+    # ── Monthly IIP bars ──────────────────────────────────────────────────
+    colors = [
+        C_IIP_POS if v >= 0 else C_IIP_NEG
+        for v in vals
+    ]
+
+    ax.bar(
+        dates,
+        vals,
+        width=20,
+        color=colors,
+        alpha=0.80,
+        edgecolor="none",
+        zorder=3,
+    )
+
+    # ── 3-month moving average ────────────────────────────────────────────
+    ma3 = None
+
     if len(vals) >= 3:
         ma3 = pd.Series(vals).rolling(3).mean().values
-        ax.plot(dates, ma3, color="#000000", linewidth=2.0, linestyle="-",
-                label="3M Avg", zorder=5, solid_capstyle="round")
-        valid_ma = [(d, v) for d, v in zip(dates, ma3) if not np.isnan(v)]
+
+        line, = ax.plot(
+            dates,
+            ma3,
+            color="#000000",
+            linewidth=1.9,
+            linestyle="-",
+            zorder=5,
+            antialiased=True,
+            solid_capstyle="round",
+            solid_joinstyle="round",
+        )
+
+        # Subtle white under-stroke for a cleaner institutional line
+        line.set_path_effects([
+            pe.Stroke(linewidth=2.9, foreground="white"),
+            pe.Normal(),
+        ])
+
+        # Direct label for latest 3M average
+        valid_ma = [
+            (d, v)
+            for d, v in zip(dates, ma3)
+            if not np.isnan(v)
+        ]
+
         if valid_ma:
-            _add_end_label(ax, [d for d, _ in valid_ma],
-                          [v for _, v in valid_ma], "3M Avg", "#000000")
+            ma_date, ma_value = valid_ma[-1]
 
-    ax.axhline(y=0, color="#000000", linewidth=0.8, zorder=2)
+            ax.annotate(
+                f"3M Avg  {ma_value:.1f}%",
+                xy=(ma_date, ma_value),
+                xytext=(10, 0),
+                textcoords="offset points",
+                fontsize=10,
+                fontweight="bold",
+                color="#000000",
+                ha="left",
+                va="center",
+                annotation_clip=False,
+                zorder=7,
+            )
 
-    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
-              ncol=2, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+    # ── Latest monthly IIP reading ────────────────────────────────────────
+    latest_date = dates[-1]
+    latest_val = float(vals[-1])
+    latest_color = C_IIP_POS if latest_val >= 0 else C_IIP_NEG
+
+    # Label directly above/below latest bar
+    latest_offset = 7 if latest_val >= 0 else -8
+    latest_va = "bottom" if latest_val >= 0 else "top"
+
+    ax.annotate(
+        f"{latest_val:.1f}%",
+        xy=(latest_date, latest_val),
+        xytext=(0, latest_offset),
+        textcoords="offset points",
+        fontsize=9.5,
+        fontweight="bold",
+        color=latest_color,
+        ha="center",
+        va=latest_va,
+        annotation_clip=False,
+        zorder=7,
+    )
+
+    # ── Zero-growth reference ─────────────────────────────────────────────
+    ax.axhline(
+        y=0,
+        color="#000000",
+        linewidth=0.9,
+        zorder=2,
+    )
+
+    # ── Axes ──────────────────────────────────────────────────────────────
     _format_date_axis(ax, len(dates))
-    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%.1f%%"))
-    ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
 
-    EconStyle.set_title(ax, "Industrial Production (IIP)",
-                        "Index of Industrial Production — YoY % Change")
+    ax.yaxis.set_major_formatter(
+        mticker.FormatStrFormatter("%.1f%%")
+    )
+
+    ax.set_ylabel(
+        "YoY Growth (%)",
+        fontsize=EconStyle.FONT_SIZE_AXIS,
+        fontweight="bold",
+        color=EconStyle.INK,
+    )
+
+    # Cleaner frame
+    for spine in ["top", "right", "left"]:
+        ax.spines[spine].set_visible(False)
+
+    # No legend — both series are now explained directly
+    # in the subtitle / chart labels.
+
+    # ── Title ─────────────────────────────────────────────────────────────
+    EconStyle.set_title(
+        ax,
+        "Industrial Production (IIP)",
+        "Monthly YoY growth  ·  black line = 3-month average",
+    )
+
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI DBIE / MoSPI")
+
+    fig.tight_layout(
+        rect=[0.02, 0.04, 0.98, 0.96]
+    )
+
+    EconStyle.add_source(
+        fig,
+        "RBI DBIE / MoSPI"
+    )
 
     fp = output_dir / "15_india_iip.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ IIP Industrial Production")
-    return fp
 
-
-# ═══════════════════════════════════════════
-# CHART 19: WHO CONTROLS CORPORATE INDIA
-# ═══════════════════════════════════════════
-
-PROMOTER_BAND = 2.5          # width of each bar, in percentage points of the share register
-PROMOTER_SAFFRON = EconStyle.LINE_RUPEE
-PROMOTER_GHOST = "#8A94A6"   # the earlier quarter: present, but never competing with the bars
-
-
-def _promoter_shares(values, edges):
-    """Each band's share of companies, in per cent."""
-    counts, _ = np.histogram(values, bins=edges)
-    return counts / counts.sum() * 100
-
-
-def chart_promoter_holdings(frame, output_dir):
-    """
-    How much of each listed company its promoter owns, today against the
-    earliest quarter NSE keeps.
-
-    Both quarters are drawn over the same companies, so the shift is promoters
-    buying and selling rather than the market listing new ones. Two lines mark
-    the rules that shape the picture: control passes at 50%, and no promoter may
-    hold more than 75%, because a quarter of every company must sit with the
-    public.
-    """
-    from data.nse_shareholding import CONTROL, PROMOTER_CEILING, constant_panel
-
-    latest = frame["quarter"].max()
-    filings = frame.groupby("quarter")["symbol"].nunique()
-    # NSE's archive thins out in its earliest quarters; start where it is whole.
-    first = filings[filings >= filings.max() * 0.6].index.min()
-    if first >= latest:
-        raise ValueError("NSE shareholding history has only one quarter of filings")
-    panel = constant_panel(frame, [first, latest])
-    now, before = panel.loc[latest].values, panel.loc[first].values
-
-    edges = np.arange(0, 100 + PROMOTER_BAND, PROMOTER_BAND)
-    centres = edges[:-1] + PROMOTER_BAND / 2
-    share_now, share_before = _promoter_shares(now, edges), _promoter_shares(before, edges)
-    median_now, median_before = float(np.median(now)), float(np.median(before))
-
-    EconStyle.apply_global_style()
-    fig, ax = EconStyle.create_figure(size="wide")
-    ax.bar(centres, share_now, width=PROMOTER_BAND * 0.9, color=PROMOTER_SAFFRON, edgecolor="white",
-           linewidth=0.6, zorder=3, label=f"{latest:%b %Y}   median {median_now:.0f}%")
-    ax.step(np.append(edges[:-1], edges[-1]), np.append(share_before, share_before[-1]), where="post",
-            color=PROMOTER_GHOST, linewidth=1.5, zorder=4, label=f"{first:%b %Y}   median {median_before:.0f}%")
-
-    top = max(share_now.max(), share_before.max()) * 1.30
-    ax.set_ylim(0, top)
-    ax.set_xlim(-1.5, 101.5)
-
-    for x, label, side in [(CONTROL, "50%\noutright control", "right"),
-                           (PROMOTER_CEILING, "75%\nthe legal ceiling", "left")]:
-        ax.axvline(x, color=EconStyle.INK, linewidth=1.0, zorder=5)
-        ax.annotate(label, xy=(x, top * 0.55), xytext=(7 if side == "left" else -6, 0),
-                    textcoords="offset points", ha=side, va="center", fontsize=8.5,
-                    color=EconStyle.INK, linespacing=1.35,
-                    path_effects=[pe.withStroke(linewidth=3, foreground="white")])
-
-    # The wall of companies parked just under the ceiling, and the companies with no promoter at all.
-    at_ceiling = int(((now >= PROMOTER_CEILING - PROMOTER_BAND) & (now <= PROMOTER_CEILING)).sum())
-    ax.annotate(f"one company in {round(len(now) / at_ceiling)} sits within\n"
-                f"{PROMOTER_BAND:g} points of the ceiling",
-                xy=(PROMOTER_CEILING - PROMOTER_BAND, share_now[int((PROMOTER_CEILING - PROMOTER_BAND) // PROMOTER_BAND)]),
-                xytext=(-16, 34), textcoords="offset points", ha="right", va="bottom", fontsize=8.5,
-                color=EconStyle.INK, linespacing=1.35, zorder=8,
-                path_effects=[pe.withStroke(linewidth=3, foreground="white")],
-                arrowprops=dict(arrowstyle="-", color=EconStyle.INK, linewidth=0.8, shrinkB=6))
-    ax.annotate(f"{int((now == 0).sum())} companies have\nno promoter at all",
-                xy=(PROMOTER_BAND / 2, share_now[0]), xytext=(14, 34), textcoords="offset points",
-                ha="left", va="bottom", fontsize=8.5, color=EconStyle.INK_MUTED, linespacing=1.35,
-                arrowprops=dict(arrowstyle="-", color=EconStyle.INK_MUTED, linewidth=0.8, shrinkB=3))
-
-    ax.set_xlabel("Promoter and promoter-group stake in the company",
-                  fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.INK_MUTED, labelpad=6)
-    ax.set_ylabel("Share of companies", fontsize=EconStyle.FONT_SIZE_AXIS, color=EconStyle.INK_MUTED)
-    ax.yaxis.grid(True, color=EconStyle.GRID_COLOR, linewidth=0.5)
-    ax.set_axisbelow(True)
-    for spine in ("top", "right", "left"):
-        ax.spines[spine].set_visible(False)
-    ax.spines["bottom"].set_color(EconStyle.AXIS_COLOR)
-    ax.xaxis.set_major_locator(mticker.MultipleLocator(10))
-    ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
-    ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=6, steps=[1, 2, 5, 10]))
-    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:.0f}%"))
-    ax.tick_params(axis="y", length=0, labelsize=EconStyle.FONT_SIZE_TICK)
-    ax.tick_params(axis="x", length=4, width=0.8, color=EconStyle.AXIS_COLOR, labelsize=EconStyle.FONT_SIZE_TICK)
-    ax.legend(loc="upper left", frameon=False, fontsize=9.5, handlelength=1.5, borderaxespad=0.8)
-
-    EconStyle.set_title(ax, "Who Controls Corporate India",
-                        f"Promoter stake in each of {panel.shape[1]:,} listed companies, in "
-                        f"{PROMOTER_BAND:g}-point bands  ·  the same companies in both quarters")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "NSE shareholding filings (quarterly, under SEBI listing rules)")
-
-    fp = output_dir / "19_india_promoter_holdings.png"
-    EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Who Controls Corporate India ({panel.shape[1]:,} companies, "
-          f"median {median_before:.1f}% → {median_now:.1f}%)")
+    print("   ✓ IIP Industrial Production")
     return fp
 
 
@@ -2291,16 +3352,19 @@ def main():
     # ── Activity & PMI charts ──────────────────────────────────────────────────
     print(f"\n   Generating charts...")
     chart_pmi(df, output_dir)
+    chart_investment_rate(output_dir)
+    chart_gva_contributions(output_dir)
+    chart_risk_appetite(output_dir)
+    chart_sector_valuations(output_dir)
+    chart_sector_rotation_12m(output_dir)
     chart_gst(df, output_dir)
     chart_fpi_flows(df, output_dir)
-    chart_nifty_it_trend(output_dir)
     chart_inflation_bar(df, output_dir)
 
     # ── Summary table (integrates CAG fiscal + weekly forex) ───────────────────
     chart_table(df, output_dir, cag_data, df_weekly)
 
     # ── Monetary Conditions charts ─────────────────────────────────────────────
-    chart_money_supply(df, output_dir)
     chart_credit_deposit(df, output_dir)
     chart_rate_transmission(output_dir)
 
@@ -2310,13 +3374,6 @@ def main():
     # ── External Sector charts (new) ──────────────────────────────────────────
     chart_forex_reserves(df_weekly, output_dir)
     chart_trade_balance(df, output_dir)
-
-    # ── Corporate ownership (NSE shareholding filings, quarterly) ─────────────
-    try:
-        from data.nse_shareholding import fetch_shareholding
-        chart_promoter_holdings(fetch_shareholding(), output_dir)
-    except Exception as exc:  # noqa: BLE001 — the chart is skipped, never drawn from part of the market
-        print(f"   ⚠ Skipping Who Controls Corporate India — {type(exc).__name__}: {exc}")
 
     # ── Fiscal charts (from CAG) — FROZEN, no changes ─────────────────────────
     if cag_data:
