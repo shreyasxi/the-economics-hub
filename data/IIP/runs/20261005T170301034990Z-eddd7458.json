@@ -1,0 +1,1258 @@
+{
+  "run_id": "20261005T170301034990Z-eddd7458",
+  "fetched_at": "2026-10-05T17:03:01.035755+00:00",
+  "status": "accepted",
+  "previous": {
+    "run_id": "20261005T113538004808Z-26377a87",
+    "fetched_at": "2026-10-05T11:35:38.004845+00:00",
+    "status": "accepted",
+    "sources": [
+      {
+        "url": "https://api.mospi.gov.in/api/iip/getIIPData",
+        "request": {
+          "frequency": "Monthly",
+          "base_year": "2022-23",
+          "type": "General",
+          "limit": 100,
+          "page": 1,
+          "Format": "JSON"
+        },
+        "role": "General IIP published growth",
+        "sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+        "raw": "raw/932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+        "retrieved_at": "2026-10-05T11:35:38.341294+00:00"
+      }
+    ],
+    "base_year": "2022-23",
+    "concept": "General",
+    "measure": "published growth_rate (% YoY)",
+    "earliest": "2023-04",
+    "latest": "2026-08",
+    "count": 41,
+    "revisions": [],
+    "installation_note": "Installed from the successful isolated live API update during this audit; original retrieval times and raw checksums retained. Subsequent live API checks returned HTTP 500.",
+    "legacy_migration": [
+      {
+        "month": "2018-10",
+        "growth_rate": 8.4082,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2018-11",
+        "growth_rate": 0.2385,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2018-12",
+        "growth_rate": 2.5268,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-01",
+        "growth_rate": 1.5873,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-02",
+        "growth_rate": 0.157,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-03",
+        "growth_rate": 2.7085,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-04",
+        "growth_rate": 3.1811,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-05",
+        "growth_rate": 4.4753,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-06",
+        "growth_rate": 1.2529,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-07",
+        "growth_rate": 4.8528,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-08",
+        "growth_rate": -1.4062,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-09",
+        "growth_rate": -4.5807,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-10",
+        "growth_rate": -6.6265,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-11",
+        "growth_rate": 2.1412,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2019-12",
+        "growth_rate": 0.4481,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-02",
+        "growth_rate": 5.1724,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-03",
+        "growth_rate": -18.6676,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-04",
+        "growth_rate": -57.3123,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-05",
+        "growth_rate": -33.3826,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-06",
+        "growth_rate": -16.5507,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-07",
+        "growth_rate": -10.5463,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-08",
+        "growth_rate": -7.1315,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-09",
+        "growth_rate": 0.9764,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-10",
+        "growth_rate": 4.5161,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-11",
+        "growth_rate": -1.6304,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2020-12",
+        "growth_rate": 2.1561,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-02",
+        "growth_rate": -3.2042,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-03",
+        "growth_rate": 24.2321,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-04",
+        "growth_rate": 133.5185,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-05",
+        "growth_rate": 27.6053,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-06",
+        "growth_rate": 13.8091,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-07",
+        "growth_rate": 11.5352,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-08",
+        "growth_rate": 12.9693,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-09",
+        "growth_rate": 4.3513,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-10",
+        "growth_rate": 4.1667,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-11",
+        "growth_rate": 1.026,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2021-12",
+        "growth_rate": 1.0189,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-01",
+        "growth_rate": 1.9766,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-02",
+        "growth_rate": 1.1547,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-03",
+        "growth_rate": 2.1978,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-04",
+        "growth_rate": 6.6614,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-05",
+        "growth_rate": 19.722,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-06",
+        "growth_rate": 12.6221,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-07",
+        "growth_rate": 2.2053,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-08",
+        "growth_rate": -0.6798,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-09",
+        "growth_rate": 3.3205,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-10",
+        "growth_rate": -4.0741,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-11",
+        "growth_rate": 7.5781,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2022-12",
+        "growth_rate": 5.1153,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-01",
+        "growth_rate": 5.8148,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-02",
+        "growth_rate": 6.0122,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-03",
+        "growth_rate": 1.9489,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-04",
+        "growth_rate": 4.6097,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-05",
+        "growth_rate": 5.6604,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-06",
+        "growth_rate": 4.0492,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-07",
+        "growth_rate": 6.1756,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-08",
+        "growth_rate": 10.8745,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-09",
+        "growth_rate": 6.3528,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-10",
+        "growth_rate": 11.8919,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-11",
+        "growth_rate": 2.4691,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2023-12",
+        "growth_rate": 4.3866,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-01",
+        "growth_rate": 4.2062,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-02",
+        "growth_rate": 5.5994,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-03",
+        "growth_rate": 5.4713,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-04",
+        "growth_rate": 5.1883,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-05",
+        "growth_rate": 6.25,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-06",
+        "growth_rate": 4.934,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-07",
+        "growth_rate": 4.9755,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-08",
+        "growth_rate": 0.0,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-09",
+        "growth_rate": 3.2326,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-10",
+        "growth_rate": 3.7267,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-11",
+        "growth_rate": 4.961,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2024-12",
+        "growth_rate": 3.7426,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-01",
+        "growth_rate": 5.2083,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-02",
+        "growth_rate": 2.7192,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-03",
+        "growth_rate": 3.9375,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-04",
+        "growth_rate": 2.5676,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-05",
+        "growth_rate": 1.8746,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-06",
+        "growth_rate": 1.5232,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-07",
+        "growth_rate": 4.2724,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-08",
+        "growth_rate": 4.1152,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-09",
+        "growth_rate": 4.629,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-10",
+        "growth_rate": 0.5323,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-11",
+        "growth_rate": 7.1573,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2025-12",
+        "growth_rate": 8.038,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"dbie_excel_monthly:2011-12base:verified_vs_mospi\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-01",
+        "growth_rate": 4.8,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-02",
+        "growth_rate": 5.2,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-03",
+        "growth_rate": 4.1,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-04",
+        "growth_rate": 4.9,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_food_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-05",
+        "growth_rate": 5.1,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_mfg_pmi\": \"manual:spglobal:2026-09-12\", \"india_svc_pmi\": \"manual:spglobal:2026-09-12\", \"india_gst_revenue\": \"manual:pib:2026-09-12\", \"india_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_core_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_food_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_unemployment\": \"manual:plfs:2026-09-12\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-06",
+        "growth_rate": 7.3,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_mfg_pmi\": \"manual:spglobal:2026-09-12\", \"india_svc_pmi\": \"manual:spglobal:2026-09-12\", \"india_gst_revenue\": \"manual:pib:2026-09-12\", \"india_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_core_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_food_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_unemployment\": \"manual:plfs:2026-09-12\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-07",
+        "growth_rate": 6.7,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_mfg_pmi\": \"manual:spglobal:2026-09-12\", \"india_svc_pmi\": \"manual:spglobal:2026-09-12\", \"india_gst_revenue\": \"manual:pib:2026-09-12\", \"india_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_core_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_food_cpi_yoy\": \"manual:mospi:2026-09-12\", \"india_unemployment\": \"manual:plfs:2026-09-12\", \"india_iip_yoy\": \"manual:mospi:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_exports_usd_bn\": \"dbie_excel_monthly\", \"india_imports_usd_bn\": \"dbie_excel_monthly\", \"india_trade_deficit_usd_bn\": \"dbie_excel_monthly\", \"india_fpi_flows\": \"dbie_excel_monthly\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      },
+      {
+        "month": "2026-08",
+        "growth_rate": 8.0,
+        "source_flags": "{\"india_bank_credit_yoy\": \"dbie_excel_fortnightly\", \"india_deposit_growth_yoy\": \"dbie_excel_fortnightly\", \"india_m3_yoy\": \"dbie_excel_fortnightly\", \"india_mfg_pmi\": \"manual:spglobal:2026-09-12\", \"india_svc_pmi\": \"manual:spglobal:2026-09-12\", \"india_gst_revenue\": \"manual:pib:2026-09-12\", \"india_composite_pmi\": \"derived:pmi_weighted:2026-09-29\", \"india_cpi_yoy\": \"manual:mospi:2026-09-15\", \"india_core_cpi_yoy\": \"manual:mospi:2026-09-15\", \"india_food_cpi_yoy\": \"manual:mospi:2026-09-15\", \"india_fpi_net_inr_cr\": \"manual:nsdl:2026-09-15\", \"india_iip_yoy\": \"manual:mospi:2026-09-29\"}",
+        "fetched_at": "2026-10-05 05:42:57",
+        "archived_at": "2026-10-05T11:35:38.004845+00:00",
+        "reason": "Canonical migration; old series/base unverified, excluded from active chart"
+      }
+    ]
+  },
+  "previous_records": [
+    {
+      "month": "2023-04",
+      "growth_rate": 0.4,
+      "index_level": 100.4,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-05",
+      "growth_rate": 5.2,
+      "index_level": 105.2,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-06",
+      "growth_rate": 4.6,
+      "index_level": 104.6,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-07",
+      "growth_rate": 3.0,
+      "index_level": 103.0,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-08",
+      "growth_rate": 6.9,
+      "index_level": 106.9,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-09",
+      "growth_rate": 4.9,
+      "index_level": 104.9,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-10",
+      "growth_rate": 6.6,
+      "index_level": 106.6,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-11",
+      "growth_rate": 1.1,
+      "index_level": 101.1,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2023-12",
+      "growth_rate": 9.0,
+      "index_level": 109.0,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-01",
+      "growth_rate": 11.1,
+      "index_level": 111.1,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-02",
+      "growth_rate": 9.7,
+      "index_level": 109.7,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-03",
+      "growth_rate": 19.0,
+      "index_level": 119.0,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-04",
+      "growth_rate": 7.1,
+      "index_level": 107.5,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-05",
+      "growth_rate": 7.3,
+      "index_level": 112.9,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-06",
+      "growth_rate": 7.3,
+      "index_level": 112.2,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-07",
+      "growth_rate": 7.8,
+      "index_level": 111.0,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-08",
+      "growth_rate": 2.1,
+      "index_level": 109.1,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-09",
+      "growth_rate": 4.7,
+      "index_level": 109.8,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-10",
+      "growth_rate": 5.6,
+      "index_level": 112.6,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-11",
+      "growth_rate": 5.9,
+      "index_level": 107.1,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2024-12",
+      "growth_rate": 6.1,
+      "index_level": 115.7,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-01",
+      "growth_rate": 6.3,
+      "index_level": 118.1,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-02",
+      "growth_rate": 2.9,
+      "index_level": 112.9,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-03",
+      "growth_rate": 5.8,
+      "index_level": 125.9,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-04",
+      "growth_rate": 4.8,
+      "index_level": 112.7,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-05",
+      "growth_rate": 3.4,
+      "index_level": 116.7,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-06",
+      "growth_rate": 2.2,
+      "index_level": 114.7,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-07",
+      "growth_rate": 5.4,
+      "index_level": 117.0,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-08",
+      "growth_rate": 4.7,
+      "index_level": 114.2,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-09",
+      "growth_rate": 6.1,
+      "index_level": 116.5,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-10",
+      "growth_rate": -0.9,
+      "index_level": 111.6,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-11",
+      "growth_rate": 7.0,
+      "index_level": 114.6,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2025-12",
+      "growth_rate": 6.7,
+      "index_level": 123.5,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-01",
+      "growth_rate": 4.1,
+      "index_level": 123.0,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-02",
+      "growth_rate": 4.4,
+      "index_level": 117.9,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-03",
+      "growth_rate": 3.0,
+      "index_level": 129.7,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-04",
+      "growth_rate": 4.9,
+      "index_level": 118.2,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-05",
+      "growth_rate": 5.0,
+      "index_level": 122.5,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-06",
+      "growth_rate": 8.8,
+      "index_level": 124.8,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-07",
+      "growth_rate": 7.4,
+      "index_level": 125.6,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    },
+    {
+      "month": "2026-08",
+      "growth_rate": 8.0,
+      "index_level": 123.3,
+      "base_year": "2022-23",
+      "concept": "General",
+      "source_url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "raw_sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "run_id": "20261005T113538004808Z-26377a87",
+      "fetched_at": "2026-10-05T11:35:38.004845+00:00"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://api.mospi.gov.in/api/iip/getIIPData",
+      "request": {
+        "frequency": "Monthly",
+        "base_year": "2022-23",
+        "type": "General",
+        "limit": 100,
+        "page": 1,
+        "Format": "JSON"
+      },
+      "role": "General IIP published growth",
+      "sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "raw": "raw/932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
+      "retrieved_at": "2026-10-05T17:03:03.192550+00:00"
+    }
+  ],
+  "base_year": "2022-23",
+  "concept": "General",
+  "measure": "published growth_rate (% YoY)",
+  "earliest": "2023-04",
+  "latest": "2026-08",
+  "count": 41,
+  "revisions": []
+}
