@@ -1,7 +1,7 @@
 {
   "audit_only": true,
   "cutoff": "2026-10-05",
-  "generated_at": "2026-10-05T05:44:12.111913+00:00",
+  "generated_at": "2026-10-05T14:32:51.251078+00:00",
   "start_month": "2016-10",
   "expected_months": 121,
   "validated_months": 121,
@@ -3981,11 +3981,11 @@
       "month": "2026-10",
       "status": "validated",
       "source": {
-        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_01102026.csv",
-        "observation_date": "2026-10-01",
-        "retrieved_at": "2026-10-04T17:25:48.391777+00:00",
-        "sha256": "b79b5e5c401578b41b44f7bad032e4865a3cd9aa7475a527766c06d134d3b85d",
-        "bytes": 17852,
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_05102026.csv",
+        "observation_date": "2026-10-05",
+        "retrieved_at": "2026-10-05T14:32:50.780314+00:00",
+        "sha256": "92fe5a8a40a550287af4c11472bf8e98027277b36a927304dd7b041cc6e0e54a",
+        "bytes": 15599,
         "content_type": "text/csv",
         "exact_target_names": [
           "Nifty 50",
@@ -4008,55 +4008,19 @@
         {
           "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_05102026.csv",
           "requested_date": "2026-10-05",
-          "retrieved_at": "2026-10-05T05:44:10.041195+00:00",
-          "http_status": 404,
-          "content_type": "text/html;charset=UTF-8",
-          "sha256": "655de6d7708ba4aa5b5f7cc491daca307d79151aa1f586af1f3e149b055d01b3",
-          "outcome": "archive_not_found"
-        },
-        {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_04102026.csv",
-          "requested_date": "2026-10-04",
-          "retrieved_at": "2026-10-05T05:44:10.547883+00:00",
-          "http_status": 404,
-          "content_type": "text/html;charset=UTF-8",
-          "sha256": "655de6d7708ba4aa5b5f7cc491daca307d79151aa1f586af1f3e149b055d01b3",
-          "outcome": "archive_not_found"
-        },
-        {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_03102026.csv",
-          "requested_date": "2026-10-03",
-          "retrieved_at": "2026-10-05T05:44:10.865335+00:00",
-          "http_status": 404,
-          "content_type": "text/html;charset=UTF-8",
-          "sha256": "655de6d7708ba4aa5b5f7cc491daca307d79151aa1f586af1f3e149b055d01b3",
-          "outcome": "archive_not_found"
-        },
-        {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_02102026.csv",
-          "requested_date": "2026-10-02",
-          "retrieved_at": "2026-10-05T05:44:11.222613+00:00",
-          "http_status": 404,
-          "content_type": "text/html;charset=UTF-8",
-          "sha256": "655de6d7708ba4aa5b5f7cc491daca307d79151aa1f586af1f3e149b055d01b3",
-          "outcome": "archive_not_found"
-        },
-        {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_01102026.csv",
-          "requested_date": "2026-10-01",
-          "retrieved_at": "2026-10-05T05:44:11.512071+00:00",
+          "retrieved_at": "2026-10-05T14:32:50.780314+00:00",
           "http_status": 200,
           "content_type": "text/csv",
-          "sha256": "b79b5e5c401578b41b44f7bad032e4865a3cd9aa7475a527766c06d134d3b85d",
+          "sha256": "92fe5a8a40a550287af4c11472bf8e98027277b36a927304dd7b041cc6e0e54a",
           "outcome": "validated_csv"
         }
       ]
     }
   ],
   "outputs": {
-    "monthly.csv": "5ff51179584db0581ab22dc7080c4b7e28c5a2f684c16bf2672af4674ad11844",
-    "extracted.csv": "2df3dc8a8ba594406a16d2d1badc8c09fd7f282fc278b1ba0333be777a408829",
+    "monthly.csv": "fd230bbf07494d68d45a0e457e0cab7f7f1ab7a7c760b0474731e9fd0e384abc",
+    "extracted.csv": "2953843ae0b1d9150417b4f45174f317a8165717721a4802bdea1bee42c37ba0",
     "coverage.csv": "9649b739f20c2aa4afc2fdab23a971c1bc07c90e218efa0b309aae7c7967d2c9",
-    "metric_details.json": "e9c9caeefe4d54ba8d45aee2cacfd1f4fcaa35fe77deb8e49a24c470d51ddc12"
+    "metric_details.json": "a3008b61540542fc7bdf1a406002b78999cdc5d737442bae7d7e7a523109620a"
   }
 }

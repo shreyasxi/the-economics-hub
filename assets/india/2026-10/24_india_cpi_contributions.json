@@ -1,0 +1,114 @@
+{
+  "design": "line",
+  "latest": {
+    "allowed_general_residual": "0.01927896664738770001927896664738770001928",
+    "allowed_published_residual": "0.03415099257500061167300311577353533958547",
+    "buckets": {
+      "Food": "2.093800446237674175824175824175824175824",
+      "Health & Education": "0.2071036626516155176402544823597455176403",
+      "Household & Apparel": "0.3490351550154211027568922305764411027569",
+      "Housing & Utilities": "0.4512349877010695006747638326585695006748",
+      "Other Consumption": "1.321847153022159365721997300944669365722",
+      "Transport": "0.3951213457169941237709658762290341237710"
+    },
+    "comparison_month": "2025-08",
+    "contribution_total": "4.818142750344933786389049546944283786389",
+    "divisions": {
+      "01": {
+        "contribution_pp": "2.093800446237674175824175824175824175824",
+        "division": "Food and beverages",
+        "index_t": "110.37",
+        "index_t12": "104.46",
+        "weight_percent": "36.7531063101009000"
+      },
+      "02": {
+        "contribution_pp": "0.1403376524202034518989782147676884518990",
+        "division": "Paan, tobacco and intoxicants",
+        "index_t": "108.44",
+        "index_t12": "103.57",
+        "weight_percent": "2.9894513474480300"
+      },
+      "03": {
+        "contribution_pp": "0.2301270650918753769037979564295353769038",
+        "division": "Clothing and footwear",
+        "index_t": "108.94",
+        "index_t12": "105.20",
+        "weight_percent": "6.3832571477623400"
+      },
+      "04": {
+        "contribution_pp": "0.4512349877010695006747638326585695006748",
+        "division": "Housing, water, electricity, gas and other fuels",
+        "index_t": "104.16",
+        "index_t12": "101.51",
+        "weight_percent": "17.6645726883430000"
+      },
+      "05": {
+        "contribution_pp": "0.1189080899235457258530942741469057258531",
+        "division": "Furnishings, household equipment and routine household maintenance",
+        "index_t": "105.65",
+        "index_t12": "102.89",
+        "weight_percent": "4.4693932060393600"
+      },
+      "06": {
+        "contribution_pp": "0.08114867386506069982648930017351069982649",
+        "division": "Health",
+        "index_t": "104.99",
+        "index_t12": "103.61",
+        "weight_percent": "6.1002633527256500"
+      },
+      "07": {
+        "contribution_pp": "0.3951213457169941237709658762290341237710",
+        "division": "Transport",
+        "index_t": "105.90",
+        "index_t12": "101.24",
+        "weight_percent": "8.7961133915624400"
+      },
+      "08": {
+        "contribution_pp": "0.07271762483248838827838827838827838827839",
+        "division": "Information and communication",
+        "index_t": "105.71",
+        "index_t12": "103.62",
+        "weight_percent": "3.6094384689580600"
+      },
+      "09": {
+        "contribution_pp": "0.02615489153127606612685560053981106612686",
+        "division": "Recreation, sport and culture",
+        "index_t": "105.03",
+        "index_t12": "103.24",
+        "weight_percent": "1.5158147751142900"
+      },
+      "10": {
+        "contribution_pp": "0.1259549887865548178137651821862348178138",
+        "division": "Education services",
+        "index_t": "108.91",
+        "index_t12": "104.99",
+        "weight_percent": "3.3333088103870400"
+      },
+      "11": {
+        "contribution_pp": "0.2833162589073560690187005976479660690187",
+        "division": "Restaurants and accommodation services",
+        "index_t": "113.61",
+        "index_t12": "104.83",
+        "weight_percent": "3.3475203529668700"
+      },
+      "13": {
+        "contribution_pp": "0.7993207253308353903990746096009253903991",
+        "division": "Personal care, social protection and miscellaneous goods and services",
+        "index_t": "124.92",
+        "index_t12": "108.46",
+        "weight_percent": "5.0377601485917900"
+      }
+    },
+    "headline_from_general": "4.819741661846925004819741661846925004800",
+    "headline_index": "108.74",
+    "headline_index_t12": "103.74",
+    "month": "2026-08",
+    "published_headline": "4.82",
+    "residual_general": "-0.001598911501991218430692114902641218411",
+    "residual_published": "-0.001857249655066213610950453055716213611"
+  },
+  "run_id": "429d7b392f2c44d9ae3c883518b9adf4",
+  "source": "https://api.mospi.gov.in/api/cpi/getCPIData",
+  "source_month": "2026-08",
+  "source_retrieval": "012c2cecebc04ecfa0aa86f8e59f37a4"
+}
