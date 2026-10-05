@@ -1,7 +1,10 @@
 {
-  "status": "failed_chart_must_be_omitted",
+  "status": "ready",
   "requested_cutoff": "2026-10-05",
-  "started_at": "2026-10-05T05:18:53.385103+00:00",
-  "error": "[Errno 2] No such file or directory: '/home/runner/work/the-economics-hub/the-economics-hub/data/nse_valuations/update-bcrn__o_/runs/ad1ce49ffc8d43f1a5848a8534fa43068f854d79419de2c445900ebcd05cd3d7.json' -> '/home/runner/work/the-economics-hub/the-economics-hub/data/nse_valuations/runs/ad1ce49ffc8d43f1a5848a8534fa43068f854d79419de2c445900ebcd05cd3d7.json'",
-  "finished_at": "2026-10-05T05:18:55.924123+00:00"
+  "started_at": "2026-10-05T05:44:09.861611+00:00",
+  "observation_date": "2026-10-01",
+  "finalized_months": [],
+  "current_sha256": "3a1d0ca39d4e1f96a475e0b887357dc0527624c210364faa1d1dca9979ee5c0e",
+  "monthly_sha256": "5ff51179584db0581ab22dc7080c4b7e28c5a2f684c16bf2672af4674ad11844",
+  "finished_at": "2026-10-05T05:44:12.288346+00:00"
 }
