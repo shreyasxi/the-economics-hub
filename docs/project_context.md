@@ -55,6 +55,8 @@ only after commit/push and a successful GitHub Actions run. Source code and work
   Accept validated newer revisions and recalculate affected growth/contributions. Archive previous observations,
   source bytes and revision differences. Changed methodology text/base/schema/units or inconsistent levels fail
   before observation writes and require review. Do not pin a yearly workbook as the production discovery path.
+- **SQLite:** database-manager operations commit/roll back and explicitly close connections. A connection
+  context alone does not close SQLite; delayed WAL checkpoints can invalidate dry-run byte checks.
 - **IIP:** General, base 2022–23, published `growth_rate` (% YoY), continuous history from Apr 2023. Official
   observations live in `india_iip_monthly`; legacy values remain separately archived and are never spliced.
   `--iip` writes a separate emergency table; rendering needs `IIP_MANUAL_FALLBACK=true`. Despite its name,

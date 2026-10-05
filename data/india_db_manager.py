@@ -13,8 +13,9 @@ Pattern mirrors rbi_sentinel/db/manager.py.
 import json
 import logging
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional
+from typing import Iterator, Optional
 
 import pandas as pd
 
@@ -84,12 +85,22 @@ CREATE INDEX IF NOT EXISTS idx_weekly_date   ON india_weekly(week_ending);
 
 # ── Connection ─────────────────────────────────────────────────────────────────
 
-def _connect() -> sqlite3.Connection:
+@contextmanager
+def _connect() -> Iterator[sqlite3.Connection]:
+    """Commit/roll back each operation, then close without waiting for GC.
+
+    sqlite3's connection context manager handles transactions only. Leaving a
+    WAL writer open can defer its checkpoint until an unrelated read/dry run.
+    """
     conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    try:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        with conn:
+            yield conn
+    finally:
+        conn.close()
 
 
 # Columns added after the table was first created. CREATE TABLE IF NOT EXISTS

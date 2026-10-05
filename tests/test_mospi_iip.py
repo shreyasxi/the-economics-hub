@@ -125,6 +125,24 @@ class IipTests(unittest.TestCase):
             self.assertIsNone(charts.chart_iip(None,self.root))
         self.assertFalse(fp.exists())
 
+    def test_database_initialization_closes_writer_before_dry_run(self):
+        # Retain the connection so garbage-collection timing cannot hide a leak.
+        connections = []
+        connect = sqlite3.connect
+        def retain(*args, **kwargs):
+            conn = connect(*args, **kwargs)
+            connections.append(conn)
+            return conn
+        with patch.object(dbm, 'DB_PATH', self.db), patch.object(dbm.sqlite3, 'connect', side_effect=retain):
+            dbm.init_db()
+        self.assertEqual(len(connections), 1)
+        with self.assertRaises(sqlite3.ProgrammingError):
+            connections[0].execute('SELECT 1')
+        before = self.db.read_bytes()
+        self.fetch(dry_run=True)
+        self.assertEqual(before, self.db.read_bytes())
+        self.assertFalse((self.root / 'IIP').exists())
+
     def test_dry_run_leaves_database_and_archive_untouched(self):
         before=self.db.read_bytes();self.fetch(dry_run=True)
         self.assertEqual(before,self.db.read_bytes());self.assertFalse((self.root/'IIP').exists())
