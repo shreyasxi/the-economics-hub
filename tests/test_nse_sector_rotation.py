@@ -59,6 +59,32 @@ class RotationTests(unittest.TestCase):
                 p=copy.deepcopy(self.payload);p['data'][1][key]=value
                 with self.assertRaises(ValueError): self.data(p)
 
+    def test_intraday_snapshot_accepts_previous_trading_day_and_keeps_weekly_formula(self):
+        p=copy.deepcopy(self.payload)
+        p['timestamp']='05-Oct-2026 11:15'
+        for row in p['data']:
+            row['previousDay']='01-Oct-2026'
+        changes,snapshot=self.load(p)
+        rows,meta=r.validate_snapshot(changes,snapshot)
+        self.assertEqual(meta['observation_date'],'2026-10-05')
+        self.assertEqual(meta['previous_close_date'],'2026-10-01')
+        self.assertEqual(meta['timestamp'],'05-Oct-2026 11:15')
+        for row in rows:
+            self.assertEqual(row['return_pct'],changes[row['index']]['change_pct_1y'])
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(r,'load_rotation_data',return_value=(rows,meta)):
+                path=chart_sector_rotation_12m(Path(directory))
+            self.assertTrue(path.exists())
+            saved=json.loads(path.with_suffix('.json').read_text())
+            self.assertEqual(saved['timestamp'],p['timestamp'])
+
+    def test_future_previous_close_reference_is_rejected(self):
+        p=copy.deepcopy(self.payload)
+        for row in p['data']:
+            row['previousDay']='02-Oct-2026'
+        with self.assertRaisesRegex(ValueError,'Future NSE previous-close'):
+            self.data(p)
+
     def test_missing_benchmark_or_sector_rejected(self):
         for name in ['NIFTY 50','NIFTY IT']:
             p=copy.deepcopy(self.payload);p['data']=[x for x in p['data'] if x['index']!=name]

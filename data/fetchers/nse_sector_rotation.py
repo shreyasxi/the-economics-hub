@@ -16,9 +16,9 @@ INDICES = {
 def validate_snapshot(changes, snapshot):
     """Retain the weekly helper's price-return formula and require all eleven rows.
 
-    allIndices supplies one current timestamp for its snapshot. The published
-    daily reference date on each row must agree too; an intraday/unfinalized or
-    mixed-date snapshot is omitted rather than substituting earlier prices.
+    allIndices supplies the current snapshot timestamp. previousDay describes
+    the previous-close reference, which can precede the snapshot date during
+    trading. Require consistent references without treating them as as-of dates.
     """
     timestamp = datetime.strptime(snapshot['timestamp'], '%d-%b-%Y %H:%M')
     observed = timestamp.date()
@@ -37,12 +37,18 @@ def validate_snapshot(changes, snapshot):
                 raise ValueError(f'Duplicate NSE index: {name}')
             selected[name] = row
     rows = []
+    previous_close_date = None
     for name, label in INDICES.items():
         if name not in selected or name not in changes:
             raise ValueError(f'Missing required NSE index: {name}')
         raw, change = selected[name], changes[name]
-        if datetime.strptime(raw['previousDay'], '%d-%b-%Y').date() != observed:
-            raise ValueError(f'Mixed/unfinalized NSE observation date: {name}')
+        previous_day = datetime.strptime(raw['previousDay'], '%d-%b-%Y').date()
+        if previous_day > observed:
+            raise ValueError(f'Future NSE previous-close date: {name}')
+        if previous_close_date is None:
+            previous_close_date = previous_day
+        elif previous_day != previous_close_date:
+            raise ValueError(f'Mixed NSE previous-close date: {name}')
         if raw['date365dAgo'] != reference:
             raise ValueError(f'Mixed NSE one-year reference date: {name}')
         for key in ('last', 'year_ago'):
@@ -58,6 +64,7 @@ def validate_snapshot(changes, snapshot):
     rows = rows[:1] + sorted(rows[1:], key=lambda r: -r['return_pct'])
     return rows, dict(source_url=_NSE_ALL_INDICES_URL, timestamp=snapshot['timestamp'],
                       observation_date=observed.isoformat(),
+                      previous_close_date=previous_close_date.isoformat(),
                       year_ago_date=reference_date.isoformat(),
                       methodology='round((last / oneYearAgoVal - 1) * 100, 2)',
                       return_type='price; dividends excluded')

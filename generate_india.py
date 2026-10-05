@@ -1394,12 +1394,13 @@ def chart_sector_rotation_12m(output_dir):
         print(f"   ⚠ WARNING: NIFTY Sector Rotation omitted — {exc}")
         return None
     observed = datetime.strptime(metadata["observation_date"], "%Y-%m-%d")
+    snapshot_time = datetime.strptime(metadata["timestamp"], "%d-%b-%Y %H:%M")
     fig = render_change_bars(
         [r["label"] for r in rows], [r["return_pct"] for r in rows],
         "NIFTY Sector Rotation — Trailing 12 Months",
-        f"Price return over the past year, not total return · {observed:%d %b %Y}",
+        "Price return over the past year, not total return",
         "NSE (allIndices, price indices)", size=(EconStyle.SIZE_WIDE[0], 5.1),
-        benchmark="NIFTY 50", source_date=f"{observed:%d %b %Y}", bottom_margin=.09,
+        benchmark="NIFTY 50", source_date=f"Snapshot {snapshot_time:%d %b %Y %H:%M} IST", bottom_margin=.09,
     )
     EconStyle.save_chart(fig, fp)
     metadata["rows"] = rows
