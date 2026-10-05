@@ -1,6 +1,7 @@
 """Verified HTTPS requests with a narrowly scoped MoSPI legacy-server retry."""
 import logging
 import ssl
+import time
 from urllib.parse import urlsplit
 
 import requests
@@ -31,7 +32,7 @@ class MospiAPIAdapter(HTTPAdapter):
         return super().proxy_manager_for(proxy, **kwargs)
 
 
-def get(session, url, **kwargs):
+def _get_once(session, url, **kwargs):
     """Retry only the known MoSPI legacy-handshake error, once, on that host."""
     try:
         return session.get(url, **kwargs)
@@ -45,3 +46,40 @@ def get(session, url, **kwargs):
                     'certificate verification remains enabled')
         session.mount(API_PREFIX, MospiAPIAdapter())
         return session.get(url, **kwargs)
+
+
+RETRY_STATUSES = {429, 500, 502, 503, 504}
+RETRY_DELAYS = (2, 4, 8)
+
+
+def get(session, url, **kwargs):
+    """Retry transient official MoSPI GET failures without weakening validation.
+
+    At most four HTTP attempts; certificate errors and other hosts fail without
+    backoff. Return the final HTTP response so callers retain normal status and
+    payload checks. No cached source or substitute series is introduced.
+    """
+    parsed = urlsplit(url)
+    official = (parsed.scheme == 'https' and parsed.hostname in
+                ('api.mospi.gov.in', 'www.mospi.gov.in', 'mospi.gov.in')
+                and parsed.port in (None, 443))
+    if not official:
+        return _get_once(session, url, **kwargs)
+    for attempt in range(len(RETRY_DELAYS) + 1):
+        try:
+            response = _get_once(session, url, **kwargs)
+        except requests.exceptions.SSLError:
+            raise  # Only the narrowly scoped compatibility path may retry TLS.
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+            if attempt == len(RETRY_DELAYS):
+                raise
+            reason = type(exc).__name__
+        else:
+            if getattr(response, 'status_code', None) not in RETRY_STATUSES or attempt == len(RETRY_DELAYS):
+                return response
+            reason = 'HTTP ' + str(response.status_code)
+            response.close()
+        delay = RETRY_DELAYS[attempt]
+        LOG.warning('MoSPI %s for %s; retry %d/%d in %ds',
+                    reason, url, attempt + 1, len(RETRY_DELAYS), delay)
+        time.sleep(delay)

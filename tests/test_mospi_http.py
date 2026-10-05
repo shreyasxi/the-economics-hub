@@ -1,7 +1,7 @@
 """MoSPI TLS compatibility is host-specific and preserves certificate checks."""
 import ssl
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import requests
 from data.fetchers import mospi_http as http
@@ -52,6 +52,57 @@ class MospiHTTPTests(unittest.TestCase):
         with self.assertRaisesRegex(requests.exceptions.SSLError, 'still failed'):
             http.get(session, http.API_PREFIX)
         self.assertEqual(session.get.call_count, 2)
+
+
+    @patch.object(http.time, 'sleep')
+    def test_gateway_failure_retries_then_returns_success(self, sleep):
+        session = Mock()
+        failed = Mock(status_code=502)
+        recovered = Mock(status_code=200)
+        session.get.side_effect = [failed, recovered]
+        self.assertIs(http.get(session, http.API_PREFIX+'catalogue', params={'page': 1}, timeout=15), recovered)
+        self.assertEqual(session.get.call_count, 2)
+        self.assertEqual(session.get.call_args_list[0], session.get.call_args_list[1])
+        failed.close.assert_called_once()
+        sleep.assert_called_once_with(2)
+
+    @patch.object(http.time, 'sleep')
+    def test_persistent_server_failure_is_bounded_and_still_fails_status_check(self, sleep):
+        session = Mock()
+        failed = requests.Response()
+        failed.status_code = 500
+        failed._content = b'official server error'
+        failed._content_consumed = True
+        session.get.return_value = failed
+        response = http.get(session, http.API_PREFIX+'iip')
+        with self.assertRaises(requests.HTTPError):
+            response.raise_for_status()
+        self.assertEqual(session.get.call_count, 4)
+        self.assertEqual([c.args[0] for c in sleep.call_args_list], [2, 4, 8])
+
+    @patch.object(http.time, 'sleep')
+    def test_connection_timeout_is_retried_but_certificate_failure_is_not(self, sleep):
+        session = Mock()
+        recovered = Mock(status_code=200)
+        session.get.side_effect = [requests.Timeout('slow'), recovered]
+        self.assertIs(http.get(session, http.API_PREFIX+'iip'), recovered)
+        self.assertEqual(session.get.call_count, 2)
+        session.get.reset_mock()
+        session.get.side_effect = requests.exceptions.SSLError('CERTIFICATE_VERIFY_FAILED')
+        with self.assertRaises(requests.exceptions.SSLError):
+            http.get(session, http.API_PREFIX+'iip')
+        session.get.assert_called_once()
+
+    @patch.object(http.time, 'sleep')
+    def test_permanent_status_and_unrelated_host_do_not_retry(self, sleep):
+        for url, status in [(http.API_PREFIX+'iip', 404), ('https://other.example/', 502),
+                            ('https://api.mospi.gov.in.evil.example/', 500)]:
+            session = Mock()
+            response = Mock(status_code=status)
+            session.get.return_value = response
+            self.assertIs(http.get(session, url), response)
+            session.get.assert_called_once()
+        sleep.assert_not_called()
 
 
 if __name__ == '__main__':

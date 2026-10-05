@@ -73,6 +73,9 @@ only after commit/push and a successful GitHub Actions run. Source code and work
   are checksum dependencies of the production updater. Rotation uses the official snapshot timestamp as its
   observation date; `previousDay` is a previous-close reference. Require all sectors and NIFTY 50, consistent
   references, finite prices and freshness; returns exclude dividends. Retain its provenance JSON with the PNG.
+- **MoSPI transport:** verified HTTPS GETs retry transient HTTP 429/500/502/503/504 and connection/timeouts
+  up to four attempts with 2/4/8-second backoff. The host-scoped legacy TLS adapter keeps certificate checks
+  enabled. Persistent errors still fail validation; retries do not authorize stale or substitute data.
 - **Failure behavior:** optional source failures leave independent charts usable, but failed/pending status or
   per-source workflow gates omit affected charts. Never silently publish stale optional images from an earlier
   run; preserve source status, current pointers and raw archives with the code/database changes.
