@@ -1672,6 +1672,13 @@ st.markdown(
     .sig-table .num { text-align: right; }
 
     /* ── What I'm watching: threads ── */
+    /* Default frame for every current and future watching chart; preserves size and gaps. */
+    [class*="st-key-ehwatch-"] [data-testid="stImageContainer"] { position: relative; }
+    [class*="st-key-ehwatch-"] [data-testid="stImageContainer"]::after {
+        content: ""; position: absolute; inset: 0;
+        border: 1.5px solid #292929; pointer-events: none;
+    }
+    [class*="st-key-ehwatch-"] [data-testid="stImageContainer"] img { border-radius: 0; }
     .wt { margin: 3.6rem 0 0 0; }
     .wt-head { font-family: 'Inter', -apple-system, sans-serif; margin: 2.3rem 0 1.2rem 0; }
     .wt-title {
@@ -1687,45 +1694,7 @@ st.markdown(
         font-size: 0.72rem; line-height: 1.35; color: var(--an-muted);
     }
     .wt-cap-src { font-weight: 600; color: var(--an-text); }
-    .wt-cap-meta a {
-        display: inline-flex; align-items: center; font-weight: 600;
-        color: var(--an-link) !important; text-decoration: none !important;
-    }
-    .wt-cap-meta a:hover { text-decoration: underline !important; text-underline-offset: 3px; }
     .wt-cap-note { font-size: 0.84rem; line-height: 1.55; color: var(--an-text); margin-top: 0.35rem; }
-    /* Three to a row on a desktop: five links then fall three and two, where
-       four to a row left the fifth on a line of its own. */
-    .wt-links {
-        list-style: none; margin: 1.2rem 0 0 0 !important; padding: 0 !important;
-        display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 2.4rem;
-        font-family: 'Inter', -apple-system, sans-serif;
-    }
-    .wt-link { margin: 0 !important; padding: 0 !important; border-top: 1px solid var(--an-rule); }
-    .wt-link::marker { content: ""; }
-    a.wt-link-a {
-        display: block; padding: 0.85rem 0 1rem 0;
-        color: inherit !important; text-decoration: none !important;
-    }
-    a.wt-link-a:focus-visible { outline: 2px solid var(--an-link); outline-offset: 3px; border-radius: 2px; }
-    .wt-link-meta {
-        display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem 0.55rem;
-        font-size: 0.71rem; line-height: 1.3; color: var(--an-muted); font-variant-numeric: tabular-nums;
-    }
-    .wt-link-src { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; color: var(--an-text); }
-    .wt-link-src .nh-lock { width: 9px; height: 10px; color: var(--an-faint); flex: none; }
-    .wt-link-title {
-        display: block; margin-top: 0.4rem;
-        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 1.1rem; font-weight: 560; line-height: 1.28; letter-spacing: -0.005em;
-        color: var(--an-ink); text-wrap: balance; transition: color 0.15s ease;
-    }
-    .wt-link-note { display: block; margin-top: 0.3rem; font-size: 0.8rem; line-height: 1.5; color: var(--an-text); }
-    a.wt-link-a:hover .wt-link-title { color: #0F3563; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.17em; }
-    a.wt-link-a:hover .nh-ext { color: var(--an-link); transform: translate(1.5px, -1.5px); }
-    .wt-mine {
-        padding: 0.1rem 0.38rem; border-radius: 3px; background: var(--an-ink);
-        font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #FFFFFF;
-    }
     .wt-head.is-later { margin-top: 3rem; padding-top: 2.2rem; border-top: 1px solid var(--an-rule); }
 
     /* ── From the newsletter: the essay shelf ── */
@@ -1775,7 +1744,6 @@ st.markdown(
     }
     @media (max-width: 1180px) {
         .es-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .wt-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .sig-cols, .sig-row { grid-template-columns: 1.6rem minmax(0, 1.4fr) 7.4rem minmax(8rem, 1fr) 4rem minmax(0, 1fr); column-gap: 0.9rem; }
         .sig-scale .sig-dir { display: none; }
     }
@@ -1799,7 +1767,6 @@ st.markdown(
         .sig-since { grid-area: since; text-align: right; align-self: end; font-size: 0.74rem; }
         .sig-bar { grid-area: bar; }
         .wt-title { font-size: 1.42rem; }
-        .wt-links { grid-template-columns: minmax(0, 1fr); }
         .es-grid { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
         a.es-card { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); column-gap: 0.9rem; align-items: start; }
         .es-cover { grid-row: 1 / span 3; aspect-ratio: 4 / 3; }
@@ -3523,6 +3490,13 @@ def page_india() -> None:
                 "Growth, prices, money, trade, capital flows and public finances, from RBI, MoSPI, "
                 "NSDL and CAG data. Charts reflect the latest data committed to the repository.",
                 "Edition", datetime.strptime(date_label, "%Y-%m").strftime("%B %Y"),
+                nav=[(title, _anchor("india", title)) for title in (
+                    "Growth & Activity",
+                    "Equity Markets",
+                    "Inflation & Monetary Conditions",
+                    "External Sector",
+                    "Public Finances",
+                )],
             ),
             unsafe_allow_html=True,
         )
@@ -3569,7 +3543,7 @@ def page_india() -> None:
         ]
 
         if activity:
-            _section("Growth & Activity")
+            _section("Growth & Activity", anchor=_anchor("india", "Growth & Activity"))
 
             # Row 1: high-frequency activity
             # Row 2: realised growth and structural investment
@@ -3619,7 +3593,7 @@ def page_india() -> None:
         )
 
         if equity_markets:
-            _section("Equity Markets")
+            _section("Equity Markets", anchor=_anchor("india", "Equity Markets"))
             _render_grid(equity_markets, cols=2)
 
         # 3. Prices & Monetary Conditions
@@ -3642,16 +3616,17 @@ def page_india() -> None:
         ]
 
         if prices_monetary:
-            _section("Inflation & Monetary Conditions")
+            _section("Inflation & Monetary Conditions", anchor=_anchor("india", "Inflation & Monetary Conditions"))
 
-            # Prices first, then credit and monetary transmission
+            # Explicit first-row pair, then credit and monetary transmission.
             prices_monetary = sorted(
                 prices_monetary,
                 key=lambda c: (
-                    0 if any(k in c.name for k in ("inflation", "cpi", "wpi")) else
-                    1 if "credit_deposit" in c.name else
-                    2 if "rate_transmission" in c.name else
-                    3
+                    0 if "india_inflation_bar" in c.name else
+                    1 if "india_cpi_contributions" in c.name else
+                    2 if "credit_deposit" in c.name else
+                    3 if "rate_transmission" in c.name else
+                    4
                 )
             )
 
@@ -3666,7 +3641,7 @@ def page_india() -> None:
         charts = [c for c in charts if c not in external]
 
         if external:
-            _section("External Sector")
+            _section("External Sector", anchor=_anchor("india", "External Sector"))
             _render_grid(external)
 
         # 5. Fiscal Policy & Public Finances
@@ -3674,7 +3649,7 @@ def page_india() -> None:
         fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
         charts = [c for c in charts if c not in fiscal]
         if fiscal:
-            _section("Fiscal Policy & Public Finances")
+            _section("Fiscal Policy & Public Finances", anchor=_anchor("india", "Public Finances"))
             _render_grid(fiscal)
 
         # Catch-all
@@ -4398,29 +4373,8 @@ def _thread_caption_html(chart: dict) -> str:
     return f'<div class="wt-cap">{title}{meta}{note}</div>'
 
 
-def _thread_links_html(links: list[dict]) -> str:
-    items = []
-    for link in links:
-        url = _safe_url(link.get("url"))
-        if not url:
-            continue
-        when = date.fromisoformat(link["date"])
-        mine = '<span class="wt-mine">My essay</span>' if link.get("mine") else ""
-        lock = _NH_LOCK if link.get("paywall") else ""
-        note = f'<span class="wt-link-note">{_esc(link["note"])}</span>' if link.get("note") else ""
-        items.append(
-            '<li class="wt-link">'
-            f'<a class="wt-link-a" href="{url}" target="_blank" rel="noopener">'
-            f'<span class="wt-link-meta">{mine}<span class="wt-link-src">{_esc(link["source"])}{lock}</span>'
-            f'<span class="an-dot"></span><span>{when.day} {when:%b %Y}</span></span>'
-            f'<span class="wt-link-title">{_esc(link["title"])}{_NH_ARROW}</span>{note}'
-            '</a></li>'
-        )
-    return f'<ul class="wt-links">{"".join(items)}</ul>' if items else ""
-
-
 def _render_thread(thread: dict, number: int) -> None:
-    """One thread: its title and why, its charts two to a row, then its reading."""
+    """One chart-only thread: its title and why, then its charts two to a row."""
     with st.container(key=f"ehwatch-{number}"):
         st.markdown(_thread_head_html(thread, number), unsafe_allow_html=True)
         shown = []
@@ -4438,9 +4392,6 @@ def _render_thread(thread: dict, number: int) -> None:
                 with column:
                     st.image(str(path), use_container_width=True)
                     st.markdown(caption, unsafe_allow_html=True)
-        links = _thread_links_html(thread.get("links", []))
-        if links:
-            st.markdown(links, unsafe_allow_html=True)
 
 
 @st.cache_data(ttl=3 * 60 * 60, show_spinner=False)

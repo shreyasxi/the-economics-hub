@@ -3,7 +3,7 @@ Analysis page: the essay shelf, the Substack readers, and the hand-written confi
 
 The shelf must never show a gap: pinned essays in the owner's order, led by a
 new post only while it is recent. The config checks catch a thread chart that
-was renamed away, a saved image that is missing, or a link that is not a link.
+was renamed away, a saved image that is missing, or article data added to a thread.
 
 Run:  python tests/test_analysis.py      (or: python -m pytest tests/test_analysis.py -q)
 """
@@ -97,17 +97,16 @@ def test_reading_time():
     assert reading_minutes(5296) == 22 and reading_minutes(100) == 1 and reading_minutes(None) is None
 
 
-THREAD_KEYS = {"theme", "why", "charts", "links"}
+THREAD_KEYS = {"theme", "why", "charts"}  # watching threads are chart-only
 DASHBOARD_CHART_KEYS = {"dashboard", "note"}
 SAVED_CHART_KEYS = {"image", "title", "source", "note"}      # the source is named, not linked
-LINK_KEYS = {"title", "source", "url", "date", "note", "paywall", "mine"}
 
 
 def test_every_thread_is_complete():
     assert analysis.WATCHING, "no threads"
     for thread in analysis.WATCHING:
         assert thread.get("theme"), f"a thread has no theme: {thread}"
-        # A misspelt field ("paywal", "tittle") is not an error in Python; the
+        # A misspelt field ("tittle") is not an error in Python; the
         # page would just leave it out. Name it here instead.
         assert set(thread) <= THREAD_KEYS, f"{thread['theme']}: unknown field {sorted(set(thread) - THREAD_KEYS)}"
         for chart in thread.get("charts", []):
@@ -117,11 +116,6 @@ def test_every_thread_is_complete():
                 continue
             assert (ROOT / "assets" / chart["image"]).exists(), f"missing saved chart: {chart['image']}"
             assert chart.get("source"), f"{thread['theme']}: a saved chart names no source: {chart['image']}"
-        for link in thread.get("links", []):
-            assert set(link) <= LINK_KEYS, f"{thread['theme']}: unknown link field {sorted(set(link) - LINK_KEYS)}"
-            assert link["url"].startswith("https://"), link
-            assert link["title"] and link["source"], link
-            date.fromisoformat(link["date"])
 
 
 def test_thread_dashboard_charts_exist():

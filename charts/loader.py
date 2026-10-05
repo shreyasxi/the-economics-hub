@@ -2,11 +2,10 @@
 Economics Hub — Chart Loader
 Discovers the latest chart folder and returns sorted PNG paths.
 
-Resolution order:
-  1. assets/  — git-tracked, used on Streamlit Cloud and after CI commits
-  2. output/  — local dev fallback (git-ignored but exists on disk)
-
-Both directories are checked so local development works without a CI commit.
+The newest dated edition wins across assets/ and output/. For the same date,
+output/ is authoritative in local development: a generated edition may have
+intentionally omitted a chart after failed source validation. Never fill such
+gaps from older assets. Streamlit Cloud uses assets/ when output/ is absent.
 """
 
 from __future__ import annotations
@@ -51,8 +50,9 @@ def _latest_folder(subdir: str) -> tuple[Path | None, str | None]:
     if not candidates:
         return None, None
 
-    # Lexicographic sort works for both YYYY-MM-DD and YYYY-MM formats
-    latest = sorted(candidates, key=lambda x: x.name)[-1]
+    # Date first, then explicit local-output precedence for matching editions.
+    # This preserves intentional omission gates rather than restoring stale PNGs.
+    latest = max(candidates, key=lambda x: (x.name, x.parent.parent.name == 'output'))
     return latest, latest.name
 
 
@@ -209,6 +209,7 @@ _TITLE_OVERRIDES = {
     "india_gva_contributions":    "What Is Driving India’s Growth?",
     "india_fiscal_deficit_gdp":  "India's Fiscal Deficit, % of GDP",
     "india_inflation_bar":       "India Inflation",
+    "india_cpi_contributions":   "What’s Driving Indian Inflation?",
     # World page: "macro_" is a file prefix, and these say more than it does
     "macro_inflation":           "US Inflation Metrics",
     "macro_labour":              "US Labour Market",

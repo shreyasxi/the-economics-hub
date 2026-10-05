@@ -394,6 +394,8 @@ The nearest parallel is mid-2008, another wave of hikes into an oil and food pri
 **How to read this chart:** Bars show trailing-12-month **price returns**, using official NSE allIndices levels from the same observation date. NIFTY 50 is the benchmark row at the top; sectors below it are sorted strongest to weakest. These are price indices, so dividends are excluded.
 
 **Relative leadership:** A sector outperforming NIFTY 50 shows relative leadership; one underperforming it shows relative weakness. A positive absolute return does not necessarily mean outperformance: compare each sector's return with the benchmark, not just with zero.
+
+**Source:** NSE, allIndices (official index levels and 12-month returns) — https://www.nseindia.com/api/allIndices
 """,
 
     "india_sector_valuations": """\
@@ -402,35 +404,47 @@ Each point ranks the current official NSE Indices valuation against that index's
 **Metrics and history:** NIFTY 50, Auto, FMCG, IT and Pharma use P/E from **April 2021 onward**, following NSE's methodology change effective 31 March 2021. Bank, Metal, Realty and Oil & Gas use P/B with up to ten years of available history. Oil & Gas begins **January 2020**, its first available monthly archive in this dataset. The current observation's month is excluded from every reference distribution; missing values stay missing. Rows require at least 60 valid completed monthly observations.
 
 The percentile is the share of valid historical multiples at or below the current multiple. This is a relative historical valuation measure, not a forecast or an automatic buy/sell signal. Source: official NSE Indices daily archives.
+
+**Source:** NSE Indices, Historical Data — https://www.niftyindices.com/reports/historical-data
 """,
 
     "india_risk_appetite": """\
 **How to read this chart:** The official NIFTY Smallcap 250 closing price index divided by the NIFTY 50 closing price index, rebased to 100 on the first matching date shown. A rising line means small caps outperform large caps over that interval. Above 100 means cumulative relative outperformance since the base date; it does not mean momentum is currently rising.
 
 **Method:** Only matching trading dates enter the calculation. No forward-filling, smoothing or constituent reconstruction. These are price indices, excluding dividend reinvestment. Raw official NSE Indices CSV exports, their checksums and source dates are retained separately from the calculated signal. This is a relative-leadership proxy for risk appetite, not market-wide breadth or a pure measure of investor sentiment.
+
+**Source:** NSE Indices, Historical Data — https://www.niftyindices.com/reports/historical-data
 """,
     "india_gross_fixed_capital_formation": """\
 **How to read this chart:** The orange line shows India's annual gross fixed capital formation (GFCF) as a share of GDP — investment in fixed assets such as machinery, buildings and infrastructure. A higher ratio means a larger share of current economic output is being devoted to expanding or replacing the economy's productive capital stock. The dashed line is the long-run average, while the shaded band highlights the mid-2000s investment boom. The series is annual and unsmoothed.
 
 **Practical takeaway:** For a developing economy, the investment rate is an important indicator of future productive capacity, but the level alone is not enough — the productivity and allocation of that investment matter too. India's sharp rise during the mid-2000s was followed by a prolonged decline as the corporate investment cycle weakened and balance-sheet stress constrained private capex. The recent recovery therefore matters: a sustained move above the long-run average would indicate that capital formation is again becoming a stronger engine of growth. Read this alongside credit growth, public capex and the GVA contribution chart to judge whether the investment recovery is broadening through the economy.
+
+**Source:** Global Macro Database, Müller et al. (2025) — https://www.globalmacrodata.com/data
 """,
 
     "india_gva_contributions": """\
 **How to read this chart:** Each stacked bar decomposes India's year-on-year real GVA growth into the contributions made by the official broad-sector groups shown in the legend, measured in percentage points. A larger positive segment means that sector contributed more to overall growth; a negative segment means it pulled growth lower. The black line is headline real GVA growth. Contributions are calculated from constant-price sector GVA levels, so the stacked bars reconcile with the headline rather than being approximated from sector growth rates.
 
 **Practical takeaway:** The composition of growth matters as much as the headline rate. When several sectors contribute positively at the same time, growth is broad-based and generally more resilient; when most of the increase comes from one segment, the headline can look strong while the underlying expansion is narrow. Watch whether the contribution mix is becoming more balanced across successive quarters, and whether weaker sectors begin adding to growth rather than merely becoming less negative. Because this uses the new 2022-23 constant-price national accounts series only, it should be read as a clean view of the current growth cycle rather than a long historical comparison.
+
+**Source:** MoSPI / NSO, eSankhyiki National Accounts and NAS 2026 — https://esankhyiki.mospi.gov.in/macroindicators?product=nas
 """,
 
     "india_pmi": """\
 **How to read this chart:** Manufacturing and services appear in separate panels on the same scale. Each line connects observed monthly PMI readings, with gaps where data is missing; the dot marks the latest reading. Above 50 indicates expansion versus the previous month; below 50 indicates contraction. The end labels show each sector's latest reading; the panel captions give its observation month and change from the immediately preceding month in index points.
 
 **Practical takeaway:** Compare the direction and persistence of the two series. Rising readings indicate a broader balance of firms reporting improvement, not a directly measurable GDP growth rate. A falling PMI above 50 still indicates expansion. Separate panels make sector divergence visible without overlapping lines or smoothing away monthly changes.
+
+**Source:** S&P Global, India Manufacturing and Services PMI — https://www.pmi.spglobal.com/Public/Release/PressReleases
 """,
 
     "india_gst": """\
 **How to read this chart:** Monthly GST (Goods and Services Tax) collections in India, shown as a bar chart with the year-on-year growth rate as a secondary signal. GST is India's broadest indirect tax, covering consumption across most goods and services. Total monthly collections above ₹1.5 lakh crore are considered robust; consistent growth above 10–12% YoY signals healthy nominal consumption. The chart reveals both the level of economic activity and the fiscal health of the central government's revenue mobilisation.
 
 **Practical takeaway:** GST collections are among the most timely indicators of India's economic momentum — they are released on the first day of every month for the prior month, with minimal revision risk. A sustained acceleration in GST collections (3+ months of sequential growth) is a strong leading signal for NIFTY earnings revisions, particularly in consumer discretionary, FMCG, and banking sectors. Seasonality matters significantly: April (start of fiscal year) and October–December (festive season) structurally print higher collections. Strip out seasonal effects and focus on the underlying YoY trend. Weak GST collections also directly constrain the government's fiscal space, limiting the scope for discretionary capex in the second half of the fiscal year.
+
+**Source:** PIB / Ministry of Finance, monthly GST revenue releases — https://pib.gov.in/allRel.aspx
 """,
 
     "india_credit": """\
@@ -453,28 +467,56 @@ The percentile is the share of valid historical multiples at or below the curren
 **Source:** NSDL FPI Net Investment Details (Calendar Year) — https://www.fpi.nsdl.co.in/Reports/Yearwise.aspx?RptType=6
 """,
 
+    "india_cpi_contributions": """\
+**How to read:** Each colored segment is a consumption bucket’s contribution, in percentage points, to headline year-on-year CPI inflation. Positive segments push inflation up; negative segments pull it down. The net stack approximately reconstructs headline inflation. The dark markers show MoSPI’s published headline rate on the same scale. Contributions begin in January 2026 because the CPI 2024 Current series provides the required comparison indices from January 2025.
+
+**Economic purpose:** Contributions combine price changes with basket importance. Very high inflation in a small category can matter less for households’ overall inflation than a moderate rise in a large category. The chart helps distinguish food-driven inflation from housing or transport pressure, and from price increases spread across consumption. “Other Consumption” combines several distinct divisions; a large contribution there should be examined in the underlying division data rather than attributed to a single cause.
+
+**The six buckets:** Food & Beverages contains Food and beverages (01). Housing & Utilities contains Housing, water, electricity, gas and other fuels (04). Transport contains Transport (07). Household & Apparel combines Clothing and footwear (03) with Furnishings, household equipment and routine household maintenance (05). Health & Education combines Health (06) with Education services (10). Other Consumption combines Paan, tobacco and intoxicants (02); Information and communication (08); Recreation, sport and culture (09); Restaurants and accommodation services (11); and Personal care, social protection and miscellaneous goods and services (13). Each of the twelve official divisions appears exactly once.
+
+**Calculation:** MoSPI’s CPI 2024 uses fixed expenditure weights with Young / Modified Laspeyres aggregation. We use the full-precision All India Combined division weights from Annexure 5.3a, printed page 108 of the Expert Group Report, without normalization. With weights expressed in percent, the aggregate index is G_t = Σ[(W_i / 100) × I_i,t]. The contribution formula is:
+
+`contribution_i,t = W_i × (I_i,t − I_i,t−12) / G_t−12`
+
+Here W_i is the official division weight in percent, I is the division index, G is CPI General, t is the observation month and t−12 is the same month one year earlier. The result is in percentage points. This is not simply weight × category inflation: the prior-year effective index share matters. Division contributions are added into the six displayed buckets without chain weighting or rescaling.
+
+**Rounding and validation:** MoSPI calculates with unrounded indices, while API and public indices have two decimal places. The contribution total can therefore differ from published headline inflation by a few thousandths of a percentage point. This chart is an estimated percentage-point decomposition from official published indices. Every month is checked against both 100 × (G_t / G_t−12 − 1) and the published CPI General inflation field. The bound against General-index inflation is 100 × 0.02 / G_t−12, with a tiny numerical epsilon. The published-rate comparison additionally allows the explicit effect of rounding the General-index ratio and 0.005 pp for rounding the published rate. There is no residual bucket or rescaling to force agreement. Missing divisions, duplicate observations, incomplete comparison history or a failed reconciliation omit the chart.
+
+**Source vintage and revisions:** Only All India, Combined, Base 2024, Current-series observations with JSON-null group, class, sub-class and item fields are used. MoSPI may revise provisional observations; the API provides no reliable status, vintage or release-time field. Production refreshes the newest available month and the preceding month, detects changed observations and preserves immutable source responses with retrieval times, queries and checksums. Values represent the current official API vintage retrieved by the collector. Older revisions require an explicit backfill; there is no silent manual or stale-data fallback.
+
+**Official sources:** [CPI API](https://api.mospi.gov.in/api/cpi/getCPIData) · [eSankhyiki CPI catalogue](https://esankhyiki.mospi.gov.in/catalogue-main/catalogue?product=CPI) · [Official weights and CPI 2024 methodology — Expert Group Report](https://www.mospi.gov.in/uploads/documents/documents/1770882257889-Expert_Group_Report_CPI.pdf) · [CPI publication and rounding note](https://www.mospi.gov.in/uploads/release_calendar/1773312227790_Press_Release_of_CPI_February_2026.pdf).
+""",
+
     "india_inflation_bar": """\
 **How to read this chart:** India's inflation landscape shown as a multi-series comparison — CPI Headline, CPI Core (ex-food and energy), and CPI Food. The RBI targets headline CPI within a 4% ± 2% band (i.e. 2–6%), with a preference for sustaining it near 4%. Food inflation, which carries approximately 45% weight in India's CPI basket, is the single largest driver of headline volatility. Core CPI is the RBI's preferred measure of underlying demand-driven inflation.
 
 **Practical takeaway:** The most important signal in this chart is the *spread* between headline and core CPI. When headline significantly exceeds core, the primary driver is food and fuel — supply-side shocks that are typically transitory and outside the RBI's direct control. When core CPI rises toward or above headline, the inflation problem has become demand-driven, requiring tighter monetary policy. For equity investors, core CPI above 5% for two or more consecutive months is the threshold above which RBI rate hikes become more probable than pauses. Food inflation above 8% for a sustained period creates political pressure, triggers government export bans on agricultural commodities, and compresses rural consumption — all structurally negative for FMCG and consumer staples sectors.
+
+**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1; MoSPI, CPI — https://mospi.gov.in/web/cpi
 """,
 
     "india_expenditure_quality": """\
 **How to read this chart:** Central government spending in each month of the financial year, in ₹ lakh crore: capital expenditure in blue and revenue expenditure in red, derived from the year-to-date figures in the Controller General of Accounts' monthly accounts. The badge shows capital expenditure so far as a share of the full-year Budget Estimate. The black line (right axis) is capital expenditure as a share of that month's total spending. March usually shows a jump in revenue spending as departments close the year's accounts.
 
 **Practical takeaway:** A higher capital share means more of each rupee goes into assets such as roads, railways and defence equipment rather than salaries, interest and subsidies, which supports growth beyond the current year. Monthly capex is lumpy, so the pattern across the year matters more than any single month. A badge share well below the part of the year that has passed (a third by July, half by September) points to underspending, which can happen when revenue disappoints and spending is held back to protect the deficit target; weak spending in the first half followed by a rush in the final quarter points to execution delays.
+
+**Source:** Controller General of Accounts, Monthly Accounts — https://cga.nic.in/index.aspx#account-section
 """,
 
     "india_deficit_financing": """\
 **How to read this chart:** How the central government finances its fiscal deficit, from the "sources of financing the deficit" table in the Controller General of Accounts' monthly accounts, in ₹ lakh crore. Each monthly bar is the position for the year to date; the bar on the right is the full-year Budget Estimate. Sources that supply money stack up from zero and those that absorb it stack down, so the black diamond, the fiscal deficit, is what remains after netting the two. Market borrowings are net borrowing through government securities sold in the market. Small savings combine securities issued against small savings with the National Small Savings Fund line; the two can move in opposite directions from month to month, so they are shown together. Other domestic covers state provident funds, special deposits and the table's "Others" line. Cash is the change in the government's cash balance, including surplus cash it has invested, plus any ways and means advances from the RBI: a drawdown helps finance the deficit, while a build-up (below zero) means more was raised than the deficit needed. The badge shows the year-to-date deficit as a share of the Budget's full-year figure.
 
 **Practical takeaway:** Market borrowings finance most of the deficit, so they decide how much government debt the bond market has to absorb. The government usually schedules more than half of its annual bond issuance in the first half of the year, so early on borrowing can run ahead of the deficit and the surplus appears below zero as a cash build-up that is drawn down later. Heavier use of small savings leaves fewer bonds for the market, but these deposits usually cost the government at least as much as market borrowing, because their rates are set with a spread over government bond yields. External financing is small, which keeps the deficit funded almost entirely in rupees and limits currency risk. A ways and means advance, if one appears, means the government briefly ran short of cash.
+
+**Source:** Controller General of Accounts, Monthly Accounts — https://cga.nic.in/index.aspx#account-section
 """,
 
     "india_fiscal_deficit_gdp": """\
 **How to read this chart:** The central government's fiscal deficit (total spending minus receipts other than borrowing) as a share of nominal GDP for each of the last ten financial years. A lighter bar marked with an asterisk is a year still in progress, showing the deficit so far against full-year GDP. The dashed line is the latest year's budget target (for FY26, the medium-term goal of bringing the deficit below 4.5% of GDP) and the dotted line is the 3% target of the Fiscal Responsibility and Budget Management (FRBM) framework.
 
 **Practical takeaway:** The deficit peaked at 9.2% of GDP in FY21, when the pandemic cut revenue and raised spending, and has come down in most years since. A smaller deficit means less government borrowing, which leaves more room in the bond market for other borrowers and eases pressure on long-term rates such as the 10-year government bond yield. Rating agencies and bond investors watch whether stated targets are met, so a miss matters more than the level alone.
+
+**Source:** Controller General of Accounts, Monthly Accounts — https://cga.nic.in/index.aspx#account-section
 """,
 
     # ── INDIA: MONETARY CONDITIONS ───────────────────────────────────────────
@@ -489,12 +531,16 @@ The percentile is the share of valid historical multiples at or below the curren
 **How to read this chart:** Grouped bars showing bank credit growth YoY % and deposit growth YoY % side-by-side each month, with the Credit-Deposit (CD) ratio overlaid as a secondary-axis line. The CD ratio (total credit ÷ total deposits) is the core liquidity health metric for India's banking system: a rising CD ratio means the system is lending more of every deposit rupee, compressing the liquidity buffer.
 
 **Practical takeaway:** India's banking system historically operates with a CD ratio between 70–78%. Sustained CD ratios above 78% signal that deposit mobilisation is lagging credit demand — which has historically preceded RBI calls for banks to raise deposit rates, moderated loan growth, or tighter systemic liquidity. The chart also shows whether credit-deposit divergence is cyclical (temporary growth surge) or structural (persistent deposit shortfall). When deposit growth consistently trails credit growth for 4+ months, watch for RBI governor commentary on deposit mobilisation — this has been a frequent conference theme in 2023–24.
+
+**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1
 """,
 
     "india_rate_transmission": """\
 **How to read this chart:** Each line is the cumulative change, in basis points, since the start of the current policy rate cycle: the RBI's repo rate against the rates banks actually charge and pay. The figures are the RBI's own, from Table IV.3 of the State of the Economy article in each month's Bulletin, and every edition restates the cycle to date — so reading the same row across editions traces how far the policy move has travelled. The external benchmark rate (EBLR) follows the repo mechanically and is left off; what matters is the gap between the repo line and the loan and deposit lines, which is the part of the move that has not reached borrowers and savers. Bank rates are reported with a lag, so the last point is usually two months behind the repo rate.
 
 **Practical takeaway:** Transmission is slow, partial and reversible. In the cycle that began in February 2025, the full repo cut reached the external benchmark immediately, while fresh lending rates moved by roughly two-thirds of it and fresh deposit rates moved further still before giving part of it back — cumulative deposit pass-through peaked and then narrowed as banks competed for funding against strong credit demand. Fresh deposit rates are the most volatile line because they reflect the mix of new business each month, not the whole deposit book; outstanding rates move slowest, since existing loans and deposits reprice only at reset dates. A widening gap between the repo line and the lending lines means policy is working less than the headline rate suggests, and it is the clearest signal that further cuts may be needed to achieve the same effect.
+
+**Source:** RBI Bulletin, State of the Economy, Table IV.3 — https://rbi.org.in/scripts/BS_ViewBulletin.aspx
 """,
 
     # ── INDIA: ECONOMIC ACTIVITY ──────────────────────────────────────────────
@@ -503,6 +549,8 @@ The percentile is the share of valid historical multiples at or below the curren
 **How to read this chart:** India's Index of Industrial Production (IIP) year-on-year percentage change, shown as green/red monthly bars with a 3-month moving average overlay. IIP measures the volume of output across manufacturing (77% weight), mining (14%), and electricity (9%). It is released monthly by MoSPI with a 6-week lag and serves as the official measure of industrial output — the closest India has to a monthly GDP proxy for the real sector.
 
 **Practical takeaway:** IIP is inherently volatile due to base effects and seasonal manufacturing cycles; the 3M MA is more informative than any single month. Sustained IIP above 5–6% YoY is consistent with RBI's 7%+ real GDP growth projections. Cross-reference with PMI: PMI is forward-looking (surveys) while IIP is backward-looking (actual output); when both are elevated simultaneously, India's manufacturing cycle is genuinely strong. IIP weakness below 2% for 3+ consecutive months has historically preceded downward revisions to advance GDP estimates and triggered RBI accommodation discussions.
+
+**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1 (MoSPI industrial production data)
 """,
 
     # ── INDIA: EXTERNAL SECTOR ────────────────────────────────────────────────
@@ -510,13 +558,17 @@ The percentile is the share of valid historical multiples at or below the curren
     "india_forex_reserves": """\
 **How to read this chart:** Dual panel showing India's total foreign exchange reserves in USD billions (area chart, left panel) and the week-on-week change in reserves (diverging bars, right panel). Data sourced from the RBI's weekly statistical supplement, released every Friday for the prior week. India's forex reserves are the RBI's primary instrument for INR management: they buy USD (accumulate reserves) when the INR is appreciating and sell USD (draw down reserves) when the INR is under depreciation pressure.
 
-**Practical takeaway:** Reserves above $600B provide approximately 12 months of import cover — a historically strong buffer that the RBI uses as a communications anchor. The weekly change chart is more actionable: sustained weekly drawdowns of $2–4B over 4+ consecutive weeks almost always indicate active RBI intervention to defend the INR. Sharp single-week drops ($5–8B) typically reflect forward contract settlements or emergency intervention during EM sell-offs (e.g., during US rate hike cycles). Reserve accumulation weeks confirm a period of INR stability or RBI building a buffer ahead of anticipated external volatility.
+**Practical takeaway:** Reserves above \\$600B provide approximately 12 months of import cover — a historically strong buffer that the RBI uses as a communications anchor. The weekly change chart is more actionable: sustained weekly drawdowns of \\$2–4B over 4+ consecutive weeks almost always indicate active RBI intervention to defend the INR. Sharp single-week drops (\\$5–8B) typically reflect forward contract settlements or emergency intervention during EM sell-offs (e.g., during US rate hike cycles). Reserve accumulation weeks confirm a period of INR stability or RBI building a buffer ahead of anticipated external volatility.
+
+**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1 (Weekly Statistical Supplement)
 """,
 
     "india_trade": """\
 **How to read this chart:** Monthly merchandise exports and imports in USD billions shown as grouped bars, with the trade deficit plotted as a secondary-axis line. Data sourced from DGCI&S via RBI DBIE. India is structurally a trade deficit country — imports (primarily crude oil, gold, electronics) consistently exceed exports — making the deficit magnitude a key variable for the current account balance and INR pressure.
 
-**Practical takeaway:** India's merchandise trade deficit typically runs at $20–25B per month under stable conditions. Deficits below $20B signal either weak import demand (slowdown) or strong export performance; deficits above $28–30B signal commodity price surges (crude oil being the dominant driver — every $10/barrel rise in Brent adds approximately $12–14B to India's annual import bill) or gold import spikes. The services trade surplus (software exports, remittances) partially offsets the merchandise deficit but is not captured here — for the full current account picture, note that India's services surplus of ~$150B/year (FY24) structurally cushions the merchandise gap.
+**Practical takeaway:** India's merchandise trade deficit typically runs at \\$20–25B per month under stable conditions. Deficits below \\$20B signal either weak import demand (slowdown) or strong export performance; deficits above \\$28–30B signal commodity price surges (crude oil being the dominant driver — every \\$10/barrel rise in Brent adds approximately \\$12–14B to India's annual import bill) or gold import spikes. The services trade surplus (software exports, remittances) partially offsets the merchandise deficit but is not captured here — for the full current account picture, note that India's services surplus of ~\\$150B/year (FY24) structurally cushions the merchandise gap.
+
+**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1 (DGCI&S merchandise trade data)
 """,
 
     # ── WEEKLY: CRYPTO ASSETS ────────────────────────────────────────────────

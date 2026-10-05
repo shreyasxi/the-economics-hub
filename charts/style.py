@@ -80,6 +80,27 @@ class EconStyle:
         "#e377c2",  # Pink
     ]
 
+    # ─── EDITORIAL CATEGORICAL PALETTE ─────────────────────────────
+    # Muted, medium-saturation colours for multi-category charts.
+    # Intended for stacked bars, decompositions, categorical comparisons, etc.
+    CATEGORICAL_COLORS = [
+        "#3C78E4",  # cobalt blue
+        "#2CB4AC",  # teal
+        "#30B080",  # green
+        "#90A84C",  # olive
+        "#F4C43C",  # gold
+        "#F88030",  # orange
+        "#D48C5C",  # terracotta
+        "#E05458",  # coral
+        "#E478A0",  # rose
+        "#D87CC0",  # magenta
+        "#A070E0",  # violet
+        "#A094E8",  # periwinkle
+    ]
+
+    BAR_EDGE_COLOR = "#2F2F2F"
+    BAR_EDGE_WIDTH = 0.7
+
     # Line palette for the redesigned line charts (World tab). Checked with the
     # dataviz palette validator on white: lightness, chroma, colour-blind
     # separation and contrast pass. Fixed order, never cycled.

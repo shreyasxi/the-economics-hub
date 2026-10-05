@@ -72,14 +72,9 @@ FIELDS = [
           "CPI food & beverages %% YoY (MoSPI, ~12th)"),
     Field("--unemployment", "india_unemployment", "%", 0, 30, "plfs",
           "PLFS unemployment rate %% (MoSPI)"),
-    # IIP is entered by hand rather than parsed from the DBIE workbook. In the
-    # September 2026 vintage RBI switched that column to a basis that matches no
-    # published MoSPI figure (Dec-25 read 147.1 where MoSPI publishes 170.7) and
-    # carried an unexplained 16% step at Jan-2026, which turned every 2026 YoY
-    # into a comparison across a discontinuity. MoSPI states the growth rate
-    # directly in its monthly release, so that number is taken at source.
+    # Current-base MoSPI automation is canonical; this flag is emergency-only.
     Field("--iip", "india_iip_yoy", "% YoY", -30, 30, "mospi",
-          "IIP %% YoY as stated by MoSPI/PIB, e.g. 4.8 (~12th, with CPI)"),
+          "Emergency General IIP %% YoY, 2022-23 base; stored separately, explicit chart opt-in required"),
     # FPI flows are taken from NSDL rather than the RBI workbook: NSDL publishes
     # the month's total within days, RBI's net portfolio series 2–3 months late.
     Field("--fpi", "india_fpi_net_inr_cr", "Rs crore", -300000, 300000, "nsdl",
@@ -231,6 +226,8 @@ def cmd_set(args):
 
     for field in supplied:
         flags[field.column] = f"manual:{field.source}:{stamp}"
+        if field.column in ('india_cpi_yoy','india_food_cpi_yoy'):
+            flags[field.column+':manual_concept'] = ('CPI (General)' if field.column=='india_cpi_yoy' else 'Food and beverages')
 
     if fpi_mtd is not None:
         flags["india_fpi_mtd_inr_cr"] = f"manual:nsdl_mtd:{stamp}"
@@ -254,6 +251,19 @@ def cmd_set(args):
     if args.dry_run:
         print("\n  --dry-run: nothing written.")
         return
+
+    if 'india_iip_yoy' in updates:
+        from data.fetchers.mospi_iip import enter_manual
+        enter_manual(conn, month, updates.pop('india_iip_yoy'))
+        # Manual values never write the official projection or its provenance.
+        flags.pop('india_iip_yoy', None)
+        if existing and existing['source_flags']:
+            old_flags = json.loads(existing['source_flags'])
+            if 'india_iip_yoy' in old_flags:
+                flags['india_iip_yoy'] = old_flags['india_iip_yoy']
+        if not updates:
+            conn.commit()
+            return
 
     cols = list(updates) + ["source_flags", "fetched_at"]
 
@@ -352,7 +362,7 @@ def cmd_show(args):
 def main(argv=None):
     parser = argparse.ArgumentParser(
         prog="python -m data.india_manual_entry",
-        description="Enter the India series that have no API.",
+        description="Enter manual India series or explicitly labelled emergency fallbacks.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Sources and release dates: docs/project_reminders.md",
     )

@@ -14,7 +14,9 @@ workbook explicitly confirm the 2022-23 base. No 2011-12-base observations are u
 Operations: run `python -m data.fetchers.mospi_gva` to refresh the database, or
 `python -m data.fetchers.mospi_gva --dry-run` to validate without writing. The
 existing India fetcher's `--append` invokes this step; chart rendering reads only
-`india_gva_quarterly`. On an inconsistent historical revision, update the official
-history source after inspecting the new release, then rerun; never suppress the
-reconciliation check or fill missing quarters. Contributions are available from
+`india_gva_quarterly`. Normal same-base revisions are accepted automatically after reconciliation, using
+newest historical statement links from the official publication catalogue.
+Previous source bytes/checksums and exact quarter changes are archived in
+`data/gva/`. A changed base/schema/official methodology document requires review;
+never suppress reconciliation or fill missing quarters. Contributions are available from
 FY2023-24 Q1 because earlier quarters lack year-earlier levels in the new series.

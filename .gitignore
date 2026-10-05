@@ -24,7 +24,8 @@ env/
 
 # ── Output (generated charts — don't bloat the repo) ──
 output/
-docs/
+docs/*
+!docs/project_context.md
 
 # ── OS Files ──
 .DS_Store
@@ -53,3 +54,13 @@ data/rbi_soe_cache/
 # Ignore SQLite temp files
 *.db-shm
 *.db-wal
+
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+data/**/*.tmp
+data/**/.update.lock
+data/nse_valuations/start_investigation.json

@@ -1,6 +1,7 @@
 """Benchmarked India rotation and unchanged weekly defaults, using official fixture."""
 import ast
 import copy
+from datetime import date
 import json
 from pathlib import Path
 import tempfile
@@ -19,6 +20,9 @@ FIXTURE = Path(__file__).parent/'fixtures/nse_rotation/allIndices_2026-10-01.jso
 
 class RotationTests(unittest.TestCase):
     def setUp(self):
+        clock = patch.object(r, 'today_ist', return_value=date(2026,10,5))
+        clock.start()
+        self.addCleanup(clock.stop)
         self.payload = json.loads(FIXTURE.read_text())
 
     def load(self, payload=None, include_snapshot=True):
@@ -94,9 +98,9 @@ class RotationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);file=root/'23_india_sector_rotation_12m_benchmark.png'
             file.write_bytes(b'old');file.with_suffix('.json').write_text('{}')
-            with patch.object(r,'fetch_nifty_sector_changes',side_effect=ValueError('Missing NIFTY 50')) as fetch:
+            with patch.object(r,'load_rotation_data',side_effect=ValueError('Missing NIFTY 50')) as fetch:
                 self.assertIsNone(chart_sector_rotation_12m(root))
-            fetch.assert_called_once_with(list(r.INDICES),include_snapshot=True)
+            fetch.assert_called_once_with()
             self.assertFalse(file.exists());self.assertFalse(file.with_suffix('.json').exists())
 
     def test_renderer_pins_benchmark_and_formats_signs(self):
@@ -122,7 +126,7 @@ class RotationTests(unittest.TestCase):
     def test_network_failure_propagates_without_other_source(self):
         with patch('requests.Session') as session:
             session.return_value.get.side_effect=ConnectionError('NSE unavailable')
-            with self.assertRaises(ConnectionError): r.load_rotation_data()
+            with self.assertRaises(ConnectionError): r.fetch_rotation_data()
             self.assertEqual(session.return_value.get.call_count,1)
 
     def test_india_explicit_layout_and_distinct_key(self):

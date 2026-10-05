@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: "0 8 * * 6"
 
-  # Manual trigger — use after updating india_manual.csv / cag_monthly_accounts.xlsx,
+  # Manual trigger — use after updating manual data / cag_monthly_accounts.xlsx,
   # or to force-regenerate charts without a data fetch.
   workflow_dispatch:
     inputs:
@@ -13,16 +13,21 @@ on:
         description: "Set to 'true' to skip data fetch and regenerate charts only"
         required: false
         default: "false"
+      manual_cpi_fallback:
+        description: "Explicit emergency CPI fallback: only concept-labelled manual headline/food pairs"
+        required: false
+        default: "false"
+
+      manual_iip_fallback:
+        description: "Explicit emergency IIP fallback: General / 2022-23-base manual values only"
+        required: false
+        default: "false"
 
 jobs:
-  # ── Job 1: Fetch latest India macro data ──────────────────────────────────
-  # continue-on-error: true — a fetch failure (API downtime, WAF block, jugaad-data
-  # break) must NEVER prevent chart generation. Charts render from last-known-good
-  # DB state. A stale chart with a timestamp is always better than a crashed pipeline.
-  fetch-data:
+  # All source updates and generation share one checkout. Optional source
+  # failures are gated per chart; independent charts still render.
+  generate-charts:
     runs-on: ubuntu-latest
-    continue-on-error: true
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,49 +44,31 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Fetch latest India data
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+      - name: Verify official GVA and IIP contracts
+        id: india-contracts
         env:
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          PYTHONPATH: "."
+        run: |
+          python -m unittest discover -s tests -p 'test_mospi_gva.py'
+          python -m unittest discover -s tests -p 'test_mospi_iip.py'
+
+      - name: Fetch latest India data including official GVA
+        id: india-fetch
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
           PYTHONPATH: "."
         run: python data/fetchers/india_fetcher.py --append
 
-      - name: Commit updated DB
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/india_macro.db
-          git diff --staged --quiet && echo "No DB changes to commit." && exit 0
-          git commit -m "auto: india data fetch $(date -u +%Y-%m-%d)"
-          git push
-
-  # ── Job 2: Generate charts ────────────────────────────────────────────────
-  # if: always() — runs unconditionally, even if fetch-data failed or was skipped.
-  # Reads exclusively from data/india_macro.db (SQLite). If the DB has no new data
-  # after a fetch failure, charts regenerate from the previous state — no crash.
-  generate-charts:
-    runs-on: ubuntu-latest
-    needs: fetch-data
-    if: always()
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 1
-
-      - name: Pull latest DB commit (if fetch-data pushed one)
-        run: git pull --rebase origin main || true
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Refresh official MoSPI General IIP current-base history
+        id: mospi-iip
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.mospi_iip
 
       - name: Verify RBI HTML and PDF parsers
         run: |
@@ -105,11 +92,20 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_nse*.py'
 
       - name: Refresh official NSE risk-appetite indices
+        id: nse-risk
         continue-on-error: true
         timeout-minutes: 10
         env:
           PYTHONPATH: "."
         run: python -m data.fetchers.nse_risk_appetite
+
+      - name: Refresh official NSE sector rotation snapshot
+        id: nse-rotation
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_sector_rotation
 
       # Optional chart: fail this update on bad source data, then omit valuations.
       - name: Refresh official NSE sector valuations
@@ -120,10 +116,46 @@ jobs:
           PYTHONPATH: "."
         run: python -m data.fetchers.nse_valuations.collector --update
 
-      - name: Generate India charts
+      - name: Verify CPI source and contribution pipeline
+        id: cpi-tests
+        continue-on-error: true
         env:
           PYTHONPATH: "."
+        run: |
+          python -m unittest discover -s tests -p 'test_cpi_contributions.py'
+          python -m unittest discover -s tests -p 'test_india_saturday.py'
+
+      - name: Refresh official MoSPI CPI 2024 contributions
+        id: mospi-cpi
+        if: ${{ steps.cpi-tests.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.mospi_cpi --update
+
+      - name: Map official CPI General and Food rates to main chart
+        id: cpi-main
+        if: ${{ steps.mospi-cpi.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.mospi_inflation
+
+      - name: Generate India charts
+        # CPI is optional, but failed refreshes must omit its chart.
+        env:
+          PYTHONPATH: "."
+          GVA_UPDATE_FAILED: ${{ steps.india-fetch.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          IIP_UPDATE_FAILED: ${{ steps.mospi-iip.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          IIP_MANUAL_FALLBACK: ${{ github.event.inputs.manual_iip_fallback == 'true' }}
+          NSE_RISK_UPDATE_FAILED: ${{ steps.nse-risk.outcome != 'success' }}
+          NSE_ROTATION_UPDATE_FAILED: ${{ steps.nse-rotation.outcome != 'success' }}
+          CPI_MAIN_UPDATE_FAILED: ${{ steps.cpi-main.outcome != 'success' }}
+          CPI_MANUAL_FALLBACK: ${{ github.event.inputs.manual_cpi_fallback == 'true' }}
           NSE_VALUATIONS_UPDATE_FAILED: ${{ steps.nse-valuations.outcome != 'success' }}
+          CPI_UPDATE_FAILED: ${{ steps.mospi-cpi.outcome != 'success' }}
         run: python generate_india.py --mode dashboard
 
       # Part 2 of 2: the briefing shown at the top of the tab, written into the
@@ -148,13 +180,25 @@ jobs:
           fi
           echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
           mkdir -p "assets/india/$MONTH_FOLDER"
-          # Remove only the optional valuation artifact when this run omitted it.
+          # Remove omitted optional artifacts before copying this run's output.
+          for NAME in 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
+            if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
+              rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
+            fi
+          done
+          # Remove the optional valuation artifact when this run omitted it.
           if [ ! -f "output/india/$MONTH_FOLDER/22_india_sector_valuations.png" ]; then
             rm -f "assets/india/$MONTH_FOLDER/22_india_sector_valuations.png"
           fi
           # A failed official rotation snapshot must not leave a prior chart published.
-          if [ ! -f "output/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png" ]; then
-            rm -f "assets/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png"
+          rm -f "assets/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png" "assets/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.json"
+          if [ -f "output/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png" ]; then
+            cp "output/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark."{png,json} "assets/india/$MONTH_FOLDER/"
+          fi
+          # Never carry a previous CPI chart into an edition after a failed update.
+          rm -f "assets/india/$MONTH_FOLDER/24_india_cpi_contributions.png" "assets/india/$MONTH_FOLDER/24_india_cpi_contributions.json"
+          if [ -f "output/india/$MONTH_FOLDER/24_india_cpi_contributions.png" ]; then
+            cp "output/india/$MONTH_FOLDER/24_india_cpi_contributions."{png,json} "assets/india/$MONTH_FOLDER/"
           fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
           if [ -f "output/india/$MONTH_FOLDER/soe.json" ]; then
@@ -180,7 +224,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/india/ assets/readme_showcase/ data/rbi_transmission.csv data/nse_indices/ data/nse_valuations/
+          git add -A assets/india/ assets/readme_showcase/ data/rbi_transmission.csv data/nse_indices/ data/nse_valuations/ data/india_macro.db
+          # A skipped optional source may never create its directory.
+          for SOURCE_DIR in data/CPI/contributions data/CPI/main data/nse_rotation data/gva data/IIP; do
+            if [ -d "$SOURCE_DIR" ]; then
+              git add -A "$SOURCE_DIR"
+            fi
+          done
           git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
           git push

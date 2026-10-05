@@ -137,6 +137,30 @@ def upsert_monthly(month: str, data: dict) -> None:
     if not data:
         return
 
+    # FRED remains diagnostic only. Even a future caller cannot turn it into
+    # a silent production fallback or overwrite official/manual headline/food.
+    data = dict(data)
+    flags = json.loads(data.get('source_flags') or '{}')
+    for column in ('india_cpi_yoy','india_food_cpi_yoy'):
+        if str(flags.get(column,'')).startswith('fred'):
+            log.error('REJECTED diagnostic FRED write for %s / %s',month,column)
+            data.pop(column,None)
+            flags.pop(column,None)
+    # Canonical automated IIP cannot be overwritten through the generic layer.
+    with _connect() as conn:
+        has_iip = conn.execute("SELECT 1 FROM sqlite_master WHERE name='india_iip_monthly'").fetchone()
+        official = conn.execute('SELECT growth_rate FROM india_iip_monthly WHERE month=?',(month,)).fetchone() if has_iip else None
+    if official:
+        if 'india_iip_yoy' in data and data['india_iip_yoy'] != official[0]:
+            raise ValueError('Conflicting IIP write: official automated value preserved; use --iip emergency fallback')
+        flags.pop('india_iip_yoy',None)
+    if 'source_flags' in data:
+        with _connect() as conn:
+            row=conn.execute('SELECT source_flags FROM india_monthly WHERE month=?',(month,)).fetchone()
+        previous=json.loads(row[0] or '{}') if row else {}
+        previous.update(flags)
+        data['source_flags']=json.dumps(previous)
+
     cols = list(data.keys())
     placeholders = ", ".join("?" * len(cols))
     update_clause = ", ".join(f"{c}=excluded.{c}" for c in cols)

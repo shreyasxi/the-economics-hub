@@ -5,11 +5,13 @@ India Macro Data Fetcher — ETL pipeline with three sources.
 Writes into data/india_macro.db via india_db_manager.
 
 Sources:
-  1. FRED (fredapi)    — CPI headline, food, core  (OECD series, ~6-week lag)
+  1. MoSPI / NSO      — quarterly GVA; CPI is updated separately before generation
+     FRED helper is diagnostic only and is never called by run_append
   2. jugaad-data       — RBI repo rate (diagnostic); weekly FPI flows from NSE
   3. RBI DBIE Excel    — "50 Macroeconomic Indicators.xlsx" (manual drop required)
                          Parsed from: Monthly, Fortnightly, Weekly sheets
-                         Covers: IIP, Trade, Forex Reserves, Bank Credit, Deposits, M3
+                         Covers: Trade, Forex Reserves, Bank Credit, Deposits, M3
+     General IIP is updated separately by mospi_iip on the official 2022–23 base.
 
 Usage:
   python data/fetchers/india_fetcher.py --append    # fetch latest, upsert to DB
@@ -80,15 +82,9 @@ SENTINEL_DB = _ROOT / "data" / "rbi_sentinel.db"
 DEFAULT_CSV = _ROOT / "data" / "india_manual.csv"
 
 # Column layout of the DBIE Excel (0-indexed, header row = row index 3)
-# NOTE ON IIP (removed from this map, 2026-09)
-# Column 4 is labelled "Index of Industrial Production", but as of the
-# September 2026 DBIE vintage its values match no published MoSPI figure:
-# the workbook reads 147.1 for Dec-2025 where MoSPI publishes 170.7, and the
-# series steps down 16% at Jan-2026 (a transition that is normally ~+2%),
-# making every 2026 year-on-year comparison span a discontinuity.
-# No other column in the workbook carries the official series either.
-# IIP is therefore entered from the MoSPI release instead:
-#     python -m data.india_manual_entry set 2026-02 --iip 4.8
+# IIP deliberately stays out of the RBI map. The separate mospi_iip updater
+# supplies canonical General / 2022–23-base published growth. --iip is an
+# explicitly enabled emergency fallback, never a silent official overwrite.
 _MONTHLY_COLS = {
     "period":     1,
     "net_portfolio": 13,  # Net Portfolio Investment (USD Million) — the monthly FPI chart
@@ -581,14 +577,19 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     """
     Fetch latest data from all sources and upsert into india_macro.db.
 
-      Source 1 (FRED)      — monthly CPI YoY series
+      Source 1 (MoSPI)     — quarterly GVA (official catalogue + workbook)
       Source 2a (jugaad)   — repo rate diagnostic (not written to DB)
       Source 2b (jugaad)   — weekly FPI net flows → india_weekly.fpi_net_flows_usd_bn
       Source 3 (DBIE Excel)— monthly trade, FPI (net portfolio), credit, M3 + weekly forex reserves
     """
     # Quarterly production data is fetched here; chart generation stays offline.
     from data.fetchers.mospi_gva import fetch as fetch_gva
-    fetch_gva(dry_run=dry_run)  # Propagate schema/reconciliation failures.
+    gva_error = None
+    try:
+        fetch_gva(dry_run=dry_run)
+    except Exception as exc:
+        gva_error = exc
+        log.error('GVA UPDATE FAILED; independent monthly/weekly updates continue: %s',exc)
     init_db()
 
     monthly_data: dict[str, dict] = {}
@@ -627,6 +628,8 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
                  get_latest_monthly_date(), get_latest_weekly_date())
     else:
         log.info("[dry-run] Complete — no DB changes made")
+    if gva_error:
+        raise RuntimeError('GVA update failed; GVA chart must be omitted') from gva_error
 
 
 def run_seed(csv_path: Path = DEFAULT_CSV) -> None:
