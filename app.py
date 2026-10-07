@@ -324,6 +324,14 @@ st.markdown(
         margin: 0 0 0.7rem 0; padding-top: 0.6rem;
         border-top: 2px solid #0A1F3D; display: inline-block;
     }
+    .mpc-sources-note {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 0.68rem;
+        color: #6B7380;
+        line-height: 1.4;
+        margin: 0.55rem 0 0 0;
+        text-align: left;
+    }
     .mpc-prov {
         list-style: none; padding: 0; margin: 0;
         display: grid; grid-template-columns: repeat(3, 1fr);
@@ -1429,6 +1437,15 @@ st.markdown(
     /* No phone rule is needed: width: 100% is the smaller of the two on any
        screen narrower than the cap, so a chart still fills a phone. */
 
+    /* RBI analytical charts: frame the image itself, leaving captions and
+       insights outside. Border-box keeps all four edges inside the column. */
+    [class*="st-key-ehcap-"][class*="-rbi-framed-"] [data-testid="stImage"] img {
+        border: 1.5px solid #292929;
+        box-sizing: border-box;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
     /* ── Chart insight expanders ─────────────────────────────────────────
        A quiet toggle under each chart, never a card: the chart is the point
        and the note is one click away. No box and no fill — a hairline rule
@@ -1995,6 +2012,27 @@ def _render_capped(chart_path: Path, cap: str, insight_label: str = "Chart insig
     with st.container(key=f"{cap}-{_chart_slug(chart_path.name)}"):
         _chart_anchor(chart_path)
         st.image(str(chart_path), use_container_width=True)
+        insight = get_insight(chart_path)
+        if insight:
+            with st.expander(insight_label):
+                st.markdown(insight)
+
+
+def _render_rbi_chart(
+    chart_path: Path,
+    cap: str,
+    insight_label: str = "Chart insights",
+    *,
+    show_caption: bool = True,
+) -> None:
+    """RBI-only image frame, external caption and existing chart insights."""
+    with st.container(key=f"{cap}-rbi-framed-{_chart_slug(chart_path.name)}"):
+        _chart_anchor(chart_path)
+        st.image(
+            str(chart_path),
+            caption=_chart_title(chart_path.name) if show_caption else None,
+            use_container_width=True,
+        )
         insight = get_insight(chart_path)
         if insight:
             with st.expander(insight_label):
@@ -3979,10 +4017,24 @@ I would just like to know where it goes.</p>
                             f'&middot; {_doc["word_count"]:,} words</span>'
                             '</li>'
                         )
+                    _available_doc_count = sum(
+                        score is not None for score in _doc_scores.values()
+                    )
+
+                    _cycle_note = ""
+                    if _available_doc_count < 3:
+                        _cycle_note = (
+                            '<p class="mpc-sources-note">'
+                            'Current reading uses available MPC documents with weights re-normalised, '
+                            'preserving the underlying economic weighting logic.'
+                            '</p>'
+                        )
+
                     st.markdown(
                         '<div class="mpc-sources">'
                         '<p class="mpc-sources-label">Source documents</p>'
                         '<ul class="mpc-prov">' + "".join(_rows) + "</ul>"
+                        f'{_cycle_note}'
                         '</div>',
                         unsafe_allow_html=True,
                     )
@@ -4016,36 +4068,34 @@ I would just like to know where it goes.</p>
                     unsafe_allow_html=True,
                 )
 
-        # Every chart from here down is drawn at a reading width (CAP_WIDE, or
-        # CAP_SQUARE for the radar) rather than the width of the window. Run
-        # full width they were over 1,300px across on a large desktop, out of
-        # proportion with the panel above them and with the page's own text.
-
-        # ── Sentiment Over Time (PRIMARY) ──
-        trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])
-        if trajectory:
-            _section("Sentiment Over Time")
-            _render_capped(trajectory, CAP_WIDE)
-
         # ── Meeting Analysis ──
         _section("Meeting Analysis")
 
         comparison, charts = _pop_summary(charts, ["03_rbi_resolution_vs_minutes"])
         radar, charts = _pop_summary(charts, ["04_rbi_subdimension_radar"])
 
-        # Main analytical chart
-        if comparison:
-            _render_capped(comparison, CAP_WIDE)
+        # Equal columns provide the reading width; the square radar keeps
+        # its existing cap and both images retain their natural aspect ratio.
+        col_comparison, col_radar = st.columns(2)
+        with col_comparison:
+            if comparison:
+                _render_rbi_chart(comparison, CAP_WIDE)
+        with col_radar:
+            if radar:
+                _render_rbi_chart(radar, CAP_SQUARE)
 
-        # Supporting chart, narrower because it is square
-        if radar:
-            _render_capped(radar, CAP_SQUARE)
-
-        # ── Repo Rate vs Sentiment (PRIMARY) ──
+        # ── Sentiment Trends ──
+        trajectory, charts = _pop_summary(charts, ["02_rbi_sentiment_trajectory"])
         rate_chart, charts = _pop_summary(charts, ["05_rbi_rate_and_sentiment"])
-        if rate_chart:
-            _section("Repo Rate vs. Sentiment")
-            _render_capped(rate_chart, CAP_WIDE)
+        if trajectory or rate_chart:
+            _section("Sentiment Trends")
+            col_trajectory, col_rate = st.columns(2)
+            with col_trajectory:
+                if trajectory:
+                    _render_rbi_chart(trajectory, CAP_WIDE)
+            with col_rate:
+                if rate_chart:
+                    _render_rbi_chart(rate_chart, CAP_WIDE)
 
         # ── Tone and the bond market ──
         # A static research chart (rbi_sentinel/research/tone_vs_10y_chart.py); it is not
@@ -4053,7 +4103,9 @@ I would just like to know where it goes.</p>
         _tone_chart = PROJECT_ROOT / "assets" / "rbi_research" / "07_rbi_tone_vs_10y.png"
         if _tone_chart.exists():
             _section("Tone and the Bond Market")
-            _render_capped(_tone_chart, CAP_WIDE, "Chart insights and testing method")
+            _render_rbi_chart(
+                _tone_chart, CAP_WIDE, "Chart insights and testing method", show_caption=False,
+            )
 
         # ── Governor Signal Analysis ──
         gov_divergence, charts = _pop_summary(charts, ["07_rbi_governor_divergence"])
