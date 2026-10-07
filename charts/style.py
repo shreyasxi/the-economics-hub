@@ -392,6 +392,16 @@ class EconStyle:
         return fig, ax
 
     @classmethod
+    def add_editorial_header(cls, fig, title, subtitle):
+        """Compact masthead used by the India Urban/Rural confidence chart."""
+        fig.text(.075, .948, title, fontsize=17, weight='bold', va='top',
+                 color=cls.TEXT_TITLE, fontproperties=cls._get_font('bold'))
+        fig.text(.075, .893, subtitle, fontsize=9.5, va='top',
+                 color=cls.TEXT_SECONDARY, fontproperties=cls._get_font())
+        fig.add_artist(Line2D([.075, .965], [.85, .85], transform=fig.transFigure,
+                             color=cls.RULE_HEAVY, lw=1.7))
+
+    @classmethod
     def set_title(cls, ax, title, subtitle=None):
         ax.set_title(
             title, fontproperties=cls._get_font("bold"),

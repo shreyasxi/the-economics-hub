@@ -15,10 +15,52 @@ import re
 from pathlib import Path
 
 
-def get_insight(filename: str) -> str | None:
+def get_insight(filename: str | Path) -> str | None:
     """Return the insight string for a given chart filename, or None if not found."""
     key = re.sub(r"^\d+[a-z]*_", "", Path(filename).stem)
-    return CHART_INSIGHTS.get(key)
+    text = CHART_INSIGHTS.get(key)
+    if text and key == 'india_discretionary_spending_sentiment':
+        text = text.replace('{latest_takeaway}', _discretionary_takeaway(Path(filename)))
+    return text
+
+
+def _discretionary_takeaway(path: Path) -> str:
+    """Edition-specific takeaway from the same audited values as the PNG."""
+    import json
+    from datetime import datetime
+    try:
+        report = json.loads(path.with_suffix('.json').read_text())
+        latest = {g: report['series'][g][-1] for g in ('Urban', 'Rural')}
+        previous = {g: report['series'][g][-2] for g in ('Urban', 'Rural')}
+        date = datetime.fromisoformat(report['latest_date'])
+        before = datetime.fromisoformat(report['previous_date'])
+        parts = [f"In {date:%b %Y}, Current balances were Urban {latest['Urban']['current_net']:.1f} pp "
+                 f"and Rural {latest['Rural']['current_net']:.1f} pp; 1Y Ahead balances were "
+                 f"{latest['Urban']['ahead_net']:.1f} and {latest['Rural']['ahead_net']:.1f} pp respectively."]
+        for horizon, label in (('current', 'Current'), ('ahead', '1Y Ahead')):
+            diff = latest['Rural'][horizon + '_net'] - latest['Urban'][horizon + '_net']
+            parts.append(f"{label} sentiment was {'Rural' if diff > 0 else 'Urban'}-led by {abs(diff):.1f} pp."
+                         if abs(diff) >= .05 else f"{label} sentiment was similar across geographies.")
+        for g in ('Urban', 'Rural'):
+            now, prior = latest[g], previous[g]
+            gap = now['ahead_net'] - now['current_net']
+            old_gap = prior['ahead_net'] - prior['current_net']
+            shift = gap - old_gap
+            direction = 'widened' if shift > .05 else 'narrowed' if shift < -.05 else 'was little changed'
+            change = now['current_net'] - prior['current_net']
+            ahead_change = now['ahead_net'] - prior['ahead_net']
+            outlook = 'stronger' if gap > .05 else 'weaker' if gap < -.05 else 'similar'
+            parts.append(f"{g} households expected {outlook} discretionary spending sentiment ahead: "
+                         f"the Ahead-minus-Current gap was {gap:+.1f} pp and {direction} "
+                         f"from {old_gap:+.1f} pp in {before:%b %Y}. Current changed {change:+.1f} pp "
+                         f"and 1Y Ahead changed {ahead_change:+.1f} pp since that round.")
+        parts.append('These are survey balances on nominal non-essential spending, not realised consumption growth '
+                     'or real expenditure volumes. Rural includes semi-urban households; coverage changes can affect comparisons.')
+        return ' '.join(parts)
+    except (OSError, ValueError, KeyError, IndexError, TypeError):
+        return ('The edition audit is unavailable, so no latest-value comparison is stated. '
+                'Compare Current with 1Y Ahead and their changes across rounds; these survey balances '
+                'describe nominal spending sentiment, not realised consumption growth or real expenditure volumes.')
 
 
 # ---------------------------------------------------------------------------
@@ -386,6 +428,66 @@ The nearest parallel is mid-2008, another wave of hikes into an oil and food pri
 **How to read this chart:** The Agflation Pipeline tracks the transmission of agricultural commodity price pressures through the food production chain — from farm-gate input costs (fertiliser, energy) through processing to retail food prices. This multi-stage pipeline view shows where price pressures are building and where they are being absorbed or passed through, with implications for headline CPI's food component.
 
 **Practical takeaway:** Agricultural commodity price spikes take 6–12 months to transmit to retail food prices due to processing, storage, and contract structures. This lag means that a wheat or corn price spike today predicts food CPI pressure 6–9 months forward — a leading indicator that CPI data alone misses. For emerging market central banks (RBI, Bank Indonesia, BCB), food inflation is particularly destabilising because food represents 35–50% of the CPI basket (vs. 12–14% in the US), meaning a global soft commodity spike translates directly into headline inflation pressure requiring policy response.
+""",
+
+    "india_inflation_expectations": """\
+**How to read this chart:** Current is households’ perceived inflation, not official CPI. All three horizons use RBI medians, not means. The charcoal curve is the latest survey, dashed blue the immediately preceding survey, and orange the available survey nearest one year earlier. The shaded 3M/1Y area contains forward-looking household expectations. Dates, values and comparison labels come from the workbook.
+
+**Practical Takeaway:** Compare each horizon across survey rounds to assess shifts in household inflation sentiment. A higher future reading than current perceptions signals greater concern ahead; a lower reading signals less concern. These responses describe household expectations and do not establish the future path of official CPI.
+
+**Frequency:** Bi-monthly; latest and comparison survey dates update from each replacement release.
+
+**Source:** [RBI Inflation Expectations Survey of Households — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Inflation%20Expectations%20Survey%20of%20Households%20-%20Bi-monthly), median columns in the published household inflation expectations table.
+""",
+
+    "india_household_price_categories": """\
+**How to read this chart:** Open circles show the share expecting prices to rise three months ahead; blue circles show one year ahead. Both horizons use the same latest RBI survey. Food, non-food, housing, services and household durables are ordered by the unrounded 1Y-minus-3M difference. The change column is in percentage points. These shares measure how many households expect a rise, not its size.
+
+**Practical Takeaway:** The highest shares identify the broadest price concerns; the largest positive changes identify categories where concern broadens with the horizon. A negative change means fewer respondents expect an increase at one year than at three months. This is household sentiment, not a category CPI forecast.
+
+**Frequency:** Bi-monthly; survey date and category values update from the replacement workbook.
+
+**Source:** [RBI Inflation Expectations Survey of Households — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Inflation%20Expectations%20Survey%20of%20Households%20-%20Bi-monthly), product-wise 3M and 1Y tables, “Prices will increase” estimates (excluding standard errors).
+""",
+
+    "india_consumer_confidence_urban_rural": """\
+**How to read this chart:** The left panel shows the Current Situation Index (CSI); the right shows the Future Expectations Index (FEI), with separate appropriate scales. Urban is blue and Rural is orange. Both indices equal 100 plus the average net responses on economic conditions, employment, prices, income and spending. Neutral is 100; above it indicates net optimism and below it net pessimism. Lines use the earliest available common history and end at the latest aligned survey; missing history stays missing.
+
+**Practical Takeaway:** Compare current and forward-looking confidence within each geography, then the Urban/Rural gap. These sentiment gaps are not GDP or consumption growth. Rural includes semi-urban households. The supplied RBI notes describe rural coverage expanding from 26 to 31 states/UTs in July 2024 and urban coverage expanding to 19 centres in March 2021; coverage changes can affect comparisons. Consult the methodology notes in each replacement release.
+
+**Frequency:** Bi-monthly; both latest survey periods must align. Replace both consumer workbooks together.
+
+**Source:** [RBI Urban Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly) and [RBI Rural Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly); published Current Situation Index (CSI) and Future Expectations Index (FEI) table.
+""",
+
+    "india_discretionary_spending_sentiment": """\
+**HOW TO READ THIS CHART:** Non-essential (discretionary) spending sentiment is shown separately for Urban and Rural households. Current (solid) is the household assessment of present non-essential spending; 1Y Ahead (dashed) is the expectation one year ahead. Values are RBI's published Net Responses: the share reporting/expecting an increase minus the share reporting/expecting a decrease, in percentage points. Higher positive balances mean a larger balance of households reporting/expecting increased spending; these are not actual consumption growth rates. The faint shaded gap shows future minus present sentiment: Ahead above Current indicates stronger expected spending sentiment, and Ahead below Current indicates weaker expectations. Both panels share dates and a common balance scale.
+
+**PRACTICAL TAKEAWAY:** {latest_takeaway}
+
+**FREQUENCY:** Bi-monthly. The common comparable sample and latest aligned round update from the replacement workbooks. Missing observations are rejected, with no interpolation or substitution.
+
+**SOURCE:** [RBI Urban Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly) and [RBI Rural Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly); Table 8, Non-essential spending, Current Perception and One Year Ahead Expectation, published Net Response columns. Non-essential expenditure is more discretionary than essential expenditure, which can remain high through necessity or higher prices; it offers a focused signal of households' willingness/capacity to spend, rather than a measure of realised real demand.
+""",
+
+    "india_consumer_confidence_urban_components": """\
+**How to read this chart:** Five rows show economic conditions, employment, prices, income and spending for Urban households. Columns are grouped into Current Perception and 1Y Ahead Expectations. Each group shows the previous survey, the latest survey in bold, and Δ (latest minus previous, in percentage points). Column dates update from the workbooks. Muted figures identify the previous round; restrained teal indicates improvement and maroon deterioration, with a neutral cue below 0.05 pp. Urban uses a blue header accent. Net responses range from −100 to +100.
+
+**Practical Takeaway:** Positive levels are favourable sentiment and negative levels are unfavourable. Prices use decreases minus increases: RBI already publishes this orientation, so neither round is sign-reversed. Other components use improvement/increase minus worsening/decrease. Spending reflects nominal expenditure sentiment and may include price changes as well as quantities. Each component has a one-fifth weight in CSI/FEI. Compare levels and changes to identify which components support or restrain confidence; these balances describe sentiment, not causal effects or a GDP forecast.
+
+**Frequency:** Bi-monthly, using the latest and immediately preceding common rounds across both consumer surveys and all component tables. Dates and deltas update from workbook contents; replace both workbooks together.
+
+**Source:** [RBI Urban Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly), published Tables 1 (General Economic Situation), 2 (Employment), 3 (Price Level), 5 (Income) and 6 (Overall Spending), Net Response columns.
+""",
+
+    "india_consumer_confidence_rural_components": """\
+**How to read this chart:** Five rows show economic conditions, employment, prices, income and spending for Rural households. Columns are grouped into Current Perception and 1Y Ahead Expectations. Each group shows the previous survey, the latest survey in bold, and Δ (latest minus previous, in percentage points). Column dates update from the workbooks. Muted figures identify the previous round; restrained teal indicates improvement and maroon deterioration, with a neutral cue below 0.05 pp. Rural uses a orange header accent. Net responses range from −100 to +100.
+
+**Practical Takeaway:** Positive levels are favourable sentiment and negative levels are unfavourable. Prices use decreases minus increases: RBI already publishes this orientation, so neither round is sign-reversed. Other components use improvement/increase minus worsening/decrease. Spending reflects nominal expenditure sentiment and may include price changes as well as quantities. Each component has a one-fifth weight in CSI/FEI. Compare levels and changes to identify which components support or restrain confidence; these balances describe sentiment, not causal effects or a GDP forecast. Rural includes semi-urban households.
+
+**Frequency:** Bi-monthly, using the latest and immediately preceding common rounds across both consumer surveys and all component tables. Dates and deltas update from workbook contents; replace both workbooks together.
+
+**Source:** [RBI Rural Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly), published Tables 1 (General Economic Situation), 2 (Employment), 3 (Price Level), 5 (Income) and 6 (Overall Spending), Net Response columns.
 """,
 
     # ── INDIA DASHBOARD ─────────────────────────────────────────────────────

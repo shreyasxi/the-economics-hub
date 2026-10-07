@@ -88,6 +88,127 @@ only after commit/push and a successful GitHub Actions run. Source code and work
 
 ---
 
+## 0.2 RBI bi-monthly survey charts — 6 Oct 2026
+
+Run the normal India workflow from the project root:
+
+```sh
+.venv/bin/python generate_india.py
+```
+
+Manually replace the official Excel releases in these directories:
+
+- `data/rbi_bimonthly_manual/inflation_survey/`: Inflation Expectations Survey of Households.
+- `data/rbi_bimonthly_manual/consumer_survey/`: both Urban and Rural Consumer Confidence Surveys.
+
+No release filename or survey date is configured in production code. The normal
+generator calls `charts.india_inflation_surveys.generate` and
+`charts.india_consumer_surveys.generate`. Both use `data.rbi_surveys` for validated
+readers and discovery and `EconStyle.save_chart` for the approved chart designs.
+
+### Outputs and dashboard placement
+
+The generator's normal run-month edition, `output/india/YYYY-MM/`, contains:
+
+| PNG (plus same-stem JSON audit) | India section |
+| --- | --- |
+| `25_india_inflation_expectations.png` | Inflation & Monetary Conditions |
+| `26_india_household_price_categories.png` | Inflation & Monetary Conditions |
+| `27_india_consumer_confidence_urban_rural.png` | Consumer Confidence |
+| `27b_india_discretionary_spending_sentiment.png` | Consumer Confidence |
+| `28_india_consumer_confidence_urban_components.png` | Consumer Confidence |
+| `29_india_consumer_confidence_rural_components.png` | Consumer Confidence |
+
+Consumer Confidence follows Growth & Activity. The shared loader discovers these
+PNGs; `app.py` uses the existing section and grid: the combined indices and discretionary spending chart share the top row, above the Urban/Rural component tables. Titles also live in
+the existing `charts.loader` title mapping. All six Insights entries are in the
+existing `config.insights.CHART_INSIGHTS` dictionary and use the normal expander.
+The discretionary chart uses canonical `config.insights.get_insight` with the chart
+path to read its same-edition JSON audit and produce a dynamic latest-data
+takeaway. Other entries retain static guidance. Table 8 non-essential spending
+uses the supplied Net Response (increase minus decrease); all common historical
+rows are reconciled within 0.151 pp. Missing values/rounds fail without interpolation. Chart labels, dates, endpoint values and deltas are dynamic;
+same-stem JSON files record exact values, source cells, paths and SHA-256 hashes.
+Existing asset publishing conventions are unchanged; this migration does not
+copy or publish a second output edition.
+
+### Discovery and validation
+
+Every `.xlsx` file in each canonical folder is inspected (extension matching is
+case-insensitive). Excel lock files beginning `~$` are excluded. Unknown or malformed
+workbooks fail explicitly rather than allowing a stale fallback. Keep these
+folders dedicated to the corresponding official releases.
+
+Inflation discovery validates the published median table and both product tables.
+The latest median observation must match the product tables' latest date and round.
+The newest workbook is selected by the survey date in its contents. Equal-newest
+files are ambiguous and rejected; remove the duplicate deliberately. The previous
+curve is the immediately preceding observation; the year-earlier curve is nearest
+the year-earlier target within 100 days. Missing comparison medians are rejected.
+Early historical missing medians are preserved. Product response components must
+reconcile with the reported price-increase share; SE columns are never estimates.
+
+Consumer geography is identified from visible RBI text: UCCS/Urban coverage notes
+versus Rural survey/rural-and-semi-urban notes. A release filename is not evidence
+of geography. Both identity signals or neither are errors. Published table titles,
+Survey Round, merged horizon headers and statistic labels identify data columns;
+hidden sheets are excluded. The newest index date selects each geography's release;
+latest index, spending and component dates must align across both workbooks.
+The component charts use the latest and immediately preceding common dates across all ten
+component tables, and they must match the common index dates.
+
+Net responses are RBI-supplied. Prices already use decreases minus increases;
+they are never sign-reversed. Other components use improvement/increase minus
+worsening/decrease. Shares and balances are reconciled for both component rounds
+within 0.151 pp, and latest component averages reconcile with CSI/FEI within that
+tolerance. Missing historical indices remain gaps, with no interpolation.
+
+A missing file, ambiguous identity/edition, changed schema, invalid value or
+misaligned round logs a clear omission warning and removes the family’s PNGs and their
+JSON audits for the affected survey family from the current output edition.
+No older workbook, hard-coded value or previous PNG is substituted. The unaffected
+family and other India charts continue, following the existing omission policy.
+
+The current readers deliberately reject material RBI schema changes: automatic
+bi-monthly replacement requires the same validated published table definitions.
+
+### Sources
+
+- Inflation: [RBI Inflation Expectations Survey of Households — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Inflation%20Expectations%20Survey%20of%20Households%20-%20Bi-monthly).
+- Urban: [RBI Urban Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly).
+- Rural: [RBI Rural Consumer Confidence Survey — Bi-monthly](https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly).
+The combined index Insight links to both sources. All survey charts use the compact
+`EconStyle.add_editorial_header` treatment from Urban vs Rural. RBI-style component tables
+group Current Perception and 1Y Ahead Expectations into previous/latest/Δ columns.
+Workbook dates supply both column headings; latest values are bold, previous
+values muted, and changes use restrained teal/maroon cues. Neutral group bands
+and minimal horizontal rules replace dots, bars and full-cell grids. Output stems
+are retained and regenerated in place, so no dot-chart edition remains active. The retired dense consumer matrix is removed from output and filtered by
+the loader for older editions.
+
+Methodology belongs in canonical Insights. The current Rural notes describe a
+coverage expansion from 26 to 31 states/UTs in July 2024; Urban expanded to 19
+centres in March 2021. The headline chart does not contain a coverage marker.
+
+### Tests
+
+```sh
+.venv/bin/python -m unittest discover -s tests -p 'test_rbi*.py'
+.venv/bin/python -m unittest discover -s tests
+```
+
+Focused tests preserve median selection, approved figure semantics, category
+ordering, price orientation and reconciliation. Synthetic workbooks in temporary
+test directories verify arbitrary/swapped filenames, same-filename replacement,
+newest-by-content selection, both comparison dates and deltas, missing/ambiguous
+files, schema changes, removal of stale output, normal generator invocation,
+canonical Insights and the actual India page's section placement. Synthetic values
+never enter production folders. Immutable official regression fixtures under `tests/fixtures/rbi_surveys/` verify
+the original exact values and source cells independently of future replacements
+in the production source folders.
+
+---
+
 ## 1. What the project is
 
 **The Economics Hub**, by Shreyas Urgunde: an institutional-style macro and markets dashboard, plus a Substack
@@ -330,7 +451,8 @@ published.
 
 ### 4.3 India — `generate_india.py`
 
-One function per chart; titles are set inside each function. Sections are chosen in `app.py` `page_india()` by
+Existing chart functions live in the generator; newer reusable implementations live under `charts/`,
+including the two RBI survey modules (§0.2). Titles are set in the renderers. Sections are chosen in `app.py` `page_india()` by
 words in the file name (§5.3). Where the data is typed by hand, §5.4 says how to enter or correct it.
 
 | File | Caption | Section | Function | What it shows | Data |
@@ -355,6 +477,13 @@ words in the file name (§5.3). Where the data is typed by hand, §5.4 says how 
 | `22_india_sector_valuations` | NIFTY Sector Valuations | Equity Markets | `chart_sector_valuations` | Current sector multiples against validated history | `data/nse_valuations/` |
 | `23_india_sector_rotation_12m_benchmark` | NIFTY Sector Rotation | Equity Markets | `chart_sector_rotation_12m` | Trailing-year price returns with NIFTY 50 benchmark | official NSE snapshot; PNG + JSON sidecar |
 | `24_india_cpi_contributions` | What’s Driving Indian Inflation | Inflation & Monetary Conditions | `charts.india_cpi_contributions.generate` | Six buckets contributing to headline inflation | independent verified CPI 2024 store; PNG + JSON sidecar |
+
+| `25_india_inflation_expectations` | Inflation Expectations - India | Inflation & Monetary Conditions | `charts.india_inflation_surveys.generate` | Median perceived current inflation vs 3M/1Y expectations across three surveys | discovered official IESH workbook; PNG + JSON |
+| `26_india_household_price_categories` | What Households Think Will Get More Expensive | Inflation & Monetary Conditions | `charts.india_inflation_surveys.generate` | Five category price-increase shares, 3M vs 1Y | same discovered IESH workbook; PNG + JSON |
+| `27b_india_discretionary_spending_sentiment` | Discretionary Spending Sentiment — India | Consumer Confidence | `charts.india_consumer_surveys.generate` | Table 8 non-essential spending balances, Current/1Y, Urban/Rural panels; common full history | discovered consumer workbooks; PNG + JSON |
+| `27_india_consumer_confidence_urban_rural` | India Consumer Confidence — Urban vs Rural | Consumer Confidence | `charts.india_consumer_surveys.generate` | CSI and FEI, common Urban/Rural history | discovered official consumer workbooks; PNG + JSON |
+| `28_india_consumer_confidence_urban_components` | India Consumer Confidence — Urban Components | Consumer Confidence | `charts.india_consumer_surveys.generate` | Five-row table, Current/1Y groups, previous/latest/Δ | discovered Urban workbook; PNG + JSON |
+| `29_india_consumer_confidence_rural_components` | India Consumer Confidence — Rural Components | Consumer Confidence | `charts.india_consumer_surveys.generate` | Five-row table, Current/1Y groups, previous/latest/Δ | discovered Rural workbook; PNG + JSON |
 
 Money supply and promoter-holdings charts are retired; the loader filters leftover images.
 

@@ -75,6 +75,12 @@ jobs:
           python tests/test_soe.py
           python tests/test_soe_pdf.py
 
+      - name: Verify RBI bi-monthly survey charts
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: python -m unittest discover -s tests -p 'test_rbi*.py'
+
       # RBI's State of the Economy, part 1 of 2: the transmission history the
       # pass-through chart is drawn from. continue-on-error — rbi.org.in being
       # slow or reshaping its table must not stop the charts; the chart is then
@@ -201,6 +207,13 @@ jobs:
             cp "output/india/$MONTH_FOLDER/24_india_cpi_contributions."{png,json} "assets/india/$MONTH_FOLDER/"
           fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
+          # Publish survey PNGs with their audits; remove omitted/retired artifacts.
+          for NAME in 25_india_inflation_expectations 26_india_household_price_categories 27_india_consumer_confidence_urban_rural 27b_india_discretionary_spending_sentiment 28_india_consumer_confidence_urban_components 29_india_consumer_confidence_rural_components 28_india_consumer_confidence_drivers; do
+            rm -f "assets/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.json"
+            if [ -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
+              cp "output/india/$MONTH_FOLDER/$NAME."{png,json} "assets/india/$MONTH_FOLDER/"
+            fi
+          done
           if [ -f "output/india/$MONTH_FOLDER/soe.json" ]; then
             cp "output/india/$MONTH_FOLDER/soe.json" "assets/india/$MONTH_FOLDER/"
           else

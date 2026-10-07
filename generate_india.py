@@ -38,6 +38,7 @@ import sys
 import io
 from pathlib import Path
 from datetime import datetime
+from data import rbi_surveys
 
 # Force UTF-8 output on Windows (avoids cp1252 errors with ₹, →, ⚠ etc.)
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
@@ -87,7 +88,7 @@ C_CUSTOMS       = "#D97706"     # Amber — customs
 
 # Section colors for table (matching macro_table style)
 SECTION_COLORS = {
-    "INFLATION":        "#B91C1C",
+    "INFLATION & EXPECTATIONS": "#B91C1C",
     "PMI":              "#FF9933",
     "FISCAL":           "#059669",
     "CREDIT & FLOWS":   "#7C3AED",
@@ -2026,17 +2027,15 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     # DEFINE TABLE STRUCTURE
     # ═══════════════════════════════════════════
     TABLE_SECTIONS = [
-        ("INFLATION", [
+        ("INFLATION & EXPECTATIONS *", [
             ("CPI (Headline)", "india_cpi_yoy", "% YoY", lambda v: f"{v:.2f}%"),
-            ("Core CPI", "india_core_cpi_yoy", "% YoY", lambda v: f"{v:.2f}%"),
             ("Food CPI", "india_food_cpi_yoy", "% YoY", lambda v: f"{v:.2f}%"),
         ]),
         ("PMI", [
             ("Manufacturing PMI", "india_mfg_pmi", "index", lambda v: f"{v:.1f}"),
             ("Services PMI", "india_svc_pmi", "index", lambda v: f"{v:.1f}"),
-            ("Composite PMI", "india_composite_pmi", "index", lambda v: f"{v:.1f}"),
         ]),
-        ("FISCAL *" if has_cag else "FISCAL", [
+        ("FISCAL **" if has_cag else "FISCAL", [
             ("GST Revenue", "india_gst_revenue", "₹L Cr", lambda v: f"₹{v:.2f}L Cr"),
         ]),
         ("CREDIT & FLOWS", [
@@ -2088,6 +2087,44 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
                         "change": chg,
                         "unit": unit,
                     })
+
+            # ── RBI Household Inflation Expectations ──────────────────────────────
+    try:
+        ie_records, _ = rbi_surveys.read_observations()
+        ie_latest, ie_previous, _ = rbi_surveys.select_curves(ie_records)
+
+        ie_rows = [
+            {
+                "section": "INFLATION & EXPECTATIONS *",
+                "name": "Household Perceived Inflation",
+                "value": ie_latest["current"],
+                "value_str": f'{ie_latest["current"]:.2f}%',
+                "change": ie_latest["current"] - ie_previous["current"],
+                "unit": "median %",
+            },
+            {
+                "section": "INFLATION & EXPECTATIONS *",
+                "name": "1-Year Inflation Expectations",
+                "value": ie_latest["one_year"],
+                "value_str": f'{ie_latest["one_year"]:.2f}%',
+                "change": ie_latest["one_year"] - ie_previous["one_year"],
+                "unit": "median %",
+            },
+        ]
+
+        # Keep the survey rows directly beneath CPI/Food CPI,
+        # rather than creating a second inflation section later.
+        inflation_end = max(
+            i for i, row in enumerate(rows)
+            if row["section"] == "INFLATION & EXPECTATIONS *"
+        ) + 1
+
+        rows[inflation_end:inflation_end] = ie_rows
+
+    except Exception as exc:
+        print(
+            f"   ⚠ Inflation expectations omitted from snapshot — {exc}"
+        )
     
     # Add weekly forex reserves if available (from india_weekly table)
     if df_weekly is not None and not df_weekly.empty and "forex_reserves_usd_bn" in df_weekly.columns:
@@ -2117,7 +2154,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
 
     # Add CAG fiscal data if available
     if has_cag:
-        fiscal_section = "FISCAL *"
+        fiscal_section = "FISCAL **"
         
         # Find insert position (after GST Revenue)
         insert_idx = len(rows)
@@ -2190,7 +2227,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     # ═══════════════════════════════════════════
     y -= 0.5
     headers = [("name", "INDICATOR"), ("latest", "LATEST"), 
-               ("change", "MoM CHG"), ("unit", "UNIT")]
+           ("change", "MoM"), ("unit", "UNIT")]
     for key, label in headers:
         ha = "left" if key == "name" else "right"
         ax.text(cx[key], y, label, fontsize=9, fontweight="bold",
@@ -2217,7 +2254,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
             cur_section = row["section"]
             y -= cat_gap
             _draw_section_bar(ax, y, 0.25)
-            sec_key = cur_section.replace(" *", "")  # Remove asterisk for color lookup
+            sec_key = cur_section.rstrip(" *")  # Remove asterisk for color lookup
             sec_color = SECTION_COLORS.get(sec_key, "#000000")
             ax.text(cx["name"], y, cur_section, fontsize=9, fontweight="bold",
                     color=sec_color, ha="left", va="center")
@@ -2245,7 +2282,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
             elif "deficit" in row["name"].lower():
                 # Lower deficit is better
                 chg_color = "#065f46" if chg <= 0 else "#991b1b"
-            elif row["section"].replace(" *", "") == "INFLATION":
+            elif row["section"].rstrip(" *") == "INFLATION & EXPECTATIONS":
                 chg_color = "#991b1b" if chg > 0 else "#065f46"
             else:
                 chg_color = "#065f46" if chg >= 0 else "#991b1b"
@@ -2266,35 +2303,71 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
         ax.plot([0.5, 9.5], [y - row_h/2, y - row_h/2],
                 color="#e2e8f0", linewidth=0.8, linestyle=":")
 
-    # ═══════════════════════════════════════════
+        # ═══════════════════════════════════════════
     # FOOTER (tighter spacing)
     # ═══════════════════════════════════════════
-    footer_y = y - row_h/2 - 0.25  # Reduced from 0.40
+    footer_y = y - row_h / 2 - 0.25
 
-    source_text = "Source: S&P Global, RBI DBIE, FRED, MoSPI, PIB, CAG"
-    ax.text(0.5, footer_y, source_text,
-            fontsize=8, color="#666666", ha="left", va="bottom")
-    
+    source_text = "Source: S&P Global, RBI DBIE / IESH, NSE, MoSPI, PIB, CAG"
+    ax.text(
+        0.5,
+        footer_y,
+        source_text,
+        fontsize=7,
+        color="#666666",
+        ha="left",
+        va="bottom",
+    )
+
+    footer_y -= 0.15
+    ax.text(
+        0.5,
+        footer_y,
+        "* Household survey changes are versus the previous bi-monthly RBI survey, not MoM.",
+        fontsize=5.7,
+        color="#666666",
+        ha="left",
+        va="bottom",
+        style="italic",
+    )
+
     if has_cag:
         footer_y -= 0.15
-        ax.text(0.5, footer_y, "* Latest fiscal data",
-                fontsize=7, color="#666666", ha="left", va="bottom", style='italic')
-    
-    # The credit, in the table's own coordinates. A point and a half up on the
-    # chart size, as the weekly summary table is: both are drawn larger than a
-    # chart, and both would look undersized at the chart's own 7.5pt.
-    EconStyle.draw_credit(fig, x=9.5, y=footer_y,
-                          size=EconStyle.WATERMARK_SIZE + 1.5,
-                          ax=ax, transform=ax.transData)
+        ax.text(
+            0.5,
+            footer_y,
+            "** Latest fiscal data",
+            fontsize=5.7,
+            color="#666666",
+            ha="left",
+            va="bottom",
+            style="italic",
+        )
+
+    # The credit, in the table's own coordinates.
+    EconStyle.draw_credit(
+        fig,
+        x=9.5,
+        y=footer_y,
+        size=EconStyle.WATERMARK_SIZE + 1.5,
+        ax=ax,
+        transform=ax.transData,
+    )
 
     # Set tight ylim to trim extra space
     ax.set_ylim(footer_y - 0.1, fig_h)
 
     fp = output_dir / "00_india_table.png"
-    fig.savefig(fp, dpi=EconStyle.DPI, bbox_inches="tight",
-                facecolor=EconStyle.BACKGROUND, pad_inches=0.08)
+    fig.savefig(
+        fp,
+        dpi=EconStyle.DPI,
+        bbox_inches="tight",
+        facecolor=EconStyle.BACKGROUND,
+        pad_inches=0.08,
+    )
+
     plt.close(fig)
-    print(f"   ✓ India Summary Table")
+    print("   ✓ India Summary Table")
     return fp
 
 
@@ -3367,6 +3440,12 @@ def main():
     chart_inflation_bar(df, output_dir)
     from charts.india_cpi_contributions import generate as chart_cpi_contributions
     chart_cpi_contributions(output_dir)
+
+    # RBI manual bi-monthly surveys use the normal dated India edition.
+    from charts.india_inflation_surveys import generate as chart_inflation_surveys
+    from charts.india_consumer_surveys import generate as chart_consumer_surveys
+    chart_inflation_surveys(output_dir)
+    chart_consumer_surveys(output_dir)
 
     # ── Summary table (integrates CAG fiscal + weekly forex) ───────────────────
     chart_table(df, output_dir, cag_data, df_weekly)

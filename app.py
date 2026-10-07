@@ -55,7 +55,7 @@ from rbi_sentinel.sentiment.score_normalizer import _DOC_WEIGHTS
 PROJECT_ROOT = Path(__file__).resolve().parent
 
 
-def get_insight(filename: str) -> str | None:
+def get_insight(filename: str | Path) -> str | None:
     """
     Chart insight text, always from the current config/insights.py.
 
@@ -101,7 +101,7 @@ st.markdown(
         padding-top: 1.0rem;
         padding-bottom: 2rem;
     }
-    
+
     /* ═══ RBI policy panel ═══════════════════════════════════════════ */
 
     /* ── Tab header ──────────────────────────────────────────────────────
@@ -908,7 +908,7 @@ st.markdown(
         margin-top: 1.1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .insti-rule {
         height: 2px;
         width: 100%;
@@ -1153,8 +1153,8 @@ st.markdown(
         margin-bottom: 0.6rem;
     }
 
-    
-    
+
+
     /* ── Section navigation ──
        Each section is a page of its own (see the foot of this file), so these
        are links with their own URLs, not tabs. They keep the tab bar's look:
@@ -1247,11 +1247,11 @@ st.markdown(
         background-color: #FFFFF0; /* BANGER: The subtle tinted pink! */
         border-right: 2px solid #111111; /* A complementary darker salmon border */
     }
-    
+
     [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
         padding-top: 1.5rem;
     }
-    
+
     /* Force default Streamlit text to deep charcoal, not harsh black */
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span,
@@ -1259,7 +1259,7 @@ st.markdown(
     [data-testid="stSidebar"] .stMarkdown {
         color: #222222 !important;
     }
-    
+
     /* 1. Header Block & Logo */
     .sb-logo-wrap {
         text-align: center;
@@ -1270,11 +1270,11 @@ st.markdown(
         width: 65%; /* Shrinks it to a tasteful, premium size */
         margin: 0 auto;
     }
-    
-  
+
+
     /* ── The High-Finance Masthead Title (Sidebar) ── */
     .sb-pub-name {
-        font-family: 'Playfair Display', Georgia, serif; 
+        font-family: 'Playfair Display', Georgia, serif;
         font-size: 1.65rem !important; /* Scaled up for dominance */
         font-weight: 900 !important;
         color: #0A1128; /* Deep navy/black to match the main header */
@@ -1876,7 +1876,7 @@ st.markdown(
 with st.sidebar:
     # ── 1. Logo & Masthead ─────────────────────────────────────────────────────
     # (Once you make your logo transparent, save it as a PNG and update the filename here if needed!)
-    logo_path = PROJECT_ROOT / "assets" / "brand" / "econhub_logo.jpg" 
+    logo_path = PROJECT_ROOT / "assets" / "brand" / "econhub_logo.jpg"
     if logo_path.exists():
         st.markdown('<div class="sb-logo-wrap">', unsafe_allow_html=True)
         st.image(str(logo_path), use_container_width=True)
@@ -1995,7 +1995,7 @@ def _render_capped(chart_path: Path, cap: str, insight_label: str = "Chart insig
     with st.container(key=f"{cap}-{_chart_slug(chart_path.name)}"):
         _chart_anchor(chart_path)
         st.image(str(chart_path), use_container_width=True)
-        insight = get_insight(chart_path.name)
+        insight = get_insight(chart_path)
         if insight:
             with st.expander(insight_label):
                 st.markdown(insight)
@@ -2008,7 +2008,7 @@ def _render_chart(chart_path: Path) -> None:
         caption=_chart_title(chart_path.name),
         use_container_width=True,
     )
-    insight = get_insight(chart_path.name)
+    insight = get_insight(chart_path)
     if insight:
         with st.expander("Chart insights"):
             st.markdown(insight)
@@ -2040,7 +2040,7 @@ def _render_wide(chart_path: Path) -> None:
     _, col_mid, _ = st.columns([1, 5, 1])
     with col_mid:
         _render_chart(chart_path)
-    
+
 # Fields the RBI page reads from the cycle brief beyond the original set.
 _BRIEF_KEYS = frozenset({
     "previous_cycle", "facts", "previous_facts", "last_rate_move",
@@ -3487,13 +3487,15 @@ def page_india() -> None:
         st.markdown(
             _page_header_html(
                 "The Indian Economy",
-                "Growth, prices, money, trade, capital flows and public finances, from RBI, MoSPI, "
-                "NSDL and CAG data. Charts reflect the latest data committed to the repository.",
-                "Edition", datetime.strptime(date_label, "%Y-%m").strftime("%B %Y"),
+                "Growth, equity markets, inflation, consumer confidence, external conditions and public finances, "
+                "from RBI, MoSPI, NSE and CAG data. Charts reflect the latest data committed to the repository.",
+                "Edition",
+                datetime.strptime(date_label, "%Y-%m").strftime("%B %Y"),
                 nav=[(title, _anchor("india", title)) for title in (
                     "Growth & Activity",
-                    "Equity Markets",
                     "Inflation & Monetary Conditions",
+                    "Equity Markets",
+                    "Consumer Confidence",
                     "External Sector",
                     "Public Finances",
                 )],
@@ -3560,7 +3562,46 @@ def page_india() -> None:
 
             _render_grid(activity)
 
-                # 2. Equity Markets
+        # 3. Prices & Monetary Conditions
+        prices_monetary_kws = [
+                    "inflation",
+                    "cpi",
+                    "wpi",
+                    "credit_deposit",
+                    "rate_transmission",
+                    "india_household_price_categories",
+                ]
+
+        prices_monetary = [
+                    c for c in charts
+                    if any(k in c.name for k in prices_monetary_kws)
+                ]
+
+        charts = [
+                    c for c in charts
+                    if c not in prices_monetary
+                ]
+
+        if prices_monetary:
+                    _section("Inflation & Monetary Conditions", anchor=_anchor("india", "Inflation & Monetary Conditions"))
+
+                    # Explicit first-row pair, then credit and monetary transmission.
+                    prices_monetary = sorted(
+                        prices_monetary,
+                        key=lambda c: (
+                            0 if "india_inflation_bar" in c.name else
+                            1 if "india_cpi_contributions" in c.name else
+                            2 if "india_inflation_expectations" in c.name else
+                            3 if "india_household_price_categories" in c.name else
+                            4 if "credit_deposit" in c.name else
+                            5 if "rate_transmission" in c.name else
+                            6
+                        )
+                    )
+
+                    _render_grid(prices_monetary)
+
+        # 3. Equity Markets
         fpi = [
             c for c in charts
             if "fpi_monthly" in c.name
@@ -3596,43 +3637,19 @@ def page_india() -> None:
             _section("Equity Markets", anchor=_anchor("india", "Equity Markets"))
             _render_grid(equity_markets, cols=2)
 
-        # 3. Prices & Monetary Conditions
-        prices_monetary_kws = [
-            "inflation",
-            "cpi",
-            "wpi",
-            "credit_deposit",
-            "rate_transmission",
-        ]
+        # 4. Consumer Sentiment
+        consumer = [c for c in charts if 'india_consumer_confidence' in c.name
+                            or 'india_discretionary_spending_sentiment' in c.name]
+        charts = [c for c in charts if c not in consumer]
+        if consumer:
+                    _section("Consumer Confidence", anchor=_anchor("india", "Consumer Confidence"))
+                    headline = [c for c in consumer if 'urban_rural' in c.name]
+                    discretionary = [c for c in consumer if 'discretionary_spending_sentiment' in c.name]
+                    components = [c for c in consumer if c not in headline + discretionary]
+                    _render_grid(headline + discretionary)
+                    _render_grid(components)
 
-        prices_monetary = [
-            c for c in charts
-            if any(k in c.name for k in prices_monetary_kws)
-        ]
-
-        charts = [
-            c for c in charts
-            if c not in prices_monetary
-        ]
-
-        if prices_monetary:
-            _section("Inflation & Monetary Conditions", anchor=_anchor("india", "Inflation & Monetary Conditions"))
-
-            # Explicit first-row pair, then credit and monetary transmission.
-            prices_monetary = sorted(
-                prices_monetary,
-                key=lambda c: (
-                    0 if "india_inflation_bar" in c.name else
-                    1 if "india_cpi_contributions" in c.name else
-                    2 if "credit_deposit" in c.name else
-                    3 if "rate_transmission" in c.name else
-                    4
-                )
-            )
-
-            _render_grid(prices_monetary)
-
-        # 4. External Sector
+        # 5. External Sector
         external_kws = ["forex", "reserves", "trade", "export", "import"]
         external = [
             c for c in charts
@@ -3644,7 +3661,7 @@ def page_india() -> None:
             _section("External Sector", anchor=_anchor("india", "External Sector"))
             _render_grid(external)
 
-        # 5. Fiscal Policy & Public Finances
+        # 6. Fiscal Policy & Public Finances
         fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
         fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
         charts = [c for c in charts if c not in fiscal]
