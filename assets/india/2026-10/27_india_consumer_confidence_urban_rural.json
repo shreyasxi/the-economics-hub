@@ -1,0 +1,119 @@
+{
+  "latest_date": "2026-07-01",
+  "previous_date": "2026-05-01",
+  "sources": {
+    "Urban": {
+      "url": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly",
+      "path": "/home/runner/work/the-economics-hub/the-economics-hub/data/rbi_bimonthly_manual/consumer_survey/UCCSH05082026.xlsx",
+      "sha256": "6b447210ad2d71c762e86f6e4277553376f26d5f6a9ad51050c1996eb640b002"
+    },
+    "Rural": {
+      "url": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly",
+      "path": "/home/runner/work/the-economics-hub/the-economics-hub/data/rbi_bimonthly_manual/consumer_survey/RCCSH05082026.xlsx",
+      "sha256": "56681b8c1d6647c81bdfe2d03ca01f8aa33617962c2f5b74c74fc54632ee5d24"
+    }
+  },
+  "source_urls": {
+    "Urban": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly",
+    "Rural": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly"
+  },
+  "common_dates": [
+    "2023-09-01",
+    "2023-11-01",
+    "2024-01-01",
+    "2024-03-01",
+    "2024-05-01",
+    "2024-07-01",
+    "2024-09-01",
+    "2024-11-01",
+    "2025-01-01",
+    "2025-03-01",
+    "2025-05-01",
+    "2025-07-01",
+    "2025-09-01",
+    "2025-11-01",
+    "2026-01-01",
+    "2026-03-01",
+    "2026-05-01",
+    "2026-07-01"
+  ],
+  "panel_y_limits": [
+    [
+      85,
+      105
+    ],
+    [
+      95,
+      135
+    ]
+  ],
+  "latest_indices": {
+    "Urban": {
+      "date": "2026-07-01",
+      "source_date_cell": "B69",
+      "csi": 88.3,
+      "csi_cell": "C69",
+      "fei": 115.3,
+      "fei_cell": "D69"
+    },
+    "Rural": {
+      "date": "2026-07-01",
+      "source_date_cell": "B21",
+      "csi": 91.672,
+      "csi_cell": "C21",
+      "fei": 113.63,
+      "fei_cell": "D21"
+    }
+  },
+  "source_notes": {
+    "Urban": [
+      {
+        "sheet": "T9 Indices",
+        "cell": "B72",
+        "text": "*CSI/FEI = 100 + Average of Net Responses of (General Economic Situation, Employment Scenario, Price Level, Household income and Overall Spending)"
+      },
+      {
+        "sheet": "T9 Indices",
+        "cell": "B73",
+        "text": "Data are based on web releases made since March 2015. For each survey round, the final figures as available in the latest web release covering the same have been considered."
+      },
+      {
+        "sheet": "T9 Indices",
+        "cell": "B75",
+        "text": "Since March 2021, the coverage of UCCS has been expanded to 6 new centres. Therefore, the results are updated with data for 19 centres from March 2021 round. "
+      },
+      {
+        "sheet": "T7 Essential spending",
+        "cell": "B71",
+        "text": "Note: Data are based on web releases made since September 2015. For each survey round, the final figures as available in the latest web release covering the same have been considered.\nSince March 2021, the coverage of UCCS has been expanded to 6 new centres. Therefore, the results are updated with data for 19 centres from March 2021 round. "
+      },
+      {
+        "sheet": "T8 Non-essential spending",
+        "cell": "B71",
+        "text": "Note: Data are based on web releases made since September 2015. For each survey round, the final figures as available in the latest web release covering the same have been considered.\nSince March 2021, the coverage of UCCS has been expanded to 6 new centres. Therefore, the results are updated with data for 19 centres from March 2021 round. "
+      }
+    ],
+    "Rural": [
+      {
+        "sheet": "T9 Indices",
+        "cell": "B24",
+        "text": "*CSI/FEI = 100 + Average of Net Responses of (General Economic Situation, Employment Scenario, Price Level, Household income and Overall Spending)"
+      },
+      {
+        "sheet": "T9 Indices",
+        "cell": "B25",
+        "text": "Up to May 2024, figures are based on 26 states/ UTs; from July 2024, figures are compiled based on 31 states/ UTs; "
+      },
+      {
+        "sheet": "T7 Essential spending",
+        "cell": "B25",
+        "text": "Note: The rural consumer confidence survey covers both rural and semi-urban areas.\nUp to May 2024, figures are based on 26 states/ UTs; from July 2024, figures are compiled based on 31 states/ UTs; \n\u2018Net response\u2019 is the difference between the percentage of respondents reporting optimism and those reporting pessimisms. It ranges between -100 and 100. Any value greater than zero indicates expansion/ optimism and values less than zero indicate contraction/ pessimism."
+      },
+      {
+        "sheet": "T8 Non-essential spending",
+        "cell": "B25",
+        "text": "Note: The rural consumer confidence survey covers both rural and semi-urban areas.\nUp to May 2024, figures are based on 26 states/ UTs; from July 2024, figures are compiled based on 31 states/ UTs; \n\u2018Net response\u2019 is the difference between the percentage of respondents reporting optimism and those reporting pessimisms. It ranges between -100 and 100. Any value greater than zero indicates expansion/ optimism and values less than zero indicate contraction/ pessimism."
+      }
+    ]
+  }
+}

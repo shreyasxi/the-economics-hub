@@ -1,0 +1,22 @@
+{
+  "http_status": 200,
+  "kind": "api",
+  "observation_months": [
+    "2026-08"
+  ],
+  "query": {
+    "Format": "JSON",
+    "base_year": "2024",
+    "division_code": "0,1,2,3,4,5,6,7,8,9,10,11,12",
+    "limit": 100,
+    "month_code": 8,
+    "page": 1,
+    "sector_code": 3,
+    "series": "Current",
+    "state_code": 1,
+    "year": "2026"
+  },
+  "retrieved_at_utc": "2026-10-07T06:01:09.429991+00:00",
+  "sha256": "7ca30d0229b04b2b95550d0118a57746b20e0fe27f080b0abb7f23a599624939",
+  "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+}

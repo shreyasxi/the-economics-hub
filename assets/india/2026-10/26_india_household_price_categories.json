@@ -1,0 +1,60 @@
+{
+  "survey_date": "2026-05-01",
+  "round": "83B",
+  "sheets": {
+    "three_month": "T1A Product-wise 3M",
+    "one_year": "T1B Product-wise 1Y"
+  },
+  "measure": "Prices will increase",
+  "units": "Percentage of respondents",
+  "ordering": "Descending unrounded 1Y minus 3M percentage-point change",
+  "categories": [
+    {
+      "category": "Services",
+      "source_category": "Options: Cost of Services",
+      "three_month": 71.062552243527,
+      "three_month_cell": "T1A Product-wise 3M!EI42",
+      "one_year": 81.2663153856217,
+      "one_year_cell": "T1B Product-wise 1Y!EI42",
+      "change_pp": 10.2037631420947
+    },
+    {
+      "category": "Housing",
+      "source_category": "Options: Housing Prices",
+      "three_month": 78.3101068076663,
+      "three_month_cell": "T1A Product-wise 3M!EI35",
+      "one_year": 87.0035305287401,
+      "one_year_cell": "T1B Product-wise 1Y!EI35",
+      "change_pp": 8.693423721073799
+    },
+    {
+      "category": "Household durables",
+      "source_category": "Options: Household Durables",
+      "three_month": 68.1991104310611,
+      "three_month_cell": "T1A Product-wise 3M!EI28",
+      "one_year": 74.9524794898119,
+      "one_year_cell": "T1B Product-wise 1Y!EI28",
+      "change_pp": 6.753369058750806
+    },
+    {
+      "category": "Non-food",
+      "source_category": "Options: Non- Food Product",
+      "three_month": 81.0899864738161,
+      "three_month_cell": "T1A Product-wise 3M!EI21",
+      "one_year": 82.7229802251291,
+      "one_year_cell": "T1B Product-wise 1Y!EI21",
+      "change_pp": 1.632993751313009
+    },
+    {
+      "category": "Food",
+      "source_category": "Options: Food Product",
+      "three_month": 85.4364346742313,
+      "three_month_cell": "T1A Product-wise 3M!EI14",
+      "one_year": 85.9222930468186,
+      "one_year_cell": "T1B Product-wise 1Y!EI14",
+      "change_pp": 0.4858583725873018
+    }
+  ],
+  "workbook": "/home/runner/work/the-economics-hub/the-economics-hub/data/rbi_bimonthly_manual/inflation_survey/IESH05062026.xlsx",
+  "workbook_sha256": "ba633a2fcd80231eb63d1ffde1275c00b52f3db2c10f1760ea35eaf9fcc7163a"
+}
