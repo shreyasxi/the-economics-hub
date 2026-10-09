@@ -19,7 +19,7 @@ import uuid
 import openpyxl
 import requests
 
-from data import cpi_contributions as cpi
+from data.processors import cpi_contributions as cpi
 from data.fetchers import mospi_http
 
 LOG = logging.getLogger(__name__)

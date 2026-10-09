@@ -42,14 +42,11 @@ Desktop.ini
 .ipynb_checkpoints/
 
 # ── local data, cache, logs ──
-data/rbi_sentinel_cache/
-data/nse_valuations/runs/
-data/nse_indices/runs/
-data/NIFTY 50/
-data/NIFTY Small Cap 250/
-
-# ── RBI Bulletin, State of the Economy — downloaded article pages ──
-data/rbi_soe_cache/
+data/cache/
+data/stores/india/nse_valuations/runs/
+data/stores/india/nse_indices/runs/
+data/inputs/nse/NIFTY 50/
+data/inputs/nse/NIFTY Small Cap 250/
 
 # Ignore SQLite temp files
 *.db-shm
@@ -63,4 +60,4 @@ htmlcov/
 .mypy_cache/
 data/**/*.tmp
 data/**/.update.lock
-data/nse_valuations/start_investigation.json
+data/stores/india/nse_valuations/start_investigation.json

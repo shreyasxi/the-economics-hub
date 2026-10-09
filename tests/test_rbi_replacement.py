@@ -8,9 +8,9 @@ import unittest
 from unittest.mock import patch
 
 import openpyxl
-from data import rbi_surveys as rbi
-from charts import india_inflation_surveys as inflation
-from charts import india_consumer_surveys as consumer
+from data.processors import rbi_surveys as rbi
+from charts.india_charts import india_inflation_surveys as inflation
+from charts.india_charts import india_consumer_surveys as consumer
 from charts import loader
 from config.insights import get_insight
 
@@ -72,8 +72,8 @@ class ReplacementTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.root=Path(self.tmp.name)
-        self.inf=self.root/'data/rbi_bimonthly_manual/inflation_survey';self.inf.mkdir(parents=True)
-        self.con=self.root/'data/rbi_bimonthly_manual/consumer_survey';self.con.mkdir(parents=True)
+        self.inf=self.root/'data/inputs/rbi/rbi_bimonthly_manual/inflation_survey';self.inf.mkdir(parents=True)
+        self.con=self.root/'data/inputs/rbi/rbi_bimonthly_manual/consumer_survey';self.con.mkdir(parents=True)
         self.output=self.root/'output/india/2026-10'
         inflation_fixture(self.inf/'release.xlsx')
         # Deliberately misleading filenames: content determines geography.
@@ -194,7 +194,7 @@ class ReplacementTests(unittest.TestCase):
             stack.enter_context(patch.object(india,'load_cag_data',return_value=(None,None,None)))
             for name in vars(india):
                 if name.startswith('chart_'):stack.enter_context(patch.object(india,name))
-            stack.enter_context(patch('charts.india_cpi_contributions.generate'))
+            stack.enter_context(patch('charts.india_charts.india_cpi_contributions.generate'))
             inf=stack.enter_context(patch.object(inflation,'generate'))
             con=stack.enter_context(patch.object(consumer,'generate'))
             india.main()
@@ -217,6 +217,7 @@ class DashboardPlacementTests(unittest.TestCase):
     def test_real_india_page_places_all_six_once_with_existing_sections(self):
         import ast
         from unittest.mock import MagicMock
+        from charts.loader import chart_key
         root=Path(__file__).resolve().parents[1]
         tree=ast.parse((root/'app.py').read_text())
         page=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='page_india')
@@ -225,21 +226,30 @@ class DashboardPlacementTests(unittest.TestCase):
                '14_india_credit_deposit','17_india_trade','07_india_expenditure_quality',
                *inflation.NAMES,*consumer.NAMES]
         charts=[Path(n+'.png') for n in names];sections=[];rendered=[]
+        section_names=['Growth & Activity','Inflation','Monetary Conditions','External Sector',
+                       'Public Finances','Equity Markets','Consumer Confidence']
+        def header(index, answer):
+            sections.append(section_names[index])
+            return section_names[index]
         namespace={'st':MagicMock(),'get_charts':lambda _: (charts,'2026-10'),
                    'datetime':datetime,'_page_header_html':MagicMock(),
                    '_anchor':lambda _,title:title,'_load_soe':lambda _:None,
                    '_soe_changes_block':lambda _: '',
                    '_pop_summary':lambda paths,_:(None,paths),
+                   'chart_key':chart_key,'_EH_ANCHORS':list(range(7)),'_EH_STYLE':'',
+                   '_eh_india_answers':lambda *_:[None]*7,'_eh_india_observations':lambda:{},
+                   '_eh_brief':lambda:{},'_eh_question_header':header,
+                   '_render_iip_industry_heatmap':MagicMock(),'_render_cpi_items':MagicMock(),
+                   '_render_india_equity_matrix':MagicMock(),
                    '_section':lambda title,**kwargs:sections.append(title),
                    '_render_grid':lambda paths,**kwargs:rendered.append((sections[-1],[p.stem for p in paths]))}
         exec(code,namespace);namespace['page_india']()
-        self.assertEqual(sections,['Growth & Activity','Inflation & Monetary Conditions','Equity Markets',
-                                   'Consumer Confidence','External Sector','Fiscal Policy & Public Finances'])
+        self.assertEqual(sections,[section_names[i] for i in (0,1,2,5,3,4,6)])
         placed={}
         for section, items in rendered:
             placed.setdefault(section, []).extend(items)
         self.assertEqual(placed['Consumer Confidence'],
                          [consumer.NAMES[0], consumer.NAMES[3], *consumer.NAMES[1:3]])
-        for name in inflation.NAMES:self.assertIn(name,placed['Inflation & Monetary Conditions'])
+        for name in inflation.NAMES:self.assertIn(name,placed['Inflation'])
         flat=[name for _,items in rendered for name in items]
         self.assertEqual(sorted(flat),sorted(names))

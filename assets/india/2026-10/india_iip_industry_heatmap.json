@@ -1,0 +1,3325 @@
+{
+  "schema_version": 1,
+  "title": "Which Industries Are Driving Industrial Growth?",
+  "description": "Manufacturing output growth by industry, year on year. Rows are sorted by the latest month; read across a row to distinguish persistent growth from a one-month spike.",
+  "base_year": "2022-23",
+  "nic_version": "NIC-2025",
+  "unit": "% YoY",
+  "deflator_regime": "Output PPI",
+  "color_cap_pct": 20,
+  "methodology_note": "Cell colour saturates at ±20%; numbers show actual YoY growth.",
+  "latest_month": "2026-08",
+  "latest_label": "Aug 2026",
+  "months": [
+    {
+      "month": "2025-09",
+      "label": "Sep 25"
+    },
+    {
+      "month": "2025-10",
+      "label": "Oct 25"
+    },
+    {
+      "month": "2025-11",
+      "label": "Nov 25"
+    },
+    {
+      "month": "2025-12",
+      "label": "Dec 25"
+    },
+    {
+      "month": "2026-01",
+      "label": "Jan 26"
+    },
+    {
+      "month": "2026-02",
+      "label": "Feb 26"
+    },
+    {
+      "month": "2026-03",
+      "label": "Mar 26"
+    },
+    {
+      "month": "2026-04",
+      "label": "Apr 26"
+    },
+    {
+      "month": "2026-05",
+      "label": "May 26"
+    },
+    {
+      "month": "2026-06",
+      "label": "Jun 26"
+    },
+    {
+      "month": "2026-07",
+      "label": "Jul 26"
+    },
+    {
+      "month": "2026-08",
+      "label": "Aug 26"
+    }
+  ],
+  "breadth": {
+    "expanding": 18,
+    "contracting": 5,
+    "unchanged": 0,
+    "total": 23,
+    "median_growth": 8.6,
+    "top_three": [
+      {
+        "nic_code": "27",
+        "industry": "Manufacture of electrical equipment",
+        "yoy_growth": 30.9
+      },
+      {
+        "nic_code": "30",
+        "industry": "Manufacture of other transport equipment",
+        "yoy_growth": 25.3
+      },
+      {
+        "nic_code": "29",
+        "industry": "Manufacture of motor vehicles, trailers and semi-trailers",
+        "yoy_growth": 25.2
+      }
+    ],
+    "bottom_three": [
+      {
+        "nic_code": "12",
+        "industry": "Manufacture of tobacco products",
+        "yoy_growth": -8.0
+      },
+      {
+        "nic_code": "14",
+        "industry": "Manufacture of wearing apparel",
+        "yoy_growth": -7.4
+      },
+      {
+        "nic_code": "19",
+        "industry": "Manufacture of coke and refined petroleum products",
+        "yoy_growth": -0.6
+      }
+    ],
+    "sentence": "18 of 23 manufacturing industries expanded from a year earlier in Aug 2026."
+  },
+  "rows": [
+    {
+      "nic_code": "27",
+      "industry": "Manufacture of electrical equipment",
+      "display_name": "Electrical equipment",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 8.8,
+          "label": "+8.8",
+          "background": "#93afc5",
+          "foreground": "#252a2d",
+          "index": 129.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 10.7,
+          "label": "+10.7",
+          "background": "#7fa1bc",
+          "foreground": "#252a2d",
+          "index": 125.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 22.3,
+          "label": "+22.3",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 130.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 25.9,
+          "label": "+25.9",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 149.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 15.6,
+          "label": "+15.6",
+          "background": "#4c7da4",
+          "foreground": "#ffffff",
+          "index": 147.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 17.6,
+          "label": "+17.6",
+          "background": "#376f9b",
+          "foreground": "#ffffff",
+          "index": 153.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 14.5,
+          "label": "+14.5",
+          "background": "#5785a9",
+          "foreground": "#ffffff",
+          "index": 175.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 21.7,
+          "label": "+21.7",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 151.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 21.7,
+          "label": "+21.7",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 162.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 37.6,
+          "label": "+37.6",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 179.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 30.5,
+          "label": "+30.5",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 170.9,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 30.9,
+          "label": "+30.9",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 170.2,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "30",
+      "industry": "Manufacture of other transport equipment",
+      "display_name": "Other transport equipment",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 10.2,
+          "label": "+10.2",
+          "background": "#84a5be",
+          "foreground": "#252a2d",
+          "index": 160.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -1.6,
+          "label": "−1.6",
+          "background": "#e5e1e1",
+          "foreground": "#252a2d",
+          "index": 144.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 15.2,
+          "label": "+15.2",
+          "background": "#5080a6",
+          "foreground": "#ffffff",
+          "index": 150.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 25.3,
+          "label": "+25.3",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 141.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 12.1,
+          "label": "+12.1",
+          "background": "#7197b5",
+          "foreground": "#252a2d",
+          "index": 149.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 18.4,
+          "label": "+18.4",
+          "background": "#2f6997",
+          "foreground": "#ffffff",
+          "index": 147.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 13.3,
+          "label": "+13.3",
+          "background": "#648eaf",
+          "foreground": "#ffffff",
+          "index": 153.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 24.3,
+          "label": "+24.3",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 153.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 9.6,
+          "label": "+9.6",
+          "background": "#8ba9c1",
+          "foreground": "#252a2d",
+          "index": 146.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 25.2,
+          "label": "+25.2",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 162.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 28.9,
+          "label": "+28.9",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 184.8,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 25.3,
+          "label": "+25.3",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 181.2,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "29",
+      "industry": "Manufacture of motor vehicles, trailers and semi-trailers",
+      "display_name": "Motor vehicles, trailers and semi-trailers",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 9.9,
+          "label": "+9.9",
+          "background": "#88a7bf",
+          "foreground": "#252a2d",
+          "index": 123.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 3.7,
+          "label": "+3.7",
+          "background": "#c8d5dd",
+          "foreground": "#252a2d",
+          "index": 122.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 18.6,
+          "label": "+18.6",
+          "background": "#2d6796",
+          "foreground": "#ffffff",
+          "index": 128.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 13.3,
+          "label": "+13.3",
+          "background": "#648eaf",
+          "foreground": "#ffffff",
+          "index": 125.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 11.6,
+          "label": "+11.6",
+          "background": "#769bb7",
+          "foreground": "#252a2d",
+          "index": 135.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 14.6,
+          "label": "+14.6",
+          "background": "#5685a9",
+          "foreground": "#ffffff",
+          "index": 135.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 18.0,
+          "label": "+18.0",
+          "background": "#336c99",
+          "foreground": "#ffffff",
+          "index": 143.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 12.4,
+          "label": "+12.4",
+          "background": "#6d95b3",
+          "foreground": "#252a2d",
+          "index": 130.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 15.3,
+          "label": "+15.3",
+          "background": "#4f80a6",
+          "foreground": "#ffffff",
+          "index": 132.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 18.3,
+          "label": "+18.3",
+          "background": "#306997",
+          "foreground": "#ffffff",
+          "index": 128.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 24.7,
+          "label": "+24.7",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 149.4,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 25.2,
+          "label": "+25.2",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 144.5,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "22",
+      "industry": "Manufacture of rubber and plastics products",
+      "display_name": "Rubber and plastics products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 4.2,
+          "label": "+4.2",
+          "background": "#c3d1db",
+          "foreground": "#252a2d",
+          "index": 106.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -5.0,
+          "label": "−5.0",
+          "background": "#d1c1c5",
+          "foreground": "#252a2d",
+          "index": 98.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 5.7,
+          "label": "+5.7",
+          "background": "#b3c6d4",
+          "foreground": "#252a2d",
+          "index": 103.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 1.1,
+          "label": "+1.1",
+          "background": "#e4e8ea",
+          "foreground": "#252a2d",
+          "index": 108.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 1.0,
+          "label": "+1.0",
+          "background": "#e5e9ea",
+          "foreground": "#252a2d",
+          "index": 108.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 1.2,
+          "label": "+1.2",
+          "background": "#e2e7e9",
+          "foreground": "#252a2d",
+          "index": 105.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -1.1,
+          "label": "−1.1",
+          "background": "#e8e6e6",
+          "foreground": "#252a2d",
+          "index": 109.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 25.3,
+          "label": "+25.3",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 125.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 4.3,
+          "label": "+4.3",
+          "background": "#c2d0da",
+          "foreground": "#252a2d",
+          "index": 111.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 20.5,
+          "label": "+20.5",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 124.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 20.0,
+          "label": "+20.0",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 129.1,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 21.4,
+          "label": "+21.4",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 127.3,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "26",
+      "industry": "Manufacture of computer, electronic and optical products",
+      "display_name": "Computer, electronic and optical products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 8.0,
+          "label": "+8.0",
+          "background": "#9bb5c9",
+          "foreground": "#252a2d",
+          "index": 163.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -9.4,
+          "label": "−9.4",
+          "background": "#b798a0",
+          "foreground": "#252a2d",
+          "index": 127.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 7.2,
+          "label": "+7.2",
+          "background": "#a4bbcc",
+          "foreground": "#252a2d",
+          "index": 132.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 7.6,
+          "label": "+7.6",
+          "background": "#a0b8cb",
+          "foreground": "#252a2d",
+          "index": 139.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 0.4,
+          "label": "+0.4",
+          "background": "#ebeded",
+          "foreground": "#252a2d",
+          "index": 140.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 4.4,
+          "label": "+4.4",
+          "background": "#c1d0da",
+          "foreground": "#252a2d",
+          "index": 140.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 0.9,
+          "label": "+0.9",
+          "background": "#e6e9eb",
+          "foreground": "#252a2d",
+          "index": 151.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 5.0,
+          "label": "+5.0",
+          "background": "#bbcbd7",
+          "foreground": "#252a2d",
+          "index": 137.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 19.9,
+          "label": "+19.9",
+          "background": "#1f5e8f",
+          "foreground": "#ffffff",
+          "index": 160.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 12.1,
+          "label": "+12.1",
+          "background": "#7197b5",
+          "foreground": "#252a2d",
+          "index": 154.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 11.5,
+          "label": "+11.5",
+          "background": "#779bb8",
+          "foreground": "#252a2d",
+          "index": 156.8,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 19.3,
+          "label": "+19.3",
+          "background": "#256292",
+          "foreground": "#ffffff",
+          "index": 165.5,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "11",
+      "industry": "Manufacture of beverages",
+      "display_name": "Beverages",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": -12.8,
+          "label": "−12.8",
+          "background": "#a27883",
+          "foreground": "#252a2d",
+          "index": 92.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -9.8,
+          "label": "−9.8",
+          "background": "#b4949c",
+          "foreground": "#252a2d",
+          "index": 93.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": -2.8,
+          "label": "−2.8",
+          "background": "#ded6d7",
+          "foreground": "#252a2d",
+          "index": 83.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": -2.8,
+          "label": "−2.8",
+          "background": "#ded6d7",
+          "foreground": "#252a2d",
+          "index": 71.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -3.5,
+          "label": "−3.5",
+          "background": "#dacfd1",
+          "foreground": "#252a2d",
+          "index": 110.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": -6.3,
+          "label": "−6.3",
+          "background": "#c9b5ba",
+          "foreground": "#252a2d",
+          "index": 124.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -6.3,
+          "label": "−6.3",
+          "background": "#c9b5ba",
+          "foreground": "#252a2d",
+          "index": 153.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -5.6,
+          "label": "−5.6",
+          "background": "#cdbbc0",
+          "foreground": "#252a2d",
+          "index": 155.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 5.6,
+          "label": "+5.6",
+          "background": "#b4c7d4",
+          "foreground": "#252a2d",
+          "index": 166.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 11.9,
+          "label": "+11.9",
+          "background": "#7399b6",
+          "foreground": "#252a2d",
+          "index": 152.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 20.7,
+          "label": "+20.7",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 126.3,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 18.3,
+          "label": "+18.3",
+          "background": "#306997",
+          "foreground": "#ffffff",
+          "index": 120.5,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "25",
+      "industry": "Manufacture of fabricated metal products, except machinery and equipment",
+      "display_name": "Fabricated metals, excluding machinery",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 11.6,
+          "label": "+11.6",
+          "background": "#769bb7",
+          "foreground": "#252a2d",
+          "index": 128.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 3.0,
+          "label": "+3.0",
+          "background": "#d0dae1",
+          "foreground": "#252a2d",
+          "index": 115.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 11.5,
+          "label": "+11.5",
+          "background": "#779bb8",
+          "foreground": "#252a2d",
+          "index": 124.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 12.1,
+          "label": "+12.1",
+          "background": "#7197b5",
+          "foreground": "#252a2d",
+          "index": 137.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 13.5,
+          "label": "+13.5",
+          "background": "#628dae",
+          "foreground": "#ffffff",
+          "index": 137.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 12.2,
+          "label": "+12.2",
+          "background": "#7096b4",
+          "foreground": "#252a2d",
+          "index": 135.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 5.6,
+          "label": "+5.6",
+          "background": "#b4c7d4",
+          "foreground": "#252a2d",
+          "index": 153.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 11.2,
+          "label": "+11.2",
+          "background": "#7a9eb9",
+          "foreground": "#252a2d",
+          "index": 125.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 14.0,
+          "label": "+14.0",
+          "background": "#5d89ac",
+          "foreground": "#ffffff",
+          "index": 128.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 8.9,
+          "label": "+8.9",
+          "background": "#92afc4",
+          "foreground": "#252a2d",
+          "index": 135.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 9.0,
+          "label": "+9.0",
+          "background": "#91aec4",
+          "foreground": "#252a2d",
+          "index": 137.9,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 16.9,
+          "label": "+16.9",
+          "background": "#3e749e",
+          "foreground": "#ffffff",
+          "index": 137.1,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "13",
+      "industry": "Manufacture of textiles",
+      "display_name": "Textiles",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 2.6,
+          "label": "+2.6",
+          "background": "#d4dde3",
+          "foreground": "#252a2d",
+          "index": 123.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -4.4,
+          "label": "−4.4",
+          "background": "#d5c7ca",
+          "foreground": "#252a2d",
+          "index": 114.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 10.8,
+          "label": "+10.8",
+          "background": "#7ea1bb",
+          "foreground": "#252a2d",
+          "index": 122.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 4.0,
+          "label": "+4.0",
+          "background": "#c5d3dc",
+          "foreground": "#252a2d",
+          "index": 128.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -0.2,
+          "label": "−0.2",
+          "background": "#eeeeed",
+          "foreground": "#252a2d",
+          "index": 121.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": -21.2,
+          "label": "−21.2",
+          "background": "#773446",
+          "foreground": "#ffffff",
+          "index": 92.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 10.6,
+          "label": "+10.6",
+          "background": "#80a2bc",
+          "foreground": "#252a2d",
+          "index": 136.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 16.2,
+          "label": "+16.2",
+          "background": "#4679a1",
+          "foreground": "#ffffff",
+          "index": 135.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 13.2,
+          "label": "+13.2",
+          "background": "#658fb0",
+          "foreground": "#ffffff",
+          "index": 136.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 13.2,
+          "label": "+13.2",
+          "background": "#658fb0",
+          "foreground": "#ffffff",
+          "index": 135.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 4.5,
+          "label": "+4.5",
+          "background": "#c0cfd9",
+          "foreground": "#252a2d",
+          "index": 136.3,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 13.1,
+          "label": "+13.1",
+          "background": "#6690b0",
+          "foreground": "#ffffff",
+          "index": 136.9,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "23",
+      "industry": "Manufacture of other non-metallic mineral products",
+      "display_name": "Other non-metallic mineral products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 5.9,
+          "label": "+5.9",
+          "background": "#b1c5d3",
+          "foreground": "#252a2d",
+          "index": 107.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 2.3,
+          "label": "+2.3",
+          "background": "#d7dfe4",
+          "foreground": "#252a2d",
+          "index": 109.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 10.1,
+          "label": "+10.1",
+          "background": "#85a6bf",
+          "foreground": "#252a2d",
+          "index": 111.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 10.9,
+          "label": "+10.9",
+          "background": "#7da0bb",
+          "foreground": "#252a2d",
+          "index": 128.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 7.8,
+          "label": "+7.8",
+          "background": "#9db7ca",
+          "foreground": "#252a2d",
+          "index": 126.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 7.8,
+          "label": "+7.8",
+          "background": "#9db7ca",
+          "foreground": "#252a2d",
+          "index": 122.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 2.0,
+          "label": "+2.0",
+          "background": "#dae1e5",
+          "foreground": "#252a2d",
+          "index": 130.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 3.3,
+          "label": "+3.3",
+          "background": "#cdd8df",
+          "foreground": "#252a2d",
+          "index": 115.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 5.8,
+          "label": "+5.8",
+          "background": "#b2c5d3",
+          "foreground": "#252a2d",
+          "index": 122.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 13.5,
+          "label": "+13.5",
+          "background": "#628dae",
+          "foreground": "#ffffff",
+          "index": 130.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 17.3,
+          "label": "+17.3",
+          "background": "#3a719c",
+          "foreground": "#ffffff",
+          "index": 132.5,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 11.4,
+          "label": "+11.4",
+          "background": "#789cb8",
+          "foreground": "#252a2d",
+          "index": 118.3,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "28",
+      "industry": "Manufacture of machinery and equipment n.e.c.",
+      "display_name": "Machinery and equipment n.e.c.",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 14.2,
+          "label": "+14.2",
+          "background": "#5b88ab",
+          "foreground": "#ffffff",
+          "index": 139.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 1.3,
+          "label": "+1.3",
+          "background": "#e1e6e9",
+          "foreground": "#252a2d",
+          "index": 109.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 10.4,
+          "label": "+10.4",
+          "background": "#82a4bd",
+          "foreground": "#252a2d",
+          "index": 116.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 5.2,
+          "label": "+5.2",
+          "background": "#b9cad6",
+          "foreground": "#252a2d",
+          "index": 129.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 6.8,
+          "label": "+6.8",
+          "background": "#a8bece",
+          "foreground": "#252a2d",
+          "index": 121.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 13.1,
+          "label": "+13.1",
+          "background": "#6690b0",
+          "foreground": "#ffffff",
+          "index": 130.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 2.3,
+          "label": "+2.3",
+          "background": "#d7dfe4",
+          "foreground": "#252a2d",
+          "index": 167.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 5.1,
+          "label": "+5.1",
+          "background": "#bacbd7",
+          "foreground": "#252a2d",
+          "index": 109.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 9.5,
+          "label": "+9.5",
+          "background": "#8caac1",
+          "foreground": "#252a2d",
+          "index": 125.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 12.3,
+          "label": "+12.3",
+          "background": "#6e96b4",
+          "foreground": "#252a2d",
+          "index": 135.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 14.6,
+          "label": "+14.6",
+          "background": "#5685a9",
+          "foreground": "#ffffff",
+          "index": 131.4,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 10.3,
+          "label": "+10.3",
+          "background": "#83a4be",
+          "foreground": "#252a2d",
+          "index": 127.3,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "31",
+      "industry": "Manufacture of furniture",
+      "display_name": "Furniture",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 9.0,
+          "label": "+9.0",
+          "background": "#91aec4",
+          "foreground": "#252a2d",
+          "index": 123.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -7.3,
+          "label": "−7.3",
+          "background": "#c3abb1",
+          "foreground": "#252a2d",
+          "index": 117.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 14.5,
+          "label": "+14.5",
+          "background": "#5785a9",
+          "foreground": "#ffffff",
+          "index": 115.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 13.0,
+          "label": "+13.0",
+          "background": "#6790b1",
+          "foreground": "#ffffff",
+          "index": 125.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 7.4,
+          "label": "+7.4",
+          "background": "#a2bacb",
+          "foreground": "#252a2d",
+          "index": 119.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 12.2,
+          "label": "+12.2",
+          "background": "#7096b4",
+          "foreground": "#252a2d",
+          "index": 121.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 12.1,
+          "label": "+12.1",
+          "background": "#7197b5",
+          "foreground": "#252a2d",
+          "index": 131.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -2.8,
+          "label": "−2.8",
+          "background": "#ded6d7",
+          "foreground": "#252a2d",
+          "index": 109.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 5.8,
+          "label": "+5.8",
+          "background": "#b2c5d3",
+          "foreground": "#252a2d",
+          "index": 116.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 9.9,
+          "label": "+9.9",
+          "background": "#88a7bf",
+          "foreground": "#252a2d",
+          "index": 123.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 14.3,
+          "label": "+14.3",
+          "background": "#5a87aa",
+          "foreground": "#ffffff",
+          "index": 131.8,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 9.4,
+          "label": "+9.4",
+          "background": "#8dabc2",
+          "foreground": "#252a2d",
+          "index": 123.5,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "16",
+      "industry": "Manufacture of wood and products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials",
+      "display_name": "Wood, cork, straw and plaiting products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 20.3,
+          "label": "+20.3",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 116.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 3.6,
+          "label": "+3.6",
+          "background": "#c9d6de",
+          "foreground": "#252a2d",
+          "index": 101.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 15.5,
+          "label": "+15.5",
+          "background": "#4d7ea5",
+          "foreground": "#ffffff",
+          "index": 110.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 10.0,
+          "label": "+10.0",
+          "background": "#86a6bf",
+          "foreground": "#252a2d",
+          "index": 126.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -1.6,
+          "label": "−1.6",
+          "background": "#e5e1e1",
+          "foreground": "#252a2d",
+          "index": 119.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 9.2,
+          "label": "+9.2",
+          "background": "#8facc3",
+          "foreground": "#252a2d",
+          "index": 109.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -10.6,
+          "label": "−10.6",
+          "background": "#af8c95",
+          "foreground": "#252a2d",
+          "index": 108.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -12.5,
+          "label": "−12.5",
+          "background": "#a47a85",
+          "foreground": "#252a2d",
+          "index": 84.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -4.9,
+          "label": "−4.9",
+          "background": "#d2c2c6",
+          "foreground": "#252a2d",
+          "index": 94.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": -3.8,
+          "label": "−3.8",
+          "background": "#d8cccf",
+          "foreground": "#252a2d",
+          "index": 104.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 7.8,
+          "label": "+7.8",
+          "background": "#9db7ca",
+          "foreground": "#252a2d",
+          "index": 113.2,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 8.6,
+          "label": "+8.6",
+          "background": "#95b1c6",
+          "foreground": "#252a2d",
+          "index": 112.2,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "15",
+      "industry": "Manufacture of leather and related products",
+      "display_name": "Leather and related products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 2.0,
+          "label": "+2.0",
+          "background": "#dae1e5",
+          "foreground": "#252a2d",
+          "index": 98.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -8.6,
+          "label": "−8.6",
+          "background": "#bb9fa6",
+          "foreground": "#252a2d",
+          "index": 90.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 2.9,
+          "label": "+2.9",
+          "background": "#d1dbe1",
+          "foreground": "#252a2d",
+          "index": 99.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 2.2,
+          "label": "+2.2",
+          "background": "#d8e0e4",
+          "foreground": "#252a2d",
+          "index": 108.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -5.6,
+          "label": "−5.6",
+          "background": "#cdbbc0",
+          "foreground": "#252a2d",
+          "index": 103.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 3.7,
+          "label": "+3.7",
+          "background": "#c8d5dd",
+          "foreground": "#252a2d",
+          "index": 100.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -4.4,
+          "label": "−4.4",
+          "background": "#d5c7ca",
+          "foreground": "#252a2d",
+          "index": 96.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 1.3,
+          "label": "+1.3",
+          "background": "#e1e6e9",
+          "foreground": "#252a2d",
+          "index": 99.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -5.6,
+          "label": "−5.6",
+          "background": "#cdbbc0",
+          "foreground": "#252a2d",
+          "index": 102.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 7.9,
+          "label": "+7.9",
+          "background": "#9cb6c9",
+          "foreground": "#252a2d",
+          "index": 108.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 0.9,
+          "label": "+0.9",
+          "background": "#e6e9eb",
+          "foreground": "#252a2d",
+          "index": 113.3,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 8.1,
+          "label": "+8.1",
+          "background": "#9ab4c8",
+          "foreground": "#252a2d",
+          "index": 109.7,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "18",
+      "industry": "Printing and reproduction of recorded media",
+      "display_name": "Printing and reproduction of recorded media",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 7.8,
+          "label": "+7.8",
+          "background": "#9db7ca",
+          "foreground": "#252a2d",
+          "index": 99.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -1.3,
+          "label": "−1.3",
+          "background": "#e7e4e4",
+          "foreground": "#252a2d",
+          "index": 92.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 5.9,
+          "label": "+5.9",
+          "background": "#b1c5d3",
+          "foreground": "#252a2d",
+          "index": 102.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 0.9,
+          "label": "+0.9",
+          "background": "#e6e9eb",
+          "foreground": "#252a2d",
+          "index": 109.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -5.4,
+          "label": "−5.4",
+          "background": "#cfbdc1",
+          "foreground": "#252a2d",
+          "index": 105.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 0.0,
+          "label": "+0.0",
+          "background": "#eff0ef",
+          "foreground": "#252a2d",
+          "index": 107.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 2.9,
+          "label": "+2.9",
+          "background": "#d1dbe1",
+          "foreground": "#252a2d",
+          "index": 115.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -4.1,
+          "label": "−4.1",
+          "background": "#d6c9cc",
+          "foreground": "#252a2d",
+          "index": 103.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -8.3,
+          "label": "−8.3",
+          "background": "#bda2a9",
+          "foreground": "#252a2d",
+          "index": 97.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 3.9,
+          "label": "+3.9",
+          "background": "#c6d3dc",
+          "foreground": "#252a2d",
+          "index": 99.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 4.6,
+          "label": "+4.6",
+          "background": "#bfced9",
+          "foreground": "#252a2d",
+          "index": 101.0,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 4.8,
+          "label": "+4.8",
+          "background": "#bdcdd8",
+          "foreground": "#252a2d",
+          "index": 94.0,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "32",
+      "industry": "Other manufacturing",
+      "display_name": "Other manufacturing",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 3.1,
+          "label": "+3.1",
+          "background": "#cfd9e0",
+          "foreground": "#252a2d",
+          "index": 135.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -13.6,
+          "label": "−13.6",
+          "background": "#9d707c",
+          "foreground": "#ffffff",
+          "index": 111.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 26.1,
+          "label": "+26.1",
+          "background": "#1e5d8f",
+          "foreground": "#ffffff",
+          "index": 107.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": -1.8,
+          "label": "−1.8",
+          "background": "#e4dfe0",
+          "foreground": "#252a2d",
+          "index": 105.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -5.5,
+          "label": "−5.5",
+          "background": "#cebcc1",
+          "foreground": "#252a2d",
+          "index": 103.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 3.7,
+          "label": "+3.7",
+          "background": "#c8d5dd",
+          "foreground": "#252a2d",
+          "index": 103.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -7.9,
+          "label": "−7.9",
+          "background": "#c0a6ac",
+          "foreground": "#252a2d",
+          "index": 110.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -4.7,
+          "label": "−4.7",
+          "background": "#d3c4c7",
+          "foreground": "#252a2d",
+          "index": 112.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 7.4,
+          "label": "+7.4",
+          "background": "#a2bacb",
+          "foreground": "#252a2d",
+          "index": 100.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 11.1,
+          "label": "+11.1",
+          "background": "#7b9eba",
+          "foreground": "#252a2d",
+          "index": 106.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 4.1,
+          "label": "+4.1",
+          "background": "#c4d2db",
+          "foreground": "#252a2d",
+          "index": 117.2,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 3.2,
+          "label": "+3.2",
+          "background": "#ced8e0",
+          "foreground": "#252a2d",
+          "index": 120.8,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "10",
+      "industry": "Manufacture of food products",
+      "display_name": "Food products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 0.0,
+          "label": "+0.0",
+          "background": "#eff0ef",
+          "foreground": "#252a2d",
+          "index": 97.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -6.8,
+          "label": "−6.8",
+          "background": "#c6b0b6",
+          "foreground": "#252a2d",
+          "index": 98.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 7.3,
+          "label": "+7.3",
+          "background": "#a3bacc",
+          "foreground": "#252a2d",
+          "index": 115.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 10.4,
+          "label": "+10.4",
+          "background": "#82a4bd",
+          "foreground": "#252a2d",
+          "index": 126.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 4.2,
+          "label": "+4.2",
+          "background": "#c3d1db",
+          "foreground": "#252a2d",
+          "index": 117.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 2.7,
+          "label": "+2.7",
+          "background": "#d3dce2",
+          "foreground": "#252a2d",
+          "index": 107.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 1.3,
+          "label": "+1.3",
+          "background": "#e1e6e9",
+          "foreground": "#252a2d",
+          "index": 103.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 5.5,
+          "label": "+5.5",
+          "background": "#b6c8d5",
+          "foreground": "#252a2d",
+          "index": 100.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 5.2,
+          "label": "+5.2",
+          "background": "#b9cad6",
+          "foreground": "#252a2d",
+          "index": 103.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 10.3,
+          "label": "+10.3",
+          "background": "#83a4be",
+          "foreground": "#252a2d",
+          "index": 103.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 2.1,
+          "label": "+2.1",
+          "background": "#d9e1e5",
+          "foreground": "#252a2d",
+          "index": 105.5,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 2.8,
+          "label": "+2.8",
+          "background": "#d2dbe2",
+          "foreground": "#252a2d",
+          "index": 104.5,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "24",
+      "industry": "Manufacture of basic metals",
+      "display_name": "Basic metals",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 11.2,
+          "label": "+11.2",
+          "background": "#7a9eb9",
+          "foreground": "#252a2d",
+          "index": 129.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 7.6,
+          "label": "+7.6",
+          "background": "#a0b8cb",
+          "foreground": "#252a2d",
+          "index": 129.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 10.6,
+          "label": "+10.6",
+          "background": "#80a2bc",
+          "foreground": "#252a2d",
+          "index": 129.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 11.8,
+          "label": "+11.8",
+          "background": "#7499b6",
+          "foreground": "#252a2d",
+          "index": 139.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 13.0,
+          "label": "+13.0",
+          "background": "#6790b1",
+          "foreground": "#ffffff",
+          "index": 143.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 9.5,
+          "label": "+9.5",
+          "background": "#8caac1",
+          "foreground": "#252a2d",
+          "index": 130.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 7.0,
+          "label": "+7.0",
+          "background": "#a6bdcd",
+          "foreground": "#252a2d",
+          "index": 141.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 4.9,
+          "label": "+4.9",
+          "background": "#bcccd7",
+          "foreground": "#252a2d",
+          "index": 128.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 4.0,
+          "label": "+4.0",
+          "background": "#c5d3dc",
+          "foreground": "#252a2d",
+          "index": 131.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 3.8,
+          "label": "+3.8",
+          "background": "#c7d4dd",
+          "foreground": "#252a2d",
+          "index": 129.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 2.0,
+          "label": "+2.0",
+          "background": "#dae1e5",
+          "foreground": "#252a2d",
+          "index": 134.6,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 2.4,
+          "label": "+2.4",
+          "background": "#d6dee3",
+          "foreground": "#252a2d",
+          "index": 134.8,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "21",
+      "industry": "Manufacture of basic pharmaceutical products and pharmaceutical preparations",
+      "display_name": "Pharmaceutical products and preparations",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 0.8,
+          "label": "+0.8",
+          "background": "#e7eaeb",
+          "foreground": "#252a2d",
+          "index": 123.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -13.1,
+          "label": "−13.1",
+          "background": "#a07580",
+          "foreground": "#ffffff",
+          "index": 106.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 0.8,
+          "label": "+0.8",
+          "background": "#e7eaeb",
+          "foreground": "#252a2d",
+          "index": 115.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 4.1,
+          "label": "+4.1",
+          "background": "#c4d2db",
+          "foreground": "#252a2d",
+          "index": 133.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -6.8,
+          "label": "−6.8",
+          "background": "#c6b0b6",
+          "foreground": "#252a2d",
+          "index": 114.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 4.1,
+          "label": "+4.1",
+          "background": "#c4d2db",
+          "foreground": "#252a2d",
+          "index": 118.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -1.1,
+          "label": "−1.1",
+          "background": "#e8e6e6",
+          "foreground": "#252a2d",
+          "index": 132.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -3.7,
+          "label": "−3.7",
+          "background": "#d9cdd0",
+          "foreground": "#252a2d",
+          "index": 110.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -6.1,
+          "label": "−6.1",
+          "background": "#cab7bb",
+          "foreground": "#252a2d",
+          "index": 115.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 3.0,
+          "label": "+3.0",
+          "background": "#d0dae1",
+          "foreground": "#252a2d",
+          "index": 123.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": -4.8,
+          "label": "−4.8",
+          "background": "#d2c3c6",
+          "foreground": "#252a2d",
+          "index": 120.0,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": 1.6,
+          "label": "+1.6",
+          "background": "#dee4e7",
+          "foreground": "#252a2d",
+          "index": 124.5,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "17",
+      "industry": "Manufacture of paper and paper products",
+      "display_name": "Paper and paper products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 0.6,
+          "label": "+0.6",
+          "background": "#e9ecec",
+          "foreground": "#252a2d",
+          "index": 107.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 1.5,
+          "label": "+1.5",
+          "background": "#dfe5e8",
+          "foreground": "#252a2d",
+          "index": 105.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 10.2,
+          "label": "+10.2",
+          "background": "#84a5be",
+          "foreground": "#252a2d",
+          "index": 109.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 11.7,
+          "label": "+11.7",
+          "background": "#759ab7",
+          "foreground": "#252a2d",
+          "index": 114.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 7.1,
+          "label": "+7.1",
+          "background": "#a5bccd",
+          "foreground": "#252a2d",
+          "index": 111.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 13.1,
+          "label": "+13.1",
+          "background": "#6690b0",
+          "foreground": "#ffffff",
+          "index": 112.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 12.0,
+          "label": "+12.0",
+          "background": "#7298b5",
+          "foreground": "#252a2d",
+          "index": 118.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 13.9,
+          "label": "+13.9",
+          "background": "#5e8aac",
+          "foreground": "#ffffff",
+          "index": 115.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": 11.4,
+          "label": "+11.4",
+          "background": "#789cb8",
+          "foreground": "#252a2d",
+          "index": 119.5,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 10.2,
+          "label": "+10.2",
+          "background": "#84a5be",
+          "foreground": "#252a2d",
+          "index": 115.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 8.3,
+          "label": "+8.3",
+          "background": "#98b3c7",
+          "foreground": "#252a2d",
+          "index": 118.5,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": -0.1,
+          "label": "−0.1",
+          "background": "#eeefee",
+          "foreground": "#252a2d",
+          "index": 112.0,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "20",
+      "industry": "Manufacture of chemicals and chemical products",
+      "display_name": "Chemicals and chemical products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": 3.2,
+          "label": "+3.2",
+          "background": "#ced8e0",
+          "foreground": "#252a2d",
+          "index": 108.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -2.7,
+          "label": "−2.7",
+          "background": "#dfd7d8",
+          "foreground": "#252a2d",
+          "index": 104.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 4.5,
+          "label": "+4.5",
+          "background": "#c0cfd9",
+          "foreground": "#252a2d",
+          "index": 108.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 1.4,
+          "label": "+1.4",
+          "background": "#e0e6e8",
+          "foreground": "#252a2d",
+          "index": 113.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -0.5,
+          "label": "−0.5",
+          "background": "#ecebeb",
+          "foreground": "#252a2d",
+          "index": 111.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": 6.1,
+          "label": "+6.1",
+          "background": "#afc3d2",
+          "foreground": "#252a2d",
+          "index": 109.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 0.1,
+          "label": "+0.1",
+          "background": "#eeefef",
+          "foreground": "#252a2d",
+          "index": 112.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 0.1,
+          "label": "+0.1",
+          "background": "#eeefef",
+          "foreground": "#252a2d",
+          "index": 104.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -1.5,
+          "label": "−1.5",
+          "background": "#e6e2e2",
+          "foreground": "#252a2d",
+          "index": 108.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": -1.0,
+          "label": "−1.0",
+          "background": "#e9e7e7",
+          "foreground": "#252a2d",
+          "index": 108.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": -2.9,
+          "label": "−2.9",
+          "background": "#ded5d6",
+          "foreground": "#252a2d",
+          "index": 109.5,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": -0.5,
+          "label": "−0.5",
+          "background": "#ecebeb",
+          "foreground": "#252a2d",
+          "index": 109.6,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "19",
+      "industry": "Manufacture of coke and refined petroleum products",
+      "display_name": "Coke and refined petroleum products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": -0.2,
+          "label": "−0.2",
+          "background": "#eeeeed",
+          "foreground": "#252a2d",
+          "index": 102.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": 5.8,
+          "label": "+5.8",
+          "background": "#b2c5d3",
+          "foreground": "#252a2d",
+          "index": 111.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 0.4,
+          "label": "+0.4",
+          "background": "#ebeded",
+          "foreground": "#252a2d",
+          "index": 107.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": -0.4,
+          "label": "−0.4",
+          "background": "#edecec",
+          "foreground": "#252a2d",
+          "index": 115.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -0.3,
+          "label": "−0.3",
+          "background": "#ededec",
+          "foreground": "#252a2d",
+          "index": 114.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": -0.8,
+          "label": "−0.8",
+          "background": "#eae8e8",
+          "foreground": "#252a2d",
+          "index": 103.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": 0.4,
+          "label": "+0.4",
+          "background": "#ebeded",
+          "foreground": "#252a2d",
+          "index": 115.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 0.0,
+          "label": "+0.0",
+          "background": "#eff0ef",
+          "foreground": "#252a2d",
+          "index": 104.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -4.8,
+          "label": "−4.8",
+          "background": "#d2c3c6",
+          "foreground": "#252a2d",
+          "index": 106.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": -0.4,
+          "label": "−0.4",
+          "background": "#edecec",
+          "foreground": "#252a2d",
+          "index": 108.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": 1.3,
+          "label": "+1.3",
+          "background": "#e1e6e9",
+          "foreground": "#252a2d",
+          "index": 113.1,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": -0.6,
+          "label": "−0.6",
+          "background": "#ebeaea",
+          "foreground": "#252a2d",
+          "index": 108.2,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "14",
+      "industry": "Manufacture of wearing apparel",
+      "display_name": "Wearing apparel",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": -3.7,
+          "label": "−3.7",
+          "background": "#d9cdd0",
+          "foreground": "#252a2d",
+          "index": 94.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -5.4,
+          "label": "−5.4",
+          "background": "#cfbdc1",
+          "foreground": "#252a2d",
+          "index": 87.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 0.0,
+          "label": "+0.0",
+          "background": "#eff0ef",
+          "foreground": "#252a2d",
+          "index": 93.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 1.9,
+          "label": "+1.9",
+          "background": "#dbe2e6",
+          "foreground": "#252a2d",
+          "index": 109.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": -8.3,
+          "label": "−8.3",
+          "background": "#bda2a9",
+          "foreground": "#252a2d",
+          "index": 99.9,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": -11.0,
+          "label": "−11.0",
+          "background": "#ad8992",
+          "foreground": "#252a2d",
+          "index": 96.6,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -9.0,
+          "label": "−9.0",
+          "background": "#b99ba3",
+          "foreground": "#252a2d",
+          "index": 101.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": -6.9,
+          "label": "−6.9",
+          "background": "#c6afb5",
+          "foreground": "#252a2d",
+          "index": 91.0,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -8.6,
+          "label": "−8.6",
+          "background": "#bb9fa6",
+          "foreground": "#252a2d",
+          "index": 94.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": -4.5,
+          "label": "−4.5",
+          "background": "#d4c6c9",
+          "foreground": "#252a2d",
+          "index": 98.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": -0.6,
+          "label": "−0.6",
+          "background": "#ebeaea",
+          "foreground": "#252a2d",
+          "index": 95.9,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": -7.4,
+          "label": "−7.4",
+          "background": "#c3aab0",
+          "foreground": "#252a2d",
+          "index": 89.0,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    },
+    {
+      "nic_code": "12",
+      "industry": "Manufacture of tobacco products",
+      "display_name": "Tobacco products",
+      "cells": [
+        {
+          "month": "2025-09",
+          "value": -6.0,
+          "label": "−6.0",
+          "background": "#cbb8bc",
+          "foreground": "#252a2d",
+          "index": 116.1,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-10",
+          "value": -7.4,
+          "label": "−7.4",
+          "background": "#c3aab0",
+          "foreground": "#252a2d",
+          "index": 105.3,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-11",
+          "value": 11.7,
+          "label": "+11.7",
+          "background": "#759ab7",
+          "foreground": "#252a2d",
+          "index": 120.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2025-12",
+          "value": 19.3,
+          "label": "+19.3",
+          "background": "#256292",
+          "foreground": "#ffffff",
+          "index": 141.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-01",
+          "value": 15.1,
+          "label": "+15.1",
+          "background": "#5181a7",
+          "foreground": "#ffffff",
+          "index": 139.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-02",
+          "value": -16.7,
+          "label": "−16.7",
+          "background": "#8b5362",
+          "foreground": "#ffffff",
+          "index": 78.4,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-03",
+          "value": -15.3,
+          "label": "−15.3",
+          "background": "#93606e",
+          "foreground": "#ffffff",
+          "index": 106.2,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-04",
+          "value": 2.2,
+          "label": "+2.2",
+          "background": "#d8e0e4",
+          "foreground": "#252a2d",
+          "index": 113.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-05",
+          "value": -6.6,
+          "label": "−6.6",
+          "background": "#c7b2b7",
+          "foreground": "#252a2d",
+          "index": 113.7,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-06",
+          "value": 3.5,
+          "label": "+3.5",
+          "background": "#cad6de",
+          "foreground": "#252a2d",
+          "index": 116.8,
+          "status": "Not specified",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-07",
+          "value": -11.8,
+          "label": "−11.8",
+          "background": "#a8818b",
+          "foreground": "#252a2d",
+          "index": 108.1,
+          "status": "Final estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        },
+        {
+          "month": "2026-08",
+          "value": -8.0,
+          "label": "−8.0",
+          "background": "#bfa5ab",
+          "foreground": "#252a2d",
+          "index": 118.0,
+          "status": "Quick estimate",
+          "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+          "release_date": "2026-09-28"
+        }
+      ]
+    }
+  ],
+  "leaders": [
+    {
+      "label": "Top Industry · Latest",
+      "value": 30.9,
+      "display": "+30.9%",
+      "period": "Electrical equipment · Aug 26 YoY",
+      "nic_code": "27"
+    },
+    {
+      "label": "Top Industry · TTM",
+      "value": 21.564105942811974,
+      "display": "+21.6%",
+      "nic_code": "27",
+      "period": "Electrical equipment · Sep 25–Aug 26"
+    }
+  ],
+  "ttm_method": "Total index over the latest 12 months versus the preceding 12 months; all 23 industries require complete windows.",
+  "source_url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+  "release_date": "2026-09-28",
+  "coverage_start": "2023-04",
+  "missing_note": "A dash means MoSPI did not publish a growth value; no observations are filled."
+}

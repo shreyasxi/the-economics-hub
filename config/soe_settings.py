@@ -5,9 +5,9 @@ The article is the RBI's monthly account of the Indian economy, published in the
 Bulletin around the 22nd-25th. Two things are taken from it:
 
   1. the opening summary and concluding assessment, shown at the top of the
-     India tab (`data/rbi_soe.py` -> soe.json -> app.py);
+     India tab (`data/processors/rbi_soe.py` -> soe.json -> app.py);
   2. Table IV.3, the transmission of policy rate changes to bank deposit and
-     lending rates, which becomes `data/rbi_transmission.csv` and the
+     lending rates, which becomes `data/stores/india/rbi_transmission.csv` and the
      pass-through chart on the India tab.
 
 Access: prefer the HTML article linked from the Bulletin contents. When HTML is
@@ -24,7 +24,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+from data.paths import PROJECT_ROOT as REPO_ROOT, RBI_SOE_CACHE, RBI_TRANSMISSION_CSV
+
+PROJECT_ROOT = REPO_ROOT
 
 # ─────────────────────────────────────────────
 # SOURCE
@@ -48,9 +50,9 @@ REQUEST_TIMEOUT = 45          # seconds; the Bulletin page is large and slow
 PAUSE_SECONDS = 2.0           # between requests, and a backfill reads one month at a time
 MAX_ATTEMPTS = 3
 
-CACHE_DIR = PROJECT_ROOT / "data" / "rbi_soe_cache"     # git-ignored
+CACHE_DIR = RBI_SOE_CACHE     # git-ignored
 BRIEFING_FILENAME = "soe.json"                          # written into the India edition folder
-TRANSMISSION_CSV = PROJECT_ROOT / "data" / "rbi_transmission.csv"   # tracked history
+TRANSMISSION_CSV = RBI_TRANSMISSION_CSV   # tracked history
 
 # ─────────────────────────────────────────────
 # BRIEFING

@@ -60,8 +60,10 @@ class YFinanceFetcher:
         retry=(retry_if_result(_empty) | retry_if_exception_type(Exception)),
         reraise=True,
     )
-    def _download(self, ticker, period, interval, start):
+    def _download(self, ticker, period, interval, start, adjusted=False, price_only=False):
         tk = yf.Ticker(ticker)
+        if adjusted or price_only:
+            return tk.history(period=period, interval=interval, auto_adjust=False, actions=True)
         if start:
             return tk.history(start=start, interval=interval)
         return tk.history(period=period, interval=interval)
@@ -116,6 +118,36 @@ class YFinanceFetcher:
         if df.empty:
             return pd.Series(dtype=float)
         return df["Close"]
+
+    def get_total_return_series(self, ticker, period="max"):
+        """Explicit Yahoo Adj Close, adjusted for splits and cash distributions.
+
+        Ratios approximate reinvested ETF total returns, after fund expenses,
+        before investor tax/trading costs, in listing currency. Never fall back
+        to Close. Existing generic price-fetch behavior stays unchanged.
+        """
+        time.sleep(random.uniform(0.2, 0.6))
+        df = self._download(ticker, period, "1d", None, adjusted=True)
+        if df.empty or "Adj Close" not in df:
+            raise ValueError(f"{ticker}: no explicit adjusted-close history")
+        result = df["Adj Close"].copy()
+        result.attrs["return_basis"] = "adjusted total return"
+        result.attrs["return_method"] = "dividend-adjusted investable total return"
+        return result
+
+    def get_price_return_series(self, ticker, period="max"):
+        """Explicit unadjusted price close for non-income assets (e.g. BTC/USD).
+
+        Kept separate from generic Close behavior and adjusted fund returns.
+        The matrix validates that the configured underlying pays no income.
+        """
+        time.sleep(random.uniform(0.2, 0.6))
+        df = self._download(ticker, period, "1d", None, price_only=True)
+        if df.empty or "Close" not in df:
+            raise ValueError(f"{ticker}: no direct price-close history")
+        result = df["Close"].copy()
+        result.attrs["return_method"] = "direct price return"
+        return result
 
     def weekly_change(self, ticker):
         """

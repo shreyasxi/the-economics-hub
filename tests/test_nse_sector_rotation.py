@@ -131,20 +131,27 @@ class RotationTests(unittest.TestCase):
 
     def test_india_explicit_layout_and_distinct_key(self):
         tree=ast.parse(Path('app.py').read_text())
-        assignment=next(n for n in ast.walk(tree) if isinstance(n,ast.Assign) and
-                        any(isinstance(t,ast.Name) and t.id=='equity_markets' for t in n.targets))
-        def ordered_names(node):
-            if isinstance(node,ast.Name):
-                return [node.id]
-            self.assertIsInstance(node,ast.BinOp)
-            self.assertIsInstance(node.op,ast.Add)
-            return ordered_names(node.left)+ordered_names(node.right)
-        self.assertEqual(ordered_names(assignment.value),
-                         ['fpi','risk_appetite','sector_valuations','sector_rotation'])
-        grid=next(n for n in ast.walk(tree) if isinstance(n,ast.Call) and
-                  isinstance(n.func,ast.Name) and n.func.id=='_render_grid' and
-                  n.args and isinstance(n.args[0],ast.Name) and n.args[0].id=='equity_markets')
-        self.assertEqual({k.arg:ast.literal_eval(k.value) for k in grid.keywords},{'cols':2})
+        from datetime import datetime
+        from unittest.mock import MagicMock
+        page=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='page_india')
+        names=['23_india_sector_rotation_12m_benchmark.png','22_india_sector_valuations.png',
+               '21_india_risk_appetite.png','03_india_fpi_monthly.png']
+        paths=[Path(name) for name in names];rendered=[];section=[None]
+        def header(index, answer): section[0]=index;return str(index)
+        namespace={'st':MagicMock(),'datetime':datetime,'get_charts':lambda _: (paths,'2026-10'),
+                   '_page_header_html':MagicMock(),'_anchor':lambda _,title:title,
+                   'chart_key':chart_key,'_EH_ANCHORS':list(range(7)),'_EH_STYLE':'',
+                   '_load_soe':lambda _:None,'_soe_changes_block':lambda _: '',
+                   '_pop_summary':lambda items,_:(None,items),
+                   '_eh_india_answers':lambda *_:[None]*7,'_eh_india_observations':lambda:{},
+                   '_eh_brief':lambda:{},'_eh_question_header':header,
+                   '_render_india_equity_matrix':MagicMock(),'_section':MagicMock(),
+                   '_render_grid':lambda items,**kwargs:rendered.append((section[0],items))}
+        exec(compile(ast.Module(body=[page],type_ignores=[]),'app.py','exec'),namespace)
+        namespace['page_india']()
+        equity=[p.name for index,items in rendered if index==5 for p in items]
+        self.assertEqual(equity,['03_india_fpi_monthly.png','21_india_risk_appetite.png',
+                                 '22_india_sector_valuations.png','23_india_sector_rotation_12m_benchmark.png'])
         self.assertNotEqual(chart_key('23_india_sector_rotation_12m_benchmark.png'),
                             chart_key('10c_india_sector_rotation_12m.png'))
 

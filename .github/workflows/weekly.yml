@@ -32,6 +32,12 @@ jobs:
           PYTHONPATH: "."
         run: python generate_weekly.py --mode dashboard
 
+      - name: Generate cross-asset market matrix
+        timeout-minutes: 12
+        env:
+          PYTHONPATH: "."
+        run: python generate_market_matrix.py
+
       # The week's headlines, collected every 4 hours by the Headline Collector
       # workflow. If there is no pool (its first week, or the cache was lost),
       # the next step reads the feeds once instead.
@@ -81,6 +87,7 @@ jobs:
           # to them, so a chart the generator no longer draws doesn't linger.
           rm -f "assets/weekly/$DATE_FOLDER"/*.png
           cp output/weekly/"$DATE_FOLDER"/*.png "assets/weekly/$DATE_FOLDER/"
+          cp "output/weekly/$DATE_FOLDER/market_matrix.json" "assets/weekly/$DATE_FOLDER/"
           if [ -f "output/weekly/$DATE_FOLDER/news.json" ]; then
             cp "output/weekly/$DATE_FOLDER/news.json" "assets/weekly/$DATE_FOLDER/"
           else

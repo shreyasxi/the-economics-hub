@@ -7,8 +7,8 @@ from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import fitz
-from data import rbi_soe as soe
-from data.rbi_soe_pdf import pdf_to_article
+from data.processors import rbi_soe as soe
+from data.processors.rbi_soe_pdf import pdf_to_article
 
 URL = 'https://rbidocs.rbi.org.in/rdocs/Bulletin/PDFs/1ARTICLE25092026ABC.PDF'
 EDITION = soe.Edition('2026-09', '123', 'https://rbi.org.in/scripts/BS_ViewBulletin.aspx?Id=123', URL)

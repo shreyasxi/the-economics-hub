@@ -23,6 +23,12 @@ on:
         required: false
         default: "false"
 
+# Serialize asset publication with the standalone daily monetary refresh.
+concurrency:
+  group: india-dashboard-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   # All source updates and generation share one checkout. Optional source
   # failures are gated per chart; independent charts still render.
@@ -33,6 +39,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 1
 
       - name: Set up Python 3.11
@@ -51,6 +58,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_mospi_gva.py'
           python -m unittest discover -s tests -p 'test_mospi_iip.py'
+          MPLBACKEND=Agg python -m unittest discover -s tests -p 'test_india_trade.py'
 
       - name: Fetch latest India data including official GVA
         id: india-fetch
@@ -60,6 +68,30 @@ jobs:
         env:
           PYTHONPATH: "."
         run: python data/fetchers/india_fetcher.py --append
+
+      - name: Verify official IIP industry and monthly PLFS contracts
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: python -m unittest discover -s tests -p 'test_mospi_activity*.py'
+
+      - name: Refresh official MoSPI IIP manufacturing industries
+        id: mospi-iip-industries
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.mospi_iip_industries
+
+      - name: Refresh official MoSPI monthly urban youth unemployment
+        id: mospi-plfs
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.mospi_plfs_monthly
 
       - name: Refresh official MoSPI General IIP current-base history
         id: mospi-iip
@@ -104,6 +136,20 @@ jobs:
         env:
           PYTHONPATH: "."
         run: python -m data.fetchers.nse_risk_appetite
+
+      - name: Verify India equity matrix
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_india_equity_matrix.py'
+
+      - name: Refresh official NSE gross TRI equity matrix
+        id: nse-equity
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.india_equity_tri
 
       - name: Refresh official NSE sector rotation snapshot
         id: nse-rotation
@@ -156,8 +202,11 @@ jobs:
           GVA_UPDATE_FAILED: ${{ steps.india-fetch.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           IIP_UPDATE_FAILED: ${{ steps.mospi-iip.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           IIP_MANUAL_FALLBACK: ${{ github.event.inputs.manual_iip_fallback == 'true' }}
+          IIP_INDUSTRIES_UPDATE_FAILED: ${{ steps.mospi-iip-industries.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          PLFS_UPDATE_FAILED: ${{ steps.mospi-plfs.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           NSE_RISK_UPDATE_FAILED: ${{ steps.nse-risk.outcome != 'success' }}
           NSE_ROTATION_UPDATE_FAILED: ${{ steps.nse-rotation.outcome != 'success' }}
+          NSE_EQUITY_UPDATE_FAILED: ${{ steps.nse-equity.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           CPI_MAIN_UPDATE_FAILED: ${{ steps.cpi-main.outcome != 'success' }}
           CPI_MANUAL_FALLBACK: ${{ github.event.inputs.manual_cpi_fallback == 'true' }}
           NSE_VALUATIONS_UPDATE_FAILED: ${{ steps.nse-valuations.outcome != 'success' }}
@@ -207,6 +256,17 @@ jobs:
             cp "output/india/$MONTH_FOLDER/24_india_cpi_contributions."{png,json} "assets/india/$MONTH_FOLDER/"
           fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
+          # Publish the heatmap and leader metrics together; clear an omitted edition.
+          rm -f "assets/india/$MONTH_FOLDER/india_equity_matrix.json"
+          if [ -f "output/india/$MONTH_FOLDER/india_equity_matrix.json" ]; then
+            cp "output/india/$MONTH_FOLDER/india_equity_matrix.json" "assets/india/$MONTH_FOLDER/"
+          fi
+          rm -f "assets/india/$MONTH_FOLDER/india_iip_industry_heatmap.json"
+          if [ -f "output/india/$MONTH_FOLDER/india_iip_industry_heatmap.json" ]; then
+            cp "output/india/$MONTH_FOLDER/india_iip_industry_heatmap.json" "assets/india/$MONTH_FOLDER/"
+          fi
+          # Youth unemployment now lives in the regenerated economic snapshot.
+          rm -f "assets/india/$MONTH_FOLDER/15b_india_urban_youth_unemployment.png"
           # Publish survey PNGs with their audits; remove omitted/retired artifacts.
           for NAME in 25_india_inflation_expectations 26_india_household_price_categories 27_india_consumer_confidence_urban_rural 27b_india_discretionary_spending_sentiment 28_india_consumer_confidence_urban_components 29_india_consumer_confidence_rural_components 28_india_consumer_confidence_drivers; do
             rm -f "assets/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.json"
@@ -237,13 +297,25 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/india/ assets/readme_showcase/ data/rbi_transmission.csv data/nse_indices/ data/nse_valuations/ data/india_macro.db
+          git add -A assets/india/ assets/readme_showcase/ "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
+          # Include canonical monthly histories and the raw evidence their loaders verify.
+          SOURCE_PATHS=$(python -m data.paths --relative MOSPI_IIP_CSV MOSPI_PLFS_CSV MOSPI_SOURCES_DIR)
+          while IFS= read -r SOURCE_PATH; do
+            if [ -e "$SOURCE_PATH" ]; then
+              git add -A "$SOURCE_PATH"
+            fi
+          done <<< "$SOURCE_PATHS"
+          EQUITY_TRI=$(python -m data.paths --relative INDIA_EQUITY_TRI)
+          if [ -f "$EQUITY_TRI" ]; then
+            git add "$EQUITY_TRI"
+          fi
           # A skipped optional source may never create its directory.
-          for SOURCE_DIR in data/CPI/contributions data/CPI/main data/nse_rotation data/gva data/IIP; do
+          SOURCE_DIRS=$(python -m data.paths --relative CPI_CONTRIBUTIONS_DIR CPI_MAIN_DIR NSE_ROTATION_DIR GVA_DIR IIP_DIR)
+          while IFS= read -r SOURCE_DIR; do
             if [ -d "$SOURCE_DIR" ]; then
               git add -A "$SOURCE_DIR"
             fi
-          done
+          done <<< "$SOURCE_DIRS"
           git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
           git push

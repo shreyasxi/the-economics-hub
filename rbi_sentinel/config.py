@@ -8,13 +8,15 @@ All URLs, paths, model constants, and scoring parameters live here.
 from pathlib import Path
 
 # ── Project Paths ─────────────────────────────────────────────────────────────
-PROJECT_ROOT = Path(__file__).parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
-CACHE_DIR = DATA_DIR / "rbi_sentinel_cache"
+from data.paths import PROJECT_ROOT as REPO_ROOT, DATA_DIR as DATA_ROOT, RBI_SENTINEL_CACHE, RBI_SENTINEL_DB
+
+PROJECT_ROOT = REPO_ROOT
+DATA_DIR = DATA_ROOT
+CACHE_DIR = RBI_SENTINEL_CACHE
 import os as _os
 # RBI_SENTINEL_DB points the whole pipeline at another database file — used to
 # test automated runs on a copy instead of the committed database.
-DB_PATH = Path(_os.environ["RBI_SENTINEL_DB"]) if _os.environ.get("RBI_SENTINEL_DB") else DATA_DIR / "rbi_sentinel.db"
+DB_PATH = Path(_os.environ["RBI_SENTINEL_DB"]) if _os.environ.get("RBI_SENTINEL_DB") else RBI_SENTINEL_DB
 LOG_PATH = PROJECT_ROOT / "output" / "logs" / "rbi_sentinel.log"
 OUTPUT_DIR = PROJECT_ROOT / "output" / "rbi_sentinel"
 ASSETS_DIR = PROJECT_ROOT / "assets" / "rbi_sentinel"

@@ -18,7 +18,7 @@ Usage:
     python generate_signals.py --out output/weekly/2026-09-19
     python generate_signals.py --week-end 2026-09-18      # a Friday
 Series and thresholds:  config/signals_settings.py
-Arithmetic:             data/signals.py
+Arithmetic:             data/processors/signals.py
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import config.signals_settings as cfg
-from data.signals import assess, last_friday_before, rank
+from data.processors.signals import assess, last_friday_before, rank
 
 
 def latest_edition(weekly_dir: Path) -> Path | None:

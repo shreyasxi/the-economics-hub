@@ -3,7 +3,7 @@
 > The single reference for how this project is built, run and changed. It is written so that an assistant
 > with **no access to the code** — a future Claude session, or any chatbot the owner uploads this file to —
 > can help change a chart, correct a figure or publish a change. Sections 1–12 describe the project as it is;
-> section 13 keeps the dated history of decisions. Core architecture and India pipeline refreshed against the working tree on 5 Oct 2026. Older dated history is background; current code and the update below take precedence.
+> section 13 keeps the dated history of decisions. Operating sections refreshed against the working tree on 9 Oct 2026, including the completed local chart/data directory migration, shared path registry, processing modules, dataset/input/cache grouping, Weekly commentary/market matrix, official India activity and external sources, CPI items, monetary charts and the standalone daily workflow. Publication was authorized by the owner; live workflow verification remains pending and must be checked against GitHub history. Older dated history is background; current code and the operating sections below take precedence.
 >
 > Companion file: `docs/project_reminders.md`, the owner's short monthly checklist (release dates, source
 > URLs, the Analysis page how-to). Upload it as well when the task is monthly data entry.
@@ -39,22 +39,58 @@ needs the app rebooted.
 
 ---
 
-## 0.1 Current architecture and India contracts — 5 Oct 2026
+## 0.1 Current architecture and India contracts — 9 Oct 2026
 
 Read this before the older detailed sections. This describes the local implementation; deployment is confirmed
 only after commit/push and a successful GitHub Actions run. Source code and workflow files are authoritative.
 
 - **Publication:** generators write `output/`; workflows copy validated charts/JSON to tracked `assets/`, prune
   to four editions and commit source stores. Streamlit reads the newest edition, with local output taking precedence
-  on equal dates. `site/` is the separate GitHub Pages link-preview landing page, deployed by `pages.yml`.
+  on equal dates. The separate GitHub Pages link-preview landing page (`site/`) and its deployment workflow
+  were removed on 9 Oct 2026; the Streamlit dashboard and chart pipelines do not depend on them.
+- **Chart organization:** `charts/` holds shared styling, templates, the asset loader and the ad-hoc chart CLI.
+  `charts/india_charts/` holds eight India-specific renderers and dashboard helpers. `generate_india.py` coordinates the
+  full edition; the daily workflow runs `python -m charts.india_charts.india_monetary --refresh-current`.
+- **Data paths:** `data/paths.py` defines canonical dataset, input and cache locations. Python consumers
+  and workflow data publication use this registry; `python -m data.paths --relative NAME` supplies shell paths.
+  Paths were centralized before files moved; the registry now points at the final grouped locations. Keep `data/50 Macroeconomic Indicators.xlsx` and
+  `data/india_manual.csv` directly in `data/` at the owner's request. Custom database/CSV arguments retain
+  their own sibling source archives. `RBI_SENTINEL_DB` still overrides the Sentinel database at runtime.
+- **Dataset organization:** canonical stores are grouped under `data/stores/{india,world,rbi_sentinel}/`;
+  supplied workbooks/bootstrap exports under `data/inputs/`; replaceable downloads under `data/cache/`.
+  Dataset bundles retain internal relative paths and source checksums. `.gitignore` preserves local caches,
+  seed exports and diagnostic runs; `.gitattributes` preserves checksum-verified NSE CSV bytes.
+- **Processing modules:** `data/processors/` holds all sixteen former top-level processing modules,
+  including database access and manual-entry CLIs. Collectors stay in `data/fetchers/`; the registry
+  stays in `data/paths.py`. Use `python -m data.processors.india_manual_entry` and
+  `python -m data.processors.world_manual_entry` for manual entry. Processors resolve datasets through the registry.
+- **Migration verification:** the full project suite passed 529 tests; all five path-contract tests passed
+  separately after adding the final layout check. Both relocated SQLite databases passed read-only integrity
+  checks. Real CPI, NSE index, MoSPI IIP/PLFS and GMD stores and RBI survey inputs loaded successfully.
+  Dataset/input/archive/cache bytes were checked against their pre-move hashes; documentation changed where
+  command/path instructions required it. Ignore rules and NSE byte-preservation attributes were checked locally.
+  These checks establish local readiness, not successful deployment. Rollout and tracking discussion: §5.7.1–5.7.2.
 - **Saturday India job:** 08:00 UTC / 13:30 IST. GVA/IIP contract tests → `india_fetcher.py --append` (including GVA)
-  → official IIP → RBI transmission → NSE checks/risk appetite/rotation/valuations → CPI checks/collector → main
+  → official IIP industries/monthly PLFS/General IIP → RBI transmission → NSE checks/risk appetite/rotation/valuations → CPI checks/collector → main
   inflation bridge → dashboard → RBI briefing → copy/prune/persist. Check `india.yml` for exact conditions:
   `skip_fetch` skips the initial India/IIP updates, but does not skip every independent source updater.
+- **Daily India monetary job:** standalone `rbi_monetary_conditions.yml`, daily 15:10 UTC / 20:40 IST,
+  including weekends. Refresh official RBI MMO with a ten-operations-date overlap → validate canonical CSV →
+  regenerate only WACR and banking-system liquidity in the existing published India edition → commit only
+  changed data/assets. No LLM, paid API, Sentinel or macro-database update. Saturday naturally reads the latest
+  CSV; the two workflows share a branch-specific publication lock. Chart contracts are in §6, automation in §10.
+  Implemented and locally tested; included in the authorized migration publication, with its first GitHub Actions run still to be verified.
 - **GVA:** dynamically discover newest official NAS history and quarterly constant-price releases, base 2022–23.
   Accept validated newer revisions and recalculate affected growth/contributions. Archive previous observations,
   source bytes and revision differences. Changed methodology text/base/schema/units or inconsistent levels fail
   before observation writes and require review. Do not pin a yearly workbook as the production discovery path.
+- **Weekly dashboard:** six dynamic macro-commentary cards, then Market Snapshot, Cross-Asset Market
+  Performance Matrix and headlines. Cards reuse stored signals, world snapshot, official India observations
+  and Sentinel brief; no hero fetcher or new scoring. The matrix has its own same-edition JSON generator (§6).
+- **Additional India sources:** 23-industry IIP breadth/heatmap and monthly urban youth PLFS come from
+  validated MoSPI releases; CPI item panels have a separate 358-item store. Forex uses canonical RBI WSS,
+  while REER and external vulnerability use official RBI/DEA stores. These are not DBIE substitutes (§6).
+  Item CPI and RBI external collectors currently run separately; do not imply Saturday refreshes them.
 - **SQLite:** database-manager operations commit/roll back and explicitly close connections. A connection
   context alone does not close SQLite; delayed WAL checkpoints can invalidate dry-run byte checks.
 - **IIP:** General, base 2022–23, published `growth_rate` (% YoY), continuous history from Apr 2023. Official
@@ -98,12 +134,12 @@ Run the normal India workflow from the project root:
 
 Manually replace the official Excel releases in these directories:
 
-- `data/rbi_bimonthly_manual/inflation_survey/`: Inflation Expectations Survey of Households.
-- `data/rbi_bimonthly_manual/consumer_survey/`: both Urban and Rural Consumer Confidence Surveys.
+- `data/inputs/rbi/rbi_bimonthly_manual/inflation_survey/`: Inflation Expectations Survey of Households.
+- `data/inputs/rbi/rbi_bimonthly_manual/consumer_survey/`: both Urban and Rural Consumer Confidence Surveys.
 
 No release filename or survey date is configured in production code. The normal
-generator calls `charts.india_inflation_surveys.generate` and
-`charts.india_consumer_surveys.generate`. Both use `data.rbi_surveys` for validated
+generator calls `charts.india_charts.india_inflation_surveys.generate` and
+`charts.india_charts.india_consumer_surveys.generate`. Both use `data.processors.rbi_surveys` for validated
 readers and discovery and `EconStyle.save_chart` for the approved chart designs.
 
 ### Outputs and dashboard placement
@@ -112,14 +148,14 @@ The generator's normal run-month edition, `output/india/YYYY-MM/`, contains:
 
 | PNG (plus same-stem JSON audit) | India section |
 | --- | --- |
-| `25_india_inflation_expectations.png` | Inflation & Monetary Conditions |
-| `26_india_household_price_categories.png` | Inflation & Monetary Conditions |
+| `25_india_inflation_expectations.png` | Inflation |
+| `26_india_household_price_categories.png` | Inflation |
 | `27_india_consumer_confidence_urban_rural.png` | Consumer Confidence |
 | `27b_india_discretionary_spending_sentiment.png` | Consumer Confidence |
 | `28_india_consumer_confidence_urban_components.png` | Consumer Confidence |
 | `29_india_consumer_confidence_rural_components.png` | Consumer Confidence |
 
-Consumer Confidence follows Growth & Activity. The shared loader discovers these
+Consumer Confidence follows Equity Markets, at the end of the seven question-led sections. The shared loader discovers these
 PNGs; `app.py` uses the existing section and grid: the combined indices and discretionary spending chart share the top row, above the Urban/Rural component tables. Titles also live in
 the existing `charts.loader` title mapping. All six Insights entries are in the
 existing `config.insights.CHART_INSIGHTS` dictionary and use the normal expander.
@@ -224,9 +260,9 @@ the World page stays global rather than India-first.
 
 | Page | URL | Built by | Refreshed | Published files |
 |---|---|---|---|---|
-| Weekly Markets | `/` (default) | `generate_weekly.py`, `generate_news.py`, `generate_signals.py` | `weekly.yml`, Saturday 06:00 UTC | 40 charts + `news.json` + `signals.json` |
+| Weekly Markets | `/` (default) | `generate_weekly.py`, `generate_market_matrix.py`, `generate_news.py`, `generate_signals.py` | `weekly.yml`, Saturday 06:00 UTC | 40 charts + `market_matrix.json` + `news.json` + `signals.json`; six cards rendered by app |
 | World | `/world` | `generate_macro.py` | `macro.yml`, Saturday 10:00 UTC; rates only: `rates.yml`, weekdays 06:30 and 21:00 UTC | 12 charts + `world_snapshot.json` |
-| India | `/india` | `generate_india.py`, `generate_soe.py` | `india.yml`, Saturday 08:00 UTC, plus manual runs | core + optional charts and provenance sidecars + `soe.json` |
+| India | `/india` | `generate_india.py`, `generate_soe.py`; targeted `charts.india_charts.india_monetary` | Saturday 08:00 UTC; monetary-only daily 15:10 UTC (local implementation, deployment pending); manual runs | core + optional charts and provenance sidecars + `soe.json`; daily job replaces only two monetary PNGs |
 | RBI Sentinel | `/rbi-sentinel` | `generate_rbi_sentinel.py --auto` | `rbi_sentinel.yml`, weekday evenings + MPC decision days | 5 charts + 1 research chart |
 | Analysis | `/analysis` | reads `signals.json`, `config/analysis.py` and the Substack archive | live | — (no charts of its own) |
 | About | `/about` | `config/resources.py` | live | — |
@@ -262,6 +298,11 @@ Streamlit Cloud never runs a generator. It serves what is committed in `assets/`
 A push to `main` is pulled within a few minutes, but the running app is **not** restarted: which
 changes need a workflow run or a reboot is in §5.7.
 
+The targeted daily monetary path is an exception to the normal `output/` → copy sequence:
+`data/fetchers/rbi_money_market.py` updates its validated canonical CSV, then
+`charts.india_charts.india_monetary --refresh-current` renders both charts temporarily and replaces only their two PNGs
+in the newest existing `assets/india/YYYY-MM/`. It neither creates an edition nor prunes assets.
+
 ---
 
 ## 3. Directory map
@@ -269,6 +310,7 @@ changes need a workflow run or a reboot is in §5.7.
 ```
 app.py                      the whole website: masthead, navigation, every page, the footer, all custom CSS
 generate_weekly.py          Weekly Markets: 40 charts (every chart in one function, generate_with_live_data)
+generate_market_matrix.py   Weekly same-edition market_matrix.json; explicit return methods and provenance
 generate_news.py            Weekly Markets: "The Week in Headlines" (news.json); --collect feeds the week-long pool
 generate_signals.py         Analysis page "Signal or noise" board: writes signals.json into a weekly edition
 generate_macro.py           World page: 12 charts (one chart_* function each) + world_snapshot.json
@@ -279,6 +321,8 @@ generate_rbi_sentinel.py    RBI Sentinel (--auto in CI; see §8)
 config/
   settings.py               INDICATORS (Weekly tickers and FRED series, by id), US_YIELD_CURVE_TENORS,
                             FRED_API_KEY (from .env), paths
+  market_matrix.py           Ordered market universe, explicit source/return methods and missing-data limits
+  india_equity_matrix.py     India equity matrix universe and official gross TRI configuration
   weekly_settings.py        WEEKLY_SECTIONS: which Weekly chart sits in which section, in page order
   macro_settings.py         MACRO_INDICATORS: the World page's FRED series (transform, good direction, max age)
   world_settings.py         World page: countries, scoreboard cell sources, freshness limits, manual fields,
@@ -295,51 +339,60 @@ charts/
   loader.py                 get_charts() (newest edition folder), chart_key(), group_charts(),
                             clean_title() + _ACRONYMS + _TITLE_OVERRIDES (captions), is_pipeline_admin()
   templates/                change_bars.py, weekly_bar.py (legacy), trend_line.py, yield_curve.py, summary_table.py
-  india_cpi_contributions.py CPI contribution chart; verifies its independent source store
   make_chart.py             one-off charts from any CSV/Excel file, into output/custom/ (never published):
                             .venv/bin/python charts/make_chart.py data.csv --title "…" --type line
 
+charts/india_charts/        India-specific renderers/helpers; shared styling remains in charts/style.py
+  india_cpi_contributions.py CPI contribution chart; verifies its independent source store
+  india_mospi_activity.py    IIP industry heatmap JSON, leaders/TTM metrics and urban youth unemployment PNG
+  india_cpi_items.py         CPI item increases/declines PNG panels and edition JSON
+  india_external.py          Canonical WSS reserves, REER and external vulnerability charts
+  india_monetary.py          WACR spread and banking-system liquidity; targeted current-assets CLI (§6)
+  india_inflation_surveys.py RBI inflation expectations and household price categories
+  india_consumer_surveys.py  RBI confidence, components and discretionary spending sentiment
+  india_equity_matrix.py     HTML table renderer for the prepared India equity matrix
+
 data/
+  paths.py                  canonical dataset/input/cache locations; stdlib-only shell CLI
   fetchers/                 market/macro clients; MoSPI GVA, IIP, CPI and inflation bridge;
-                            NSE risk appetite, sector rotation, nse_valuations/{collector,production}.py;
-                            india_source_archive.py (GVA/IIP journals), mospi_http.py (HTTP retries)
-  india_macro.db            India series, SQLite (tracked): monthly/weekly projections, GVA, official IIP,
-                            legacy IIP archive, emergency IIP and CPI observation audit tables (§5.4)
-  india_db_manager.py       India database schema and upsert helpers
-  india_manual_entry.py     CLI for PMI, GST, FPI, unemployment, core CPI; guarded CPI/emergency IIP entries
-  india_manual.csv          legacy India manual data (fallback only)
-  50 Macroeconomic Indicators.xlsx   RBI DBIE workbook (replaced by hand monthly)
-  cag_monthly_accounts.xlsx          CAG monthly accounts workbook (replaced when CGA publishes one)
-  cag_manual_accounts.csv            CAG months typed from the CGA web page, incl. deficit financing (fin_*)
-  rbi_soe.py                State of the Economy: fetch and parse
-  rbi_transmission.csv      rate-transmission history (Table IV.3), one row per edition and cycle (tracked)
-  cpi_contributions.py      validated CPI observations, weights, contribution arithmetic and archive checks
-  CPI/contributions/        immutable CPI raw responses, retrieval journals and run vintages; current pointer
-  CPI/main/                 headline/food history, proposed writes and conflict/status journals
-  IIP/, gva/                official source bytes, accepted/bootstrap manifests and revision journals
-  nse_indices/              retained seed/daily index sources, manifest and rebased risk-appetite signal
-  nse_rotation/             date-validated NSE snapshot, raw bytes and status
-  nse_valuations/           verified monthly history, source CSVs, derived audit outputs and readiness status
-  gmd_investment.csv/json    saved India investment-rate series and provenance
-  world_snapshot.py         World page fetch + build (FRED, OECD, BIS, Eurostat, Bundesbank, BoE, MoF Japan, Yahoo,
-                            and the central banks' own announcements: FOMC, ECB, BoE, BoJ, PBoC)
-  pboc_reverse_repo.csv     PBoC 7-day reverse repo changes since 2019, one sourced row per change (tracked;
-                            rates.yml appends new changes)
-  world_manual_entry.py     CLI for World cells with no free API
-  world_manual.csv          World manual figures (month, country, field, value, source)
-  valuations.py             Shiller CAPE and Damodaran ERP / country risk downloads (every run)
-  news.py                   headlines: RSS reading, theme sorting, story ranking
-  signals.py                Signal or noise arithmetic
-  substack.py               the newsletter shelf (Substack archive API, RSS fallback)
-  rbi_sentinel.db           RBI documents, scores, composites, decisions (tracked)
-  rbi_live_market.csv       hand-entered 10-year closes for the live test (tracked)
-  rbi_live_log.csv          live test log (created from Oct 2026)
-  rbi_sentinel_cache/, rbi_soe_cache/   downloaded pages (git-ignored)
+                            NSE TRI, risk appetite, rotation and valuation collectors; RBI money/external data
+  processors/               sixteen processing modules: DB access, manual-entry tools, CPI validation,
+                            RBI surveys/SOE, NSE indices, matrices, world snapshots, valuations, news,
+                            signals and Substack loading (§0.1)
+  stores/india/
+    india_macro.db          monthly/weekly projections, official GVA/IIP and manual observation audits
+    CPI/                    contribution/item histories and immutable source journals; main CPI bridge
+    gva/, IIP/              official source bytes, accepted/bootstrap manifests and revision journals
+    nse_indices/            retained sources, manifest and rebased risk-appetite signal
+    nse_rotation/           date-validated NSE snapshot, raw bytes and status
+    nse_valuations/         monthly history, source CSVs, audit outputs and readiness status
+    mospi_iip_industries.csv, mospi_plfs_monthly.csv, mospi_activity_sources/  histories/raw evidence
+    gmd_investment.csv/json  saved India investment-rate series and provenance
+    india_equity_tri.json    verified official gross TRI equity histories
+    india_trade_releases.json verified releases supplementing missing DBIE merchandise months
+    rbi_transmission.csv     pass-through history, one row per edition and cycle
+    rbi_money_market.csv     official daily operations/effective-date policy rates; canonical RBI sign
+    rbi_wss_reserves.csv, rbi_reer.csv, india_external_vulnerability.csv  official external stores
+  stores/world/
+    world_manual.csv        manually entered World figures
+    pboc_reverse_repo.csv   sourced PBoC rate ledger, maintained by rates.yml
+    gdp_ppp.csv             GDP weights used by the World rate cycle
+  stores/rbi_sentinel/
+    rbi_sentinel.db         RBI documents, scores, composites and decisions
+    rbi_live_market.csv     hand-entered 10-year closes
+    rbi_live_log.csv        live-test log
+  inputs/cag/               cag_monthly_accounts.xlsx and cag_manual_accounts.csv
+  inputs/rbi/               rbi_bimonthly_manual/{inflation_survey,consumer_survey}/ workbooks
+  inputs/mospi/             cpi_1814.xlsx and CPI Metadata.xlsx supplied reference workbooks
+  inputs/nse/               NIFTY 50/ and NIFTY Small Cap 250/ bootstrap exports (git-ignored)
+  cache/                    rbi_sentinel/ and rbi_soe/ downloads; all caches are git-ignored
+  50 Macroeconomic Indicators.xlsx   owner-facing DBIE workbook; intentionally stays at data top level
+  india_manual.csv          owner-facing fallback/seed CSV; intentionally stays at data top level
 
 rbi_sentinel/               RBI Sentinel package (§8): config.py, fetchers/, cleaners/, sentiment/, db/, charts/,
                             pipeline.py, live_log.py, seed_rates.py, research/tone_vs_10y_chart.py
 tests/                      offline regression scripts/unittest suites (§5.6); fixtures/{soe,mospi_gva,
-                            cpi,iip,nse_rotation}/ preserve official parser inputs
+                            cpi,iip,nse_rotation,rbi_money_market,mospi_activity,rbi_external,nse_tri}/ preserve official parser inputs
 
 assets/                     what the live site serves (tracked): weekly/YYYY-MM-DD/, macro/YYYY-MM/,
                             india/YYYY-MM/, rbi_sentinel/YYYY-MM/ — newest 4 editions each;
@@ -352,8 +405,8 @@ docs/                       project_context.md tracked; other owner notes/templa
                             templates/ (cag_fill.xlsx, fpi_nsdl_fill, rbi_sentinel/ price files behind chart 07),
                             "Manual Data Feeding (6th and 23rd).png"
 
-site/                       static link-preview landing page, CSS/brand assets and social preview card
-.github/workflows/          weekly.yml, macro.yml, rates.yml, india.yml, rbi_sentinel.yml, headlines.yml, keep_alive.yml, pages.yml
+.github/workflows/          weekly.yml, macro.yml, rates.yml, india.yml, rbi_monetary_conditions.yml,
+                            rbi_sentinel.yml, headlines.yml, keep_alive.yml
 .github/scripts/            prune_assets.py (keeps 4 editions), rbi_should_run.py (RBI gate), keep_alive.py
 .streamlit/config.toml      theme; .streamlit/secrets.toml is local only
 ```
@@ -365,7 +418,7 @@ Local only, never committed: `.env`, `.streamlit/secrets.toml`, `output/` and ot
 
 ## 4. Chart index — where every chart comes from
 
-Every published chart is a PNG named `NN_<key>.png`. The **key** (the name without its number) is what ties a
+Most published charts are PNGs named `NN_<key>.png`. The **key** (the name without its number) is what ties a
 chart to its section, its caption and its "Chart insights" text; the number only sets the order within a
 World or India section. Captions are the words under each chart on the site (also what the search box finds).
 
@@ -422,7 +475,8 @@ draws them instead — the snapshot table (00), the trend lines (02, 04, 08) and
 | `29_btc_mvrv` | Bitcoin MVRV Ratio | Crypto | Market value ÷ realised value since 2011 | Coin Metrics community API (CapMVRVCur, PriceUSD) |
 
 The table at the top of the page (`00`) and the real-wage figure in it are the only Weekly items without a
-"Chart insights" text, by design. Also on this page: **The Week in Headlines** (`news.json`, §9).
+"Chart insights" text, by design. Also on this page: **Macro Picture at a glance**, the HTML **Cross-Asset Market Performance Matrix**
+(`market_matrix.json`, §6) and **The Week in Headlines** (`news.json`, §9).
 
 ### 4.2 World — `generate_macro.py`
 
@@ -435,7 +489,7 @@ One function per chart. Titles are in `MACRO_TITLES` near the top of the file. S
 | `01_macro_inflation` | US Inflation Metrics | United States | `chart_inflation` | Each CPI category's contribution to headline CPI inflation over 12 months (stacked bars: energy, food, core goods, services ex-shelter, shelter), with headline CPI and core PCE lines and the 2% target | FRED CPIAUCNS CPIUFDNS CPIENGNS CUUR0000SACL1E CUUR0000SASLE CUUR0000SAH1 PCEPILFE; BLS December relative importance, typed yearly (`CPI_RELATIVE_IMPORTANCE`) |
 | `02_macro_labour` | US Labour Market | United States | `chart_labour` | Unemployment and jobless claims in two panels, payrolls badge | FRED UNRATE ICSA PAYEMS |
 | `07_macro_balance_sheet` | Federal Reserve Balance Sheet | United States | `chart_fed_balance_sheet` | Total assets | FRED WALCL |
-| `16_macro_cape` | Shiller CAPE and Excess CAPE Yield | US Equity Valuations | `chart_cape` | CAPE and excess CAPE yield, two panels | Shiller `ie_data.xls` (`data/valuations.py`) |
+| `16_macro_cape` | Shiller CAPE and Excess CAPE Yield | US Equity Valuations | `chart_cape` | CAPE and excess CAPE yield, two panels | Shiller `ie_data.xls` (`data/processors/valuations.py`) |
 | `17_macro_equity_risk_premium` | US Equity Risk Premium | US Equity Valuations | `chart_equity_risk_premium` | Implied ERP (trailing 12 months) since 2008 | Damodaran `ERPbymonth.xlsx` |
 | `18_macro_country_erp` | Equity Risk Premiums Across the G20 | Country Risk | `chart_country_erp` | Mature-market premium + country risk premium, stacked | Damodaran `ctryprem*.xlsx` |
 | `19_macro_regional_erp` | Equity Risk Premiums by Region | Country Risk | `chart_regional_erp` | Every rated country as a dot on its region's row; GDP-weighted average | Damodaran |
@@ -452,7 +506,7 @@ published.
 ### 4.3 India — `generate_india.py`
 
 Existing chart functions live in the generator; newer reusable implementations live under `charts/`,
-including the two RBI survey modules (§0.2). Titles are set in the renderers. Sections are chosen in `app.py` `page_india()` by
+including the two RBI survey modules (§0.2) and `charts.india_charts.india_monetary` (§6). Titles are set in the renderers. Sections are chosen in `app.py` `page_india()` by
 words in the file name (§5.3). Where the data is typed by hand, §5.4 says how to enter or correct it.
 
 | File | Caption | Section | Function | What it shows | Data |
@@ -460,32 +514,44 @@ words in the file name (§5.3). Where the data is typed by hand, §5.4 says how 
 | `00_india_table` | (India Economic Snapshot) | top, beside "What changed" | `chart_table` | Latest month's key indicators | `india_macro.db` (many columns) |
 | `01_india_pmi` | India PMI | Growth & Activity | `chart_pmi` | Manufacturing and services PMI | `india_mfg_pmi`, `india_svc_pmi` (typed, S&P Global) |
 | `15_india_iip` | India IIP | Growth & Activity | `chart_iip` | Industrial production, % YoY | official General IIP published YoY, base 2022–23; `india_iip_monthly` |
-| `06_india_inflation_bar` | India Inflation | Inflation & Monetary Conditions | `chart_inflation_bar` | Headline and food CPI, % YoY | official MoSPI published headline and Food and beverages rates; `mospi_inflation.py` bridge |
-| `14_india_credit_deposit` | India Credit Deposit | Inflation & Monetary Conditions | `chart_credit_deposit` | Credit against deposit growth | `india_bank_credit_yoy`, `india_deposit_growth_yoy` (DBIE) |
-| `18_india_rate_transmission` | India Rate Transmission | Inflation & Monetary Conditions | `chart_rate_transmission` | How far repo changes have reached deposit and lending rates | `data/rbi_transmission.csv` (automatic, `generate_soe.py`) |
-| `16_india_forex_reserves` | India Forex Reserves | External Sector | `chart_forex_reserves` | Reserves, weekly | `india_weekly.forex_reserves_usd_bn` (DBIE) |
-| `17_india_trade` | India Trade | External Sector | `chart_trade_balance` | Exports, imports, deficit | `india_exports_usd_bn`, `india_imports_usd_bn` (DBIE) |
-| `03_india_fpi_monthly` | India FPI Monthly | Equity Markets | `chart_fpi_flows` | Net foreign portfolio investment per month | NSDL `india_fpi_net_inr_cr` (typed, ₹ crore) when any exists, else RBI's `india_fpi_flows` (US$ bn); never mixed (`fpi_series()`) |
+| `06_india_inflation_bar` | India Inflation | Inflation | `chart_inflation_bar` | Headline and food CPI, % YoY | official MoSPI published headline and Food and beverages rates; `mospi_inflation.py` bridge |
+| `14_india_credit_deposit` | India Credit Deposit | Monetary Conditions | `chart_credit_deposit` | Credit against deposit growth | `india_bank_credit_yoy`, `india_deposit_growth_yoy` (DBIE) |
+| `18_india_rate_transmission` | India Rate Transmission | Monetary Conditions | `chart_rate_transmission` | How far repo changes have reached deposit and lending rates | `data/stores/india/rbi_transmission.csv` (automatic, `generate_soe.py`) |
+| `19_india_money_market_corridor` | WACR Relative to the RBI Policy Rate (legacy key/caption) | Monetary Conditions | `charts.india_charts.india_monetary.wacr_spread` | Overnight call rate minus same-day repo, bps; full observed range | `data/stores/india/rbi_money_market.csv`, official RBI MMO and MPC resolutions |
+| `20_india_system_liquidity` | Banking System Liquidity | Monetary Conditions | `charts.india_charts.india_monetary.liquidity` | Surplus (+) / deficit (−), outstanding RBI operations; 20-weekday average | same canonical CSV; stored RBI sign reversed for display only |
+| `16_india_forex_reserves` | India Forex Reserves | External Sector | `chart_forex_reserves` / `charts.india_charts.india_external.load_forex` | Reserves, weekly | canonical `data/stores/india/rbi_wss_reserves.csv`, RBI WSS |
+| `17_india_trade` | India Trade | External Sector | `chart_trade_balance` | Exports, imports, deficit | `india_exports_usd_bn`, `india_imports_usd_bn` (DBIE; verified official release supplement for missing months) |
+| `03_india_fpi_monthly` | India FPI Monthly | Equity Markets | `chart_fpi_flows` | Net foreign portfolio investment per month | NSDL only: completed-month `india_fpi_net_inr_cr` (typed, ₹ crore), optional current-month MTD; no RBI fallback (`fpi_series()`) |
 | `02_india_gst` | India GST | Fiscal Policy & Public Finances | `chart_gst` | Monthly GST collections | `india_gst_revenue` (typed, PIB, ₹ lakh crore) |
-| `07_india_expenditure_quality` | India Expenditure Quality | Fiscal Policy & Public Finances | `chart_expenditure_quality` | Capital against revenue spending, year to date; capex Budget ÷ 12 line | `data/cag_monthly_accounts.xlsx` + `data/cag_manual_accounts.csv` |
+| `07_india_expenditure_quality` | India Expenditure Quality | Fiscal Policy & Public Finances | `chart_expenditure_quality` | Capital against revenue spending, year to date; capex Budget ÷ 12 line | `data/inputs/cag/cag_monthly_accounts.xlsx` + `data/inputs/cag/cag_manual_accounts.csv` |
 | `09_india_deficit_financing` | India Deficit Financing | Fiscal Policy & Public Finances | `chart_deficit_financing` | How the deficit is financed | `cag_manual_accounts.csv`, `fin_*` columns |
 | `11_india_fiscal_deficit_gdp` | India's Fiscal Deficit, % of GDP | Fiscal Policy & Public Finances | `chart_fiscal_deficit_gdp` | Deficit as % of GDP against the Budget target | CAG workbook/CSV + the BE row's GDP |
 
 | `20_india_gross_fixed_capital_formation` | India Investment Rate | Growth & Activity | `chart_investment_rate` | Gross fixed capital formation as % of GDP | saved GMD CSV + JSON provenance |
 | `22_india_gva_contributions` | Real GVA contributions | Growth & Activity | `chart_gva_contributions` | Primary, secondary and tertiary contributions to real growth | official MoSPI constant-price GVA, base 2022–23 |
-| `21_india_risk_appetite` | Indian Risk Appetite | Equity Markets | `chart_risk_appetite` | Smallcap 250 / NIFTY 50 price ratio, rebased | verified `data/nse_indices/` |
-| `22_india_sector_valuations` | NIFTY Sector Valuations | Equity Markets | `chart_sector_valuations` | Current sector multiples against validated history | `data/nse_valuations/` |
+| `21_india_risk_appetite` | Indian Risk Appetite | Equity Markets | `chart_risk_appetite` | Smallcap 250 / NIFTY 50 price ratio, rebased | verified `data/stores/india/nse_indices/` |
+| `22_india_sector_valuations` | NIFTY Sector Valuations | Equity Markets | `chart_sector_valuations` | Current sector multiples against validated history | `data/stores/india/nse_valuations/` |
 | `23_india_sector_rotation_12m_benchmark` | NIFTY Sector Rotation | Equity Markets | `chart_sector_rotation_12m` | Trailing-year price returns with NIFTY 50 benchmark | official NSE snapshot; PNG + JSON sidecar |
-| `24_india_cpi_contributions` | What’s Driving Indian Inflation | Inflation & Monetary Conditions | `charts.india_cpi_contributions.generate` | Six buckets contributing to headline inflation | independent verified CPI 2024 store; PNG + JSON sidecar |
+| `24_india_cpi_contributions` | What’s Driving Indian Inflation | Inflation | `charts.india_charts.india_cpi_contributions.generate` | Six buckets contributing to headline inflation | independent verified CPI 2024 store; PNG + JSON sidecar |
 
-| `25_india_inflation_expectations` | Inflation Expectations - India | Inflation & Monetary Conditions | `charts.india_inflation_surveys.generate` | Median perceived current inflation vs 3M/1Y expectations across three surveys | discovered official IESH workbook; PNG + JSON |
-| `26_india_household_price_categories` | What Households Think Will Get More Expensive | Inflation & Monetary Conditions | `charts.india_inflation_surveys.generate` | Five category price-increase shares, 3M vs 1Y | same discovered IESH workbook; PNG + JSON |
-| `27b_india_discretionary_spending_sentiment` | Discretionary Spending Sentiment — India | Consumer Confidence | `charts.india_consumer_surveys.generate` | Table 8 non-essential spending balances, Current/1Y, Urban/Rural panels; common full history | discovered consumer workbooks; PNG + JSON |
-| `27_india_consumer_confidence_urban_rural` | India Consumer Confidence — Urban vs Rural | Consumer Confidence | `charts.india_consumer_surveys.generate` | CSI and FEI, common Urban/Rural history | discovered official consumer workbooks; PNG + JSON |
-| `28_india_consumer_confidence_urban_components` | India Consumer Confidence — Urban Components | Consumer Confidence | `charts.india_consumer_surveys.generate` | Five-row table, Current/1Y groups, previous/latest/Δ | discovered Urban workbook; PNG + JSON |
-| `29_india_consumer_confidence_rural_components` | India Consumer Confidence — Rural Components | Consumer Confidence | `charts.india_consumer_surveys.generate` | Five-row table, Current/1Y groups, previous/latest/Δ | discovered Rural workbook; PNG + JSON |
+| `25_india_inflation_expectations` | Inflation Expectations - India | Inflation | `charts.india_charts.india_inflation_surveys.generate` | Median perceived current inflation vs 3M/1Y expectations across three surveys | discovered official IESH workbook; PNG + JSON |
+| `26_india_household_price_categories` | What Households Think Will Get More Expensive | Inflation | `charts.india_charts.india_inflation_surveys.generate` | Five category price-increase shares, 3M vs 1Y | same discovered IESH workbook; PNG + JSON |
+| `27b_india_discretionary_spending_sentiment` | Discretionary Spending Sentiment — India | Consumer Confidence | `charts.india_charts.india_consumer_surveys.generate` | Table 8 non-essential spending balances, Current/1Y, Urban/Rural panels; common full history | discovered consumer workbooks; PNG + JSON |
+| `27_india_consumer_confidence_urban_rural` | India Consumer Confidence — Urban vs Rural | Consumer Confidence | `charts.india_charts.india_consumer_surveys.generate` | CSI and FEI, common Urban/Rural history | discovered official consumer workbooks; PNG + JSON |
+| `28_india_consumer_confidence_urban_components` | India Consumer Confidence — Urban Components | Consumer Confidence | `charts.india_charts.india_consumer_surveys.generate` | Five-row table, Current/1Y groups, previous/latest/Δ | discovered Urban workbook; PNG + JSON |
+| `29_india_consumer_confidence_rural_components` | India Consumer Confidence — Rural Components | Consumer Confidence | `charts.india_charts.india_consumer_surveys.generate` | Five-row table, Current/1Y groups, previous/latest/Δ | discovered Rural workbook; PNG + JSON |
 
-Money supply and promoter-holdings charts are retired; the loader filters leftover images.
+Additional artifacts use explicit renderers rather than ordinary PNG routing:
+
+| Artifact | Page placement | Implementation / source |
+|---|---|---|
+| `india_iip_industry_heatmap.json` | Growth & Activity, below PMI/IIP | `charts.india_charts.india_mospi_activity`; 23 manufacturing industries, latest 12 months |
+| `15b_india_urban_youth_unemployment.png` | Growth & Activity | same module; official monthly Urban/Persons CWS, ages 15–29 |
+| `06b_india_cpi_items_increases/declines.png` + `06b_india_cpi_items.json` | Inflation, below headline/contributions | `charts.india_charts.india_cpi_items`, `app._render_cpi_items`; separate official item store |
+| `30_india_reer.png` | External Sector, when valid history exists | `charts.india_charts.india_external`; official 40-currency CPI-based REER, 2015–16 = 100 |
+| `31_india_external_vulnerability.png` | External Sector | same module; current-account/GDP and short-term debt/reserves, official RBI/DEA |
+
+Money supply, promoter-holdings and standalone real-policy-rate charts are retired; the loader filters leftover images.
 
 Also on the page: RBI's **State of the Economy** briefing and "What changed since last month" (`soe.json`,
 §6), both quoted from RBI, never written by the pipeline.
@@ -494,7 +560,7 @@ Also on the page: RBI's **State of the Economy** briefing and "What changed sinc
 
 | File | Module | What it shows | Data |
 |---|---|---|---|
-| `01_rbi_stance_meter` | `stance_meter.py` | Gauge of the latest meeting's composite tone (top of page) | `data/rbi_sentinel.db` |
+| `01_rbi_stance_meter` | `stance_meter.py` | Gauge of the latest meeting's composite tone (top of page) | `data/stores/rbi_sentinel/rbi_sentinel.db` |
 | `02_rbi_sentiment_trajectory` | `sentiment_trajectory.py` | Tone over time, rate decisions in a strip below | same |
 | `03_rbi_resolution_vs_minutes` | `doc_comparison.py` | Resolution against Minutes tone, recent cycles | same |
 | `04_rbi_subdimension_radar` | `subdimension_radar.py` | Five sub-dimensions, current against previous meeting | same |
@@ -506,7 +572,7 @@ Each module has a `generate(...)` function called from `run_generate_charts()` i
 ### 4.5 Analysis page — no charts of its own
 
 **Signal or noise** is HTML drawn from `signals.json` (52 markets' weekly moves against their typical week;
-series and thresholds in `config/signals_settings.py`, arithmetic in `data/signals.py`). **What I'm watching**
+series and thresholds in `config/signals_settings.py`, arithmetic in `data/processors/signals.py`). **What I'm watching**
 shows the site's own charts by key plus images saved in `assets/analysis/`, all listed in `config/analysis.py`.
 **From the newsletter** reads the Substack archive when the page opens. Details §6; editing §5.10.
 
@@ -589,11 +655,13 @@ Data comes from the project's fetchers: `fred_fetcher.fetch_series("DGS10", peri
     (`macro_cape`, `equity_risk_premium`) → Country Risk (`country_erp`, `regional_erp`, `ratings_vs_markets`) →
     Emerging Markets (`macro_em_`) → Global Growth (`oecd_cli`) → Other.
   - India: snapshot at top → **Growth & Activity** (PMI, IIP, investment rate, GVA; explicit order)
-    → **Equity Markets** (FPI, risk appetite, valuations, rotation) → **Inflation & Monetary Conditions**
-    (headline/food CPI, CPI contributions, credit/deposits, transmission) → **External Sector** (forex, trade)
-    → **Fiscal Policy & Public Finances** → Other. Read `page_india()` for exact membership and order.
+    → **Inflation** (headline/food CPI, contributions, item panels, inflation surveys)
+    → **Monetary Conditions** (WACR, liquidity, credit/deposits, transmission)
+    → **External Sector** (vulnerability, reserves, REER, trade) → **Public Finances**
+    → **Equity Markets** (FPI, risk appetite, valuations, rotation) → **Consumer Confidence**
+    → Supporting Indicators. Read `page_india()` for exact membership and order.
   - So a file name decides where a new chart lands. Changing these lists is an `app.py` change (needs a reboot).
-  - India uses explicit ordering for its growth, equity and inflation rows; other groups retain loader order.
+  - India explicitly pairs growth/inflation/consumer rows and orders monetary/external charts; equity uses loader order.
 - **Add a chart**:
   1. Write a block (Weekly) or `chart_*` function (World, India) that saves `NN_<key>.png` with `EconStyle.save_chart`.
      World and India functions must also be called from the page's main routine.
@@ -608,21 +676,22 @@ Data comes from the project's fetchers: `fred_fetcher.fetch_series("DGS10", peri
 ### 5.4 Enter or correct a data point
 
 **Never type over a number the pipeline fetched** — fix the source, the mapping or the calculation instead.
-Only the stores below hold hand-entered figures. Run the commands from the project folder; add `--dry-run` to
+Hand-entered figures and the separate official source stores are listed below. Run the commands from the project folder; add `--dry-run` to
 preview any `set`.
 
 | Page | Figure | How to enter or correct it | Stored in |
 |---|---|---|---|
 | Weekly Markets | any | Nothing is stored: every number is fetched fresh each run (Yahoo, FRED, NSE, Coin Metrics). A wrong number means a wrong ticker or series (`config/settings.py`) or a wrong calculation (the chart's block). | — |
-| World | Manufacturing PMI (US, euro area, UK, Japan, China), Japan CPI, China unemployment, China 10-year | `PYTHONPATH=. .venv/bin/python -m data.world_manual_entry set 2026-08 --country US --pmi 52.4` (`--cpi` Japan only, `--unemployment` and `--ten-year` China only). Running `set` again for the same month overwrites. `… status` lists what is missing. | `data/world_manual.csv` |
+| World | Manufacturing PMI (US, euro area, UK, Japan, China), Japan CPI, China unemployment, China 10-year | `PYTHONPATH=. .venv/bin/python -m data.processors.world_manual_entry set 2026-08 --country US --pmi 52.4` (`--cpi` Japan only, `--unemployment` and `--ten-year` China only). Running `set` again for the same month overwrites. `… status` lists what is missing. | `data/stores/world/world_manual.csv` |
 | World | everything else | Automatic, with freshness limits (`config/world_settings.py`); no overrides by design. A stale source fails the run with a message naming it. | — |
-| India | PMIs, GST, core CPI, unemployment, FPI (NSDL); headline/food CPI and IIP have guarded manual fallbacks | `PYTHONPATH=. .venv/bin/python -m data.india_manual_entry set 2026-08 --gst 2.04 --cpi 4.5` — flags `--mfg-pmi --svc-pmi --gst --cpi --core-cpi --food-cpi --unemployment --iip --fpi`. Units: PMI index; GST ₹ **lakh crore** (2.04, never 204000); CPI/IIP % YoY; unemployment %; FPI ₹ **crore**. Range-checked; prints before → after; setting a month again corrects it. `… status` shows 12 months, `… show 2026-08` one. Composite PMI is calculated — never enter it. | `data/india_macro.db`, table `india_monthly` |
-| India | bank credit, deposits, M3, exports, imports, forex reserves, RBI's FPI series | Download RBI's DBIE workbook, save it over `data/50 Macroeconomic Indicators.xlsx` (same name), then `PYTHONPATH=. .venv/bin/python data/fetchers/india_fetcher.py --dry-run` and `… --append` (updates the months present; other columns untouched). A wrong figure is corrected by RBI's next workbook, not by hand. | `india_monthly`, `india_weekly` |
-| India | fiscal: revenue spending, capex, fiscal deficit, interest, subsidies, Budget (BE) rows, deficit financing | One row per month in `data/cag_manual_accounts.csv`, **year-to-date ₹ crore**, rules in the file's header comment (the financing rows must add up, to within ₹1 crore). A row in `data/cag_monthly_accounts.xlsx` for the same month wins, except the `fin_*` columns. Checked by `tests/test_cag_manual.py` and by `generate_india.py`, which stops on a bad figure. | the CSV / workbook |
-| India | rate transmission, State of the Economy briefing | Automatic from RBI's Bulletin (`generate_soe.py`); never typed. | `data/rbi_transmission.csv`, `soe.json` |
-| RBI Sentinel | 10-year G-sec close on a decision day (live test) | Add one line: `2026-10-07,<previous day close>,<decision day close>,Investing.com` | `data/rbi_live_market.csv` |
-| RBI Sentinel | a repo-rate decision recorded wrongly | Correct `RATE_CHANGES` in `rbi_sentinel/seed_rates.py` (`(date, new_rate, action, change_bps)`), then `python -m rbi_sentinel.seed_rates` | `data/rbi_sentinel.db` |
-| RBI Sentinel | tone scores | Never edited by hand; rescoring costs money (§8). | `data/rbi_sentinel.db` |
+| India | PMIs, GST, core CPI, unemployment, FPI (NSDL); headline/food CPI and IIP have guarded manual fallbacks | `PYTHONPATH=. .venv/bin/python -m data.processors.india_manual_entry set 2026-08 --gst 2.04 --core-cpi 3.8` — flags `--mfg-pmi --svc-pmi --gst --cpi --core-cpi --food-cpi --unemployment --iip --fpi`. Units: PMI index; GST ₹ **lakh crore** (2.04, never 204000); CPI/IIP % YoY; unemployment %; FPI ₹ **crore**. Range-checked; prints before → after; setting a month again corrects it. `… status` shows 12 months, `… show 2026-08` one. Composite PMI is calculated — never enter it. | `data/stores/india/india_macro.db`, table `india_monthly` |
+| India | DBIE bank credit, deposits, M3, exports/imports and legacy reserve/RBI portfolio rows (published reserves/FPI use separate sources) | Download RBI's DBIE workbook, save it over `data/50 Macroeconomic Indicators.xlsx` (same name), then `PYTHONPATH=. .venv/bin/python data/fetchers/india_fetcher.py --dry-run` and `… --append` (updates the months present; other columns untouched). A wrong figure is corrected by RBI's next workbook, not by hand. | `india_monthly`, `india_weekly` |
+| India | fiscal: revenue spending, capex, fiscal deficit, interest, subsidies, Budget (BE) rows, deficit financing | One row per month in `data/inputs/cag/cag_manual_accounts.csv`, **year-to-date ₹ crore**, rules in the file's header comment (the financing rows must add up, to within ₹1 crore). A row in `data/inputs/cag/cag_monthly_accounts.xlsx` for the same month wins, except the `fin_*` columns. Checked by `tests/test_cag_manual.py` and by `generate_india.py`, which stops on a bad figure. | the CSV / workbook |
+| India | official activity, CPI items and RBI external stores | Separate collector commands and contracts in §6; no manual replacement of official observations. | canonical CSVs / source archives |
+| India | rate transmission, State of the Economy briefing | Automatic from RBI's Bulletin (`generate_soe.py`); never typed. | `data/stores/india/rbi_transmission.csv`, `soe.json` |
+| RBI Sentinel | 10-year G-sec close on a decision day (live test) | Add one line: `2026-10-07,<previous day close>,<decision day close>,Investing.com` | `data/stores/rbi_sentinel/rbi_live_market.csv` |
+| RBI Sentinel | a repo-rate decision recorded wrongly | Correct `RATE_CHANGES` in `rbi_sentinel/seed_rates.py` (`(date, new_rate, action, change_bps)`), then `python -m rbi_sentinel.seed_rates` | `data/stores/rbi_sentinel/rbi_sentinel.db` |
+| RBI Sentinel | tone scores | Never edited by hand; rescoring costs money (§8). | `data/stores/rbi_sentinel/rbi_sentinel.db` |
 
 India's `india_monthly` table has one row per month (`month` = `YYYY-MM`) with the columns `india_mfg_pmi,
 india_svc_pmi, india_composite_pmi, india_gst_revenue, india_unemployment, india_cpi_yoy, india_core_cpi_yoy,
@@ -632,12 +701,13 @@ source_flags, fetched_at`; `india_weekly` has `week_ending, forex_reserves_usd_b
 fpi_net_flows_usd_bn, fetched_at`. Release dates and source links for all of the above: `project_reminders.md`.
 
 **Then publish:** commit the changed data file, push, and run the page's workflow (India Dashboard Generator
-has a `skip_fetch` option to only redraw; World Generator redraws everything). §5.7.
+has a `skip_fetch` option for initial India/activity refreshes, not every independent updater; World Generator redraws everything). §5.7.
 
 ### 5.5 Change words on the site
 
 | Words | Where | Live after a push? |
 |---|---|---|
+| Weekly macro-card titles/commentary/badges | `app.py`: `_eh_front_page`, `_eh_world_answer`, `_eh_front_india`, `_eh_front_stance`; detailed India answers remain separate | needs a reboot |
 | Page titles and standfirsts (Weekly, World, India, RBI) | `app.py`, each `page_*()` calls `_page_header_html(title, standfirst, …)` | needs a reboot |
 | Masthead, tab row, sidebar | `app.py` | needs a reboot |
 | About page, footer links and lines | `config/resources.py` | yes |
@@ -659,8 +729,10 @@ PYTHONPATH=. .venv/bin/python generate_signals.py               # the Analysis b
 for f in tests/test_*.py; do PYTHONPATH=. .venv/bin/python "$f" > /dev/null || echo "FAILED: $f"; done
 ```
 
-- Weekly, World and the signals board need `FRED_API_KEY` in `.env`. No generator publishes anything — they
-  write to `output/` (the signals board into the newest `output/weekly/` edition).
+- Weekly, World and the signals board need `FRED_API_KEY` in `.env`. Normal generators write to `output/`
+  (the signals board into the newest `output/weekly/` edition). The targeted monetary command in §6 instead
+  replaces two local `assets/india/` PNGs; it does not commit or push. Use `--assets` with a temporary asset root
+  containing an existing `india/YYYY-MM/` folder for a disposable preview.
 - On localhost the newest folder wins across `output/` and `assets/`, so after a local run the local site shows
   the local charts; the live site only ever shows committed `assets/`.
 - Tests (run each `tests/test_*.py` script; unittest discovery alone misses plain-function suites): `test_weekly_sections` (every Weekly chart placed once), `test_units`
@@ -677,12 +749,12 @@ for f in tests/test_*.py; do PYTHONPATH=. .venv/bin/python "$f" > /dev/null || e
    git pull                                     # FIRST, before changing anything: the workflows commit to main too
    # … make the change, run the checks (§5.6) …
    git status                                   # what has changed
-   git add data/india_macro.db                  # the files you mean to publish, by name
+   git add data/stores/india/india_macro.db                  # the files you mean to publish, by name
    git commit -m "data: GST for Aug 2026 corrected"
    git push
    ```
    If the push is refused because a workflow pushed in the meantime: `git pull --rebase`, then `git push`. If
-   that reports a conflict in a database file (`data/india_macro.db`, `data/rbi_sentinel.db`), don't try to merge
+   that reports a conflict in a database file (`data/stores/india/india_macro.db`, `data/stores/rbi_sentinel/rbi_sentinel.db`), don't try to merge
    it: run `git rebase --abort` (which puts everything back as it was) and ask for help — the figures need
    entering again on top of the newer database.
 2. **What shows up when:**
@@ -694,12 +766,78 @@ for f in tests/test_*.py; do PYTHONPATH=. .venv/bin/python "$f" > /dev/null || e
 | `app.py`, or any other Python module | the push **and** Streamlit Cloud → Manage app → **Reboot** |
 
 3. **Workflows** (Actions tab): Weekly Markets Generator, World Generator, India Dashboard Generator, RBI
-   Sentinel, Headline Collector, Keep Streamlit App Alive. Start them with **Run workflow**, never **Re-run** on an old run: a
+   Monetary Conditions Daily (deployment pending), RBI Sentinel, Headline Collector, Keep Streamlit App Alive. Start them with **Run workflow**, never **Re-run** on an old run: a
    re-run reuses the commit it first ran on, and its final push is refused once `main` has moved on (the World
    run of 21 Sep 2026 failed twice this way). Don't start two chart workflows at once — the second one's push
    can be refused for the same reason.
 4. Check the live page after a few minutes. New charts under old captions, or new words in an old layout, mean
    the app needs a reboot.
+
+### 5.7.1 Publishing the directory migration — proposed rollout
+
+The 9 Oct reorganization is complete locally. The owner authorized publication of the complete migration;
+confirm the current published revision from Git history and GitHub Actions before declaring live verification.
+No workflow runs are initiated as part of the migration push. The owner decides which optional
+artifacts to keep; the working tree also includes chart/data/features predating the directory migration.
+
+1. **Review the complete change set.** Include `data/paths.py`, `data/processors/`, `charts/india_charts/`,
+   their updated consumers, required source inputs/stores, workflow updates, `.gitignore`, `.gitattributes`,
+   tests/fixtures and documentation. Include removals of the old module/data locations and the retired
+   `site/`/`pages.yml`. A long deletion/addition list mostly represents moves. Git can recognize many renames
+   after both sides are staged; review the staged diff before committing. Avoid publishing new paths without
+   the files they point to, or publishing moved files without their updated readers.
+2. **Publish the coherent migration together.** Use a branch/PR and the owner's commit/push/merge approval
+   process. Streamlit serves `main`; a push to a feature branch alone does not update the live dashboard.
+   Keep the current published `assets/` needed by the dashboard available throughout the migration.
+3. **Check the app after the migration reaches `main`.** Reboot Streamlit if it still runs old imported modules;
+   verify Weekly, World, India, RBI and Analysis pages load the existing published editions. A directory move
+   does not itself require regenerating every chart. The existing PNG/JSON asset locations are unchanged.
+4. **Validate affected pipelines deliberately, one at a time.** Start a fresh workflow on the latest `main`,
+   wait for it to finish and inspect its logs/live artifacts before starting the next writer. The proposed
+   order is India → World → Weekly; World uses the India store, and Weekly commentary reuses saved snapshots.
+   Then check the targeted daily monetary job. `skip_fetch=true` in India is available for a reduced refresh,
+   but it still permits independent RBI/NSE/CPI refreshes and is not a completely offline migration check.
+   Optional source failures can coexist with a green job; inspect omissions and warnings as well as job status.
+
+Every workflow does not need an immediate manual run:
+
+| Workflow | How it relates to migration verification |
+|---|---|
+| India Dashboard Generator | Main India generation, relocated inputs/stores and publication; primary check |
+| World Generator | Relocated World inputs/ledgers, shared India reads and World publication |
+| Weekly Markets Generator | Moved news/signals/matrix processors and Weekly publication |
+| RBI Monetary Conditions Daily | Targeted collector/render/publication paths; unchanged source data is a successful no-op, so it may not render during a manual check |
+| Central Bank Rates | Separate between-edition World refresh and PBoC ledger publication; optional additional check or observe its next scheduled run |
+| RBI Sentinel | Relocated DB/cache/log paths; check its next routine run or deliberately trigger it. It can use the paid Anthropic scoring API and create/update an input-request issue, so do not run it merely to redraw charts |
+| Headline Collector | Moved news module through `generate_news.py`; can be checked manually or at its next scheduled collection |
+| Keep Streamlit App Alive | Browser availability check; no relocated data store to regenerate |
+| Link Preview Page | Retired with `site/`; there is no replacement Pages workflow to run |
+
+### 5.7.2 What belongs in GitHub — discussion, not a new tracking decision
+
+The owner asked to discuss possible exclusions before changing policy. Do not expand `.gitignore`, remove
+tracked material, stage, commit or push based on this section alone. Existing ignore rules remain in force.
+
+| Category | Role and publication implications |
+|---|---|
+| Python modules, configuration, workflows, path registry, Git rules and tests | Required to publish the implementation coherently; workflow tests also need their referenced fixtures |
+| `data/stores/` canonical DB/CSV/JSON and source archives | Used by deployed readers and source validation; local availability is insufficient for a fresh CI checkout or Streamlit deployment |
+| `data/inputs/cag/`, `data/inputs/rbi/` and owner-facing DBIE/manual files | Active offline inputs. Keeping DBIE/manual files at the top of `data/` is a location preference, not an instruction to exclude them from Git |
+| `assets/` published charts, edition JSON, branding and fonts | Deployed app content. Generated files here are intentional deployment artifacts, unlike local `output/` |
+| `data/cache/`, `output/`, `.venv/`, Python/test caches, `.env`, local secrets and SQLite WAL/SHM files | Already excluded under current rules; not part of the publishable migration |
+| `data/inputs/nse/NIFTY 50/` and `NIFTY Small Cap 250/` | Local bootstrap exports already excluded; existing published NSE stores do not require republishing those seed inputs |
+| NSE diagnostic `runs/` and `start_investigation.json` | Already ignored at the new locations. One `start_investigation.json` was previously tracked at the old location; its old deletion/new exclusion needs an explicit owner decision during staged review |
+| Optional input reference workbooks and future audit reports | Possible candidates for further exclusions only after checking runtime, tests, reproducibility and the owner's desired archive. No new exclusions were decided |
+
+Do not blanket-ignore `data/stores/`, `*.db`, `*.csv`, JSON, raw sources or all generated files. CPI/GVA/IIP/NSE
+and MoSPI stores include retained evidence and manifests their loaders check; stripping these can break
+validation even when the normalized table still exists. Some stores can be generated again, but that is not
+the same as having them available offline on the first deployment. An external archive or reduced retention
+policy would be a separate design and migration, not just an ignore rule.
+
+Ignoring a file does not untrack an already committed copy. Review optional exclusions and deletion records
+with the owner first. The large pending diff also contains prior feature/data/chart work, so do not assume
+every untracked file is either disposable or part of this directory-only change.
 
 ### 5.8 Undo
 
@@ -716,6 +854,8 @@ for f in tests/test_*.py; do PYTHONPATH=. .venv/bin/python "$f" > /dev/null || e
 | Weekly, *Rank the week's unusual moves* | over a quarter of the 52 series could not be read | nothing is published for the board that week; the charts are fine |
 | World, *Generate World charts and snapshot* | a source is stale or failed: the log ends `FINISHED WITH PROBLEMS`, one line per source | nothing is published until it is fixed, by design; a renamed/discontinued series needs a replacement |
 | India, source update steps | RBI/NSE/MoSPI blocked or changed | independent charts still render; failed optional sources gate their charts and remove stale artifacts; inspect source status/logs |
+| RBI Monetary Conditions Daily, refresh/validation | bad or empty RBI response, invalid canonical observations, or latest data older than 7 days | prior canonical CSV and live charts are preserved; inspect RBI availability and source/schema errors; unchanged data is a successful no-op |
+| RBI Monetary Conditions Daily, rendering/publication | chart render, asset replacement or Git conflict failed | no automated commit on render failure; prior live PNGs preserved; resolve source/code or rebase conflicts explicitly, never force-push |
 | RBI Sentinel | see §8 | |
 | Any, "FRED_API_KEY is not set" | the secret expired or was removed | re-add it in GitHub → Settings → Secrets; there is no fallback by design |
 
@@ -771,6 +911,51 @@ The current state of each page, with the reasons behind it. The chart-by-chart l
 - **Titles:** `WEEKLY_TITLES` holds a `dashboard` and a `newsletter` title per chart.
   CI uses `--mode dashboard`. Newsletter strings are marked `# ── EDIT for each Substack issue ──`.
 
+#### Weekly macro commentary and market matrix — local implementation, 9 Oct 2026
+
+The six **Macro Picture at a glance** titles, in order:
+1. Are global markets risk-on or risk-off?
+2. Is global growth strengthening or slowing?
+3. Are global inflation pressures building or easing?
+4. How is India’s economic activity trending?
+5. Are India’s inflation pressures broadening or cooling?
+6. How hawkish is the RBI?
+
+`_eh_front_page` reuses same-edition `signals.json`, `world_snapshot.json`, `_eh_india_observations`
+and `_eh_brief`. Hero bodies lead with interpretation and support it with 2–3 available observations,
+normally in two sentences. Definitions and calculation prose belong in Insights/methodology notes.
+The India inflation card replaces the former monetary-conditions card; its link targets India inflation.
+Detailed India answers are separate and were not rewritten by this hero-copy change.
+
+Risk requires at least three existing equity/HY-spread/VIX signals, including HY and VIX: aligned signs
+produce Risk-on/Risk-off, otherwise Mixed. Missing required inputs produce Awaiting data. Global growth/
+inflation use US, euro area and China levels and prior-month changes; all three levels are required and at
+least two changes must corroborate unanimously for Strengthening/Slowing or Building/Easing; a flat or
+conflicting reading is Mixed. India activity requires same-month manufacturing/services PMI: both above
+50 gives Expanding, both below gives Slowing, otherwise Mixed; conflicting IIP direction gives Mixed.
+India inflation uses latest-month headline/core/food CPI and consecutive-month comparisons: at least two
+rising/falling measures give Broadening/Cooling only when all available comparable directions agree.
+This is trend corroboration, not an item diffusion or above-target-basket measure. Sentinel keeps its
+existing ±0.05 tone thresholds and displays current/stored previous score, prior meeting month, repo
+change/rate and stated stance. Missing evidence is never fabricated. Card CSS/HTML remain unchanged;
+copy changes affected intrinsic row heights (known issue 16).
+
+The **Cross-Asset Market Performance Matrix** is HTML, not a new PNG. `generate_market_matrix.py`
+writes schema-v2 `market_matrix.json` into an existing Weekly chart edition; `--out` can select it.
+`config.market_matrix` defines the universe; `data.processors.market_matrix` calculates observed returns, drawdown,
+52-week sparklines and completed month-end distance from the 10-month average. Sources are explicitly
+labelled: dividend-adjusted investable proxies, official NSE Nifty 50 gross TRI where available, and
+underlying price returns for non-income assets. Do not substitute price/NTR data for official TRI or
+spot prices for rolling commodity-futures investor returns. Horizons use actual dated anchors; 3Y/5Y
+are annualised. Instrument currency/methodology are recorded; no silent currency conversion.
+
+Source failures are listed under `left_out`; more than 20% missing fails the build. Stale inputs are
+rejected (over three business days for markets, two calendar days for crypto); no stale-cache fallback
+or interpolation. A failed rerun removes its old JSON. The Weekly workflow requires matrix generation
+and copies its JSON with the edition; the app validates schema/date/provenance and never borrows another
+edition's matrix. NSE retrieval audits stay under the local edition's `market_matrix_sources/nse_tri`.
+Tests: `test_market_matrix.py`, `test_yfinance_market_matrix.py`, `test_nse_tri.py`.
+
 ### World — `generate_macro.py` (page "World", title "The World Economy")
 Replaced Macro Pulse on 15 Sep 2026. Standfirst (rewritten 16 Sep 2026, the old one named charts that no longer exist
 and framed the page around India): *Central banks, growth and inflation, equity valuations and country risk across the
@@ -792,7 +977,7 @@ Brent in rupees (the dashboard has an international audience, not only Indian re
 misfired in 2024 and repeats the unemployment rate) and the United States summary table (every row but the Sahm rule
 was already on a chart; the Sahm series was dropped from `MACRO_INDICATORS` with it).
 
-**US Equity Valuations** (`data/valuations.py`, downloaded every run; `tests/test_valuations.py`):
+**US Equity Valuations** (`data/processors/valuations.py`, downloaded every run; `tests/test_valuations.py`):
 - Shiller `ie_data.xls`: the link is scraped from shillerdata.com (its path changes with each upload); legacy .xls, so
   `xlrd` is in requirements.txt. Columns are found by header text (CAPE = "P/E10 or CAPE", not TR CAPE; "Excess CAPE
   Yield" is a fraction). Dates are year.month decimals (1990.1 = October). The latest row is dropped while Shiller's note
@@ -875,7 +1060,7 @@ it should be reflected"), even when it takes effect later:
   X percent" (a dissent says "would", never read) and "…will be effective from <date>". Missed the 18 Sep 2026 hike
   (1.00 → 1.25% from 24 Sep) for a week before this.
 - PBoC: the **7-day reverse repo rate** (owner's call, 24 Sep 2026; the PBoC calls it its main policy rate; BIS carries
-  the 1-year LPR). `data/pboc_reverse_repo.csv` holds every change since Oct 2019, each dated by the first 7-day
+  the 1-year LPR). `data/stores/world/pboc_reverse_repo.csv` holds every change since Oct 2019, each dated by the first 7-day
   operation at the new rate and linked to the notice (verified by hand against the PBoC archive; the English archive
   lacks notice No.194 of 27 Sep 2024, which was 14-day only, so the Sep 2024 cut is dated 29 Sep). Each run reads the
   newest notices on the **Chinese** open market operations list (posted 09:20 Beijing, hours before the English
@@ -941,18 +1126,22 @@ unemployment (shutdown) and YoY counted 12 rows; now matched by calendar month (
 sign; now by meaning (`good` per column in `SCOREBOARD_COLUMNS`, applied in `_scoreboard_html`).
 
 ### India Dashboard — `generate_india.py`
-- **Automatic series** (`india_fetcher.py --append` → `india_macro.db`): bank credit/deposits,
-  M3, exports/imports, forex reserves (DBIE workbook), plus RBI's net portfolio investment (`india_fpi_flows`, US$ bn)
-- **FPI chart and table:** NSDL net investment (`india_fpi_net_inr_cr`, ₹ crore, entered with `--fpi`) when any
-  NSDL figure exists, otherwise RBI's series. `fpi_series()` in `generate_india.py` picks one; they are never mixed
+- **DBIE ingestion** (`india_fetcher.py --append` → `india_macro.db`): bank credit/deposits, M3,
+  exports/imports and legacy forex/RBI portfolio series. M3 has no current chart; legacy reserve/portfolio
+  rows are not the sources for published reserves/FPI. Verified official merchandise releases in
+  `data/stores/india/india_trade_releases.json` supplement only missing DBIE months; DBIE takes precedence on overlap.
+- **FPI chart and table:** NSDL only (`india_fpi_net_inr_cr`, ₹ crore, entered with `--fpi`), with optional
+  current-month MTD (`--fpi-mtd`, `--fpi-mtd-asof`). No RBI fallback. `fpi_series()` selects completed months;
+  a final monthly observation supersedes MTD, which never enters the completed-month cumulative total
 - **NIFTY IT standalone chart:** function retained, but not called by the current dashboard; sector rotation includes IT.
-- **Manual series** (`python -m data.india_manual_entry set …`): manufacturing and services PMI,
-  GST, core CPI, PLFS unemployment and **FPI** (NSDL, ₹ crore). Headline/food CPI and IIP are official automated series; emergency manual rules are in §0.1
+- **Manual series** (`python -m data.processors.india_manual_entry set …`): manufacturing and services PMI,
+  GST, core CPI, the legacy monthly unemployment field and **FPI** (NSDL, ₹ crore).
+  The new urban youth PLFS chart/snapshot use the separate official monthly store, not `--unemployment`. Headline/food CPI and IIP are official automated series; emergency manual rules are in §0.1
 - **CAG fiscal charts (4 since Sep 2026):** GST, expenditure quality (with a capex Budget ÷ 12 line and a
   "capex to date, % of Budget" badge), deficit financing, fiscal deficit % of GDP.
   Tax composition and monthly capex were retired (CGA stopped publishing tax by head; monthly capex repeated the others);
   the fiscal consolidation tracker was replaced by deficit financing on 15 Sep 2026.
-  While CGA does not publish the workbook, months typed from its web page go in `data/cag_manual_accounts.csv`
+  While CGA does not publish the workbook, months typed from its web page go in `data/inputs/cag/cag_manual_accounts.csv`
   (year-to-date ₹ crore: revenue expenditure, capex, fiscal deficit required; interest, subsidies optional;
   BE rows with GDP, and a BE fiscal deficit sets the deficit chart's target line). `load_cag_tables()` merges them, the workbook wins on overlap,
   and bad figures stop the run (`tests/test_cag_manual.py`)
@@ -962,7 +1151,7 @@ sign; now by meaning (`good` per column in `SCOREBOARD_COLUMNS`, applied in `_sc
   small savings (b + e), other domestic (c + d + f), cash (g + h + i), external. The workbook has no financing page,
   so `load_cag_financing()` keeps using these rows even after a workbook supersedes the month's other figures
 - **State of the Economy (added 18 Sep 2026):** RBI's monthly article in the Bulletin, read by `generate_soe.py`
-  (fetch and parse: `data/rbi_soe.py`; settings: `config/soe_settings.py`; tests: `tests/test_soe.py`, offline, with
+  (fetch and parse: `data/processors/rbi_soe.py`; settings: `config/soe_settings.py`; tests: `tests/test_soe.py`, offline, with
   saved editions in `tests/fixtures/soe/`). Two outputs:
   - `soe.json` — the opening summary, the concluding assessment and a month-on-month comparison, all **quoted
     verbatim**, written into the India edition folder and published with its charts, the way `news.json` is on Weekly.
@@ -976,26 +1165,144 @@ sign; now by meaning (`good` per column in `SCOREBOARD_COLUMNS`, applied in `_sc
     Chart pointers ("(Chart III.5a)") are stripped; nothing else in a quoted sentence is touched. A topic missing from
     either month is left out, and a previous edition that cannot be read simply means no comparison. `generate_soe.py`
     fetches the previous edition too, trying two months back before giving up.
-  - `data/rbi_transmission.csv` — Table IV.3 (pass-through of policy rate changes to bank deposit and lending rates)
+  - `data/stores/india/rbi_transmission.csv` — Table IV.3 (pass-through of policy rate changes to bank deposit and lending rates)
     from every edition, which draws `18_india_rate_transmission.png`. Backfilled to Feb 2025 (16 points in the
     current cycle); `python generate_soe.py --history` reads any editions missing from the file. The chart follows
     whichever cycle is current, easing or tightening, and the title says which; a new cycle with only one month behind
     it leaves the finished cycle up until it has two, because one point is not a path.
-  - **Access:** the article's web page on rbi.org.in answers a normal request; the PDF and the Current Statistics
-    spreadsheets sit on rbidocs.rbi.org.in, which serves scripts a CAPTCHA, so nothing asks for them. Past editions
-    come from the Bulletin page's own month archive (an ASP.NET postback). The article starts in November 2020.
+  - **Access:** HTML first, then the official PDF linked in the same Bulletin row when needed. Challenge/
+    CAPTCHA responses are rejected; there is no bypass. A manually downloaded PDF can be supplied with
+    `generate_soe.py --month YYYY-MM --pdf-file /path/to/report.pdf`; official source identity and printed
+    month are checked. Past editions use the Bulletin archive. The article starts in November 2020.
   - **Layout traps** (all seen between 2021 and 2026, all covered by tests): charts and the high-frequency tables
     III.1–III.5 are images, so only four HTML tables can be read; the transmission table has been numbered Table 5,
     Table 4 and Table IV.3, so it is found by caption; its columns are matched by pattern and a renamed or reordered
     column stops the run; the "overall interest rate effect" column only exists from 2025; some editions put the
     cycle's name on one row and its dates on the next; month cells carry footnote marks ("Jul* 2025"); and two
     editions can restate the same month, where the newer figure wins.
-  - **Cross-check:** RBI's own repo column is compared with the Sentinel's rate history (`data/rbi_sentinel.db`)
+  - **Cross-check:** RBI's own repo column is compared with the Sentinel's rate history (`data/stores/rbi_sentinel/rbi_sentinel.db`)
     for every cycle; a disagreement is a problem and fails the run. Both cycles matched on 18 Sep 2026.
 - **Workflow:** Saturday 08:00 UTC fetches then regenerates charts; a failed fetch still regenerates
   from the last good database. A push does **not** trigger it — use Actions → Run workflow. The two State of the
   Economy steps are `continue-on-error`: RBI being slow or reshaping its table never stops the charts.
 - Monthly routine and source URLs: `docs/project_reminders.md`
+
+#### Official activity, CPI items and external sources — 9 Oct 2026
+
+**Industry IIP and labour:** `mospi_iip_industries` discovers the latest official monthly structured
+annexure and reconciles its full current-base history. Require 23 manufacturing industries, base 2022–23,
+NIC-2025 and Output PPI; pre-29-Jun-2026 superseded deflator vintages are rejected. Use published YoY,
+not changes recomputed from rounded indices. Retain source bytes, release dates, explicit revision statuses
+and hashes in `data/stores/india/mospi_activity_sources/`; no filling missing observations. The heatmap uses the latest
+12 months, sorted by latest YoY, and reports positive-growth breadth. Leader TTM uses two complete
+12-month index windows for all industries; missing coverage omits that metric. General IIP remains a
+separate official series.
+
+`mospi_plfs_monthly` validates monthly Urban/Persons CWS unemployment from the redesigned January-2025
+methodology, with comparable observations starting Apr 2025. Store ages 15–29 and 15+ separately;
+latest five months reconcile against Statement 3 of the newest bulletin. The youth chart highlights ages 15–29 with a 15+ comparison; the snapshot
+uses ages 15–29; never splice quarterly, usual-status or older-methodology observations. Both collectors
+run in Saturday India unless `skip_fetch`; failure flags omit their affected artifacts while independent
+charts remain usable. Tests: `test_mospi_activity.py`, `test_mospi_activity_workflow.py`.
+
+**CPI items:** separate All India Combined base-2024 store, `data/stores/india/CPI/items/`, with 358 validated item
+codes, immutable responses, manifests and current/attempt status. Published YoY is preferred; an explicitly
+supported derived value requires exact same-code/same-base indices twelve months apart. Missing published
+YoY is not repaired by derivation. Panels rank the largest increases/declines, not weighted contributions
+or inflation diffusion. `app._render_cpi_items` checks edition JSON against the canonical snapshot and both
+PNGs; invalid/missing data gives an unavailable state. No new hero dependency was introduced. The normal
+India generator renders these panels, but `india.yml` does **not** yet refresh/persist the independent
+item store. Collect separately with `PYTHONPATH=. .venv/bin/python -m data.fetchers.mospi_cpi_items --update`.
+Tests: `test_cpi_items.py`.
+
+**External:** `charts.india_charts.india_external.load_forex` reads `data/stores/india/rbi_wss_reserves.csv`, converting official
+USD million to USD billion; week-on-week changes require adjacent seven-day observations. Legacy DBIE
+reserves are never the rendering fallback. `rbi_reer.csv` holds the official 40-currency CPI-based REER
+(2015–16 = 100, not fair value). `india_external_vulnerability.csv` holds official current-account/GDP
+and short-term debt/reserves observations, with publication dates/source metadata; gaps remain gaps.
+Collectors reject challenge pages, unofficial URLs, changed definitions and invalid rows. Refresh separately:
+`PYTHONPATH=. .venv/bin/python -m data.fetchers.rbi_external --series all` (or `wss`, `reer`, `vulnerability`).
+These collectors are not currently steps in Saturday India. `generate_india.py` reads the existing stores;
+missing/invalid optional sources omit affected charts. Tests: `test_rbi_external.py`.
+
+Merchandise quick estimates in `data/stores/india/india_trade_releases.json` are verified release inputs, not guesses.
+The India fetcher supplements missing DBIE months only and validates the official release; retain month,
+exports/imports, publication date and URL. DBIE wins on overlap. Tests: `test_india_trade.py`.
+
+#### RBI monetary conditions: chart and source contracts
+
+The two daily monetary charts live in `charts/india_charts/india_monetary.py`. The full India generator calls
+`generate()` using the already-stored CSV; it does not fetch MMO itself. The daily workflow is separate
+from the Saturday dashboard and RBI Sentinel (§10).
+
+**Canonical inputs:** `data/stores/india/rbi_money_market.csv`, collected by `data/fetchers/rbi_money_market.py` from
+official RBI Money Market Operations releases. Each row retains its operations date, release date,
+official MMO URL, policy-source URL and timezone-aware retrieval timestamp. Repo/SDF/MSF history comes
+from official MPC resolutions applied on their effective dates; the collector supports the SDF regime
+from 8 Apr 2022. These are independent inputs, not a Sentinel or macro-database refresh.
+
+**WACR (`19_india_money_market_corridor.png`):** the legacy filename is stable; this is a single-series
+spread chart, not a multi-rate corridor. `wacr_spread_data()` calculates `(call_rate - repo_rate) * 100`
+in bps. Plot consecutive valid, positive-volume observations directly, including genuine weekend trades.
+Zero-volume missing WACR is allowed; positive-volume missing WACR is rejected. No calendar filling,
+smoothing, winsorisation or suppression of genuine observations.
+
+- Title: **Overnight Funding vs. the RBI Policy Rate**.
+- Subtitle: **Measures how closely actual overnight funding conditions are aligned with the RBI’s policy stance**.
+- Full observed minimum/maximum, padded on each side by 8% of the range or at least 10 bps. Major ticks
+  sit strictly inside the plotting range, clear of the top rule. Signed tick labels carry `bps`, with Unicode
+  minus; there is no generic vertical unit label, clipped scale or boundary triangle.
+- Blue observed line, subtle ±10 bp alignment band, prominent zero line and horizontal house-colour grid
+  at alpha 1.0. Fill from the line to zero uses categorical coral (`CATEGORICAL_COLORS[7]`) above zero and
+  teal (`[1]`) below, alpha 0.25. Positive means tighter overnight funding relative to repo; negative means easier.
+- Only the latest observation has a direct value/date label. Muted 90° side-guide labels sit outside the
+  far right edge, separately within the positive/negative regions: “Overnight funding tighter than policy”
+  and “Overnight funding easier than policy”. They wrap for fit and remain clear of the latest annotation.
+- Use the standard `EconStyle.create_figure`, `set_title`, `add_top_rule`, `add_source`, `save_chart`
+  hierarchy; never override title typography after `set_title`. Methodology belongs in canonical Insights.
+
+**Banking System Liquidity (`20_india_system_liquidity.png`):** retain the stored RBI convention,
+`net_liquidity_injection_cr`: injection (+), absorption (−). `banking_system_liquidity()` reverses the sign
+on a copy for presentation: `banking_system_liquidity = -1 * net_liquidity_injection_cr`; divide by
+100,000 to show ₹ lakh crore. Positive surplus bars use `LINE_TEAL`; negative deficits use `LINE_MAROON`.
+The latest label and average use that same transformed sign. This measures outstanding RBI liquidity
+operations including today's operations, not broader bank cash, net durable liquidity, or WSS flows.
+
+The title is **Banking System Liquidity**; subtitle is **Surplus (+) / deficit (−), based on RBI outstanding
+liquidity operations**. The source line is RBI — Money Market Operations, total outstanding net.
+`liquidity_average()` takes 20 Mon–Fri observations from the transformed series. Weekend operations remain
+in the bars; a missing weekday invalidates the average window rather than being filled. Published holiday
+operations are included: this is not an exchange-holiday calendar.
+
+**Targeted commands** (project root; fetch only when authorized):
+
+```sh
+PYTHONPATH=. .venv/bin/python -m data.fetchers.rbi_money_market --refresh-recent --overlap 10
+PYTHONPATH=. .venv/bin/python -m charts.india_charts.india_monetary --refresh-current
+```
+
+The original collector `--start YYYY-MM-DD --end YYYY-MM-DD` interface remains available for explicitly
+requested history collection. Routine updates use the overlap; do not hand-edit canonical observations.
+Manual workflow dispatch also skips rendering when source data are unchanged. For a chart-only design change,
+run the targeted chart CLI locally and publish the two reviewed PNGs with owner approval, or let the next genuine
+data update redraw them; dispatch alone is not a force-render option.
+The targeted chart command validates canonical data, selects the newest existing valid `assets/india/YYYY-MM/`
+folder, renders both PNGs in temporary storage, then replaces only those two files. Both renders must succeed
+before either live file changes; replacement failure rolls back a previously replaced PNG. It never creates
+an edition, removes unrelated assets, runs the full generator, or reads/writes Sentinel. Local `output/` may
+still take precedence in the development dashboard; the daily job deliberately targets published `assets/`.
+
+Focused verification:
+
+```sh
+.venv/bin/python -m unittest discover -s tests -p 'test_rbi_money_market.py'
+.venv/bin/python -m unittest discover -s tests -p 'test_india_monetary_redesign.py'
+.venv/bin/python -m unittest discover -s tests -p 'test_rbi_monetary_daily.py'
+```
+
+The daily suite simulates new observations, unchanged releases, recent revisions, bad/empty sources,
+staleness, month-boundary archives, atomic-write/render/replacement failures, active-edition detection,
+unrelated-asset preservation and no-op Git diffs. Synthetic data remain in temporary test directories.
 
 ### Analysis — `/analysis` (added 21 Sep 2026)
 Title "Connecting the Dots" (`config/analysis.py` `TITLE`, `DEK`), no date in its header. Three blocks:
@@ -1098,9 +1405,9 @@ Normal use: 2 calls on decision day, 1 on Minutes day, 0 otherwise (~$0.15 per m
 ### Live test (from October 2026)
 Historical scores could carry hindsight, because every past meeting predates the model's training.
 From Oct 2026 `rbi_sentinel/live_log.py` records each Resolution's tone change and the time it
-was scored (committed before the 17:00 G-sec close) in `data/rbi_live_log.csv`. The 10-year close
+was scored (committed before the 17:00 G-sec close) in `data/stores/rbi_sentinel/rbi_live_log.csv`. The 10-year close
 has no sanctioned automatic source, so the workflow opens a GitHub issue assigned to the owner;
-the close is added by hand to `data/rbi_live_market.csv`.
+the close is added by hand to `data/stores/rbi_sentinel/rbi_live_market.csv`.
 
 ### Research findings (Sep 2026)
 - The composite tracks the policy cycle but adds nothing beyond the RBI's stated stance for
@@ -1151,15 +1458,18 @@ Test pipeline changes on a copy: `RBI_SENTINEL_DB=/path/to/copy.db python …`
   `tests/test_weekly_sections.py` fails when the latest weekly folder and the lists disagree. Odd sections centre the last chart.
 - **World page:** reads `world_snapshot.json` from the latest macro folder; strip, calendar and scoreboard are HTML built in
   app.py (`_central_bank_strip_html`, `_calendar_html`, `_scoreboard_html`). `config.world_settings` is reloaded when the file changes.
-- **India page:** header "The Indian Economy". Five sections: Growth & Activity; Equity Markets;
-  Inflation & Monetary Conditions; External Sector; Fiscal Policy & Public Finances. `page_india()` explicitly
-  pairs PMI/IIP, investment/GVA and main CPI/contributions. The retired money-supply/promoter images are filtered.
+- **India page:** header "The Indian Economy". Seven question-led sections, in order: Growth & Activity,
+  Inflation, Monetary Conditions, External Sector, Public Finances, Equity Markets and Consumer Confidence.
+  `_eh_question_header`/`_eh_india_answers` supply detailed answers and metric strips. `page_india()` pairs
+  PMI/IIP, inserts the industry heatmap, pairs headline CPI/contributions, then inserts CPI item panels.
+  Monetary and external charts have explicit ordering. Consumer headline charts precede component tables.
+  Retired images are filtered; unmatched charts appear under Supporting Indicators.
 - **The Week in Headlines (live from 17 Sep 2026, commit 835c3dd):** the weekly workflow runs `generate_news.py`
   after the charts and copies `news.json` into `assets/weekly/<date>/`, so each edition keeps its own headlines and
   they are pruned with it. The Weekly page reads `news.json` from the same folder as its charts; an edition without
   one shows no strip. Locally: `python generate_news.py` writes into the newest `output/weekly/` edition that has
   charts (never a new folder, which would hide the charts). Feeds and filters: `config/news_settings.py`; logic:
-  `data/news.py` (feeds read in parallel); tests: `tests/test_news.py` (offline).
+  `data/processors/news.py` (feeds read in parallel); tests: `tests/test_news.py` (offline).
   - Content: RSS headlines from BBC, Guardian, CNBC, FT, Bloomberg (World) and Mint, Business Standard, BusinessLine,
     Indian Express (India), last 7 days. Sorted into themes (central banks, inflation, trade, energy, growth, markets,
     public finances), grouped into stories (TF-IDF with synonyms), one story per theme, ranked by outlet count;
@@ -1251,11 +1561,12 @@ Test pipeline changes on a copy: `RBI_SENTINEL_DB=/path/to/copy.db python …`
 ### Workflows
 | Workflow | Schedule (UTC) | Command | Commits |
 |---|---|---|---|
-| `weekly.yml` ("Weekly Markets Generator") | Sat 06:00 | `generate_weekly.py --mode dashboard`, restores the headline pool, then `generate_news.py` (optional: `continue-on-error`, 8 min limit), then `generate_signals.py` (optional, 10 min limit), keeps the last 4 weeks | `assets/weekly/` (charts + `news.json` + `signals.json`), showcase |
+| `weekly.yml` ("Weekly Markets Generator") | Sat 06:00 | `generate_weekly.py --mode dashboard`, `generate_market_matrix.py` (required), restores the headline pool, then `generate_news.py` (optional: `continue-on-error`, 8 min limit), then `generate_signals.py` (optional, 10 min limit), keeps the last 4 weeks | `assets/weekly/` (charts + `market_matrix.json` + `news.json` + `signals.json`), showcase |
 | `headlines.yml` ("Headline Collector") | every 4 h at :41 | `generate_news.py --collect` into the headline pool (Actions cache only; previous copy deleted) | nothing |
-| `rates.yml` ("Central Bank Rates") | Mon–Fri 06:30 and 21:00 | `generate_macro.py --rates-only` (strip, policy-rate cells, rate cycle chart into the newest `assets/macro/` edition; writes nothing when no rate changed) | `assets/macro/`, `data/pboc_reverse_repo.csv` |
+| `rates.yml` ("Central Bank Rates") | Mon–Fri 06:30 and 21:00 | `generate_macro.py --rates-only` (strip, policy-rate cells, rate cycle chart into the newest `assets/macro/` edition; writes nothing when no rate changed) | `assets/macro/`, `data/stores/world/pboc_reverse_repo.csv` |
 | `macro.yml` ("World Generator") | Sat 10:00 | `generate_macro.py --mode dashboard` (fails on stale/failed sources), copies PNGs + `world_snapshot.json`, keeps the last 4 months | `assets/macro/`, showcase |
-| `india.yml` ("India Dashboard Generator") | Sat 08:00 + manual (`skip_fetch` option) | GVA/IIP tests and updates, RBI transmission, NSE updates, CPI tests/update/bridge, generation, RBI briefing, copy/prune; see §0.1; keeps the last 4 months | `india_macro.db`, `rbi_transmission.csv`, NSE stores, CPI/main/contributions, GVA/IIP archives, `assets/india/` and showcase |
+| `india.yml` ("India Dashboard Generator") | Sat 08:00 + manual (`skip_fetch` option) | GVA/General IIP/industry IIP/monthly PLFS tests and updates, RBI transmission, NSE updates, CPI tests/update/bridge, generation, RBI briefing, copy/prune; see §0.1; keeps the last 4 months | `india_macro.db`, `rbi_transmission.csv`, NSE stores, CPI/main/contributions, MoSPI activity CSVs/raw archives, GVA/IIP archives, `assets/india/` and showcase |
+| `rbi_monetary_conditions.yml` ("RBI Monetary Conditions Daily") | Daily 15:10, including weekends + manual; 20:40 IST | `python -m data.fetchers.rbi_money_market --refresh-recent --overlap 10`, then targeted `python -m charts.india_charts.india_monetary --refresh-current` only on data change | only `data/stores/india/rbi_money_market.csv` and the two current-edition monetary PNGs, only when changed; local implementation, deployment pending |
 | `rbi_sentinel.yml` | weekdays, see §8 | `generate_rbi_sentinel.py --auto`, keeps the last 4 months of charts | `rbi_sentinel.db`, `assets/rbi_sentinel/`, live log |
 | `keep_alive.yml` ("Keep Streamlit App Alive") | 00:00, 10:00, 20:00 | `.github/scripts/keep_alive.py` visits the app so it doesn't hibernate | nothing |
 
@@ -1268,6 +1579,44 @@ on. `weekly.yml`, `macro.yml` and `india.yml` push with a plain `git push`, so t
 can collide the same way (on 21 Sep 2026 World collided with India's push, then failed again on Re-run).
 `rbi_sentinel.yml` already pulls with `--rebase` and retries three times; copying that into the other three
 was offered on 21 Sep 2026 and the owner declined: start runs one at a time with Run workflow instead.
+
+#### Daily monetary refresh and Saturday coordination
+
+The owner approved a standalone daily monetary workflow on 8 Oct 2026. It is implemented and locally
+validated but **not yet committed, pushed or triggered**. Include the existing monetary CSV, modules,
+tests/fixtures and current assets when publishing this work; several are still untracked in the working tree.
+Saturday retains its 08:00 UTC cadence and full-dashboard responsibilities, reading the latest canonical MMO
+CSV naturally. Its only changes for this addition are the shared lock and latest-branch checkout.
+
+Both India workflows use `india-dashboard-${{ github.ref }}`, `cancel-in-progress: false`, `queue: max`.
+Queued runs wait without cancelling an active or older pending India run. Checkout explicitly uses
+`${{ github.ref_name }}` after acquiring the slot, so a queued Saturday run does not overwrite newer daily
+assets from an obsolete checkout. This serializes the two India workflows only; other workflows can still push.
+
+The collector re-fetches from the tenth-most-recent stored operations date through today's IST date.
+Official revisions merge by operations date; later release/retrieval precedence cannot undo a newer stored
+release. A retrieval timestamp alone is not a data revision: unchanged economic values and provenance
+preserve the prior CSV bytes and skip chart rendering and committing.
+
+Before atomic CSV replacement, validate the entire staged merge: unique chronological dates, finite required
+numbers, valid policy values for WACR, finite spreads calculated by the exact formula in §6, no positive-volume
+missing WACR, official URLs, and no backwards latest date. Bad/challenge/malformed pages, empty overall fetches,
+invalid merges and write failures fail closed, preserving the prior CSV and live charts. A validated empty
+current-month archive before its first release is legitimate; previous-month overlap still supplies observations.
+Empty historical archives fail rather than silently masquerading as no new data.
+
+Observed MMO release lags were 1–4 calendar days. Warn when the latest operations date is older than 3 days;
+fail before canonical replacement when older than 7. The wider failure threshold allows weekends, holidays
+and ordinary publication delays; it does not fill missing observations. An unchanged, acceptably fresh dataset
+is a successful no-op. Source failure and excessive staleness are explicit failures, not no-ops.
+
+When data change, stage-render only the two PNGs (§6). The commit step stages those exact current-edition
+paths plus the canonical CSV, checks `git diff --cached --quiet`, and commits **Update RBI monetary conditions**
+only for a non-empty diff. Rebase/push retries up to three times accommodate unrelated branch updates;
+conflicts fail without automatic resolution or force-pushing. Render failure prevents the commit step.
+This job installs only pandas, NumPy, Matplotlib, requests and Beautiful Soup, uses the automatic
+`GITHUB_TOKEN` with `contents: write`, and has a 25-minute limit. No LLM/model calls, paid API keys,
+Sentinel database, macro database, transmission CSV, full India generation, pruning or briefing updates.
 
 ### Secrets
 | Name | Where | Used by |
@@ -1301,18 +1650,21 @@ Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflo
 ## 11. Known issues
 
 1. **World manual cells.** Manufacturing PMIs (US, euro area, UK, Japan, China), Japan CPI, China unemployment and
-   China 10-year have no free API and show "awaiting entry" until keyed in (`data/world_manual_entry.py`). (The old Macro Pulse cron bug — `0 8 8-14 * 6`
+   China 10-year have no free API and show "awaiting entry" until keyed in (`data/processors/world_manual_entry.py`). (The old Macro Pulse cron bug — `0 8 8-14 * 6`
    running daily on the 8th–14th — was fixed on 15 Sep 2026 by the weekly Saturday schedule.)
-2. **RBI fact-extractor tests** (`policy_facts.py`) are deferred to the Oct 2026 MPC cycle.
+2. **RBI fact-extractor coverage:** `tests/test_rbi_rate_decisions.py` already covers stored decisions,
+   chained extraction and reverse-repo disambiguation. Extend fixtures for new wording when needed; tests are
+   no longer wholly deferred. This documentation refresh did not rerun them.
 3. **21 old RBI documents** have no cached page and no cycle; they are logged as skipped every run. Expected.
 4. **`meeting_composites`** stores one row per document date; charts group by policy cycle.
 5. **EM FX tickers** (`BRL=X` etc.) can be stale at weekends; weekly change uses 30 days of data.
 6. **No chart explanation** for the two summary tables, Weekly "Market Snapshot" and "India Economic Snapshot" (by design).
 7. **CAG fiscal data** ends Feb 2026 in the workbook; Mar 2026 (provisional) to Jul 2026 and BE 2026-27 are in
-   `data/cag_manual_accounts.csv` (BE from Budget at a Glance via PRS; July FD and total spending match CGA press
+   `data/inputs/cag/cag_manual_accounts.csv` (BE from Budget at a Glance via PRS; July FD and total spending match CGA press
    reports). GDP 2026-27 is KPMG's rounded ₹393 lakh crore — replace with the exact Budget at a Glance figure.
-   Financing rows (Apr–Jul 2026 and BE 2026-27) are in the same file. Next: Aug 2026 accounts including the
-   financing page (end-Sep). FPI from NSDL is loaded through Aug 2026.
+   Financing rows (Apr–Jul 2026 and BE 2026-27) are in the same file. Next owner task: add any newer CGA accounts and financing rows after checking the
+   official release. FPI coverage is dynamic; inspect `data.processors.india_manual_entry status` rather than relying
+   on an old month recorded here.
 8. **India source availability:** MoSPI/NSE endpoints can fail or change schema. Failed optional refreshes
    gate the affected chart and remove stale published artifacts; check source status journals and workflow logs.
    The official main CPI bridge covers Jan 2024 onward. Older legacy DB rows are not canonical CPI history;
@@ -1325,11 +1677,21 @@ Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflo
     `generate_macro.py` are never called. Nine `CHART_INSIGHTS` keys have no chart any more (`agflation_pipeline`,
     `india_credit`, `india_repo_rate`, `labour_market`, `macro_em_vulnerability`, `rbi_governor_divergence`,
     `stablecoin_mcap`, `us_yield_trend`, `wage_growth`). Harmless.
-12. **Workflow push collisions** — see §10; the owner prefers starting runs one at a time to a workflow change.
+12. **Workflow push collisions** — see §10. Daily monetary and Saturday India publication now share a lock
+    in the local implementation; unrelated workflows still need care. The daily job rebases/retries, while
+    existing Weekly/World/Saturday push behavior is otherwise unchanged.
 13. **Analysis page "why" lines** in `config/analysis.py` are drafts written for the owner to rewrite.
 14. **`make_chart.py` moved from the project root into `charts/`** (owner, 21 Sep 2026; its `PROJECT_ROOT` is now
     `Path(__file__).resolve().parents[1]`, so it still finds the house style and writes to `output/custom/`).
-    The move was not yet committed on that day, and the README still lists it at the root.
+    The historical uncommitted note is not current deployment evidence; the directory map uses the new path.
+15. **Daily monetary deployment pending (8 Oct 2026):** local implementation and offline simulations pass;
+    no deployment is established by local files. An earlier broader India test run reported the unrelated
+    `test_gva_failure_still_persists_independent_monthly_source` failure: expected exports 35, existing trade
+    supplementation supplies 43.81. This is outside the daily monetary workflow's focused test gate;
+    its present status requires a fresh test run.
+16. **Macro-card heights (9 Oct 2026):** commentary changed locally with CSS and card HTML unchanged.
+    Dashboard inspection found no overflow, but text-sized grid rows changed height. Exact previous card
+    heights were not preserved; do not describe the copy change as pixel-identical.
 
 ---
 
@@ -1368,6 +1730,24 @@ Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflo
 Dated notes kept for the reasons behind decisions, roughly newest first. Where they differ from §1–§12,
 §1–§12 describe the current state. Section numbers in older notes (e.g. "§4", "§7") refer to this file's
 earlier layout: pages were §4, the app §7, CI §8.
+
+**Operating documentation and Weekly macro commentary** (9 Oct 2026, local only). Documented the
+same-edition market matrix, official industry IIP/PLFS, CPI items, RBI external stores and current India
+question-led layout. Corrected NSDL-only FPI and RBI PDF fallback descriptions. Weekly hero copy now uses
+levels and interpretation; India inflation replaces monetary conditions, and Sentinel uses its stored
+previous-meeting score. No new hero data dependency or styling edit; intrinsic card heights still changed.
+Deployment and previously reported broader test failures remain unverified by this documentation update.
+
+**India monetary charts and standalone daily refresh** (8 Oct 2026, owner-directed; local only, not
+committed/pushed/run in Actions). WACR was finalized as one unsmoothed spread series with the complete
+observed range, signed bps ticks, categorical fills and a muted vertical side guide; constrained axes and
+diagnostic outlier labels/triangles were rejected. Banking-system liquidity reverses RBI's canonical sign
+for display only, including its latest value and weekday average. The five unusual spreads on 7 Feb,
+30 Mar, 18 Apr and 4–5 Sep 2026 matched retrieved official MMO releases and linked MPC rates; no source
+discrepancy or canonical correction was found. The new daily workflow separates monetary freshness from
+Saturday's broader dashboard, preserves unchanged CSV bytes, stages both charts before publication and
+shares a serialization group with Saturday. Operating definitions and commands are in §6; CI contracts
+and deployment status in §10, rather than a separate validation report.
 
 **Central bank rates the day they are announced; the global rate cycle** (24 Sep 2026, owner's request; not yet
 committed on that day). The owner noticed the BoJ's 18 Sep hike missing from the strip: BoJ and PBoC came from BIS,
@@ -1411,7 +1791,7 @@ threads by theme, and an automated board that stays fresh without them.
      `tests/test_analysis.py` also rejects unknown field names ("paywal"), and its runner reports a KeyError or a
      bad date as a FAIL instead of stopping. The owner's how-to is in project_reminders.md, "Analysis page".
   3. **From the newsletter** — `_substack_posts` (st.cache_data 3 h; a failed read is cleared, not cached) →
-     `shelf()` in `data/substack.py`: PINNED slugs in order, led by the newest post marked New for `NEW_FOR_DAYS` (30), so a
+     `shelf()` in `data/processors/substack.py`: PINNED slugs in order, led by the newest post marked New for `NEW_FOR_DAYS` (30), so a
      quiet spell never shows as a gap. **Trap:** the archive API returns fewer rows than asked (23 for limit=50), so
      it is paged by `offset=len(rows)` until a page adds nothing — the first count (29) missed two 2021 posts; there
      are 31. Covers go through `substackcdn.com/image/fetch/w_640,...` (one original is 5,760 px / 2.7 MB).
@@ -1594,7 +1974,7 @@ stopped matching any section's keywords — which is how the owner was still see
 `get_output_dir()` now unlinks the folder's PNGs before a run. Local `output/` folders outrank `assets/`, so localhost
 shows the newest local run while Streamlit Cloud (no `output/`) shows the newest committed edition.
 
-*Last updated 2026-09-21 by Claude Opus 5 — Sixteenth pass: reorganised for readers without the code: a
+*Historical revision record — 2026-09-21 by Claude Opus 5 — Sixteenth pass: reorganised for readers without the code: a
 "read this first" section (§0), a chart-by-chart index with each chart's function and data (§4), step-by-step
 recipes for changing charts, captions, sections and data points and for publishing (§5), current-state notes
 for Analysis, About and the footer (§6, §9), known issues added (§11), rules added (§12); corrected four pages

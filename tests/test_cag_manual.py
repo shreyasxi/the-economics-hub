@@ -1,5 +1,5 @@
 """
-Checks on the manual CAG rows (data/cag_manual_accounts.csv) that stand in for
+Checks on the manual CAG rows (data/inputs/cag/cag_manual_accounts.csv) that stand in for
 the monthly accounts workbook while CGA does not publish it. Each test writes a
 small CSV to a temporary folder; the real data files are never modified.
 

@@ -67,7 +67,7 @@ jobs:
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           # Fold the write-ahead log into the database file so git sees one file.
-          python -c "import sqlite3; c = sqlite3.connect('data/rbi_sentinel.db'); c.execute('PRAGMA wal_checkpoint(TRUNCATE)'); c.close()"
+          python -c "import sqlite3; from data.paths import RBI_SENTINEL_DB; c = sqlite3.connect(RBI_SENTINEL_DB); c.execute('PRAGMA wal_checkpoint(TRUNCATE)'); c.close()"
           exit 0
 
       - name: Commit and push changes
@@ -76,8 +76,9 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           python .github/scripts/prune_assets.py rbi_sentinel   # keep the last 4 months of charts
-          git add -A data/rbi_sentinel.db assets/rbi_sentinel
-          if [ -f data/rbi_live_log.csv ]; then git add data/rbi_live_log.csv; fi
+          git add -A "$(python -m data.paths --relative RBI_SENTINEL_DB)" assets/rbi_sentinel
+          LIVE_LOG=$(python -m data.paths --relative RBI_LIVE_LOG_CSV)
+          if [ -f "$LIVE_LOG" ]; then git add "$LIVE_LOG"; fi
           if git diff --cached --quiet; then
             echo "No data changed — nothing to commit."
             exit 0

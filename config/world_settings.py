@@ -6,7 +6,7 @@ tab (generate_macro.py writes the snapshot; app.py renders it).
 
 Every scoreboard cell is either AUTO (fetched from an official API each run;
 a failed or stale fetch fails the run) or MANUAL (no free machine-readable
-source; keyed in with `python -m data.world_manual_entry`, shown as "awaiting
+source; keyed in with `python -m data.processors.world_manual_entry`, shown as "awaiting
 entry" when missing and flagged when old — never guessed).
 
 Central bank calendars are the banks' own published schedules. Update them
@@ -155,7 +155,7 @@ RATE_CYCLE_START = "2000-01"
 BIS_EXTENDED_AREAS = {"US": "US", "XM": "EA", "GB": "UK", "JP": "JP", "IN": "IN"}
 # The GDP-weighted rate cycle sizes each bank's move in basis points and
 # weights it by its economy's GDP at purchasing power parity (World Bank,
-# data/gdp_ppp.csv). Every BIS area needs its World Bank code here. The
+# data/stores/world/gdp_ppp.csv). Every BIS area needs its World Bank code here. The
 # euro area is the World Bank's EMU aggregate, which counts today's members
 # in every year, so members the BIS still reports on their own (Greece to
 # 2000, Croatia to 2022) are taken out of it while they do. A move bigger

@@ -9,14 +9,14 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from data import india_db_manager as dbm
-from data import india_manual_entry as manual
+from data.processors import india_db_manager as dbm
+from data.processors import india_manual_entry as manual
 from data.fetchers import mospi_inflation as inflation
 from data.fetchers import mospi_iip_audit as iip
 from data.fetchers import nse_sector_rotation as rotation
 from data.fetchers import india_fetcher as fetcher
 from data.fetchers import mospi_gva as gva
-from data import cpi_contributions as cpi
+from data.processors import cpi_contributions as cpi
 import generate_india as charts
 
 FIXTURES = Path(__file__).parent/'fixtures'
@@ -191,6 +191,8 @@ class SaturdayTests(unittest.TestCase):
     def test_gva_failure_still_persists_independent_monthly_source(self):
         independent={'2026-08':{'india_exports_usd_bn':35,'_sources':{'india_exports_usd_bn':'dbie_excel_monthly'}}}
         with patch.object(gva,'fetch',side_effect=ValueError('official history revision')),\
+             patch.object(fetcher,'fetch_trade_releases',return_value={}),\
+             patch('data.fetchers.rbi_external.refresh_wss',return_value=[]),\
              patch.object(fetcher,'init_db'),patch.object(fetcher,'fetch_repo_rate_current'),\
              patch.object(fetcher,'fetch_dbie_all',return_value=(independent,{})),\
              patch.object(fetcher,'_existing_flags',return_value={}),\
@@ -233,7 +235,7 @@ class SaturdayTests(unittest.TestCase):
         self.assertLess(workflow.index('run: python -m data.fetchers.mospi_cpi --update'),workflow.index('run: python -m data.fetchers.mospi_inflation'))
         self.assertEqual(workflow.count('cron: "0 8 * * 6"'),1)
         self.assertNotIn('needs: fetch-data',workflow)
-        self.assertIn('data/india_macro.db',workflow[workflow.index('- name: Commit and push charts'):])
+        self.assertIn('python -m data.paths --relative INDIA_DB',workflow[workflow.index('- name: Commit and push charts'):])
         for flag in ['IIP_UPDATE_FAILED','GVA_UPDATE_FAILED','NSE_RISK_UPDATE_FAILED','NSE_ROTATION_UPDATE_FAILED','CPI_MAIN_UPDATE_FAILED','CPI_UPDATE_FAILED','NSE_VALUATIONS_UPDATE_FAILED']:
             self.assertIn(flag,workflow)
 

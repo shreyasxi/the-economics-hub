@@ -16,7 +16,8 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from data.nse_indices import (ROOT, NAMES, DAILY_SOURCE, digest, import_exports,
+from data.paths import NIFTY_SMALLCAP_INPUT_DIR, NIFTY_50_INPUT_DIR
+from data.processors.nse_indices import (ROOT, NAMES, DAILY_SOURCE, digest, import_exports,
                               load_risk_appetite, parse_daily, publish)
 
 
@@ -25,9 +26,8 @@ def bootstrap(root=ROOT):
     root = Path(root)
     if (root / 'manifest.json').exists():
         return load_risk_appetite(root)
-    data = Path(__file__).resolve().parents[1]
-    small = sorted((data / 'NIFTY Small Cap 250').glob('*.csv'))
-    large = sorted((data / 'NIFTY 50').glob('*.csv'))
+    small = sorted((NIFTY_SMALLCAP_INPUT_DIR).glob('*.csv'))
+    large = sorted((NIFTY_50_INPUT_DIR).glob('*.csv'))
     if not small or not large:
         raise ValueError('Missing seed exports; bootstrap requires both supplied folders')
     return import_exports(small, large, '2016-10-04',

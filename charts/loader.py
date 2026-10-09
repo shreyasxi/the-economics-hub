@@ -77,8 +77,8 @@ def get_charts(subdir: str) -> tuple[list[Path], str | None]:
     )
     # Retired India charts can still exist in archived or local editions.
     if subdir == "india":
-        retired = {"india_money_supply", "india_promoter_holdings",
-                   "india_consumer_confidence_drivers"}
+        retired = {"india_money_supply", "india_promoter_holdings", "india_real_policy_rate",
+                   "india_consumer_confidence_drivers", "india_urban_youth_unemployment"}
         pngs = [p for p in pngs if chart_key(p.name) not in retired]
     return pngs, label
 
@@ -187,6 +187,9 @@ _ACRONYMS = {
 # under a chart that already carries its full title, so it only has to say
 # which chart this is.
 _TITLE_OVERRIDES = {
+    "india_reer": "India’s Real Effective Exchange Rate",
+    "india_external_vulnerability": "India’s External Vulnerability",
+    "india_money_market_corridor": "WACR Relative to the RBI Policy Rate",
     # Cross-asset ratios: a slash reads as a ratio, an underscore does not
     "btc_mvrv_zscore":           "Bitcoin MVRV Z-Score",
     "btc_zscore_global_m2":      "Bitcoin vs Global M2 and the Z-Score",

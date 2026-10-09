@@ -13,7 +13,9 @@ import statistics
 import time
 import requests
 
-ROOT = Path(__file__).resolve().parents[2] / "nse_valuations"
+from data.paths import NSE_VALUATIONS_DIR
+
+ROOT = NSE_VALUATIONS_DIR
 URL = 'https://archives.nseindia.com/content/indices/ind_close_all_{date}.csv'
 NAMES = ['Nifty 50', 'Nifty Auto', 'Nifty Bank', 'Nifty Financial Services', 'Nifty FMCG', 'Nifty IT', 'Nifty Metal', 'Nifty Pharma', 'Nifty PSU Bank', 'Nifty Realty', 'Nifty Private Bank', 'Nifty Oil & Gas', 'Nifty Healthcare Index', 'Nifty Consumer Durables']
 SCHEMA = ['Index Name', 'Index Date', 'Open Index Value', 'High Index Value', 'Low Index Value', 'Closing Index Value', 'Points Change', 'Change(%)', 'Volume', 'Turnover (Rs. Cr.)', 'P/E', 'P/B', 'Div Yield']

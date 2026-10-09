@@ -7,6 +7,19 @@ from charts import loader
 
 
 class IndiaLoaderTests(unittest.TestCase):
+    def test_retired_real_policy_png_cannot_enter_chart_or_search_inventory(self):
+        for base in ('assets', 'output'):
+            with self.subTest(base=base), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                edition = root/base/'india/2026-10'
+                edition.mkdir(parents=True)
+                (edition/'21_india_real_policy_rate.png').write_bytes(b'stale')
+                kept = edition/'19_india_money_market_corridor.png'
+                kept.write_bytes(b'current')
+                with patch.object(loader, '_get_base_dirs', return_value=[root/base]):
+                    paths, _ = loader.get_charts('india')
+                self.assertEqual(paths, [kept])
+
     def test_local_matching_edition_wins_without_stale_chart_fallback(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)

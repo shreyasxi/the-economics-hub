@@ -1,16 +1,22 @@
 """
 data/fetchers/india_fetcher.py
 
-India Macro Data Fetcher — ETL pipeline with three sources.
-Writes into data/india_macro.db via india_db_manager.
+India Macro Data Fetcher — ETL pipeline with official-source reserves.
+Writes monthly data into data/stores/india/india_macro.db; WSS reserves use a canonical CSV.
 
 Sources:
   1. MoSPI / NSO      — quarterly GVA; CPI is updated separately before generation
      FRED helper is diagnostic only and is never called by run_append
   2. jugaad-data       — RBI repo rate (diagnostic); weekly FPI flows from NSE
   3. RBI DBIE Excel    — "50 Macroeconomic Indicators.xlsx" (manual drop required)
-                         Parsed from: Monthly, Fortnightly, Weekly sheets
-                         Covers: Trade, Forex Reserves, Bank Credit, Deposits, M3
+                         Parsed from: Monthly and Fortnightly sheets
+                         Covers: Trade, Bank Credit, Deposits, M3
+     Trade supplement:  verified Ministry of Commerce quick estimates in
+                         data/stores/india/india_trade_releases.json fill missing DBIE months.
+                         Add new monthly releases there; DBIE revisions take precedence.
+  4. RBI WSS           — automated weekly Total Reserves, US$ million
+                         Stored in data/stores/india/rbi_wss_reserves.csv; preserves DBIE history
+                         only after verifying at least five WSS overlaps.
      General IIP is updated separately by mospi_iip on the official 2022–23 base.
 
 Usage:
@@ -42,7 +48,7 @@ import pandas as pd
 _ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(_ROOT))
 
-from data.india_db_manager import (
+from data.processors.india_db_manager import (
     DB_PATH,
     init_db,
     seed_from_csv,
@@ -66,7 +72,10 @@ logging.basicConfig(
 
 # Local DBIE Excel — update manually by downloading from:
 # https://data.rbi.org.in/DBIE/#/dbie/ind1
-DBIE_EXCEL_LOCAL = _ROOT / "data" / "50 Macroeconomic Indicators.xlsx"
+from data.paths import DBIE_WORKBOOK, INDIA_TRADE_RELEASES, RBI_SENTINEL_DB, INDIA_MANUAL_CSV
+
+DBIE_EXCEL_LOCAL = DBIE_WORKBOOK
+TRADE_RELEASES_LOCAL = INDIA_TRADE_RELEASES
 
 # FRED series IDs for India CPI (OECD-sourced, ~6-week lag)
 FRED_SERIES = {
@@ -76,10 +85,10 @@ FRED_SERIES = {
 }
 
 # Path to the rbi_sentinel DB for repo rate fallback
-SENTINEL_DB = _ROOT / "data" / "rbi_sentinel.db"
+SENTINEL_DB = RBI_SENTINEL_DB
 
 # Path to legacy CSV for --seed
-DEFAULT_CSV = _ROOT / "data" / "india_manual.csv"
+DEFAULT_CSV = INDIA_MANUAL_CSV
 
 # Column layout of the DBIE Excel (0-indexed, header row = row index 3)
 # IIP deliberately stays out of the RBI map. The separate mospi_iip updater
@@ -446,6 +455,43 @@ def fetch_dbie_monthly(source: Path) -> dict[str, dict]:
     return results
 
 
+def fetch_trade_releases(dbie_monthly: dict[str, dict],
+                         source: Path = TRADE_RELEASES_LOCAL) -> dict[str, dict]:
+    """Supplement missing DBIE trade months with verified Commerce quick estimates.
+
+    The checked-in release file preserves the inputs and publication provenance.
+    A complete DBIE pair takes precedence, including subsequent revisions.
+    """
+    if not source.exists():
+        return {}
+    results = {}
+    for release in json.loads(source.read_text())["releases"]:
+        month = release["month"]
+        datetime.strptime(month + "-01", "%Y-%m-%d")
+        datetime.strptime(release["published_on"], "%Y-%m-%d")
+        exports = float(release["exports_usd_bn"])
+        imports = float(release["imports_usd_bn"])
+        if not (5 <= exports <= 120 and 5 <= imports <= 160):
+            raise ValueError(f"Invalid merchandise trade values for {month}")
+        if not release["source_url"].startswith("https://www.pib.gov.in/"):
+            raise ValueError(f"Expected official PIB source for {month}")
+        existing = dbie_monthly.get(month, {})
+        if all(existing.get(k) is not None for k in
+               ("india_exports_usd_bn", "india_imports_usd_bn")):
+            continue
+        row = {
+            "india_exports_usd_bn": exports,
+            "india_imports_usd_bn": imports,
+            "india_trade_deficit_usd_bn": round(imports - exports, 4),
+        }
+        provenance = (f"commerce:pib:quick_estimate:published={release['published_on']}:"
+                      f"{release['source_url']}")
+        row["_sources"] = {key: provenance for key in row}
+        results[month] = row
+    log.info("Commerce releases: %d missing DBIE trade months supplemented", len(results))
+    return results
+
+
 def fetch_dbie_fortnightly(source: Path) -> dict[str, dict]:
     """
     Parse Fortnightly sheet: Bank Credit YoY, Deposit Growth YoY, M3 YoY.
@@ -527,12 +573,12 @@ def fetch_dbie_weekly(source: Path) -> dict[str, dict]:
 
 def fetch_dbie_all(dry_run: bool = False) -> tuple[dict[str, dict], dict[str, dict]]:
     """
-    Load the local DBIE Excel and parse all three sheets.
+    Load local DBIE monthly/fortnightly sheets; reserves are collected via WSS.
     If the file is missing, logs an error and returns empty dicts.
 
     Returns:
         monthly_data  — { "YYYY-MM":    { column: value, ... } }
-        forex_weekly  — { "YYYY-MM-DD": { column: value, ... } }
+        forex_weekly  — empty compatibility return; no DBIE reserves in production
     """
     if not DBIE_EXCEL_LOCAL.exists():
         log.error(
@@ -550,11 +596,11 @@ def fetch_dbie_all(dry_run: bool = False) -> tuple[dict[str, dict], dict[str, di
     for month, vals in fetch_dbie_fortnightly(DBIE_EXCEL_LOCAL).items():
         monthly_data.setdefault(month, {}).update(vals)
 
-    forex_weekly = fetch_dbie_weekly(DBIE_EXCEL_LOCAL)
+    # Legacy parser retained for audits; production reserves come from WSS.
+    forex_weekly = {}
 
     if dry_run:
-        log.info("[dry-run] DBIE: %d months, %d forex weeks would be upserted",
-                 len(monthly_data), len(forex_weekly))
+        log.info("[dry-run] DBIE: %d months would be upserted", len(monthly_data))
 
     return monthly_data, forex_weekly
 
@@ -580,7 +626,8 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
       Source 1 (MoSPI)     — quarterly GVA (official catalogue + workbook)
       Source 2a (jugaad)   — repo rate diagnostic (not written to DB)
       Source 2b (jugaad)   — weekly FPI net flows → india_weekly.fpi_net_flows_usd_bn
-      Source 3 (DBIE Excel)— monthly trade, FPI (net portfolio), credit, M3 + weekly forex reserves
+      Source 3 (DBIE Excel)— monthly trade, FPI (net portfolio), credit, M3
+      Source 4 (RBI WSS)   — weekly forex reserves in canonical CSV
     """
     # Quarterly production data is fetched here; chart generation stays offline.
     from data.fetchers.mospi_gva import fetch as fetch_gva
@@ -602,6 +649,10 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     dbie_monthly, forex_weekly = fetch_dbie_all(dry_run=dry_run)
     for month, vals in dbie_monthly.items():
         monthly_data.setdefault(month, {}).update(vals)
+    for month, vals in fetch_trade_releases(dbie_monthly).items():
+        row = monthly_data.setdefault(month, {})
+        row.setdefault("_sources", {}).update(vals["_sources"])
+        row.update({key: value for key, value in vals.items() if key != "_sources"})
 
     # ── Write monthly data ────────────────────────────────────────────────────
     if not dry_run:
@@ -616,11 +667,13 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     else:
         log.info("[dry-run] Would upsert %d months into india_monthly", len(monthly_data))
 
-    # ── Weekly table: forex reserves (from DBIE) ──────────────────────────────
-    if not dry_run and forex_weekly:
-        for week_ending, row in forex_weekly.items():
-            upsert_weekly(week_ending, row)
-        log.info("Upserted %d weeks (forex) into india_weekly", len(forex_weekly))
+    # ── Weekly reserves: official WSS canonical CSV, independent of DBIE ─────
+    from data.fetchers.rbi_external import refresh_wss
+    try:
+        reserves = refresh_wss(dry_run=dry_run)
+        log.info("WSS reserves: %d canonical weekly observations", len(reserves))
+    except Exception as exc:
+        log.error("WSS refresh failed; canonical stored reserves preserved: %s", exc)
 
     # ── Summary ───────────────────────────────────────────────────────────────
     if not dry_run:
@@ -646,7 +699,7 @@ def run_seed(csv_path: Path = DEFAULT_CSV) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="India Macro Data Fetcher — populates data/india_macro.db"
+        description="India Macro Data Fetcher — populates data/stores/india/india_macro.db"
     )
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--append",  action="store_true",

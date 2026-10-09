@@ -18,7 +18,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config.signals_settings as cfg
-from data.signals import assess, last_friday_before, rank
+from data.processors.signals import assess, last_friday_before, rank
 
 WEEK_END = date(2026, 9, 18)          # a Friday
 PCT = {"id": "x", "name": "X", "group": "Equities", "measure": "pct", "fmt": "index"}

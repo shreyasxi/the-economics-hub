@@ -20,8 +20,10 @@ COUNTRY_NAME = "India"
 VINTAGE = "2026_09"
 START_YEAR = 1990
 
-CSV_PATH = Path(__file__).resolve().parents[1] / "gmd_investment.csv"
-META_PATH = CSV_PATH.with_suffix(".json")
+from data.paths import GMD_INVESTMENT_CSV, GMD_INVESTMENT_META
+
+CSV_PATH = GMD_INVESTMENT_CSV
+META_PATH = GMD_INVESTMENT_META
 
 
 def prepare(frame):

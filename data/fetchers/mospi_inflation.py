@@ -14,11 +14,13 @@ import sqlite3
 
 import requests
 
-from data import cpi_contributions as cpi
-from data.india_db_manager import DB_PATH
+from data.processors import cpi_contributions as cpi
+from data.processors.india_db_manager import DB_PATH
 from data.fetchers.mospi_cpi import Retrieval, fetch_pages, atomic_json, immutable
 
-ROOT = cpi.ROOT.parent / 'main'
+from data.paths import CPI_MAIN_DIR
+
+ROOT = CPI_MAIN_DIR
 LOG = logging.getLogger(__name__)
 TARGETS = {'CPI (General)': 'india_cpi_yoy', 'Food and beverages': 'india_food_cpi_yoy'}
 OLD_FIELDS = {'baseyear','year','month','state','sector','group','subgroup','index','inflation','status'}

@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config.analysis as analysis
 import config.resources as resources
 from charts.loader import chart_key, get_charts
-from data.substack import cover_url, from_archive, from_rss, reading_minutes, shelf
+from data.processors.substack import cover_url, from_archive, from_rss, reading_minutes, shelf
 
 ROOT = Path(__file__).resolve().parent.parent
 

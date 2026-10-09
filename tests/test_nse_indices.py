@@ -3,10 +3,10 @@ import tempfile
 from pathlib import Path
 import unittest
 import pandas as pd
-from data.nse_indices import parse_export, combine_exports, relative_performance, import_exports, load_risk_appetite
+from data.processors.nse_indices import parse_export, combine_exports, relative_performance, import_exports, load_risk_appetite
 import json
 import requests
-from data.nse_indices import import_exports, load_risk_appetite, parse_daily, parse_export
+from data.processors.nse_indices import import_exports, load_risk_appetite, parse_daily, parse_export
 from data.fetchers.nse_risk_appetite import refresh
 
 

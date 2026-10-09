@@ -5,8 +5,8 @@ import unittest
 from unittest.mock import patch
 
 import openpyxl
-from data import rbi_surveys as survey
-from charts import india_inflation_surveys as chart
+from data.processors import rbi_surveys as survey
+from charts.india_charts import india_inflation_surveys as chart
 from config.insights import get_insight
 
 

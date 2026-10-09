@@ -7,7 +7,7 @@ Reads the RBI's monthly article and produces the two things the India tab uses:
                               written into an India edition folder and published
                               with that edition's charts, exactly as
                               generate_news.py does for the weekly headlines;
-  data/rbi_transmission.csv   Table IV.3 across editions: how much of each
+  data/stores/india/rbi_transmission.csv   Table IV.3 across editions: how much of each
                               policy rate move has reached bank deposit and
                               lending rates. Tracked in git, one row per
                               edition and cycle, and read by generate_india.py.
@@ -41,11 +41,13 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config.soe_settings import (
     BRIEFING_FILENAME, FIRST_EDITION, MAX_EDITION_AGE_DAYS, PAUSE_SECONDS, PROJECT_ROOT, TRANSMISSION_CSV,
 )
-from data.rbi_soe import Edition, SoeError, build_session, compare_editions, fetch_article, \
+from data.processors.rbi_soe import Edition, SoeError, build_session, compare_editions, fetch_article, \
     find_latest, find_month, parse_briefing, parse_transmission
 
 INDIA_OUTPUT = PROJECT_ROOT / "output" / "india"
-SENTINEL_DB = PROJECT_ROOT / "data" / "rbi_sentinel.db"
+from data.paths import RBI_SENTINEL_DB
+
+SENTINEL_DB = RBI_SENTINEL_DB
 
 CSV_COLUMNS = [
     "month", "published", "cycle_type", "cycle_start", "cycle_end",
@@ -163,7 +165,7 @@ def history_rows(edition: Edition, briefing: dict, transmission: dict) -> list[d
 
 def repo_change_bps(cycle_start: str, cycle_end: str, db: Path = SENTINEL_DB) -> int | None:
     """
-    The repo rate change over a cycle, from data/rbi_sentinel.db.
+    The repo rate change over a cycle, from data/stores/rbi_sentinel/rbi_sentinel.db.
 
     The Sentinel records the repo rate at every MPC cycle, so RBI's own repo
     column in the transmission table can be checked against it. Returns None when

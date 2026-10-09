@@ -1,0 +1,34 @@
+{
+  "release": {
+    "id": "2863",
+    "title": "<p>Periodic Labour Force Survey (PLFS) Monthly Bulletin August 2026</p>",
+    "published_year": "2026-09-15",
+    "file_one": {
+      "path": "uploads/publications_reports/publications_reports1789465291404_ba9c7140-0b83-481b-a5fd-a7ac121c476f_Monthly_Bulletin_Aug_2026.pdf",
+      "type": "document",
+      "filemime": "application/pdf",
+      "filename": "Monthly_Bulletin_Aug_2026.pdf",
+      "filesize": 11156398
+    },
+    "file_two": null,
+    "file_three": null,
+    "redirectional_path": "",
+    "is_active": true
+  },
+  "source_url": "https://api.mospi.gov.in/api/plfs/getData",
+  "request": {
+    "frequency_code": 3,
+    "indicator_code": 3,
+    "gender_code": 3,
+    "sector_code": 2,
+    "limit": 100,
+    "Format": "JSON"
+  },
+  "table_id": "Statement 3: Unemployment Rate (in per cent) in CWS",
+  "raw_sha256": "eab346f0e254bdc9a6cf88535097d6605bbeb540bd671c13e5769e3d499fbd7b",
+  "bulletin_sha256": "14a6d0fccf18417aee8abe8ca2d26e9e1eebd5e91579003f9626229a6896ba7d",
+  "fetched_at": "2026-10-09T06:14:20.763920+00:00",
+  "start_month": "2025-04",
+  "spot_checks": 10,
+  "release_date_semantics": "Corroborating bulletin vintage; API record dates not exposed"
+}

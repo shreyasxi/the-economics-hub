@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from data.fetchers.mospi_cpi import atomic_json
-from data.cpi_contributions import sha
+from data.processors.cpi_contributions import sha
 
 from data.fetchers.india_fetcher import fetch_nifty_sector_changes, _NSE_ALL_INDICES_URL
 
@@ -17,7 +17,9 @@ INDICES = {
     "NIFTY REALTY": "Realty", "NIFTY ENERGY": "Energy",
     "NIFTY PSU BANK": "PSU Bank", "NIFTY INFRASTRUCTURE": "Infra",
 }
-ROOT = Path(__file__).resolve().parents[1] / 'nse_rotation'
+from data.paths import NSE_ROTATION_DIR
+
+ROOT = NSE_ROTATION_DIR
 
 
 def today_ist():

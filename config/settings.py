@@ -17,9 +17,11 @@ load_dotenv()
 # ─────────────────────────────────────────────
 # PATHS
 # ─────────────────────────────────────────────
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+from data.paths import PROJECT_ROOT as REPO_ROOT, DATA_CACHE as CACHE_PATH
+
+PROJECT_ROOT = REPO_ROOT
 STYLE_DIR = PROJECT_ROOT / "style"
-DATA_CACHE = PROJECT_ROOT / "data" / "cache"
+DATA_CACHE = CACHE_PATH
 CHART_BANK = PROJECT_ROOT / "charts" / "bank"
 OUTPUT_DIR = PROJECT_ROOT / "output" / "weekly"
 TEMPLATE_DIR = PROJECT_ROOT / "output" / "templates"

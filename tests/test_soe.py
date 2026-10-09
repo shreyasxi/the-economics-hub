@@ -29,7 +29,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from data.rbi_soe import (
+from data.processors.rbi_soe import (
     Edition, SoeError, parse_briefing, parse_conclusion, parse_summary,
     parse_transmission, published_date,
 )
@@ -108,7 +108,7 @@ def test_a_changed_layout_is_refused_rather_than_guessed():
 
 def test_sentences_are_not_split_inside_a_figure():
     """An early parser split on every full stop and reported CPI as "from 4."."""
-    from data.rbi_soe import summary_sentences
+    from data.processors.rbi_soe import summary_sentences
 
     sentences = summary_sentences(
         "Headline CPI inflation rose to 4.45 per cent in July. Exports reached US$ 44.2 billion.")
@@ -119,7 +119,7 @@ def test_sentences_are_not_split_inside_a_figure():
 
 def test_each_section_gives_its_opening_verdict_with_the_figures_in_it():
     """The point of using sections rather than the summary: RBI's numbers come along."""
-    from data.rbi_soe import parse_topics
+    from data.processors.rbi_soe import parse_topics
 
     topics = parse_topics(fixture("2026-08"))
     assert set(topics) == {"Inflation", "Demand", "Supply", "Money and credit", "Global"}
@@ -130,14 +130,14 @@ def test_each_section_gives_its_opening_verdict_with_the_figures_in_it():
 
 def test_chart_pointers_are_dropped_from_a_quoted_sentence():
     """"(Chart III.5a)" sends the reader to a picture that is not on this page."""
-    from data.rbi_soe import parse_topics
+    from data.processors.rbi_soe import parse_topics
 
     for topic in parse_topics(fixture("2026-07")).values():
         assert "Chart" not in topic and "(Table" not in topic
 
 
 def test_a_month_is_paired_with_the_one_before_it():
-    from data.rbi_soe import compare_editions
+    from data.processors.rbi_soe import compare_editions
 
     changes = compare_editions(fixture("2026-08"), "2026-08", fixture("2026-07"), "2026-07")
     assert [c["topic"] for c in changes] == [
@@ -151,11 +151,11 @@ def test_a_month_is_paired_with_the_one_before_it():
 
 def test_both_sides_of_a_comparison_are_quoted_from_their_own_edition():
     """Neither side may be reworded: each must appear in the edition it claims."""
-    from data.rbi_soe import compare_editions
+    from data.processors.rbi_soe import compare_editions
 
     # The article's own words, with only the markup and footnote markers taken
     # out — the same cleanup the parser does, and nothing more.
-    from data.rbi_soe import _article_table, _clean, _paragraphs
+    from data.processors.rbi_soe import _article_table, _clean, _paragraphs
 
     pages = {month: " ".join(_clean(p) for p in _paragraphs(_article_table(fixture(month))))
              for month in ("2026-08", "2026-07")}
@@ -168,7 +168,7 @@ def test_both_sides_of_a_comparison_are_quoted_from_their_own_edition():
 
 def test_a_section_one_month_does_not_carry_is_left_out():
     """An edition without a section is simply not paired on that topic."""
-    from data.rbi_soe import compare_editions, parse_topics
+    from data.processors.rbi_soe import compare_editions, parse_topics
 
     without = fixture("2026-07").replace('class="head">Inflation<', 'class="head">Prices and Costs<')
     assert "Inflation" not in parse_topics(without)
@@ -177,7 +177,7 @@ def test_a_section_one_month_does_not_carry_is_left_out():
 
 
 def test_an_unreadable_previous_edition_leaves_the_briefing_without_a_comparison():
-    from data.rbi_soe import compare_editions
+    from data.processors.rbi_soe import compare_editions
 
     assert compare_editions(fixture("2026-08"), "2026-08", fixture("2026-08"), "2026-08") == []
 
@@ -216,7 +216,7 @@ def test_cycle_name_on_its_own_row_and_months_with_footnote_marks():
 
 
 def test_an_edition_without_the_table_is_not_an_error():
-    from data.rbi_soe import _soup, _find_transmission_table
+    from data.processors.rbi_soe import _soup, _find_transmission_table
     page = _soup(fixture("2026-02"))
     for table in list(page.find_all("table")):
         if table.find("table") is None and "Repo Rate" in table.get_text():

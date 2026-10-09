@@ -3,8 +3,8 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 from datetime import datetime
-from data import rbi_surveys as rbi
-from charts import india_consumer_surveys as d
+from data.processors import rbi_surveys as rbi
+from charts.india_charts import india_consumer_surveys as d
 from config.insights import get_insight
 import matplotlib.pyplot as plt
 

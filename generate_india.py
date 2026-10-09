@@ -1,7 +1,7 @@
 """
 Economics Hub — India Macro Dashboard
 ========================================
-Generates India-specific charts from data/india_macro.db (SQLite),
+Generates India-specific charts from data/stores/india/india_macro.db (SQLite),
 with CSV fallback for legacy compatibility.
 Also generates fiscal charts from CAG Monthly Accounts Dashboard.
 
@@ -13,7 +13,7 @@ Data sources:
   - IIP:                         MoSPI General, 2022–23-base published YoY growth
   - FPI Flows:                   RBI DBIE
   - Exports / Imports:           RBI DBIE
-  - Forex Reserves (weekly):     RBI DBIE
+  - Forex Reserves (weekly):     RBI Weekly Statistical Supplement
 
   MANUAL (enter into DB via india_fetcher --seed or SQLite direct write):
   - Manufacturing PMI:   S&P Global (1st biz day of month)
@@ -21,7 +21,7 @@ Data sources:
   - GST Revenue:         PIB / Finance Ministry (1st of month, ₹ Lakh Cr)
   - See docs/project_reminders.md for exact URLs and entry workflow
 
-  CAG EXCEL (data/cag_monthly_accounts.xlsx):
+  CAG EXCEL (data/inputs/cag/cag_monthly_accounts.xlsx):
   - Fiscal Deficit, Capital Expenditure, Net Tax Revenue, etc.
   - Source: CAG DAMA Dashboard (released with ~1 month lag)
 
@@ -38,7 +38,7 @@ import sys
 import io
 from pathlib import Path
 from datetime import datetime
-from data import rbi_surveys
+from data.processors import rbi_surveys
 
 # Force UTF-8 output on Windows (avoids cp1252 errors with ₹, →, ⚠ etc.)
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
@@ -62,10 +62,12 @@ from charts.style import EconStyle
 # CONFIG
 # ═══════════════════════════════════════════
 
-DEFAULT_CSV   = Path(__file__).parent / "data" / "india_manual.csv"
-DEFAULT_CAG   = Path(__file__).parent / "data" / "cag_monthly_accounts.xlsx"
-DEFAULT_DB    = Path(__file__).parent / "data" / "india_macro.db"
-TRANSMISSION_CSV = Path(__file__).parent / "data" / "rbi_transmission.csv"
+from data.paths import INDIA_MANUAL_CSV, CAG_WORKBOOK, INDIA_DB, RBI_TRANSMISSION_CSV, CAG_MANUAL_CSV
+
+DEFAULT_CSV   = INDIA_MANUAL_CSV
+DEFAULT_CAG   = CAG_WORKBOOK
+DEFAULT_DB    = INDIA_DB
+TRANSMISSION_CSV = RBI_TRANSMISSION_CSV
 OUTPUT_BASE   = Path(__file__).parent / "output" / "india"
 
 # Colors
@@ -92,7 +94,7 @@ SECTION_COLORS = {
     "PMI":              "#FF9933",
     "FISCAL":           "#059669",
     "CREDIT & FLOWS":   "#7C3AED",
-    "LABOUR":           "#0F172A",
+    "UNEMPLOYMENT":     "#0F172A",
     "MONETARY":         "#0369A1",   # Blue — monetary conditions section
     "EXTERNAL SECTOR":  "#0F766E",   # Teal — external sector section
 }
@@ -117,7 +119,7 @@ SECTION_BG = "#F1F5F9"  # Slate 100
 def load_india_data(csv_path=DEFAULT_CSV, months=None):
     """
     Load India monthly macro data.
-    Primary:  data/india_macro.db  (india_monthly table)
+    Primary:  data/stores/india/india_macro.db  (india_monthly table)
     Fallback: data/india_manual.csv (legacy)
     """
     # ── Try SQLite primary source ─────────────────────────────────────────────
@@ -183,31 +185,13 @@ def load_india_data(csv_path=DEFAULT_CSV, months=None):
 
 
 def load_forex_weekly(n_weeks=78):
-    """
-    Load weekly forex reserves from india_macro.db (india_weekly table).
-    Returns DataFrame with columns: week_ending (datetime), forex_reserves_usd_bn,
-    forex_reserves_wow_chg.  Returns None if no data is available.
-    """
-    if not DEFAULT_DB.exists():
-        return None
+    """Read canonical WSS CSV; legacy DBIE migration belongs to the collector."""
+    from charts.india_charts.india_external import load_forex
     try:
-        import sqlite3
-        with sqlite3.connect(DEFAULT_DB) as conn:
-            df = pd.read_sql_query(
-                "SELECT * FROM india_weekly ORDER BY week_ending DESC LIMIT ?",
-                conn, params=[n_weeks]
-            )
-        if df.empty:
-            return None
-        df = df.sort_values("week_ending").reset_index(drop=True)
-        df["week_ending"] = pd.to_datetime(df["week_ending"])
-        df = df.drop(columns=["fetched_at"], errors="ignore")
-        print(f"   Loaded {len(df)} weeks of forex reserve data")
-        return df
-    except Exception as e:
-        print(f"   Warning: Forex weekly load failed: {e}")
+        return load_forex(n_weeks)
+    except (OSError, ValueError, KeyError) as exc:
+        print(f"   Warning: WSS reserves unavailable: {exc}")
         return None
-
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -233,10 +217,10 @@ def crore_to_lakh_crore(value):
 # ─────────────────────────────────────────────────────────────────────────────
 # CAG manual rows — a stop-gap while the CGA website does not publish the
 # updated workbook. Figures are typed from CGA's monthly accounts web page into
-# data/cag_manual_accounts.csv and merged with the workbook here. Every value is
+# data/inputs/cag/cag_manual_accounts.csv and merged with the workbook here. Every value is
 # checked; a row that fails stops the run rather than publishing a wrong chart.
 # ─────────────────────────────────────────────────────────────────────────────
-CAG_MANUAL = Path(__file__).parent / "data" / "cag_manual_accounts.csv"
+CAG_MANUAL = CAG_MANUAL_CSV
 
 # csv column -> workbook column. Only what the fiscal charts draw: CGA's web
 # page no longer gives tax revenue by head, so those columns are not collected.
@@ -370,7 +354,7 @@ def read_cag_manual(path=CAG_MANUAL):
                        **{CAG_MANUAL_FIELDS[k]: v for k, v in values.items() if k in CAG_MANUAL_FIELDS}})
 
     if problems:
-        raise CagManualError("data/cag_manual_accounts.csv has problems:\n  " + "\n  ".join(problems))
+        raise CagManualError("data/inputs/cag/cag_manual_accounts.csv has problems:\n  " + "\n  ".join(problems))
     return pd.DataFrame(actual), pd.DataFrame(budget), pd.DataFrame(gdp), pd.DataFrame(financing)
 
 
@@ -423,9 +407,9 @@ def load_cag_tables(cag_path=DEFAULT_CAG, manual_path=CAG_MANUAL):
     # "% of BE" and "% of GDP" figures cannot be drawn.
     latest_fy = df_actual['FY'].iloc[-1]
     if df_bere[(df_bere['FY'] == latest_fy) & (df_bere['Month'] == 'BE')].empty:
-        raise CagManualError(f"CAG {latest_fy} has monthly rows but no BE row — add it to data/cag_manual_accounts.csv")
+        raise CagManualError(f"CAG {latest_fy} has monthly rows but no BE row — add it to data/inputs/cag/cag_manual_accounts.csv")
     if df_gdp[df_gdp['FY'] == latest_fy].empty:
-        raise CagManualError(f"CAG {latest_fy} has no GDP — add gdp to its BE row in data/cag_manual_accounts.csv")
+        raise CagManualError(f"CAG {latest_fy} has no GDP — add gdp to its BE row in data/inputs/cag/cag_manual_accounts.csv")
     return df_actual, df_bere, df_gdp
 
 
@@ -1304,7 +1288,7 @@ def chart_investment_rate(output_dir):
 
 def chart_risk_appetite(output_dir):
     """Smallcap/large-cap price-index ratio; no network calls or imputed dates."""
-    from data.nse_indices import ROOT, load_risk_appetite
+    from data.processors.nse_indices import ROOT, load_risk_appetite
     import os
     fp = output_dir / '21_india_risk_appetite.png'
     try:
@@ -1670,7 +1654,7 @@ def fpi_freshness(df, today=None):
     ).to_timestamp()
 
     manual_command = (
-        "python -m data.india_manual_entry set "
+        "python -m data.processors.india_manual_entry set "
         f"{expected_month:%Y-%m} --fpi <Rs crore>"
     )
 
@@ -2042,8 +2026,8 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
             ("Bank Credit Growth", "india_bank_credit_yoy", "% YoY", lambda v: f"{v:.1f}%"),
             ("Net FPI Flows", fpi_series(df)["col"], fpi_series(df)["unit"], fpi_series(df)["fmt"]),
         ]),
-        ("LABOUR", [
-            ("Unemployment (PLFS)", "india_unemployment", "%", lambda v: f"{v:.1f}%"),
+        ("UNEMPLOYMENT", [
+            ("All India Unemployment", "india_unemployment", "%", lambda v: f"{v:.1f}%"),
         ]),
         ("EXTERNAL SECTOR", [
             ("Exports", "india_exports_usd_bn", "$B", lambda v: f"${v:.1f}B"),
@@ -2088,7 +2072,17 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
                         "unit": unit,
                     })
 
-            # ── RBI Household Inflation Expectations ──────────────────────────────
+    # Latest urban youth PLFS observation sits beneath the headline rate.
+    try:
+        from charts.india_charts.india_mospi_activity import load_youth_snapshot
+        youth_row = load_youth_snapshot()
+        labour_end = next((i + 1 for i, row in enumerate(rows)
+                           if row['name'] == 'All India Unemployment'), len(rows))
+        rows.insert(labour_end, youth_row)
+    except (ValueError, OSError) as exc:
+        print(f"   ⚠ Urban youth unemployment omitted from snapshot — {exc}")
+
+    # ── RBI Household Inflation Expectations ──────────────────────────────
     try:
         ie_records, _ = rbi_surveys.read_observations()
         ie_latest, ie_previous, _ = rbi_surveys.select_curves(ie_records)
@@ -2126,7 +2120,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
             f"   ⚠ Inflation expectations omitted from snapshot — {exc}"
         )
     
-    # Add weekly forex reserves if available (from india_weekly table)
+    # Add weekly forex reserves from the canonical WSS loader
     if df_weekly is not None and not df_weekly.empty and "forex_reserves_usd_bn" in df_weekly.columns:
         latest_fx = df_weekly.iloc[-1]
         fx_val = latest_fx.get("forex_reserves_usd_bn")
@@ -2199,7 +2193,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     cat_gap = 0.45
     header_block = 1.4
     content_h = (0.65 * len(sections_seen)) + (row_h * n)
-    footer_space = 0.70 if has_cag else 0.55  # Reduced from 0.95
+    footer_space = 0.70 if has_cag else 0.55
     fig_h = header_block + content_h + footer_space
 
     fig, ax = EconStyle.create_figure(size=(7.0, fig_h))
@@ -2308,7 +2302,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
     # ═══════════════════════════════════════════
     footer_y = y - row_h / 2 - 0.25
 
-    source_text = "Source: S&P Global, RBI DBIE / IESH, NSE, MoSPI, PIB, CAG"
+    source_text = "Source: S&P Global, RBI DBIE / WSS / IESH, NSE, MoSPI, PIB, CAG"
     ax.text(
         0.5,
         footer_y,
@@ -2336,7 +2330,7 @@ def chart_table(df, output_dir, cag_data=None, df_weekly=None):
         ax.text(
             0.5,
             footer_y,
-            "** Latest fiscal data",
+            "** Latest data",
             fontsize=5.7,
             color="#666666",
             ha="left",
@@ -2566,7 +2560,7 @@ def chart_credit_deposit(df, output_dir):
         
     ax.set_ylabel("YoY Growth (%)", fontsize=EconStyle.FONT_SIZE_AXIS)
 
-    EconStyle.set_title(ax, "Systemic Liquidity: Bank Credit & Deposit Growth",
+    EconStyle.set_title(ax, "Bank Credit and Deposit Growth",
                         "Scheduled Commercial Banks — YoY Growth (%)")
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
@@ -2742,7 +2736,7 @@ class TransmissionDataError(ValueError):
 
 def load_transmission(path=TRANSMISSION_CSV):
     """
-    The current rate cycle from data/rbi_transmission.csv, one row per edition.
+    The current rate cycle from data/stores/india/rbi_transmission.csv, one row per edition.
 
     Each edition of RBI's State of the Economy restates the cycle to date, so
     reading the same row across editions gives the path of pass-through through
@@ -2894,7 +2888,7 @@ def chart_forex_reserves(df_weekly, output_dir):
     Forex Reserves: dual-panel — bounded area chart for level + bar chart for WoW change.
     """
     if df_weekly is None or df_weekly.empty:
-        print("   ⚠ Skipping Forex Reserves — data pending DBIE configuration")
+        print("   ⚠ Skipping Forex Reserves — canonical WSS data unavailable")
         return None
     if "forex_reserves_usd_bn" not in df_weekly.columns:
         return None
@@ -2930,7 +2924,10 @@ def chart_forex_reserves(df_weekly, output_dir):
     # Apply dynamic limits
     ax_level.set_ylim(bottom=y_bottom, top=max_level + 15)
     
-    _add_end_label(ax_level, dates, levels, f"${levels[-1]:.0f}B", C_RESERVES, offset_y=5)
+    ax_level.annotate(f"${levels[-1]:.1f}B", (dates[-1], levels[-1]),
+                      xytext=(8, 5), textcoords="offset points",
+                      color=C_RESERVES, fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold")
     ax_level.set_ylabel("USD Billion", fontsize=EconStyle.FONT_SIZE_AXIS)
     
     # Use our universal date formatter
@@ -2941,7 +2938,7 @@ def chart_forex_reserves(df_weekly, output_dir):
 
     # ── RIGHT PANEL: WoW Change ──
     if "forex_reserves_wow_chg" in df_weekly.columns:
-        chg_vals = df_weekly["forex_reserves_wow_chg"].fillna(0).values
+        chg_vals = df_weekly["forex_reserves_wow_chg"].values
         C_POS = "#16A34A"
         C_NEG = "#DC2626"
         chg_colors = [C_POS if v >= 0 else C_NEG for v in chg_vals]
@@ -2961,7 +2958,8 @@ def chart_forex_reserves(df_weekly, output_dir):
         EconStyle.add_top_rule(ax_chg)
 
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI DBIE")
+    EconStyle.add_source(fig, df_weekly.attrs.get("source", "RBI WSS"),
+                         df_weekly.attrs.get("latest_observation"))
 
     fp = output_dir / "16_india_forex_reserves.png"
     EconStyle.save_chart(fig, fp)
@@ -3028,7 +3026,7 @@ def chart_trade_balance(df, output_dir):
     ax2.annotate(
         f"Deficit\n${last_val:.1f}B",
         xy=(dates[-1], last_val),
-        xytext=(8, 5), textcoords="offset points",
+        xytext=(-10, 10), textcoords="offset points", ha="right",
         fontsize=9, fontweight="bold", color=C_DEFICIT_BOLD,
         fontfamily=EconStyle.FONT_FAMILY,
         bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.85),
@@ -3053,7 +3051,10 @@ def chart_trade_balance(df, output_dir):
                         "Monthly Merchandise Exports & Imports ($B)")
     EconStyle.add_top_rule(ax)
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI DBIE / DGCI&S")
+    EconStyle.add_source(
+        fig, "RBI DBIE / Ministry of Commerce",
+        date_text=f"Data through {df_trade['date'].max():%b %Y}",
+    )
 
     fp = output_dir / "17_india_trade.png"
     EconStyle.save_chart(fig, fp)
@@ -3173,7 +3174,7 @@ def chart_deficit_financing(output_dir, manual_path=CAG_MANUAL):
     """
     fin = load_cag_financing(manual_path)
     if fin.empty:
-        print("   ⚠ Skipping Deficit Financing — no financing rows in data/cag_manual_accounts.csv")
+        print("   ⚠ Skipping Deficit Financing — no financing rows in data/inputs/cag/cag_manual_accounts.csv")
         return None
 
     fy = fin["FY"].max()
@@ -3435,15 +3436,19 @@ def main():
     chart_risk_appetite(output_dir)
     chart_sector_valuations(output_dir)
     chart_sector_rotation_12m(output_dir)
+    from data.processors.india_equity_matrix import generate as generate_equity_matrix
+    generate_equity_matrix(output_dir)
     chart_gst(df, output_dir)
     chart_fpi_flows(df, output_dir)
     chart_inflation_bar(df, output_dir)
-    from charts.india_cpi_contributions import generate as chart_cpi_contributions
+    from charts.india_charts.india_cpi_contributions import generate as chart_cpi_contributions
     chart_cpi_contributions(output_dir)
+    from charts.india_charts.india_cpi_items import generate as chart_cpi_items
+    chart_cpi_items(output_dir)
 
     # RBI manual bi-monthly surveys use the normal dated India edition.
-    from charts.india_inflation_surveys import generate as chart_inflation_surveys
-    from charts.india_consumer_surveys import generate as chart_consumer_surveys
+    from charts.india_charts.india_inflation_surveys import generate as chart_inflation_surveys
+    from charts.india_charts.india_consumer_surveys import generate as chart_consumer_surveys
     chart_inflation_surveys(output_dir)
     chart_consumer_surveys(output_dir)
 
@@ -3453,12 +3458,23 @@ def main():
     # ── Monetary Conditions charts ─────────────────────────────────────────────
     chart_credit_deposit(df, output_dir)
     chart_rate_transmission(output_dir)
+    from charts.india_charts.india_monetary import generate as chart_monetary_plumbing
+    chart_monetary_plumbing(df, output_dir)
 
     # ── Economic Activity — IIP (new) ──────────────────────────────────────────
     chart_iip(df, output_dir)
+    from charts.india_charts.india_mospi_activity import generate as chart_mospi_activity
+    # Official collectors run separately. Missing/invalid canonical sources
+    # must not abort the unrelated India charts or create fabricated artifacts.
+    try:
+        chart_mospi_activity(output_dir)
+    except (ValueError, OSError) as exc:
+        print(f"   ⚠ MoSPI industry/labour artifacts unavailable: {exc}")
 
     # ── External Sector charts (new) ──────────────────────────────────────────
     chart_forex_reserves(df_weekly, output_dir)
+    from charts.india_charts.india_external import generate as chart_external_official
+    chart_external_official(output_dir)
     chart_trade_balance(df, output_dir)
 
     # ── Fiscal charts (from CAG) — FROZEN, no changes ─────────────────────────

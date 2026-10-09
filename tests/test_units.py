@@ -30,7 +30,7 @@ def test_crore_per_lakh_crore_constant():
 
 def test_feb26_capex_converts_to_realistic_magnitude():
     """
-    Feb-26 monthly capex from data/cag_monthly_accounts.xlsx is Rs 87,041 crore
+    Feb-26 monthly capex from data/inputs/cag/cag_monthly_accounts.xlsx is Rs 87,041 crore
     (929,322 cumulative less 842,281 the prior month). In lakh crore that is
     0.87 - not 870, which is what the dashboard published.
     """

@@ -1,0 +1,35 @@
+{
+  "status": "success",
+  "code": 200,
+  "message": "Latest Releases retrieved successfully.",
+  "data": [
+    {
+      "id": "3612",
+      "title": "Press Release on Quick Estimates of all India Index of Industrial Production (IIP) base year 2022-23 for August 2026",
+      "published_year": "2026-09-28",
+      "file_one": {
+        "path": "uploads/latestReleases/latest_release_1790590696008_1b346687-0a5f-445a-83a2-28283c586094_IIP_Press_Release_August_2026.pdf",
+        "filemime": "application/pdf",
+        "filename": "IIP Press Release August 2026.pdf",
+        "filesize": 1074631
+      },
+      "file_two": {
+        "path": "uploads/latestReleases/latest_release_1790590696633_c0f8dc21-040f-4f5c-bfc1-63be2e5775d7_Indices_IIP_2022-23_Monthly_annual_Aug_2026.xlsx",
+        "filemime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "filename": "Indices IIP 2022-23 Monthly_annual Aug 2026.xlsx",
+        "filesize": 43257
+      },
+      "file_three": null,
+      "is_active": true,
+      "start_date": "2026-09-28T00:00:00.000Z",
+      "end_date": "2027-09-28T00:00:00.000Z",
+      "is_new": "3"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalItems": 1,
+    "totalPages": 1,
+    "pageSize": 100
+  }
+}

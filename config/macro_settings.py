@@ -7,7 +7,7 @@ dollar bond yields, the dollar against EM currencies and the rupee).
 
 The six-economy scoreboard, central bank strip and calendar are configured
 in config/world_settings.py; the equity valuation spreadsheets in
-data/valuations.py.
+data/processors/valuations.py.
 
 Series retired in Sep 2026 because Weekly Markets already charts them, or
 they carried little signal: HY/EM credit spreads, EMLC, NFCI, M2, 2s10s,

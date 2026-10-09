@@ -21,7 +21,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from data.valuations import (_fraction, check_fresh, country_risk_links, parse_country_erps, parse_damodaran_erp,
+from data.processors.valuations import (_fraction, check_fresh, country_risk_links, parse_country_erps, parse_damodaran_erp,
                              parse_regional_erps, parse_shiller, parse_update_date, pick_year_ago, shiller_file_url)
 from generate_macro import cli_phase
 

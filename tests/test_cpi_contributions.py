@@ -9,9 +9,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from data import cpi_contributions as cpi
+from data.processors import cpi_contributions as cpi
 from data.fetchers import mospi_cpi as collector
-from charts import india_cpi_contributions as chart
+from charts.india_charts import india_cpi_contributions as chart
 import matplotlib.pyplot as plt
 
 FIXTURE = Path(__file__).parent/'fixtures'/'cpi'/'official_2025_2026.json'

@@ -22,6 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
+from data.paths import RBI_SENTINEL_DB
+
 from rbi_sentinel.cleaners.policy_facts import extract_policy_facts  # noqa: E402  (stdlib-only module)
 
 DAYTIME_CRONS = {"15 5 * * 1-5", "15 6 * * 1-5", "45 7 * * 1-5", "15 9 * * 1-5"}
@@ -36,7 +38,7 @@ def decide() -> tuple[bool, str]:
     if schedule not in DAYTIME_CRONS:
         return True, f"evening schedule '{schedule}'"
 
-    con = sqlite3.connect(ROOT / "data" / "rbi_sentinel.db")
+    con = sqlite3.connect(RBI_SENTINEL_DB)
     row = con.execute(
         """SELECT raw_text FROM rbi_documents
            WHERE doc_type = 'resolution' AND source_kind = 'press_release' AND word_count > 0

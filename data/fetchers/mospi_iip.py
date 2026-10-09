@@ -15,7 +15,8 @@ from pathlib import Path
 import sqlite3
 
 import requests
-from data.india_db_manager import DB_PATH, _SCHEMA
+from data.paths import archive_for_db
+from data.processors.india_db_manager import DB_PATH, _SCHEMA
 from data.fetchers.india_source_archive import read_connection, Archive, sha256
 from data.fetchers.mospi_http import get
 from data.fetchers.mospi_iip_audit import validate
@@ -112,7 +113,7 @@ def store(rows, sources, archive, db):
 
 def fetch(dry_run=False, db=DB_PATH):
     previous = previous_records(db)
-    archive = None if dry_run else Archive(Path(db).parent/'IIP', previous)
+    archive = None if dry_run else Archive(archive_for_db(db, 'IIP'), previous)
     try:
         rows, sources = [], {}
         page, totals = 1, None
@@ -159,7 +160,7 @@ def fetch(dry_run=False, db=DB_PATH):
 
 def load(db=DB_PATH, manual_fallback=False):
     """Offline canonical chart data; emergency overlay requires explicit opt-in."""
-    root = Path(db).parent/'IIP'
+    root = archive_for_db(db, 'IIP')
     state = root/'status.json'
     if not manual_fallback:
         require(state.exists() and json.loads(state.read_text())['status'] == 'accepted',

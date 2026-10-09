@@ -39,6 +39,8 @@ from datetime import date, datetime, timedelta, timezone
 # Suppress harmless Matplotlib date locator warnings
 warnings.filterwarnings("ignore")
 
+from data.paths import BDTI_IMAGE
+
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -58,10 +60,10 @@ from data.fetchers.fred_fetcher import FredFetcher
 from config.settings import FRED_API_KEY
 from config.macro_settings import CPI_INDEXES, CPI_RELATIVE_IMPORTANCE, EM_FX_PEERS, MACRO_INDICATORS
 from config.world_settings import OECD_CLI_COUNTRIES
-from data.world_snapshot import (apply_rate_update, build_rate_update, build_snapshot, monthly,
+from data.processors.world_snapshot import (apply_rate_update, build_rate_update, build_snapshot, monthly,
                                  rates_fingerprint, yoy_by_date)
-from data.world_manual_entry import load_rows as load_world_manual_rows
-from data.valuations import fetch_country_risk, fetch_damodaran_erp, fetch_shiller
+from data.processors.world_manual_entry import load_rows as load_world_manual_rows
+from data.processors.valuations import fetch_country_risk, fetch_damodaran_erp, fetch_shiller
 from rbi_sentinel.config import DB_PATH as RBI_SENTINEL_DB
 
 import dbnomics
@@ -866,7 +868,7 @@ def chart_bdti_branded_screenshot(output_dir, mode="dashboard"):
     EconStyle.apply_global_style()
     
     # 1. Load the raw screenshot
-    img_path = PROJECT_ROOT / "data" / "bdti_raw_chart.png"
+    img_path = BDTI_IMAGE
     if not img_path.exists():
         print("   ⚠ Missing bdti_screenshot.png in the data folder.")
         return

@@ -13,8 +13,8 @@ record that the score existed before the day's move was known. The 10-year
 close is added afterwards.
 
 Files (both tracked in git):
-  data/rbi_live_log.csv      one row per live meeting, written by the pipeline
-  data/rbi_live_market.csv   10-year closes supplied by hand when no automatic
+  data/stores/rbi_sentinel/rbi_live_log.csv      one row per live meeting, written by the pipeline
+  data/stores/rbi_sentinel/rbi_live_market.csv   10-year closes supplied by hand when no automatic
                              source returns them: decision_date,previous_close,close,source
 """
 
@@ -34,8 +34,10 @@ from rbi_sentinel.db import manager as db
 log = logging.getLogger("rbi_sentinel.live_log")
 
 LIVE_TEST_START = "2026-10-01"          # first meeting after the model's training cutoff
-LOG_PATH = DATA_DIR / "rbi_live_log.csv"
-MARKET_FEED_PATH = DATA_DIR / "rbi_live_market.csv"
+from data.paths import RBI_LIVE_LOG_CSV, RBI_LIVE_MARKET_CSV
+
+LOG_PATH = RBI_LIVE_LOG_CSV
+MARKET_FEED_PATH = RBI_LIVE_MARKET_CSV
 IST = timezone(timedelta(hours=5, minutes=30))
 GSEC_CLOSE_IST = (17, 0)                # G-sec market closes 17:00 IST
 # Written when a close is missing, so the workflow can open a GitHub issue.
@@ -124,7 +126,7 @@ def fetch_ten_year_close(decision_date: str) -> Optional[tuple[float, float, str
 
     No sanctioned programmatic source is wired in yet: FBIL and CCIL publish the
     data only through interactive web pages. Returning None routes the request
-    to data/rbi_live_market.csv and a GitHub issue asking for the figure.
+    to data/stores/rbi_sentinel/rbi_live_market.csv and a GitHub issue asking for the figure.
     """
     return None
 
@@ -172,7 +174,7 @@ def record_market_closes(today: Optional[date] = None) -> list[str]:
             + "".join(f"- **{d}** — and the close on the previous trading day\n" for d in waiting)
             + "\n**Where to find it:** Investing.com → India 10-Year Bond Yield → Historical Data "
             "(the \"Price\" column), or the FBIL/CCIL benchmark page.\n\n"
-            "**Where to put it:** on GitHub open `data/rbi_live_market.csv` → pencil icon (Edit) → "
+            "**Where to put it:** on GitHub open `data/stores/rbi_sentinel/rbi_live_market.csv` → pencil icon (Edit) → "
             "add one line per date below the header → Commit changes:\n\n"
             "```\ndecision_date,previous_close,close,source\n"
             + "".join(f"{d},<previous day close>,<decision day close>,<where it came from>\n" for d in waiting)

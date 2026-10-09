@@ -9,8 +9,8 @@ from datetime import datetime
 import openpyxl
 import matplotlib.pyplot as plt
 
-from data import rbi_surveys as c
-from charts import india_consumer_surveys as chart
+from data.processors import rbi_surveys as c
+from charts.india_charts import india_consumer_surveys as chart
 from config.insights import get_insight
 
 class ConsumerTests(unittest.TestCase):

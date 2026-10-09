@@ -31,7 +31,7 @@ import sys
 from pathlib import Path
 
 import config.news_settings as news_settings
-from data.news import build_news, collect_headlines, pool_from_json, pool_to_json
+from data.processors.news import build_news, collect_headlines, pool_from_json, pool_to_json
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 DEFAULT_POOL = PROJECT_ROOT / "output" / "headline_pool" / "pool.json"

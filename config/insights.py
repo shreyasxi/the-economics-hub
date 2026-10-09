@@ -70,6 +70,18 @@ def _discretionary_takeaway(path: Path) -> str:
 # ---------------------------------------------------------------------------
 
 CHART_INSIGHTS: dict[str, str] = {
+    "india_cpi_items": """\
+These are individual CPI items’ year-on-year price changes, showing where increases and declines are most extreme. The rankings measure the intensity of item price movements, not contribution to headline CPI. An item with a very high inflation rate may have a small CPI weight.
+
+Source: [MoSPI / eSankhyiki CPI API](https://api.mospi.gov.in/api/cpi/getCPIData), All-India Combined, current 2024-base series. Published YoY readings are retained; missing published readings remain missing. The two panels use independent axis scales.
+""",
+    "india_urban_youth_unemployment": """\
+**How to read this chart:** The dominant blue line is MoSPI's monthly unemployment rate for urban persons aged 15–29 across All India. UR is the unemployed share of the **labour force**, not the share of the total youth population. Current Weekly Status (CWS) classifies activity using the seven days preceding the survey. The thin muted line is the same-source urban rate for persons aged 15 and above.
+
+Youth unemployment is structurally higher than overall unemployment; compare the two age groups without treating their difference as a causal explanation. Month-to-month survey estimates can be noisy. Read several months together and do not infer labour-market deterioration from one monthly move alone.
+
+**Methodology:** The sampling design changed in January 2025, and the first officially published comparable monthly observation is April 2025. This chart starts there and contains no older quarterly series, smoothing, interpolation or seasonal adjustment. Source: MoSPI PLFS Monthly Bulletin, **Statement 3: Unemployment Rate (in per cent) in CWS**; Urban, Persons, All India.
+""",
 
     # ── WEEKLY: EQUITIES ────────────────────────────────────────────────────
 
@@ -637,6 +649,26 @@ Here W_i is the official division weight in percent, I is the division index, G 
 **Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1
 """,
 
+    "india_money_market_corridor": """\
+**How to read this chart:** WACR minus the same day's policy repo rate, in basis points: (call rate − repo) × 100. Zero means alignment; negative values mean overnight call funding below repo, positive values above repo. The subtle ±10 bp band is a descriptive alignment guide, not an RBI-defined corridor or threshold.
+
+**Observations:** The line connects consecutive valid, positive-volume RBI observations directly, including genuine weekend trades. Zero-volume missing-WACR dates have no plotted observation. No calendar reindexing, filling or smoothing is used. Positive-volume missing-WACR rows fail validation.
+
+**Display range:** The full observed spread range is shown, with padding above the maximum and below the minimum. Every genuine observation remains visible and unchanged; no clipping, winsorisation or suppression is used. Read persistent deviations alongside the neighbouring system-liquidity chart; a single spread is not a policy-stance verdict.
+
+**Source:** Reserve Bank of India — Money Market Operations / MPC resolutions. The as-of date is the latest valid WACR observation.
+""",
+
+    "india_system_liquidity": """\
+**How to read this chart:** Daily bars show net RBI liquidity injection (+) / absorption (−), in ₹ lakh crore, using RBI's official total net liquidity injected from outstanding operations including today's operations. Positive injection meets a banking-system deficit; negative absorption indicates a surplus. Both the chart and stored values retain RBI's original sign convention. The line averages 20 Mon–Fri observations; weekend operations remain in the bars. Missing weekdays invalidate an average window rather than being filled.
+
+**Why it matters:** Negative values mean excess liquidity is being absorbed by RBI; positive values mean RBI is supplying liquidity to meet a system funding shortage. A move from surplus towards deficit can signal tighter liquidity; read it alongside WACR relative to repo. This operations-based measure also reflects RBI’s response, so a deficit itself is not evidence of policy tightening.
+
+**Caveats:** Taxes, government balances, currency demand, FX transactions and RBI operations make daily liquidity noisy. The total outstanding figure differs from today's operations alone and from net durable liquidity. WSS Liquidity Operations by RBI includes a different flow formula, including OMO; it is not substituted here. The weekday average includes holidays when RBI publishes operations, so it is not an exchange-holiday-adjusted business-day measure.
+
+**Source:** Reserve Bank of India — Money Market Operations, total outstanding net injection (+) / absorption (−). ₹100,000 crore equals ₹1 lakh crore.
+""",
+
     "india_rate_transmission": """\
 **How to read this chart:** Each line is the cumulative change, in basis points, since the start of the current policy rate cycle: the RBI's repo rate against the rates banks actually charge and pay. The figures are the RBI's own, from Table IV.3 of the State of the Economy article in each month's Bulletin, and every edition restates the cycle to date — so reading the same row across editions traces how far the policy move has travelled. The external benchmark rate (EBLR) follows the repo mechanically and is left off; what matters is the gap between the repo line and the loan and deposit lines, which is the part of the move that has not reached borrowers and savers. Bank rates are reported with a lag, so the last point is usually two months behind the repo rate.
 
@@ -657,12 +689,28 @@ Here W_i is the official division weight in percent, I is the division index, G 
 
     # ── INDIA: EXTERNAL SECTOR ────────────────────────────────────────────────
 
+    "india_external_vulnerability": """\
+**How to read this chart:** The left panel shows the RBI's directly published quarterly current-account balance as a percentage of that quarter's GDP. Positive is a surplus; negative is a deficit requiring net external financing. The right panel shows the official ratio of short-term external debt (original maturity of up to one year) to foreign exchange reserves, both measured at quarter-end. Higher means more short-term liabilities relative to the reserve buffer; lower means stronger coverage. Gaps remain missing.
+
+**Practical takeaway:** These are two separate pieces of evidence, with no weighted score or invented risk thresholds. The original-maturity measure excludes long-term debt coming due within the next twelve months; it is narrower than residual-maturity obligations. A deficit is a flow over a quarter, while debt and reserves are end-quarter stocks. Later official releases can revise both ratios. Read the release-specific provenance alongside the chart; the two panels need not have the same latest quarter.
+
+**Source:** RBI quarterly Balance of Payments releases; RBI and Department of Economic Affairs quarterly External Debt releases, Table 5 (India's Key External Debt Indicators).
+""",
+
+    "india_reer": """\
+**How to read this chart:** RBI's 40-currency, CPI-based trade-weighted real effective exchange rate adjusts a basket of bilateral rupee exchange rates for relative consumer prices. A rise means real trade-weighted appreciation relative to the reference period; a fall means depreciation. The base is 2015–16 = 100. The chart uses RBI's internally consistent published series, including its revised historical back-series. P marks provisional data.
+
+**Practical takeaway:** Real appreciation can pressure price competitiveness and moderate imported inflation; depreciation can support competitiveness while increasing import costs. REER is an index, not an estimate of equilibrium: above 100 does not establish overvaluation, and below 100 does not establish undervaluation. The six-currency moving-base series is not used. Missing months are never interpolated.
+
+**Source:** RBI Bulletin Current Statistics, Table 37 — Indices of Nominal Effective Exchange Rate (NEER) and Real Effective Exchange Rate (REER) of the Indian Rupee. Monthly history: RBI Handbook of Statistics on the Indian Economy, 40-currency monthly table. Methodology: RBI Bulletin, January 2021.
+""",
+
     "india_forex_reserves": """\
-**How to read this chart:** Dual panel showing India's total foreign exchange reserves in USD billions (area chart, left panel) and the week-on-week change in reserves (diverging bars, right panel). Data sourced from the RBI's weekly statistical supplement, released every Friday for the prior week. India's forex reserves are the RBI's primary instrument for INR management: they buy USD (accumulate reserves) when the INR is appreciating and sell USD (draw down reserves) when the INR is under depreciation pressure.
+**How to read this chart:** India's total foreign exchange reserves are shown in US$ billions, alongside changes between consecutive weekly observations. The canonical source is RBI's Weekly Statistical Supplement, Foreign Exchange Reserves table, Total Reserves in US$ million, divided by 1,000 for presentation. Dates are observation dates, not publication dates. Historical DBIE observations are retained with their provenance after checking WSS overlaps at its whole-million publication precision.
 
-**Practical takeaway:** Reserves above \\$600B provide approximately 12 months of import cover — a historically strong buffer that the RBI uses as a communications anchor. The weekly change chart is more actionable: sustained weekly drawdowns of \\$2–4B over 4+ consecutive weeks almost always indicate active RBI intervention to defend the INR. Sharp single-week drops (\\$5–8B) typically reflect forward contract settlements or emergency intervention during EM sell-offs (e.g., during US rate hike cycles). Reserve accumulation weeks confirm a period of INR stability or RBI building a buffer ahead of anticipated external volatility.
+**Practical takeaway:** Reserves provide an external liquidity buffer. Changes reflect transactions, exchange-rate valuation and gold valuation, so a fall alone does not identify RBI intervention. Missing weekly observations leave the weekly change missing; no zero change is invented. No fixed reserve amount establishes safety or a fixed number of months of import cover.
 
-**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1 (Weekly Statistical Supplement)
+**Source:** RBI Weekly Statistical Supplement — Foreign Exchange Reserves. Release links and retrieval timestamps are retained with each observation.
 """,
 
     "india_trade": """\
@@ -670,7 +718,7 @@ Here W_i is the official division weight in percent, I is the division index, G 
 
 **Practical takeaway:** India's merchandise trade deficit typically runs at \\$20–25B per month under stable conditions. Deficits below \\$20B signal either weak import demand (slowdown) or strong export performance; deficits above \\$28–30B signal commodity price surges (crude oil being the dominant driver — every \\$10/barrel rise in Brent adds approximately \\$12–14B to India's annual import bill) or gold import spikes. The services trade surplus (software exports, remittances) partially offsets the merchandise deficit but is not captured here — for the full current account picture, note that India's services surplus of ~\\$150B/year (FY24) structurally cushions the merchandise gap.
 
-**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1 (DGCI&S merchandise trade data)
+**Source:** RBI Database on Indian Economy (DBIE) — https://data.rbi.org.in/DBIE/#/dbie/ind1 (DGCI&S merchandise trade data), supplemented for missing recent months by Ministry of Commerce merchandise quick estimates published by PIB — https://www.pib.gov.in/. The footer shows the latest observation month.
 """,
 
     # ── WEEKLY: CRYPTO ASSETS ────────────────────────────────────────────────

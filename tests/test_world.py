@@ -23,10 +23,10 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import data.world_snapshot as ws
+import data.processors.world_snapshot as ws
 from config.macro_settings import CPI_RELATIVE_IMPORTANCE
 from config.world_settings import CENTRAL_BANKS, MANUAL_FIELDS
-from data.world_manual_entry import HEADER, ManualDataError, load_rows, validate_row
+from data.processors.world_manual_entry import HEADER, ManualDataError, load_rows, validate_row
 from generate_macro import _spread_labels_centred, cpi_contributions, monotone_curve, weekly_average, write_snapshot
 
 

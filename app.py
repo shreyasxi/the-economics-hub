@@ -45,12 +45,14 @@ import config.soe_settings as _soe_settings
 import config.weekly_settings as _weekly_settings
 import config.world_settings as _world_settings
 
-import data.substack as _substack
+import data.processors.substack as _substack
 from rbi_sentinel.config import DOC_GOVERNOR, DOC_MINUTES, DOC_RESOLUTION
 import rbi_sentinel.cleaners.policy_facts as _policy_facts
 import rbi_sentinel.db.manager as _manager
 from rbi_sentinel.db.manager import get_latest_composite
 from rbi_sentinel.sentiment.score_normalizer import _DOC_WEIGHTS
+
+from data.paths import INDIA_DB
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
@@ -517,6 +519,7 @@ st.markdown(
         font-size: 1.46rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
         color: var(--nh-ink);
     }
+    .nh #nh-title { scroll-margin-top: 96px; }
     .nh-week {
         font-size: 0.8rem; font-weight: 500; color: var(--nh-muted); white-space: nowrap;
         font-variant-numeric: tabular-nums lining-nums;
@@ -1433,6 +1436,15 @@ st.markdown(
         width: 100% !important;
         max-width: 100% !important;
         height: auto !important;
+    }
+    /* India and Weekly snapshot images retain their original white artwork. */
+    [class*="st-key-ehcap-"][class*="snapshot-card"] [data-testid="stImage"] {
+        background:#fff;border:2px solid #28251f;border-radius:0;
+        box-shadow:4px 4px 0 #28251f;padding:0;box-sizing:border-box;
+        width:calc(100% - 5px);margin-bottom:5px;
+    }
+    [class*="st-key-ehcap-"][class*="snapshot-card"] [data-testid="stImage"] img {
+        mix-blend-mode:normal;border-radius:0;
     }
     /* No phone rule is needed: width: 100% is the smaller of the two on any
        screen narrower than the cap, so a chart still fills a phone. */
@@ -3356,7 +3368,716 @@ def _page_header_html(title: str, dek: str = "", meta_label: str = "", meta_valu
     )
 
 
+# ── Answer-led front page and India evidence ────────────────────────────────
+
+_EH_QUESTIONS = (
+    "How is India’s economic activity trending?",
+    "How are inflation pressures evolving?",
+    "How are monetary conditions changing?",
+    "How is India’s external position changing?",
+    "How are public finances evolving?",
+    "How are Indian equities performing?",
+    "How is consumer confidence trending?",
+)
+_EH_ANCHORS = ("Growth & Activity", "Inflation & Monetary Conditions",
+               "Monetary Conditions", "External Sector", "Public Finances",
+               "Equity Markets", "Consumer Confidence")
+
+_EH_STYLE = """
+<style>
+/* Streamlit's markdown typography needs scoped overrides on p/h elements. */
+.eh-question {font-family:Inter,sans-serif;}
+.eh-question h2 {font-family:Inter,sans-serif!important;}
+.eh-card .eh-card-title {font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+    font-size:18px!important;font-weight:600!important;line-height:1.4!important;
+    margin:0 0 14px!important;padding:0!important;}
+.eh-question h2 {font-size:1rem!important;line-height:1.5!important;margin:0 0 14px!important;padding:0!important;}
+p.eh-evidence {font-size:.86rem!important;line-height:1.6!important;margin:12px 0!important;}
+.eh-front {--nh-ink:#0A1F3D;color:#172331;margin:2.2rem 0 36px;font-family:Inter,sans-serif;}
+.eh-cards {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:22px;padding:0 5px 5px 0;}
+.eh-card {display:flex;flex-direction:column;background:#f8f0e3;border:2px solid #28251f;
+    box-shadow:4px 4px 0 #28251f;padding:20px 20px 14px;min-width:0;}
+.eh-card .eh-card-title {letter-spacing:0;text-transform:none;}
+.eh-card .eh-card-title a {display:block;color:#28251f!important;text-decoration:none!important;}
+.eh-card .eh-card-title a:hover {text-decoration:underline!important;text-underline-offset:3px;}
+.eh-card .eh-card-title a:focus-visible {outline:2px solid #853342;outline-offset:4px;}
+.eh-card .eh-arrow {white-space:nowrap;}
+.eh-card .eh-state {align-self:flex-start;border:1px solid #a84439;color:#923d34;
+    font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:.76rem;
+    line-height:1.4;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;margin:0;
+    margin-top:auto;}
+.eh-card p.eh-evidence {font-family:'Newsreader',Georgia,'Times New Roman',serif;
+    font-size:1.08rem!important;line-height:1.45!important;margin:0 0 14px!important;color:#514b42;}
+.eh-state {font-size:1.65rem;line-height:1.15;font-weight:700;letter-spacing:-.025em;}
+.eh-evidence {font-size:.86rem;line-height:1.6;margin:12px 0;}
+.eh-question {border-top:3px solid #172331;padding:18px 0 8px;margin-top:30px;color:#172331;}
+.eh-question h2 {font-size:1rem;letter-spacing:.025em;text-transform:uppercase;margin:0 0 14px;padding:0;}
+.eh-metrics {display:flex;flex-wrap:wrap;gap:12px 30px;margin:18px 0;}
+.eh-metric {font-size:.75rem;color:#606773;}
+.eh-metric b {display:block;color:#172331;font-size:1.15rem;font-variant-numeric:tabular-nums;}
+@media(max-width:1000px) {.eh-cards {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:640px) {.eh-cards {grid-template-columns:minmax(0,1fr);}.eh-card {padding:18px 18px 14px;}}
+</style>
+"""
+
+
+def _eh_number(value) -> bool:
+    return isinstance(value, (int, float)) and math.isfinite(value)
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def _eh_india_observations() -> dict:
+    """One read-only connection; existing generic readers set writable WAL PRAGMAs.
+
+    No fetch or migration. Reserves use the canonical WSS CSV. Keep dates per series;
+    never forward-fill a partly populated latest month. IIP uses its existing
+    accepted-source loader, not the legacy monthly mirror.
+    """
+    import sqlite3
+    from contextlib import closing
+    result = {"monthly": [], "weekly": [], "iip": [], "transmission": [], "fiscal": [],
+              "real_policy": None, "equity": [], "consumer": {}, "sector_rotation": {}, "sector_valuations": []}
+    path = INDIA_DB
+    if path.exists():
+        try:
+            with closing(sqlite3.connect(f"{path.as_uri()}?mode=ro", uri=True)) as conn:
+                conn.row_factory = sqlite3.Row
+                for key, table, period in (("monthly", "india_monthly", "month"),
+                                           ("weekly", "india_weekly", "week_ending")):
+                    result[key] = [dict(r) for r in conn.execute(
+                        f"SELECT * FROM {table} ORDER BY {period} DESC LIMIT 24")][::-1]
+        except sqlite3.Error:
+            pass
+        try:
+            from data.fetchers.mospi_iip import load
+            result["iip"] = load(path)
+        except (OSError, ValueError, sqlite3.Error, KeyError):
+            pass
+    # External evidence uses the same canonical WSS history as the chart.
+    # Never show legacy DBIE reserve values after a canonical source failure.
+    result["weekly"] = []
+    try:
+        from charts.india_charts.india_external import load_forex
+        reserves = load_forex(24)
+        if reserves is not None:
+            result["weekly"] = reserves.assign(
+                week_ending=lambda frame: frame["week_ending"].dt.strftime("%Y-%m-%d")
+            ).to_dict("records")
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
+        import pandas as pd
+        from charts.india_charts.india_monetary import latest_real_policy_metric
+        monthly = pd.DataFrame(result["monthly"]).rename(columns={"month": "date"})
+        result["real_policy"] = latest_real_policy_metric(monthly)
+    except (OSError, ValueError, KeyError, sqlite3.Error):
+        pass  # Existing missing-data convention: omit unavailable metrics.
+    try:
+        from data.processors.nse_indices import load_risk_appetite
+        panel, risk_meta = load_risk_appetite()
+        # Compare actual closes at the end of completed calendar months;
+        # exclude the partial current month and retain each trading date.
+        completed = panel[panel.index < pd.Timestamp(date.today().replace(day=1))]
+        closes = completed.groupby(completed.index.to_period("M")).tail(1).tail(2)
+        if len(closes) == 2 and closes.index[-1].to_period("M") - closes.index[0].to_period("M") == pd.offsets.MonthEnd(1):
+            result["equity"] = closes.reset_index().assign(
+                month=lambda df: df["date"].dt.strftime("%Y-%m-%d"),
+                base_date=risk_meta["base_date"]).to_dict("records")
+    except (OSError, ValueError, KeyError, AssertionError):
+        pass
+    try:
+        # Reuse the displayed chart's recorded snapshot, with its own date.
+        india_charts, _ = get_charts("india")
+        rotation_chart = next((p for p in india_charts if "sector_rotation_12m_benchmark" in p.name), None)
+        if rotation_chart:
+            rotation = json.loads(rotation_chart.with_suffix(".json").read_text())
+            if rotation["observation_date"] <= date.today().isoformat():
+                result["sector_rotation"] = rotation
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
+        from data.fetchers.nse_valuations.production import ROOT, load_chart_data
+        status = json.loads((ROOT / "update_status.json").read_text())
+        cutoff = date.fromisoformat(status["requested_cutoff"])
+        if cutoff <= date.today():
+            # Validate the stored edition at its recorded cutoff. This does
+            # not refresh sources or claim that the snapshot is from today.
+            result["sector_valuations"], _ = load_chart_data(as_of=cutoff)
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
+        from data.processors.rbi_surveys import load_consumer_comparison
+        comparison = load_consumer_comparison()
+        if comparison["latest_date"] <= date.today().isoformat():
+            result["consumer"] = comparison["series"]
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
+        from charts.india_charts.india_mospi_activity import HEATMAP, validate_heatmap
+        india_charts, _ = get_charts('india')
+        if india_charts:
+            matrix = json.loads((india_charts[0].parent / HEATMAP).read_text())
+            validate_heatmap(matrix)
+            result['industry_leaders'] = matrix.get('leaders', [])
+    except (OSError, ValueError, KeyError):
+        pass
+    # Reuse the validated, offline chart loaders. Cached here so Excel/CSV
+    # processing happens once, not for each question or card.
+    try:
+        from generate_india import load_transmission, load_cag_tables
+    except ImportError:
+        return result
+    try:
+        transmission = load_transmission()
+        if transmission is not None:
+            result["transmission"] = transmission.to_dict("records")
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
+        actual, _, _ = load_cag_tables()
+        result["fiscal"] = actual.to_dict("records")
+    except (OSError, ValueError, KeyError):
+        pass
+    return result
+
+
+def _eh_brief() -> dict:
+    """Reuse the existing brief; an absent policy database must not be created."""
+    import sqlite3
+    if not _manager.DB_PATH.exists():
+        return {}
+    try:
+        return _load_cycle_brief() or {}
+    except (OSError, sqlite3.Error):
+        return {}
+
+
+def _eh_pair(rows: list[dict], key: str, period: str = "month") -> list[dict]:
+    return [r for r in rows if _eh_number(r.get(key)) and str(r[period]) <= date.today().isoformat()][-2:]
+
+
+def _eh_metric(rows: list[dict], key: str, label: str, unit: str = "%",
+               period: str = "month") -> dict | None:
+    pair = _eh_pair(rows, key, period)
+    if not pair:
+        return None
+    row = pair[-1]
+    return {"label": label, "value": row[key], "display": f"{row[key]:,.2f}{unit}",
+            "period": row[period], "previous": pair[0][key] if len(pair) == 2 else None,
+            "previous_period": pair[0][period] if len(pair) == 2 else None}
+
+
+def _eh_result(state: str, evidence: str, metrics: list, context: str = "") -> dict:
+    return {"state": state, "evidence": evidence,
+            "metrics": [m for m in metrics if m], "context": context}
+
+
+def _eh_direction(metrics: list[dict], up: str, down: str) -> str:
+    """Only compare consecutive observations, and require two corroborating series.
+
+    All available directions must agree; disagreement or a flat reading is
+    Mixed. No averaging unrelated magnitudes or dramatic numeric cut-offs.
+    """
+    changes = []
+    for metric in metrics:
+        if not metric:
+            continue
+        if _eh_number(metric.get("change")):
+            changes.append(metric["change"])
+        elif metric.get("previous") is not None:
+            changes.append(metric["value"] - metric["previous"])
+    if len(changes) < 2:
+        return "Awaiting data"
+    return up if all(c > 0 for c in changes) else down if all(c < 0 for c in changes) else "Mixed"
+
+
+def _eh_india_answers(obs: dict, brief: dict) -> list[dict]:
+    rows = obs["monthly"]
+    mfg = _eh_metric(rows, "india_mfg_pmi", "Manufacturing PMI", "")
+    svc = _eh_metric(rows, "india_svc_pmi", "Services PMI", "")
+    iip = _eh_metric(obs["iip"], "growth_rate", "IIP YoY")
+    # PMI's published 50 boundary is meaningful; expansion is not a claim
+    # that GDP is 'strong'. Use both surveys in the same observation month.
+    state = "Awaiting data"
+    if mfg and svc and mfg["period"] == svc["period"]:
+        state = "Expanding" if min(mfg["value"], svc["value"]) > 50 else (
+            "Contracting" if max(mfg["value"], svc["value"]) < 50 else "Mixed")
+    if iip and ((state == "Expanding" and iip["value"] < 0) or (state == "Contracting" and iip["value"] > 0)):
+        state = "Mixed"
+    growth_evidence = "Awaiting manufacturing and services PMI for the same month."
+    if mfg and svc:
+        growth_evidence = f'Manufacturing PMI {mfg["value"]:.1f} and services PMI {svc["value"]:.1f}; 50 separates expansion from contraction.'
+        if iip:
+            growth_evidence += f' IIP growth was {iip["value"]:.1f}% YoY.'
+    if len(obs.get('industry_leaders', [])) > 1:
+        growth_evidence += ' Industry TTM compares total output in the latest 12 months with the preceding 12 months.'
+    growth = _eh_result(state, growth_evidence, [mfg, svc, iip] + obs.get('industry_leaders', []))
+    prices = [_eh_metric(rows, k, label) for k, label in (
+        ("india_cpi_yoy", "Headline CPI YoY"), ("india_core_cpi_yoy", "Core CPI YoY"),
+        ("india_food_cpi_yoy", "Food CPI YoY"))]
+    prices = [m for m in prices if m]
+    # Compare like observation months; 4% target and 2–6% context already
+    # documented in the chart insights. Never treat a forecast as an actual.
+    aligned = [m for m in prices if m["period"] == max((x["period"] for x in prices), default="")]
+    state = _eh_direction(aligned, "Building", "Easing")
+    headline = next((m for m in aligned if m["label"] == "Headline CPI YoY"), None)
+    if headline and headline["value"] > 6:
+        state = "Above tolerance"
+    inflation_evidence = "Awaiting comparable headline, core and food inflation observations."
+    if headline:
+        inflation_evidence = f'Headline CPI {headline["value"]:.2f}% against the 4% target (2–6% band). '
+        inflation_evidence += "; ".join(f'{m["label"].replace(" CPI YoY", "")} {m["value"] - m["previous"]:+.2f} pp'
+                                         for m in aligned if m["previous"] is not None) + " vs prior observation."
+    inflation = _eh_result(state, inflation_evidence, prices)
+    # Bank borrowing costs come from the validated transmission path. Its
+    # cumulative cycle-to-date changes are differenced within the SAME cycle.
+    # A newer MPC decision is shown separately, never backdated into bank rates.
+    transmission = obs.get("transmission", [])
+    costs = [_eh_metric(transmission, key, label, " bp", "cycle_end") for key, label in (
+        ("walr_fresh_bps", "Fresh loan rates / cycle"),
+        ("walr_outstanding_bps", "Outstanding loan rates / cycle"))]
+    costs = [m for m in costs if m]
+    state = _eh_direction(costs, "Tightening", "Easing")
+    action = brief.get("rate_action")
+    action_sign = {"hike": 1, "cut": -1, "hold": 0}.get(action)
+    # A policy pivot conflicting with lagged bank rates warrants Mixed; a hold
+    # does not negate observed transmission. Do not vote with credit growth.
+    if action_sign is not None and ((state == "Easing" and action_sign > 0) or
+                                    (state == "Tightening" and action_sign < 0)):
+        state = "Mixed"
+    monetary_metrics = list(costs)
+    repo = brief.get("repo_rate_pct")
+    if _eh_number(repo):
+        monetary_metrics.insert(0, {"label": "Repo rate", "value": repo, "display": f"{repo:.2f}%",
+                                    "period": brief.get("policy_cycle", ""), "previous": None})
+    real_policy = obs.get("real_policy")
+    if real_policy and _eh_number(real_policy.get("value")):
+        monetary_metrics.insert(1 if _eh_number(repo) else 0, real_policy)
+    action_text = {"hike": "raised", "cut": "cut", "hold": "held"}.get(action, "unavailable")
+    cost_text = "; ".join(f'{m["label"].split(" / ")[0]} {m["value"] - m["previous"]:+.0f} bp vs prior observation'
+                          for m in costs if m["previous"] is not None)
+    monetary = _eh_result(state, f"Latest MPC: repo {action_text}. " +
+                          (cost_text + "; bank-rate evidence lags the policy decision." if cost_text else
+                           "Awaiting comparable fresh and outstanding bank lending rates."), monetary_metrics)
+    reserve = _eh_metric(obs["weekly"], "forex_reserves_usd_bn", "FX reserves", " bn USD", "week_ending")
+    trade = _eh_metric(rows, "india_trade_deficit_usd_bn", "Trade deficit", " bn USD")
+    external_state = "Awaiting data"
+    if reserve and trade and reserve["previous"] is not None and trade["previous"] is not None:
+        # A narrower positive merchandise deficit and higher reserves corroborate.
+        r, t = reserve["value"] - reserve["previous"], trade["value"] - trade["previous"]
+        external_state = "Strengthening" if r > 0 and t < 0 else "Weakening" if r < 0 and t > 0 else "Mixed"
+    external_evidence = "Awaiting comparable reserve and merchandise-deficit observations; both are required."
+    if reserve and trade and reserve["previous"] is not None and trade["previous"] is not None:
+        external_evidence = (f'FX reserves {reserve["previous"]:.2f} → {reserve["value"]:.2f} bn USD; '
+                             f'merchandise deficit {trade["previous"]:.2f} → {trade["value"]:.2f} bn USD. '
+                             "Weekly reserves and monthly trade are compared separately.")
+    external = _eh_result(external_state, external_evidence, [reserve, trade])
+    # Compare fiscal years at the same month, not cumulative July vs June.
+    # Deficit down AND capex share up corroborate improvement. Seasonal budget
+    # execution is not assumed to follow a straight line through the year.
+    fiscal_rows = obs.get("fiscal", [])
+    fiscal_metrics, fiscal_state = [], "Awaiting data"
+    fiscal_evidence = "Awaiting comparable same-month fiscal-year deficit and expenditure observations."
+    if fiscal_rows:
+        latest = fiscal_rows[-1]
+        matched = [r for r in fiscal_rows if r["FY"] < latest["FY"] and
+                   str(r["Month"]).split("-")[0] == str(latest["Month"]).split("-")[0]]
+        values = (latest.get("Fiscal Deficit"), latest.get("Capital Expenditure"), latest.get("Revenue Expenditure"))
+        if all(_eh_number(v) for v in values) and values[1] + values[2] > 0:
+            deficit, capex, revenue = values
+            share = capex / (capex + revenue) * 100
+            context = f'FY{latest["FY"]} through {latest["Month"]}'
+            fiscal_metrics = [
+                {"label": "Fiscal deficit YTD", "display": f"{deficit / 100000:.2f} lakh crore INR", "period": context},
+                {"label": "Capex / expenditure YTD", "display": f"{share:.1f}%", "period": context},
+            ]
+            fiscal_state = "Mixed"
+            fiscal_evidence = "Deficit and capex share are available, but improvement requires a comparable prior fiscal year at the same month."
+            if matched:
+                prev = matched[-1]
+                old = (prev.get("Fiscal Deficit"), prev.get("Capital Expenditure"), prev.get("Revenue Expenditure"))
+                if all(_eh_number(v) for v in old) and old[1] + old[2] > 0:
+                    old_share = old[1] / (old[1] + old[2]) * 100
+                    fiscal_state = "Improving" if deficit < old[0] and share > old_share else (
+                        "Deteriorating" if deficit > old[0] and share < old_share else "Mixed")
+                    fiscal_evidence = f'Deficit {old[0] / 100000:.2f} → {deficit / 100000:.2f} lakh crore INR; capex share {old_share:.1f}% → {share:.1f}% vs FY{prev["FY"]} at the same month.'
+    fiscal = _eh_result(fiscal_state, fiscal_evidence, fiscal_metrics)
+    equity_metrics = [_eh_metric(obs.get("equity", []), key, label, "") for key, label in (
+        ("nifty50_close", "NIFTY 50"), ("smallcap_close", "NIFTY Smallcap 250"))]
+    equity_state = _eh_direction(equity_metrics, "Gaining ground", "Losing ground")
+    equity_evidence = "Awaiting comparable closes for two consecutive completed months."
+    if all(m and m["previous"] is not None for m in equity_metrics):
+        equity_evidence = "; ".join(
+            f'{m["label"]} {m["previous"]:,.2f} → {m["value"]:,.2f} '
+            f'({(m["value"] / m["previous"] - 1) * 100:+.1f}%)' for m in equity_metrics[:1])
+        equity_evidence += (f' between {equity_metrics[0]["previous_period"]} and '
+                            f'{equity_metrics[0]["period"]}, the last matched closes of completed months. '
+                            'Price indices exclude dividends.')
+    # Trailing returns, sector leadership and valuations add context; their
+    # different horizons do not vote in the monthly price-direction label.
+    equity_metrics = equity_metrics[:1]
+    rotation = obs.get("sector_rotation", {})
+    benchmark = next((r for r in rotation.get("rows", []) if r.get("index") == "NIFTY 50"
+                      and _eh_number(r.get("return_pct"))), None)
+    if benchmark:
+        equity_metrics.append({"label": "NIFTY 50 (TTM)", "display": f'{benchmark["return_pct"]:+.2f}%',
+                               "period": f'{rotation.get("observation_date", "")} · trailing 12 months'})
+    sectors = [r for r in rotation.get("rows", []) if r.get("index") != "NIFTY 50"
+               and _eh_number(r.get("return_pct"))]
+    if sectors:
+        leader = max(sectors, key=lambda r: r["return_pct"])
+        laggard = min(sectors, key=lambda r: r["return_pct"])
+        period = f'{rotation.get("observation_date", "")} · trailing 12 months'
+        for row, label in ((leader, "Leading sector"), (laggard, "Lagging sector")):
+            equity_metrics.append({"label": f'{label} · {row["label"]}',
+                                   "display": f'{row["return_pct"]:+.2f}%', "period": period})
+        equity_evidence += (f' Over the trailing 12 months, '
+                            f'{leader["label"]} led ({leader["return_pct"]:+.2f}%) and '
+                            f'{laggard["label"]} lagged ({laggard["return_pct"]:+.2f}%) '
+                            f'as of {rotation.get("observation_date", "")}.')
+    valuations = [r for r in obs.get("sector_valuations", []) if r.get("index") != "Nifty 50"
+                  and _eh_number(r.get("percentile")) and _eh_number(r.get("current_multiple"))]
+    if valuations:
+        high = max(valuations, key=lambda r: r["percentile"])
+        low = min(valuations, key=lambda r: r["percentile"])
+        for row, label in ((high, "Highest Valuation"), (low, "Lowest Valuation")):
+            equity_metrics.append({"label": f'{label} · {row["label"]}',
+                                   "display": f'{row["metric"]} {row["current_multiple"]:.2f}×',
+                                   "period": f'{row["percentile"]:.1f} / 100 own-history percentile · {row["observation_date"]}'})
+        equity_evidence += (f' {high["label"]} trades at {high["metric"]} {high["current_multiple"]:.2f}×; '
+                            f'{low["label"]} at {low["metric"]} {low["current_multiple"]:.2f}×. '
+                            'Valuation ranking uses each sector’s own-history percentile.')
+    equity = _eh_result(equity_state, equity_evidence, equity_metrics)
+    consumer_metrics = [_eh_metric(obs.get("consumer", {}).get(geography, []), key,
+                                  f"{geography} {label}", "", "date")
+                        for geography in ("Urban", "Rural")
+                        for key, label in (("csi", "current confidence"), ("fei", "future expectations"))]
+    consumer_state = _eh_direction(consumer_metrics, "Improving", "Weakening")
+    consumer_evidence = "Awaiting aligned urban and rural current and future confidence readings."
+    if all(m and m["previous"] is not None for m in consumer_metrics):
+        consumer_evidence = "; ".join(
+            f'{m["label"]} {m["previous"]:.1f} → {m["value"]:.1f}' for m in consumer_metrics)
+        consumer_evidence += (f' from {consumer_metrics[0]["previous_period"]} to '
+                              f'{consumer_metrics[0]["period"]}. 100 is neutral; these are survey indices.')
+    else:
+        consumer_state = "Awaiting data"
+    consumer = _eh_result(consumer_state, consumer_evidence, consumer_metrics)
+    return [growth, inflation, monetary, external, fiscal, equity, consumer]
+
+
+def _eh_metric_strip(metrics: list[dict]) -> str:
+    return '<div class="eh-metrics">' + ''.join(
+        f'<div class="eh-metric">{_esc(m["label"])}<b>{_esc(m["display"])}</b>'
+        f'<span>{_esc(m["period"])}</span></div>' for m in metrics) + '</div>'
+
+
+def _eh_question_header(index: int, answer: dict) -> str:
+    return (f'<div id="chart-{_anchor("india", _EH_ANCHORS[index])}-question"></div>'
+            f'<section class="eh-question" id="{_anchor("india", _EH_ANCHORS[index])}">'
+            f'<h2>{_esc(_EH_QUESTIONS[index])}</h2><div class="eh-state">{_esc(answer["state"])}</div>'
+            f'<p class="eh-evidence">{_esc(answer["evidence"])}</p>'
+            + _eh_metric_strip(answer["metrics"]) + '</section>')
+
+
+def _eh_state_card(question: str, answer: dict, destination: str) -> str:
+    return (f'<article class="eh-card"><div class="eh-card-title" role="heading" aria-level="3"><a href="{_esc(destination)}" target="_self">'
+            f'{_esc(question)} <span class="eh-arrow" aria-hidden="true">↗</span></a></div>'
+            f'<p class="eh-evidence">{_esc(answer["evidence"])}</p>'
+            f'<div class="eh-state">{_esc(answer["state"])}</div></article>')
+
+
+def _eh_world_answer(snapshot: dict, key: str, up: str, down: str) -> dict:
+    # A fixed three-economy lens, labelled explicitly, rather than a global score.
+    metrics = []
+    for row in snapshot.get("scoreboard", []):
+        if row.get("country") not in ("US", "EA", "CN"):
+            continue
+        cell = row.get("cells", {}).get(key, {})
+        if cell.get("status") != "ok" or not _eh_number(cell.get("value")):
+            continue
+        change = cell.get("change")
+        metrics.append({"label": row["label"], "value": cell["value"],
+                        "change": change,
+                        "display": f'{cell["value"]:.2f}' + ('%' if key == 'cpi_yoy' else ''),
+                        "period": cell.get("period", "")})
+    state = _eh_direction(metrics, up, down) if len(metrics) == 3 else "Awaiting data"
+    growth = key == "mfg_pmi"
+    opening = ({up: "Manufacturing momentum is strengthening across major economies.",
+                down: "Manufacturing momentum is slowing across major economies.",
+                "Mixed": "Global manufacturing remains uneven."} if growth else
+               {up: "Inflation pressures are building across major economies.",
+                down: "Inflation pressures are easing across major economies.",
+                "Mixed": "Inflation trends diverge across major economies."})
+    levels = ", ".join(f'{m["label"]} {m["value"]:.1f}' + ("" if growth else "%") for m in metrics)
+    changes = [m["change"] for m in metrics if _eh_number(m.get("change"))]
+    direction = "improved" if growth else "accelerated"
+    count = sum(c > 0 for c in changes)
+    if state == down:
+        count = sum(c < 0 for c in changes)
+        direction = "weakened" if growth else "decelerated"
+    trend = f", with {count} of {len(changes)} readings having {direction} from the prior month" if changes else ""
+    evidence = opening.get(state, "The global trend is awaiting comparable data.")
+    if levels:
+        evidence += f' {"PMI readings" if growth else "Headline inflation"}: {levels}{trend}.'
+    return _eh_result(state, evidence, metrics)
+
+
+def _eh_front_india(obs: dict) -> tuple[dict, dict]:
+    """Hero commentary only; keep the detailed India answers unchanged."""
+    mfg = _eh_metric(obs["monthly"], "india_mfg_pmi", "Manufacturing PMI", "")
+    svc = _eh_metric(obs["monthly"], "india_svc_pmi", "Services PMI", "")
+    iip = _eh_metric(obs["iip"], "growth_rate", "Industrial production")
+    state = "Awaiting data"
+    if mfg and svc and mfg["period"] == svc["period"]:
+        state = "Expanding" if min(mfg["value"], svc["value"]) > 50 else (
+            "Slowing" if max(mfg["value"], svc["value"]) < 50 else "Mixed")
+        if iip and ((state == "Expanding" and iip["value"] < 0) or
+                    (state == "Slowing" and iip["value"] > 0)):
+            state = "Mixed"
+    opening = {"Expanding": "India’s activity remains firm.", "Slowing": "India’s activity is subdued.",
+               "Mixed": "India’s activity signals are mixed."}
+    evidence = opening.get(state, "India’s activity trend is awaiting aligned data.")
+    points = [f'{m["label"]} was {m["value"]:.1f}' for m in (mfg, svc) if m]
+    if iip:
+        points.append(f'industrial production grew {iip["value"]:.1f}% YoY' if iip["value"] >= 0
+                      else f'industrial production fell {abs(iip["value"]):.1f}% YoY')
+    if points:
+        sentence = ", ".join(points[:-1]) + ", while " + points[-1] if len(points) > 1 else points[0]
+        evidence += " " + sentence[0].upper() + sentence[1:] + "."
+    activity = _eh_result(state, evidence, [mfg, svc, iip])
+
+    prices = [m for key, label in (("india_cpi_yoy", "Headline CPI"),
+              ("india_core_cpi_yoy", "core inflation"), ("india_food_cpi_yoy", "food inflation"))
+              if (m := _eh_metric(obs["monthly"], key, label))]
+    latest = max((m["period"] for m in prices), default="")
+    aligned = [m for m in prices if m["period"] == latest]
+    # Direction requires consecutive monthly observations from the same release.
+    comparable = [m for m in aligned if m["previous_period"] and
+                  (datetime.strptime(str(m["period"])[:7], "%Y-%m").year * 12 + datetime.strptime(str(m["period"])[:7], "%Y-%m").month -
+                   datetime.strptime(str(m["previous_period"])[:7], "%Y-%m").year * 12 - datetime.strptime(str(m["previous_period"])[:7], "%Y-%m").month) == 1]
+    state = _eh_direction(comparable, "Broadening", "Cooling")
+    opening = {"Broadening": "India’s inflation measures rose from the prior month.",
+               "Cooling": "India’s inflation pressures are cooling.",
+               "Mixed": "India’s inflation trends are mixed."}
+    evidence = opening.get(state, "India’s inflation trend is awaiting comparable data.")
+    if aligned:
+        evidence += " " + ", ".join(f'{m["label"]} was {m["value"]:.2f}%' for m in aligned) + "."
+    return activity, _eh_result(state, evidence, aligned)
+
+
+def _eh_front_stance(brief: dict) -> dict:
+    score, previous = brief.get("composite_overall_score"), brief.get("previous_score")
+    if not _eh_number(score):
+        return _eh_result("Awaiting data", "No scored RBI policy meeting is available.", [])
+    state = _stance_dir(score).title()
+    opening = f'RBI communication is {state.lower()}.'
+    tone = f'The Sentinel stands at {score:+.2f}'
+    if _eh_number(previous):
+        verb = "rose to" if score > previous else "fell to" if score < previous else "was unchanged at"
+        tone = f'The Sentinel {verb} {score:+.2f} from {previous:+.2f}' if score != previous else f'The Sentinel was unchanged at {score:+.2f}'
+        cycle = brief.get("previous_cycle")
+        if cycle:
+            tone += " in " + date.fromisoformat(cycle).strftime("%B")
+        else:
+            tone += " at the prior meeting"
+    repo, bps, action = brief.get("repo_rate_pct"), brief.get("rate_change_bps"), brief.get("rate_action")
+    if action in ("hike", "cut"):
+        tone += ", alongside a " + (f'{abs(bps):g} bp ' if _eh_number(bps) else "") + action
+        if _eh_number(repo):
+            tone += f' to {repo:.2f}%'
+    elif action == "hold":
+        tone += ", with repo held" + (f' at {repo:.2f}%' if _eh_number(repo) else " unchanged")
+    stance = (brief.get("facts") or {}).get("stated_stance")
+    if stance:
+        tone += f' and a ‘{stance}’ stance'
+    return _eh_result(state, opening + " " + tone + ".", [])
+
+
+def _eh_front_page(charts: list[Path]) -> None:
+    signals = _load_signals(charts) or {}
+    world_charts, _ = get_charts("macro")
+    try:
+        snapshot = _load_world_snapshot(world_charts) or {}
+    except (OSError, ValueError):
+        snapshot = {}
+    brief = _eh_brief()
+    activity, inflation = _eh_front_india(_eh_india_observations())
+    rows = {r["id"]: r for r in signals.get("rows", [])}
+    # Same direction labels as the existing Sentinel, with no new scoring/LLM call.
+    stance = _eh_front_stance(brief)
+    risk_ids = (("sp500", 1), ("stoxx50", 1), ("us_hy", -1), ("vix", -1))
+    available = [(rows[k], sign) for k, sign in risk_ids if k in rows and _eh_number(rows[k].get("move"))]
+    directions = [r["move"] * sign for r, sign in available]
+    risk_keys = {r["id"] for r, _ in available}
+    risk_state = "Awaiting data" if len(directions) < 3 or not {"us_hy", "vix"} <= risk_keys else (
+        "Risk-on" if all(d > 0 for d in directions) else "Risk-off" if all(d < 0 for d in directions) else "Mixed")
+    risk_evidence = "Awaiting weekly cross-asset observations."
+    if risk_state != "Awaiting data":
+        opening = {"Risk-on": "Markets favour risk across equities, credit and volatility.",
+                   "Risk-off": "Markets are defensive across equities, credit and volatility.",
+                   "Mixed": "Markets show a mixed appetite for risk."}[risk_state]
+        # One equity market plus credit and volatility keeps the evidence concise.
+        evidence_rows = [r for r, _ in available if r["id"] != "stoxx50"]
+        if not any(r["id"] == "sp500" for r in evidence_rows):
+            evidence_rows = [r for r, _ in available]
+        risk_evidence = opening + " " + ", ".join(
+            f'{r["name"]} moved {_sig_amount(r["move"], r["measure"])}' for r in evidence_rows) + "."
+    risk = _eh_result(risk_state, risk_evidence, [])
+    cards = [
+        ("Are global markets risk-on or risk-off?", risk, "#" + _anchor("weekly", "Cross-Asset Signals")),
+        ("Is global growth strengthening or slowing?", _eh_world_answer(snapshot, "mfg_pmi", "Strengthening", "Slowing"), "/world"),
+        ("Are global inflation pressures building or easing?", _eh_world_answer(snapshot, "cpi_yoy", "Building", "Easing"), "/world"),
+        (_EH_QUESTIONS[0], activity, "/india?chart=" + _anchor("india", _EH_ANCHORS[0]) + "-question"),
+        ("Are India’s inflation pressures broadening or cooling?", inflation, "/india?chart=" + _anchor("india", _EH_ANCHORS[1]) + "-question"),
+        ("How hawkish is the RBI?", stance, "/rbi-sentinel"),
+    ]
+    st.markdown(
+        _EH_STYLE + '<section class="eh-front" aria-labelledby="eh-front-title"><div class="nh-head">'
+        '<div class="nh-title" id="eh-front-title" role="heading" aria-level="2">Macro Picture at a glance</div></div>'
+        '<div class="eh-cards">' + ''.join(_eh_state_card(*card) for card in cards) + '</div></section>',
+        unsafe_allow_html=True,
+    )
+
+
 # ── Weekly Markets page ────────────────────────────────────────────────────
+
+def _load_market_matrix(edition: Path) -> dict | None:
+    """Read only the displayed edition; never search a different folder."""
+    try:
+        payload = json.loads((edition / 'market_matrix.json').read_text())
+        if payload['schema_version'] != 2 or payload['as_of'] != edition.name:
+            return None
+        for group in payload['groups']:
+            for row in group['rows']:
+                if (row['latest_date'] > payload['as_of'] or
+                    row['return_method'] not in ('dividend-adjusted investable total return',
+                                                 'official total-return index', 'direct price return') or
+                    not math.isfinite(row['latest_level']) or row['latest_level'] <= 0):
+                    return None
+                for field in ('source', 'source_url', 'instrument_or_index', 'ticker_or_series', 'currency'):
+                    if not row.get(field):
+                        return None
+        return payload
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _market_matrix_html(payload: dict) -> str:
+    """Presentation only: scoped CSS, escaped text, inline SVG; no chart loader."""
+    import math
+    from charts.style import EconStyle
+    positive, negative = (EconStyle.CATEGORICAL_COLORS[i] for i in (0, 7))
+    def cell_style(value):
+        # Same restrained palette as India equities, on the existing column scale.
+        strength = 0 if value is None else min(1, abs(value) / 20)
+        intensity = 1 if strength == 1 else .14 * strength ** 2
+        ink = (62, 107, 134) if value is not None and value > 0 else (139, 64, 87)
+        rgb = tuple(round(255 + (channel - 255) * intensity) for channel in ink)
+        bg = '#{:02x}{:02x}{:02x}'.format(*rgb)
+        return bg, '#ffffff' if intensity == 1 else '#30393d', '600' if intensity == 1 else '400'
+    columns = ('1W', '1M', 'YTD', '1Y', '3Y', '5Y', 'Off high')
+    rows = [r for g in payload['groups'] for r in g['rows']]
+    esc = lambda value: html.escape(str(value), quote=True).replace('$', '&#36;')
+    def pct(value):
+        if value is None or not math.isfinite(value):
+            return '—'
+        rounded = round(value, 1)
+        return ('+' if rounded > 0 else '−' if rounded < 0 else '') + f'{abs(rounded):.1f}%'
+    def value(row, col):
+        return row['off_high'] if col == 'Off high' else row['returns'].get(col)
+    scales = {}
+    for col in columns:
+        magnitudes = sorted(abs(value(r, col)) for r in rows if value(r, col) is not None)
+        scales[col] = max(.5, magnitudes[min(len(magnitudes)-1, int((len(magnitudes)-1)*.8))]) if magnitudes else 1
+    def spark(row):
+        vals = [p['value'] for p in row['sparkline']]
+        if not vals:
+            return '—'
+        low, high = min(vals), max(vals)
+        points = [(3 + i*114/max(1,len(vals)-1), 29-(v-low)*24/(high-low or 1)) for i,v in enumerate(vals)]
+        path = ' '.join(f'{x:.2f},{y:.2f}' for x,y in points)
+        colour = {'uptrend':positive,'downtrend':negative}.get(row['trend_state'], '#91969e')
+        tooltip = esc(f"{row['label']}: {row['trend_state']}; month-end {row['latest_month_end']}; distance from 10-month average {pct(row['distance_from_sma_pct'])}")
+        x,y = points[-1]
+        return f'<svg class="mmatrix-spark" viewBox="0 0 120 34" role="img" aria-label="{tooltip}"><title>{tooltip}</title><polyline points="{path}" fill="none" stroke="#505b64" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="{x:.2f}" cy="{y:.2f}" r="3" fill="{colour}"/></svg>'
+    summary = payload['summary']
+    sentence = f"{summary['uptrend_count']} of {summary['valid_markets']} markets are above their 10-month trend."
+    if summary['best_1y'] and summary['worst_1y']:
+        best,worst = summary['best_1y'],summary['worst_1y']
+        sentence += f" Over one year, {best['label']} led at {pct(best['return_pct'])}, while {worst['label']} was weakest at {pct(worst['return_pct'])}."
+    else:
+        sentence += ' Too few markets have valid one-year history to compare leaders and laggards.'
+    breadth = summary.get('breadth', [])
+    if breadth:
+        sentence += ' ' + ', while '.join(
+            f"{b['uptrend_count']} of {b['valid_markets']} {b['label'].lower()} markets are above trend"
+            for b in breadth) + '.'
+    css = '''<style>
+.mmatrix{color:#28251f;padding:0;margin:24px 0 32px;box-sizing:border-box;width:100%;max-width:100%;min-width:0;font-family:Inter,sans-serif}
+.mmatrix .mmatrix-head{font-family:Newsreader,Georgia,serif;font-size:28px;line-height:1.2;color:#28251f;margin:0 0 16px;font-weight:600}
+.mmatrix .mmatrix-lede{font-family:Inter,sans-serif;font-size:14px;line-height:1.6;margin:0 0 16px;color:#28251f;font-weight:500}
+.mmatrix .mmatrix-method{font-family:Inter,sans-serif;font-size:12px;color:#68645d;line-height:1.6;margin:0 0 16px}
+.mmatrix .mmatrix-scroll{overflow-x:auto;max-width:100%;overscroll-behavior-x:contain;scrollbar-color:#aaa296 #f4f4f1}
+.mmatrix .mmatrix-scroll:focus-visible{outline:2px solid #0a1f3d;outline-offset:2px}
+.mmatrix .mmatrix-table{table-layout:fixed;border:1.5px solid #87918f;border-collapse:separate;border-spacing:0;background:#ffffff;width:100%;min-width:970px;font-size:12px;font-family:Inter,sans-serif;font-variant-numeric:tabular-nums}
+.mmatrix .mmatrix-market-col{width:218px}
+.mmatrix .mmatrix-spark-col{width:120px}
+.mmatrix .mmatrix-table th,.mmatrix .mmatrix-table td{padding:11px 10px;border:0;border-bottom:1px solid #edf0ee;white-space:nowrap;text-align:right;line-height:1.4}
+.mmatrix .mmatrix-table thead th{color:#ffffff;background:#3d4549;font-size:12px;font-weight:600;padding-top:14px;padding-bottom:14px;border-bottom:1px solid #3d4549}
+.mmatrix .mmatrix-table thead .mmatrix-name{color:#ffffff;background:#3d4549;font-size:12px;font-weight:600}
+.mmatrix .mmatrix-table .mmatrix-name{position:sticky;left:0;z-index:1;background:#ffffff;text-align:left;white-space:normal;font-size:13px;font-weight:500;color:#172331}
+.mmatrix .mmatrix-table .mmatrix-group{text-align:left;color:#394247;letter-spacing:.065em;font-size:11px;padding-top:11px;padding-bottom:10px;border-top:1px solid #d4dbd5;border-bottom:1px solid #dce2dc;border-left:3px solid #87948a;font-weight:700;background:#e7eae5}
+.mmatrix .mmatrix-table .mmatrix-group-rest{background:#e7eae5;border-top:1px solid #d4dbd5;border-bottom:1px solid #dce2dc}
+.mmatrix .mmatrix-group-label{position:sticky;left:0;display:block;width:max-content;max-width:200px}
+.mmatrix .mmatrix-spark{width:104px;min-width:104px;height:30px;display:block}
+.mmatrix .mmatrix-table .mmatrix-cell{color:#30393d;min-width:62px;font-weight:400}
+.mmatrix .mmatrix-row>td:nth-child(3),.mmatrix .mmatrix-row>td:nth-child(7),.mmatrix .mmatrix-row>td:nth-child(9){padding-left:13px}
+.mmatrix .mmatrix-row>td:nth-child(9){border-left:1px solid #eef0ed}
+.mmatrix .mmatrix-table thead th:nth-child(3),.mmatrix .mmatrix-table thead th:nth-child(7),.mmatrix .mmatrix-table thead th:nth-child(9){padding-left:13px}
+.mmatrix .mmatrix-details{font-family:Inter,sans-serif;font-size:11px;color:#68645d;margin-top:16px;line-height:1.7}
+.mmatrix .mmatrix-details summary{cursor:pointer;color:#172331;font-weight:500}
+.mmatrix .mmatrix-details a{color:#0a1f3d;text-decoration:underline}
+.mmatrix .mmatrix-details .mmatrix-sources{padding-left:18px;margin:10px 0}
+.mmatrix .mmatrix-note{font-family:Inter,sans-serif;font-size:11px;color:#68645d;line-height:1.6;margin-top:12px}
+@media(max-width:700px){.mmatrix .mmatrix-head{font-size:24px}.mmatrix .mmatrix-market-col{width:170px}.mmatrix .mmatrix-spark-col{width:110px}}
+</style>'''
+    out = [css, '<section class="mmatrix" aria-label="Cross-Asset Market Performance Matrix">',
+           '<h2 class="mmatrix-head">Cross-Asset Market Performance Matrix</h2>',
+           f'<p class="mmatrix-lede">{esc(sentence)}</p>',
+           f'<p class="mmatrix-method">Returns through {esc(_fmt_day(date.fromisoformat(payload["as_of"])))}. Returns use total-return indices or dividend-adjusted investable proxies where available; non-income assets use underlying price returns. 3Y and 5Y are annualised. All returns in USD; no currency conversion.</p>',
+           '<div class="mmatrix-scroll" tabindex="0" role="region" aria-label="Market returns; scroll horizontally for all horizons"><table class="mmatrix-table"><colgroup><col class="mmatrix-market-col"><col class="mmatrix-spark-col"><col span="7"></colgroup><thead><tr><th class="mmatrix-name" scope="col">Market</th><th scope="col">52 weeks</th>']
+    out.extend(f'<th scope="col" title="{esc(c + (" annualised" if c in ("3Y","5Y") else ""))}">{esc(c)}</th>' for c in columns)
+    out.append('</tr></thead><tbody>')
+    for group in payload['groups']:
+        out.append(f'<tr><th class="mmatrix-group" colspan="2" scope="rowgroup"><span class="mmatrix-group-label">{esc(group["label"].upper())}</span></th><td class="mmatrix-group-rest" colspan="7"></td></tr>')
+        for row in group['rows']:
+            metadata = f"{row['label']}; underlying: {row['instrument_or_index']} ({row['ticker_or_series']}); source: {row['source']}; method: {row['return_method']}; {row['methodology_note']}; currency: {row['currency']}; latest observation: {row['latest_date']}"
+            out.append(f'<tr class="mmatrix-row"><th class="mmatrix-name" scope="row" title="{esc(metadata)}" aria-label="{esc(metadata)}">{esc(row["label"])}</th><td>{spark(row)}</td>')
+            for col in columns:
+                v = value(row,col)
+                intensity = min(1,abs(v)/scales[col]) if v is not None else 0
+                # Preserve the matrix's existing per-column relative intensity.
+                colour_value = None if v is None else (20*intensity if v > 0 else -20*intensity) if abs(v)>=.05 else 0
+                bg, foreground, weight = cell_style(colour_value)
+                tip = f"Peak: {row['high_date']}; history since {row['history_start']}" if col=='Off high' else f"As of {row['latest_date']}; anchor {row['anchor_dates'].get(col) or 'unavailable'}" + ('; annualised CAGR' if col in ('3Y','5Y') else '')
+                out.append(f'<td class="mmatrix-cell" style="background:{bg};color:{foreground};font-weight:{weight}" title="{esc(tip)}">{pct(v)}</td>')
+            out.append('</tr>')
+    out.append('</tbody></table></div>')
+    missing = summary['valid_markets']-summary['trend_valid_count']
+    if missing:
+        out.append(f'<p class="mmatrix-note">{missing} markets have insufficient completed-month history for the trend rule.</p>')
+    if payload['left_out']:
+        out.append('<p class="mmatrix-note">Left out: ' + '; '.join(esc(f"{r['label']} ({r['ticker_or_series']}): {r['reason']}") for r in payload['left_out']) + '.</p>')
+    out.append('<details class="mmatrix-details"><summary>How this is measured</summary><p>' + ' '.join(esc(v) for v in payload['methodology'].values()) + '</p><ul class="mmatrix-sources">')
+    for row in rows:
+        url = row['source_url']
+        source_label = esc(row['source'])
+        if url.startswith(('https://', 'http://')):
+            source_label = f'<a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{source_label}</a>'
+        out.append(f'<li>{esc(row["label"])} — {esc(row["instrument_or_index"])}; {source_label}; {esc(row["return_method"])} ({esc(row["currency"])}). {esc(row["methodology_note"])}</li>')
+    out.append('</ul></details></section>')
+    return ''.join(out)
+
 
 def page_weekly() -> None:
     charts, date_label = get_charts("weekly")
@@ -3372,25 +4093,35 @@ def page_weekly() -> None:
         # Sections and their chart order live in config/weekly_settings.py.
         sections, unlisted = group_charts(charts, weekly_cfg.WEEKLY_SECTIONS)
 
+        news = _load_news(charts)
+        headlines = _headlines_html(news) if news else None
+
         st.markdown(
             _page_header_html(
                 "The Week in Markets",
                 "Weekly moves and the trends behind equities, bonds, currencies, commodities "
                 "and crypto across the major markets.",
                 "Last updated", _fmt_day(datetime.strptime(date_label, "%Y-%m-%d").date()),
-                nav=[(title, _anchor("weekly", title)) for title, _ in sections],
+                nav=([("Top Headlines", "nh-title")] if headlines else [])
+                    + [(title, _anchor("weekly", title)) for title, _ in sections],
             ),
             unsafe_allow_html=True,
         )
 
-        # The week in headlines, when this edition has them.
-        news = _load_news(charts)
-        headlines = _headlines_html(news) if news else None
-        if headlines:
-            st.markdown(headlines, unsafe_allow_html=True)
+        _eh_front_page(charts)
 
         if summary:
-            _render_summary(summary)
+            _render_capped(summary, CAP_TABLE + "-weekly-snapshot-card")
+
+        matrix = _load_market_matrix(charts[0].parent)
+        if matrix:
+            st.markdown(_market_matrix_html(matrix), unsafe_allow_html=True)
+        else:
+            st.caption("Market performance matrix unavailable for this Weekly edition.")
+
+        # The week in headlines, when this edition has them.
+        if headlines:
+            st.markdown(headlines, unsafe_allow_html=True)
 
         for title, section_charts in sections:
             _section(title, anchor=_anchor("weekly", title))
@@ -3509,12 +4240,128 @@ def page_world() -> None:
             _render_grid(charts)
 
 
+def _iip_heatmap_html(data: dict) -> str:
+    """Render prepared labels/colours only; economic calculations live in generation."""
+    from html import escape
+    esc = lambda value: escape(str(value), quote=True)
+    heads = ''.join(f'<th scope="col">{esc(m["label"])}</th>' for m in data['months'])
+    rows = []
+    for row in data['rows']:
+        cells = []
+        for cell in row['cells']:
+            if not all(re.fullmatch(r'#[0-9a-fA-F]{6}', cell[k]) for k in ('background', 'foreground')):
+                raise ValueError('Invalid heatmap colour')
+            tooltip = (f'{row["industry"]} · {cell["month"]} · {cell["label"]}% YoY · '
+                       f'{cell["status"]} · Released {cell["release_date"]}')
+            cells.append(f'<td style="background:{cell["background"]};color:{cell["foreground"]}" '
+                         f'title="{esc(tooltip)}">{esc(cell["label"])}</td>')
+        rows.append(f'<tr><th scope="row" title="{esc(row["industry"])}">'
+                    f'<span class="iip-nic">{esc(row["nic_code"])}</span> '
+                    f'{esc(row["display_name"])}</th>{"".join(cells)}</tr>')
+    return ('<style>'
+            '.iip-block{max-width:100%;min-width:0;margin:24px 0 32px;font-family:Inter,sans-serif;}'
+            '.iip-block h3{font-family:Newsreader,Georgia,serif;font-size:28px;line-height:1.2;font-weight:600;color:#28251f;margin:0 0 16px;}'
+            '.iip-block p{font-size:14px;line-height:1.6;color:#28251f;margin:0 0 16px;}'
+            '.iip-scroll{display:block;overflow-x:auto;max-width:100%;overscroll-behavior-x:contain;'
+            '}'
+            '.iip-scroll table{border:1.5px solid #28251f;border-collapse:separate;border-spacing:2px;table-layout:fixed;'
+            'width:max-content;min-width:100%;font-size:12px;font-variant-numeric:tabular-nums;}'
+            '.iip-scroll th,.iip-scroll td{padding:8px 7px;text-align:center;min-width:59px;}'
+            '.iip-scroll thead th{font-weight:700;white-space:nowrap;background:#28251f;color:#ffffff;}'
+            '.iip-scroll tr>th:first-child{position:sticky;left:0;z-index:1;text-align:left;'
+            'width:260px;min-width:260px;max-width:260px;white-space:normal;'
+            'background:#f4f4f1;color:#292d30;font-weight:500;line-height:1.35;}'
+            '.iip-scroll thead tr>th:first-child{background:#28251f;color:#ffffff;font-weight:700;}'
+            '.iip-nic{color:#747a7d;font-size:10px;}'
+            '.iip-method{color:#737a7e;font-size:12px!important;}'
+            '@media(max-width:600px){.iip-block h3{font-size:24px;}'
+            '.iip-scroll tr>th:first-child{width:170px;min-width:170px;max-width:170px;}}'
+            '</style>'
+            '<section class="iip-block" id="chart-india-iip-industry-heatmap">'
+            f'<h3>{esc(data["title"])}</h3><p>{esc(data["description"])}</p>'
+            f'<p><strong>{esc(data["breadth"]["sentence"])}</strong></p>'
+            '<div class="iip-scroll" tabindex="0" role="region" aria-label="Manufacturing industry growth; scroll months horizontally">'
+            '<table aria-label="Manufacturing output growth, percent year on year">'
+            f'<thead><tr><th scope="col">Manufacturing industry · NIC</th>{heads}</tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table></div>'
+            f'<p class="iip-method">Source: <a href="{esc(data["source_url"])}" target="_blank" rel="noopener">'
+            f'MoSPI monthly IIP annexure</a> · Released {esc(data["release_date"])}</p></section>')
+
+
+def _render_iip_industry_heatmap(folder: Path) -> None:
+    path = folder / 'india_iip_industry_heatmap.json'
+    if path.exists():
+        try:
+            data = json.loads(path.read_text())
+            if data['schema_version'] != 1 or len(data['rows']) != 23:
+                raise ValueError('Invalid heatmap schema')
+            st.markdown(_iip_heatmap_html(data), unsafe_allow_html=True)
+        except (ValueError, KeyError, TypeError, OSError):
+            st.warning('IIP industry breadth is unavailable: the current edition artifact failed validation.')
+
+
+def _render_india_equity_matrix(folder: Path) -> None:
+    """Read the displayed edition only; never fetch market data in the app."""
+    from config.india_equity_matrix import ARTIFACT
+    from charts.india_charts.india_equity_matrix import render_html
+    try:
+        payload = json.loads((folder / ARTIFACT).read_text())
+        if payload['requested_as_of'][:7] != folder.name:
+            raise ValueError('India equity matrix belongs to another edition')
+        st.markdown(render_html(payload), unsafe_allow_html=True)
+    except (ValueError, KeyError, TypeError, OSError, OverflowError):
+        st.caption('India equity matrix unavailable for this edition: validated official NSE TRI data is required.')
+
+
+def _render_cpi_items(folder: Path) -> None:
+    from html import escape
+    from data.processors import cpi_items
+    from charts.india_charts.india_cpi_items import NAME
+    path = folder / (NAME + '.json')
+    if not path.exists():
+        st.caption('CPI item price pressures are unavailable: a validated official item snapshot is required.')
+        return
+    try:
+        data = json.loads(path.read_text())
+        rows, manifest = cpi_items.load_current()
+        expected = cpi_items.snapshot(rows)
+        if data['run_id'] != manifest['run_id'] or any(data[k] != v for k, v in expected.items()):
+            raise ValueError('CPI item edition differs from validated snapshot')
+        panels = [folder / f'{NAME}_{side}.png' for side in ('increases', 'declines')]
+        if not all(p.exists() for p in panels):
+            raise ValueError('Missing item panel')
+        st.markdown('<style>.cpi-items-heading{margin:24px 0 8px;font-family:Newsreader,Georgia,serif;'
+                    'font-size:28px;line-height:1.2;font-weight:600;color:#28251f;'
+                    'text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;}'
+                    '.cpi-items-copy{font-family:Inter,sans-serif;font-size:14px;line-height:1.6;'
+                    'color:#28251f;margin:0 0 16px;}'
+                    '.cpi-mobile-note{display:none;}'
+                    '@media(max-width:600px){.cpi-items-heading{font-size:24px;}'
+                    '.cpi-mobile-note{display:block;font-size:12px;color:#737a7e;}'
+                    '.st-key-cpi-item-panels [data-testid=stImage]{overflow-x:auto;display:block;max-width:100%;}'
+                    '.st-key-cpi-item-panels img{min-width:680px;width:680px!important;max-width:none!important;}}'
+                    '</style>'
+                    f'<h3 class="cpi-items-heading" id="chart-india-cpi-items">{escape(data["title"])}</h3>'
+                    f'<p class="cpi-items-copy">{escape(data["subtitle"])}</p>'
+                    f'<p class="cpi-items-copy"><strong>{escape(data["summary"])}</strong></p>',
+                    unsafe_allow_html=True)
+        st.markdown('<p class="cpi-mobile-note">Scroll each panel horizontally to read all labels and values.</p>',
+                    unsafe_allow_html=True)
+        with st.container(key='cpi-item-panels'):
+            for column, panel in zip(st.columns(2, gap='large'), panels):
+                with column:
+                    st.image(str(panel), use_container_width=True)
+        st.caption(data['source_line'])
+    except (ValueError, OSError, KeyError, TypeError):
+        st.warning('CPI item price pressures are unavailable: official snapshot validation failed.')
+
+
 # ── India page ─────────────────────────────────────────────────────────────
 
 def page_india() -> None:
     charts, date_label = get_charts("india")
     # Hide retired charts from existing editions as well as future runs.
-    charts = [c for c in charts if "india_nifty_it_trend" not in c.name]
+    charts = [c for c in charts if "india_nifty_it_trend" not in c.name and "india_cpi_items" not in c.name]
 
     if not charts:
         st.warning(
@@ -3529,14 +4376,10 @@ def page_india() -> None:
                 "from RBI, MoSPI, NSE and CAG data. Charts reflect the latest data committed to the repository.",
                 "Edition",
                 datetime.strptime(date_label, "%Y-%m").strftime("%B %Y"),
-                nav=[(title, _anchor("india", title)) for title in (
-                    "Growth & Activity",
-                    "Inflation & Monetary Conditions",
-                    "Equity Markets",
-                    "Consumer Confidence",
-                    "External Sector",
-                    "Public Finances",
-                )],
+                nav=[(label, _anchor("india", anchor)) for label, anchor in zip(
+                    ("Growth & Activity", "Inflation", "Monetary Conditions", "Equity Markets",
+                     "External Sector", "Public Finances", "Consumer Confidence"),
+                    (_EH_ANCHORS[i] for i in (0, 1, 2, 5, 3, 4, 6)))],
             ),
             unsafe_allow_html=True,
         )
@@ -3554,162 +4397,80 @@ def page_india() -> None:
         changed = _soe_changes_block(soe) if soe else ""
         if summary and changed:
             col_table, col_changed = st.columns([1, 1], gap="large")
-            with col_table, st.container(key=f"{CAP_HERO}-{_chart_slug(summary.name)}"):
+            with col_table, st.container(key=f"{CAP_HERO}-{_chart_slug(summary.name)}-india-snapshot-card"):
                 _chart_anchor(summary)
                 st.image(str(summary), use_container_width=True)
             with col_changed:
                 st.markdown(changed, unsafe_allow_html=True)
         elif summary:
-            _render_summary(summary)
+            _render_capped(summary, CAP_TABLE + "-india-snapshot-card")
         elif changed:
             st.markdown(changed, unsafe_allow_html=True)
 
-        # 1. Growth & Activity
-        activity_kws = [
-            "pmi",
-            "iip",
-            "india_gross_fixed_capital_formation",
-            "india_gva_contributions",
-        ]
-
-        activity = [
-            c for c in charts
-            if any(k in c.name for k in activity_kws)
-        ]
-
-        charts = [
-            c for c in charts
-            if c not in activity
-        ]
-
-        if activity:
-            _section("Growth & Activity", anchor=_anchor("india", "Growth & Activity"))
-
-            # Row 1: high-frequency activity
-            # Row 2: realised growth and structural investment
-            activity = sorted(
-                activity,
-                key=lambda c: (
-                    0 if "pmi" in c.name else
-                    1 if "iip" in c.name else
-                    2 if "india_gross_fixed_capital_formation" in c.name else
-                    3 if "india_gva_contributions" in c.name else
-                    4
-                )
-            )
-
-            _render_grid(activity)
-
-        # 3. Prices & Monetary Conditions
-        prices_monetary_kws = [
-                    "inflation",
-                    "cpi",
-                    "wpi",
-                    "credit_deposit",
-                    "rate_transmission",
-                    "india_household_price_categories",
-                ]
-
-        prices_monetary = [
-                    c for c in charts
-                    if any(k in c.name for k in prices_monetary_kws)
-                ]
-
-        charts = [
-                    c for c in charts
-                    if c not in prices_monetary
-                ]
-
-        if prices_monetary:
-                    _section("Inflation & Monetary Conditions", anchor=_anchor("india", "Inflation & Monetary Conditions"))
-
-                    # Explicit first-row pair, then credit and monetary transmission.
-                    prices_monetary = sorted(
-                        prices_monetary,
-                        key=lambda c: (
-                            0 if "india_inflation_bar" in c.name else
-                            1 if "india_cpi_contributions" in c.name else
-                            2 if "india_inflation_expectations" in c.name else
-                            3 if "india_household_price_categories" in c.name else
-                            4 if "credit_deposit" in c.name else
-                            5 if "rate_transmission" in c.name else
-                            6
-                        )
-                    )
-
-                    _render_grid(prices_monetary)
-
-        # 3. Equity Markets
-        fpi = [
-            c for c in charts
-            if "fpi_monthly" in c.name
-        ]
-        charts = [c for c in charts if c not in fpi]
-
-        risk_appetite = [
-            c for c in charts
-            if "india_risk_appetite" in c.name
-        ]
-        charts = [c for c in charts if c not in risk_appetite]
-
-        sector_valuations = [
-            c for c in charts
-            if "sector_valuations" in c.name
-        ]
-        charts = [c for c in charts if c not in sector_valuations]
-
-        sector_rotation = [
-            c for c in charts
-            if "sector_rotation_12m" in c.name
-        ]
-        charts = [c for c in charts if c not in sector_rotation]
-
-        equity_markets = (
-            fpi
-            + risk_appetite
-            + sector_valuations
-            + sector_rotation
+        answers = _eh_india_answers(_eh_india_observations(), _eh_brief())
+        st.markdown(_EH_STYLE, unsafe_allow_html=True)
+        # Consume each chart exactly once; summary was already rendered above.
+        # Preserve old section anchors and every per-chart anchor/insight renderer.
+        keywords = (
+            ("pmi", "iip", "india_gdp", "gva", "gross_fixed_capital_formation"),
+            ("inflation", "cpi", "wpi", "household_price_categories"),
+            ("money_market_corridor", "system_liquidity", "credit_deposit", "rate_transmission", "money_supply", "liquidity"),
+            ("external_vulnerability", "forex", "reserves", "reer", "trade", "export", "import"),
+            ("fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"),
         )
+        for index, keys in enumerate(keywords):
+            section_charts = [c for c in charts if any(k in c.name for k in keys)]
+            if index == 2:
+                order = ("money_market_corridor", "system_liquidity", "credit_deposit",
+                         "rate_transmission", "money_supply", "liquidity")
+                section_charts.sort(key=lambda c: next((i for i, key in enumerate(order) if key in c.name), len(order)))
+            if index == 3:
+                order = ("external_vulnerability", "forex_reserves", "reer", "trade")
+                section_charts.sort(key=lambda c: next((i for i, key in enumerate(order) if key in c.name), len(order)))
+            charts = [c for c in charts if c not in section_charts]
+            st.markdown(_eh_question_header(index, answers[index]), unsafe_allow_html=True)
+            if index == 0:
+                activity = [c for c in section_charts if chart_key(c.name) in
+                            ('india_pmi', 'india_iip')]
+                activity.sort(key=lambda c: ('india_pmi', 'india_iip').index(chart_key(c.name)))
+                _render_grid(activity)
+                if section_charts:
+                    _render_iip_industry_heatmap(section_charts[0].parent)
+                _render_grid([c for c in section_charts if c not in activity])
+            elif index == 1:
+                section_charts.sort(key=lambda c: (0 if "india_inflation_bar" in c.name else
+                                                   1 if "india_cpi_contributions" in c.name else 2))
+                trends = [c for c in section_charts if chart_key(c.name) in
+                          ('india_inflation_bar', 'india_cpi_contributions')]
+                _render_grid(trends)
+                if section_charts:
+                    _render_cpi_items(section_charts[0].parent)
+                _render_grid([c for c in section_charts if c not in trends])
+            else:
+                _render_grid(section_charts)
 
-        if equity_markets:
-            _section("Equity Markets", anchor=_anchor("india", "Equity Markets"))
-            _render_grid(equity_markets, cols=2)
-
-        # 4. Consumer Sentiment
-        consumer = [c for c in charts if 'india_consumer_confidence' in c.name
-                            or 'india_discretionary_spending_sentiment' in c.name]
+            if index == 2:
+                equity_keys = ("fpi_monthly", "risk_appetite", "sector_valuations", "sector_rotation")
+                equity = [c for c in charts if any(k in c.name for k in equity_keys)]
+                charts = [c for c in charts if c not in equity]
+                if equity:
+                    st.markdown(_eh_question_header(5, answers[5]), unsafe_allow_html=True)
+                    first = [c for c in equity if any(k in c.name for k in ('fpi_monthly', 'risk_appetite'))]
+                    first.sort(key=lambda c: 0 if 'fpi_monthly' in c.name else 1)
+                    last = [c for c in equity if c not in first]
+                    last.sort(key=lambda c: 0 if 'sector_valuations' in c.name else 1)
+                    _render_grid(first)
+                    _render_india_equity_matrix(equity[0].parent)
+                    _render_grid(last)
+        consumer = [c for c in charts if "consumer_confidence" in c.name or "discretionary_spending_sentiment" in c.name]
         charts = [c for c in charts if c not in consumer]
         if consumer:
-                    _section("Consumer Confidence", anchor=_anchor("india", "Consumer Confidence"))
-                    headline = [c for c in consumer if 'urban_rural' in c.name]
-                    discretionary = [c for c in consumer if 'discretionary_spending_sentiment' in c.name]
-                    components = [c for c in consumer if c not in headline + discretionary]
-                    _render_grid(headline + discretionary)
-                    _render_grid(components)
-
-        # 5. External Sector
-        external_kws = ["forex", "reserves", "trade", "export", "import"]
-        external = [
-            c for c in charts
-            if any(k in c.name for k in external_kws)
-        ]
-        charts = [c for c in charts if c not in external]
-
-        if external:
-            _section("External Sector", anchor=_anchor("india", "External Sector"))
-            _render_grid(external)
-
-        # 6. Fiscal Policy & Public Finances
-        fiscal_kws = ["fiscal", "deficit", "capex", "expenditure", "gst", "tax", "revenue", "consolidation"]
-        fiscal = [c for c in charts if any(k in c.name for k in fiscal_kws)]
-        charts = [c for c in charts if c not in fiscal]
-        if fiscal:
-            _section("Fiscal Policy & Public Finances", anchor=_anchor("india", "Public Finances"))
-            _render_grid(fiscal)
-
-        # Catch-all
+            st.markdown(_eh_question_header(6, answers[6]), unsafe_allow_html=True)
+            headline = [c for c in consumer if "urban_rural" in c.name or "discretionary" in c.name]
+            _render_grid(headline)
+            _render_grid([c for c in consumer if c not in headline])
         if charts:
-            _section("Other")
+            _section("Supporting Indicators")
             _render_grid(charts)
 
 

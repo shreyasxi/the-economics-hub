@@ -5,8 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from data import rbi_surveys as rbi
-from charts import india_consumer_surveys as chart
+from data.processors import rbi_surveys as rbi
+from charts.india_charts import india_consumer_surveys as chart
 from config.insights import get_insight
 
 class DiscretionaryTests(unittest.TestCase):

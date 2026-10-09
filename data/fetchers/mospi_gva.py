@@ -18,12 +18,13 @@ import sqlite3
 from urllib.parse import quote, urljoin, urlsplit
 import html
 
+from data.paths import archive_for_db
 from data.fetchers.india_source_archive import read_connection, Archive
 
 import openpyxl
 import requests
 
-from data.india_db_manager import DB_PATH
+from data.processors.india_db_manager import DB_PATH
 
 CATALOGUE_URL = 'https://api.mospi.gov.in/api/esankhyiki/cms/golden-sheet/list'
 DOWNLOAD_ROOT = 'https://api.mospi.gov.in/api/esankhyiki/file/download/'
@@ -262,7 +263,7 @@ def load(db=DB_PATH, check_status=True):
     if check_status:
         import json
         from data.fetchers.india_source_archive import sha256
-        root = Path(db).parent/'gva'
+        root = archive_for_db(db, 'gva')
         if (root/'status.json').exists():
             require(json.loads((root/'status.json').read_text())['status'] == 'accepted',
                     'latest GVA update rejected/pending; review required')
@@ -402,11 +403,11 @@ def fetch(dry_run=False, db=DB_PATH):
             if conn.execute("SELECT 1 FROM sqlite_master WHERE name='india_gva_quarterly'").fetchone():
                 previous = load(db, check_status=False)
     import json
-    current_path = Path(db).parent/'gva'/'current.json'
+    current_path = archive_for_db(db, 'gva')/'current.json'
     if not current_path.exists():
-        current_path = Path(db).parent/'gva'/'bootstrap.json'
+        current_path = archive_for_db(db, 'gva')/'bootstrap.json'
     previous_manifest = json.loads(current_path.read_text()) if current_path.exists() else None
-    archive = None if dry_run else Archive(Path(db).parent / 'gva', previous)
+    archive = None if dry_run else Archive(archive_for_db(db, 'gva'), previous)
     try:
         with requests.Session() as session:
             def retain(response, url, request, role):

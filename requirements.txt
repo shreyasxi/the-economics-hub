@@ -9,6 +9,7 @@ numpy>=1.24.0
 openpyxl>=3.1.0          # required by pandas.read_excel for .xlsx (CAG + DBIE)
 xlrd>=2.0.1              # required by pandas.read_excel for legacy .xls (Shiller CAPE data)
 yfinance>=0.2.36
+curl_cffi>=0.7.0        # official NSE TRI browser-compatible HTTP; also used by modern yfinance
 fredapi>=0.5.1
 dbnomics>=0.4.0
 global_macro_data==2.0.0 # official GMD package; explicit investment snapshot refresh

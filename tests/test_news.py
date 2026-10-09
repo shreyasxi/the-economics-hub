@@ -23,7 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config.news_settings as cfg
-import data.news as news
+import data.processors.news as news
 
 NOW = datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc)
 
