@@ -1,0 +1,157 @@
+{
+ "generated_at": "2026-10-10 04:00 UTC",
+ "reads": {
+  "count": 24,
+  "first": "2026-10-03 05:43 UTC"
+ },
+ "headlines": {
+  "from": "2026-10-03",
+  "to": "2026-10-10",
+  "world": {
+   "items": [
+    {
+     "title": "Oil prices jump on tanker attacks and slowing flows through Strait of Hormuz",
+     "url": "https://www.ft.com/content/ec860f96-5a2b-461a-a897-a957860c3dba?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-08",
+     "theme": "Energy & commodities",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 5
+    },
+    {
+     "title": "India’s central bank hikes rates for the first time since 2023 as inflation risks build",
+     "url": "https://www.cnbc.com/2026/10/07/india-rbi-interest-rates-inflation.html",
+     "publisher": "CNBC",
+     "date": "2026-10-07",
+     "theme": "Central banks",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Top Wall Street analysts are upbeat about the prospects for these 3 stocks",
+     "url": "https://www.cnbc.com/2026/10/04/top-analysts-are-upbeat-about-the-prospects-for-these-3-stocks.html",
+     "publisher": "CNBC",
+     "date": "2026-10-04",
+     "theme": "Markets",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "UK reviewing whether to impose tariffs on Chinese car imports to align with EU",
+     "url": "https://www.theguardian.com/business/2026/oct/05/uk-tariffs-chinese-car-imports-eu-manufacturing",
+     "publisher": "The Guardian",
+     "date": "2026-10-05",
+     "theme": "Trade & tariffs",
+     "also": [
+      "BBC News",
+      "Financial Times"
+     ],
+     "days": 2
+    },
+    {
+     "title": "Ireland offers tax cuts in budget to help with cost of living",
+     "url": "https://www.ft.com/content/094a93af-ad94-4db2-8254-bc415d5161a6?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-06",
+     "theme": "Public finances",
+     "also": [
+      "BBC News",
+      "Bloomberg"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "RBI MPC meeting Oct 2026: Why TCS, HDFC Bank, ICICI Lombard, Coal India shares may gain if 25 bps rate hike is announced",
+     "url": "https://www.livemint.com/market/stock-market-news/rbi-mpc-meeting-october-2026-why-hdfc-bank-icici-lombard-coal-india-tcs-likely-to-gain-if-bank-announces-rate-hike-11791268517566.html",
+     "publisher": "Mint",
+     "date": "2026-10-06",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "GST Council meet: Tax officers' arrest power scrapped; easier e-comm norms for small sellers — Check key highlights",
+     "url": "https://www.livemint.com/economy/gst-council-meet-tax-officers-arrest-power-scrapped-easier-e-comm-norms-for-small-sellers-check-key-highlights-11791460904109.html",
+     "publisher": "Mint",
+     "date": "2026-10-08",
+     "theme": "Public finances",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Global shares slip as oil prices jumps and bond yields remain high",
+     "url": "https://www.business-standard.com/markets/news/global-shares-slip-as-oil-prices-jumps-and-bond-yields-remain-high-126100900062_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-09",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 2
+    },
+    {
+     "title": "India services PMI rises to 55.2 in September amid demand recovery",
+     "url": "https://www.business-standard.com/economy/news/india-services-pmi-rises-to-55-2-in-september-hits-3-month-high-126100600260_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-06",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Rupee slides to a five-month low of 96.7/$, yields rise",
+     "url": "https://www.thehindubusinessline.com/markets/rupee-slides-to-a-five-month-low-of-967-yields-rise/article71556132.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-10-07",
+     "theme": "Markets",
+     "also": [
+      "Mint"
+     ],
+     "days": 4
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
