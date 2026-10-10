@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-10 04:01",
+ "generated_at": "2026-10-10 11:52",
  "week": {
   "from": "2026-10-02",
   "to": "2026-10-09"
@@ -121,20 +121,6 @@
    "last_price": "2026-10-09"
   },
   {
-   "id": "eth",
-   "name": "Ether",
-   "group": "Crypto",
-   "measure": "pct",
-   "fmt": "usd",
-   "level": 2471.912598,
-   "move": -7.3549,
-   "typical": 8.8084,
-   "multiple": -0.835,
-   "since": "2026-06-26",
-   "history_from": "2017-11-17",
-   "last_price": "2026-10-08"
-  },
-  {
    "id": "us_ig",
    "name": "US investment-grade spread",
    "group": "Credit",
@@ -161,6 +147,20 @@
    "since": "2026-09-25",
    "history_from": "2016-10-21",
    "last_price": "2026-10-08"
+  },
+  {
+   "id": "eth",
+   "name": "Ether",
+   "group": "Crypto",
+   "measure": "pct",
+   "fmt": "usd",
+   "level": 2485.538574,
+   "move": -6.8442,
+   "typical": 8.8084,
+   "multiple": -0.777,
+   "since": "2026-06-26",
+   "history_from": "2017-11-17",
+   "last_price": "2026-10-09"
   },
   {
    "id": "usdidr",
@@ -273,20 +273,6 @@
    "since": "2026-07-31",
    "history_from": "2016-10-21",
    "last_price": "2026-10-09"
-  },
-  {
-   "id": "btc",
-   "name": "Bitcoin",
-   "group": "Crypto",
-   "measure": "pct",
-   "fmt": "usd",
-   "level": 81676.335938,
-   "move": -3.3384,
-   "typical": 6.4044,
-   "multiple": -0.521,
-   "since": "2026-06-26",
-   "history_from": "2016-10-21",
-   "last_price": "2026-10-08"
   },
   {
    "id": "us_real10",
@@ -453,6 +439,20 @@
    "typical": 3.9694,
    "multiple": 0.404,
    "since": "2026-10-02",
+   "history_from": "2016-10-21",
+   "last_price": "2026-10-09"
+  },
+  {
+   "id": "btc",
+   "name": "Bitcoin",
+   "group": "Crypto",
+   "measure": "pct",
+   "fmt": "usd",
+   "level": 82546.320312,
+   "move": -2.3088,
+   "typical": 6.4044,
+   "multiple": -0.361,
+   "since": "2026-09-11",
    "history_from": "2016-10-21",
    "last_price": "2026-10-09"
   },
