@@ -152,7 +152,9 @@ class IipTests(unittest.TestCase):
         self.assertLess(workflow.index('run: python -m data.fetchers.mospi_iip'),workflow.index('run: python generate_india.py'))
         self.assertIn('IIP_UPDATE_FAILED',workflow);self.assertIn('manual_iip_fallback',workflow)
         self.assertIn('06_india_inflation_bar 15_india_iip;',workflow)
-        self.assertIn('python -m data.paths --relative CPI_CONTRIBUTIONS_DIR CPI_MAIN_DIR NSE_ROTATION_DIR GVA_DIR IIP_DIR',workflow)
+        source_dirs = next(line for line in workflow.splitlines() if 'SOURCE_DIRS=$(python -m data.paths' in line)
+        for name in ('CPI_CONTRIBUTIONS_DIR', 'CPI_MAIN_DIR', 'NSE_ROTATION_DIR', 'GVA_DIR', 'IIP_DIR'):
+            self.assertIn(name, source_dirs.replace(')', '').split())
 
 
 if __name__=='__main__':unittest.main()
