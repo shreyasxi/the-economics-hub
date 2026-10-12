@@ -85,3 +85,21 @@ def test_stance_votes_alone_are_not_reported_as_rate_votes():
     from rbi_sentinel.cleaners.archive_facts import rate_vote, stated_stance
     assert rate_vote('Six members voted to continue with the neutral stance.', 'hold', 0) is None
     assert stated_stance('Dr. A voted to change the stance to neutral.') is None
+
+
+def test_committed_wal_snapshot_reads_without_runtime_sidecars(tmp_path):
+    """Fresh deployments contain the checkpointed DB, never its WAL/SHM files."""
+    import shutil
+    from data.paths import RBI_SENTINEL_DB
+    path = tmp_path / 'copied snapshot.db'
+    shutil.copy2(RBI_SENTINEL_DB, path)
+    before = path.read_bytes()
+    rows = get_summary_archive(db_path=path)
+    assert len(rows) >= 62
+    assert path.read_bytes() == before
+    assert sorted(p.name for p in tmp_path.iterdir()) == [path.name]
+    from data.processors.portfolio_india_regimes import policy_history
+    with patch('data.processors.portfolio_india_regimes.RBI_SENTINEL_DB', path):
+        assert not policy_history().empty
+    assert path.read_bytes() == before
+    assert sorted(p.name for p in tmp_path.iterdir()) == [path.name]

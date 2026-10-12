@@ -16,7 +16,10 @@ permissions:
 
 jobs:
   yields:
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ github.ref_name }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +52,7 @@ jobs:
           fi
           git commit -m "chore: refresh global government yields"
           for attempt in 1 2 3; do
-            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            git pull --rebase origin "$TARGET_BRANCH" && git push origin "HEAD:$TARGET_BRANCH" && exit 0
             sleep 10
           done
           exit 1

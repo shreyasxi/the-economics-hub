@@ -336,7 +336,9 @@ def get_summary_archive(model_version: str = SCORING_MODEL_VERSION,
                         db_path: Optional[Path] = None) -> list[dict]:
     """Read saved executive summaries without altering the DB or running scoring."""
     path = Path(db_path or DB_PATH).resolve()
-    with sqlite3.connect(path.as_uri() + "?mode=ro", uri=True) as conn:
+    from contextlib import closing
+    from data.fetchers.india_source_archive import read_connection
+    with closing(read_connection(path)) as conn:
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA query_only=ON")
         rows = conn.execute(

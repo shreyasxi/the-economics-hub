@@ -237,7 +237,7 @@ class DailyTests(unittest.TestCase):
         daily = (ROOT/'.github/workflows/rbi_monetary_conditions.yml').read_text()
         saturday = (ROOT/'.github/workflows/india.yml').read_text()
         for text in (daily,saturday):
-            self.assertIn('group: india-dashboard-${{ github.ref }}',text)
+            self.assertIn('group: repository-publication-${{ github.ref }}',text)
             self.assertIn('cancel-in-progress: false',text)
             self.assertIn('queue: max',text)
             self.assertIn('ref: ${{ github.ref_name }}',text)

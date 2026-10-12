@@ -69,4 +69,4 @@ def read_connection(db):
     # A committed WAL-mode DB without its runtime sidecars cannot be opened
     # read-only on older SQLite. There is no WAL to ignore in this case.
     suffix = '' if Path(str(path)+'-wal').exists() else '&immutable=1'
-    return sqlite3.connect(f'file:{path}?mode=ro{suffix}', uri=True)
+    return sqlite3.connect(path.as_uri() + f'?mode=ro{suffix}', uri=True)

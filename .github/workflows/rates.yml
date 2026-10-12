@@ -24,7 +24,10 @@ permissions:
 
 jobs:
   rates:
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ github.ref_name }}
     timeout-minutes: 20
 
     steps:
@@ -61,7 +64,7 @@ jobs:
           git commit -m "chore: central bank rates $(date -u '+%Y-%m-%d %H:%M UTC')"
           # Other workflows push to main too (RBI Sentinel on weekdays): rebase and retry.
           for attempt in 1 2 3; do
-            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            git pull --rebase origin "$TARGET_BRANCH" && git push origin "HEAD:$TARGET_BRANCH" && exit 0
             echo "Push attempt $attempt failed; retrying"
             sleep $((attempt * 10))
           done

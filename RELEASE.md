@@ -12,11 +12,15 @@ Checks needs `PORTFOLIO_SNAPSHOT_URL` and `PORTFOLIO_SNAPSHOT_SHA256`.
 
 ## Before the production merge
 
-Run **Repository Checks** and **Portfolio Deployment Checks** on the release
-branch. Repository Checks exercises all source tests on Python 3.11; the second
-workflow downloads and tests the actual private deployment package, including
-the real-data independent verifiers. Local private data are absent from normal
-CI, so the additional workflow is required to verify the full Lab deployment.
+**Repository Checks** runs automatically when the release branch is pushed.
+It exercises all source tests on Python 3.11. **Portfolio Deployment Checks**
+downloads and tests the actual private deployment package, including the
+real-data independent verifiers. New manually dispatched workflows appear in
+Actions only after their workflow files exist on the default branch, so run
+that new workflow on `main` after the initial merge. Until then, use the offline
+installation verification in the deployment guide. Local private data are
+absent from normal CI, so the additional package check is required to verify
+the full Lab deployment.
 
 You can test chart workflows on the release branch too. Their resulting data
 commits stay on that branch and must be included in the eventual merge. Do not
@@ -59,3 +63,5 @@ partially validated edition. A failed refresh must not be treated as success.
 Finally reboot Streamlit if needed and inspect Weekly, World, India, RBI,
 the archive, Research & About and both Portfolio modes. Confirm the new World
 sections exist in `assets/macro/<edition>/`, not only in ignored local `output/`.
+
+GitHub documents [dispatch availability](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow) and [concurrency queues](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#concurrency).

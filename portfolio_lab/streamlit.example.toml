@@ -1,0 +1,4 @@
+# Copy these top-level entries into Streamlit Cloud Secrets.
+# Replace only the URL for the supplied release package; never commit a real URL/token.
+PORTFOLIO_SNAPSHOT_URL = "https://your-private-storage.example/release.portfolio-snapshot.zip"
+PORTFOLIO_SNAPSHOT_SHA256 = "4ba40dd11775ffbcd706cde25d315697aee435da5086928717ab0eb890a4e58e"

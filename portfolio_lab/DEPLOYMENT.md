@@ -25,7 +25,9 @@ Global, macro and India snapshots, their manifests and validation evidence.
    PORTFOLIO_SNAPSHOT_SHA256 = "paste-the-64-character-sha256-here"
    ```
 
-   Preserve existing application secrets. Never commit the real URL or token.
+   [streamlit.example.toml](streamlit.example.toml) contains the exact checksum
+   for the supplied package. Preserve existing application secrets. Never
+   commit the real URL or token.
 3. Add the same two values as GitHub repository Actions secrets to run
    **Portfolio Deployment Checks**. That workflow checks the actual deployment
    package and both modes; it does not upload data artifacts or commit histories.
@@ -40,7 +42,8 @@ an unavailable-data notice; no fabricated or synthetic results are substituted.
 
 ## Refreshing the package
 
-Use the existing environment from the repository root:
+Use the existing environment from the owner’s source checkout, separate from
+the server’s installed deployment data, at the repository root:
 
 ```sh
 .venv/bin/python -m data.fetchers.portfolio_prices --prepare

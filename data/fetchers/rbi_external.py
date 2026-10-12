@@ -636,7 +636,9 @@ def collect_wss(client, weeks=8):
 
 
 def legacy_reserves(path=INDIA_DB):
-    with sqlite3.connect(f'file:{Path(path).resolve()}?mode=ro', uri=True) as conn:
+    from contextlib import closing
+    from data.fetchers.india_source_archive import read_connection
+    with closing(read_connection(path)) as conn:
         rows = conn.execute('SELECT week_ending, forex_reserves_usd_bn, fetched_at FROM india_weekly WHERE forex_reserves_usd_bn IS NOT NULL ORDER BY week_ending').fetchall()
     return [dict(date=d, total_reserves_usd_mn=v*1000, unit='US$ million', source='RBI DBIE legacy; WSS overlap checked',
                  release_date='', source_url='https://data.rbi.org.in/DBIE/', fetched_at=t or now()) for d,v,t in rows]

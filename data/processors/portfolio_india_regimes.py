@@ -7,7 +7,9 @@ from data.paths import RBI_SENTINEL_DB,CPI_MAIN_STATUS,RBI_MONEY_MARKET_CSV
 
 
 def policy_history():
-    with sqlite3.connect('file:'+str(RBI_SENTINEL_DB)+'?mode=ro',uri=True) as c:
+    from contextlib import closing
+    from data.fetchers.india_source_archive import read_connection
+    with closing(read_connection(RBI_SENTINEL_DB)) as c:
         frame=pd.read_sql_query('SELECT policy_cycle,repo_rate_pct FROM mpc_meetings WHERE policy_cycle IS NOT NULL AND repo_rate_pct IS NOT NULL',c)
     frame['Date']=pd.to_datetime(frame.policy_cycle)
     if (frame.groupby('Date').repo_rate_pct.nunique()>1).any():raise ValueError('Conflicting RBI effective decisions')

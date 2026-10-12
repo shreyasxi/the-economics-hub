@@ -3544,7 +3544,8 @@ def _eh_india_observations() -> dict:
     path = INDIA_DB
     if path.exists():
         try:
-            with closing(sqlite3.connect(f"{path.as_uri()}?mode=ro", uri=True)) as conn:
+            from data.fetchers.india_source_archive import read_connection
+            with closing(read_connection(path)) as conn:
                 conn.row_factory = sqlite3.Row
                 for key, table, period in (("monthly", "india_monthly", "month"),
                                            ("weekly", "india_weekly", "week_ending")):
