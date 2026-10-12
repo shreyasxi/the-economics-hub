@@ -1,0 +1,159 @@
+{
+ "generated_at": "2026-10-12 08:42 UTC",
+ "reads": {
+  "count": 24,
+  "first": "2026-10-05 17:23 UTC"
+ },
+ "headlines": {
+  "from": "2026-10-05",
+  "to": "2026-10-12",
+  "world": {
+   "items": [
+    {
+     "title": "EU negotiators head to China hoping to curb cheap imports of hybrid electric cars",
+     "url": "https://www.theguardian.com/business/2026/oct/07/eu-negotiators-head-to-china-hoping-to-curb-cheap-imports-of-hybrid-electric-cars",
+     "publisher": "The Guardian",
+     "date": "2026-10-07",
+     "theme": "Trade & tariffs",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "India’s central bank hikes rates for the first time since 2023 as inflation risks build",
+     "url": "https://www.cnbc.com/2026/10/07/india-rbi-interest-rates-inflation.html",
+     "publisher": "CNBC",
+     "date": "2026-10-07",
+     "theme": "Central banks",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Oil prices jump on tanker attacks and slowing flows through Strait of Hormuz",
+     "url": "https://www.ft.com/content/ec860f96-5a2b-461a-a897-a957860c3dba?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-08",
+     "theme": "Energy & commodities",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Euro falls to 17-month low against dollar amid French debt fears",
+     "url": "https://www.theguardian.com/business/2026/oct/05/euro-falls-dollar-amid-french-debt-cac-40-spain-eurozone",
+     "publisher": "The Guardian",
+     "date": "2026-10-05",
+     "theme": "Markets",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Ireland offers tax cuts in budget to help with cost of living",
+     "url": "https://www.ft.com/content/094a93af-ad94-4db2-8254-bc415d5161a6?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-06",
+     "theme": "Public finances",
+     "also": [
+      "BBC News",
+      "Bloomberg"
+     ],
+     "days": 3
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Reserve Bank of India takes steps to support rupee, opens dollar window for oil companies",
+     "url": "https://www.livemint.com/economy/reserve-bank-of-india-takes-steps-to-support-rupee-opens-dollar-window-for-oil-companies-11791610568736.html",
+     "publisher": "Mint",
+     "date": "2026-10-10",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "GST Council meeting rescheduled for Thursday, says official order",
+     "url": "https://www.livemint.com/economy/gst-council-meeting-rescheduled-to-thursday-says-official-order-11791217970800.html",
+     "publisher": "Mint",
+     "date": "2026-10-05",
+     "theme": "Public finances",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Global shares slip as oil prices jumps and bond yields remain high",
+     "url": "https://www.business-standard.com/markets/news/global-shares-slip-as-oil-prices-jumps-and-bond-yields-remain-high-126100900062_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-09",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 2
+    },
+    {
+     "title": "IT stocks lead Nifty rebound as benchmark snaps eight-week losing streak",
+     "url": "https://www.business-standard.com/markets/news/it-stocks-lead-nifty-rebound-as-benchmark-snaps-eight-week-losing-streak-126100901255_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-09",
+     "theme": "Markets",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 2
+    },
+    {
+     "title": "India services PMI climbs to 55.2 in September as domestic demand strengthens",
+     "url": "https://www.thehindubusinessline.com/economy/india-services-pmi-climbs-to-552-in-september-as-domestic-demand-strengthens/article71550039.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-10-06",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 1
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
