@@ -14,6 +14,20 @@ and Gold/SPX under Commodities ("gold") and real yields under Fixed Income
 
 SUMMARY_CHART = "summary_table"
 
+# The two currency bar charts share this universe and the displayed quote direction.
+WEEKLY_FX = {
+    "DXY": "DX-Y.NYB",
+    "EUR/USD": "EURUSD=X",
+    "GBP/USD": "GBPUSD=X",
+    "USD/INR": "INR=X",
+    "USD/JPY": "JPY=X",
+    "USD/CNY": "CNY=X",
+    "AUD/USD": "AUDUSD=X",
+    "USD/CAD": "CAD=X",
+    "USD/CHF": "CHF=X",
+    "NZD/USD": "NZDUSD=X",
+}
+
 # Page order. Each section also gets a jump link in the tab header.
 WEEKLY_SECTIONS: list[tuple[str, list[str]]] = [
     ("Equities", [

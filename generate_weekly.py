@@ -797,19 +797,9 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 
     # ── 2. FX ──
 
-    print("   [4/8] FX — 12-Month Trends")
-    trend = TrendLineChart()
-    for ind_id in ["dxy", "eurusd","usdinr", "usdjpy"]:
-        dates, vals = get_trend(ind_id)
-        if dates:
-            ind = INDICATORS[ind_id]
-            # "DXY", as the subtitle has it: the full name would end "(DXY) (+3.7%)".
-            trend.add_series("DXY" if ind_id == "dxy" else ind["name"], dates, vals,
-                             color_key=ind["color_key"])
-    trend.render(title="Key FX Rates — Trailing 12 Months",
-                 subtitle="Indexed to 100 at start  ·  DXY, EUR/USD, USD/INR, USD/JPY",
-                 source="Yahoo Finance", normalize=True, ylabel="Indexed (start = 100)")
-    trend.save(output_dir / "04_fx_trend.png")                                      # <--- Add this
+    print("   [FX] Weekly and trailing-12-month performance bars")
+    from charts.weekly_fx import generate_fx_charts
+    generate_fx_charts(output_dir, fetcher=yf_fetcher)
 
     # ── 3. YIELDS ──
 
@@ -1093,19 +1083,6 @@ def generate_with_live_data(output_dir, mode="dashboard"):
     except Exception as e:
         print(f"   ⚠ Real wage growth failed: {e}")
         
-    # ── 8. FX WEEKLY BAR ──
-    print("   [FX-bar] FX — Weekly Performance Bar Chart")
-    try:
-        fx_ids = ["dxy", "eurusd", "gbpusd", "usdinr", "usdjpy", "usdcny"]
-        names_fx, values_fx, cks_fx = build_bar_data(fx_ids)
-
-        if names_fx:
-            _t, _s = WEEKLY_TITLES["fx_weekly"][mode]
-            fig = render_change_bars(names_fx, values_fx, _t, _s.format(date=date_label), "Yahoo Finance")
-            EconStyle.save_chart(fig, output_dir / "03_fx_weekly.png")
-    except Exception as e:
-        print(f"   ⚠ FX weekly bar failed: {e}")
-
     # NOTE: USD/BRL is an ad-hoc narrative chart. Run: python custom/brazil_fx.py
 
     # ── 11. CREDIT SPREADS ──
@@ -2825,6 +2802,8 @@ def generate_with_live_data(output_dir, mode="dashboard"):
 def main():
     parser = argparse.ArgumentParser(description="Generate Economics Hub Weekly Dashboard")
     parser.add_argument("--preview", action="store_true", help="Generate at lower DPI")
+    parser.add_argument("--fx-only", action="store_true", help="Refresh just the two currency charts")
+    parser.add_argument("--output-dir", type=Path, help="Output folder for --fx-only")
     parser.add_argument(
         "--mode",
         choices=["dashboard", "newsletter"],
@@ -2836,6 +2815,14 @@ def main():
     if args.preview:
         EconStyle.DPI = EconStyle.DPI_PREVIEW
 
+    if args.fx_only:
+        from charts.weekly_fx import generate_fx_charts
+        # Avoid the full generator's cleanup of every PNG in the edition.
+        output_dir = args.output_dir or PROJECT_ROOT / "output" / "fx"
+        generate_fx_charts(output_dir)
+        return
+    if args.output_dir:
+        parser.error("--output-dir requires --fx-only")
     output_dir = get_output_dir()
 
     generate_with_live_data(output_dir, mode=args.mode)

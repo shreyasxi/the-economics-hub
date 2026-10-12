@@ -120,15 +120,15 @@ Youth unemployment is structurally higher than overall unemployment; compare the
     # ── WEEKLY: FOREIGN EXCHANGE ────────────────────────────────────────────
 
     "fx_weekly": """\
-**How to read this chart:** Weekly percentage moves in major currency pairs, anchored by the DXY (US Dollar Index). For cross rates like EUR/USD and GBP/USD, a positive bar means the dollar *weakened*; for USD/INR and USD/CNY, a positive bar means the dollar *strengthened* against the respective EM currency. The DXY move sets the directional context — if it dominates as the largest mover, the week's FX story is a dollar narrative, not a bilateral one.
+**How to read this chart:** Weekly percentage moves from the previous completed Friday to the latest completed Friday in nine currency pairs and DXY (US Dollar Index). For EUR/USD, GBP/USD, AUD/USD and NZD/USD, a positive bar means the dollar *weakened*. For USD/INR, USD/JPY, USD/CNY, USD/CAD and USD/CHF, a positive bar means the dollar *strengthened*. DXY provides the dollar-basket context. Blue and red show the sign of the quoted rate's move, rather than whether it is good or bad.
 
 **Practical takeaway:** Dollar strength weeks (DXY up, EM pairs showing dollar appreciation) tend to coincide with risk-off sentiment, rising US yields, or hawkish Fed rhetoric. Watch the USD/INR bar against the India VIX: when the rupee depreciates alongside rising India VIX, it signals portfolio capital outflows. A divergence where USD/JPY weakens sharply without a corresponding DXY move may indicate a carry trade unwind — historically a precursor to broader EM volatility.
 """,
 
     "fx_trend": """\
-**How to read this chart:** Key FX rates over the trailing 12 months, all indexed to 100 at the start. Because DXY and cross rates move in opposite directions for "dollar strength," compare the *slope* of each line rather than the absolute level. A rising USD/INR line alongside a falling EUR/USD line confirms a broad dollar appreciation cycle.
+**How to read this chart:** Ranked percentage changes over the trailing 12 months for the same nine currency pairs and DXY shown in the weekly chart. Blue bars mean the quoted rate rose; red bars mean it fell. A positive EUR/USD, GBP/USD, AUD/USD or NZD/USD bar means the dollar weakened against that currency. A positive USD/INR, USD/JPY, USD/CNY, USD/CAD or USD/CHF bar means the dollar strengthened. DXY rising indicates a stronger dollar against its basket. Returns compare observed closes around the last completed Friday and the same date one year earlier.
 
-**Practical takeaway:** Sustained DXY appreciation over more than two quarters historically correlates with EM central bank intervention, tighter financial conditions in dollar-indebted economies, and downward pressure on commodity prices (oil, gold priced in USD). For India-watchers, the USD/INR trend over 12 months matters more than any single week's move — a structurally depreciating rupee erodes real import costs, widens the current account deficit, and forces RBI to deploy FX reserves.
+**Practical takeaway:** Compare the weekly and 12-month bars to see whether the week's move extends or reverses the longer-term direction. Read each pair's quote direction before comparing it with DXY. For India, a rising USD/INR bar means rupee depreciation over the period and more rupees needed for dollar-priced imports.
 """,
 
     # ── WEEKLY: GOVERNMENT BOND YIELDS ─────────────────────────────────────
