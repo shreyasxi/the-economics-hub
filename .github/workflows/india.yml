@@ -344,6 +344,12 @@ jobs:
       - name: Keep only the last 4 months in assets/
         run: python .github/scripts/prune_assets.py india
 
+      - name: Refresh India overview cards
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python generate_macro_cards.py --publish --only india
+
       - name: Update README showcase charts
         run: |
           mkdir -p assets/readme_showcase
@@ -356,7 +362,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/india/ assets/readme_showcase/ "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
+          git add -A assets/india/ assets/readme_showcase/ assets/macro_cards.json "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
           # Include canonical monthly histories and the raw evidence their loaders verify.
           SOURCE_PATHS=$(python -m data.paths --relative MOSPI_IIP_CSV MOSPI_PLFS_CSV MOSPI_SOURCES_DIR RBI_WSS_CSV RBI_REER_CSV INDIA_EXTERNAL_CSV)
           while IFS= read -r SOURCE_PATH; do

@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-12T19:49:13.977654+00:00",
+  "editions": {
+    "weekly": "assets/weekly/2026-10-12",
+    "macro": "assets/macro/2026-10",
+    "india": "assets/india/2026-10"
+  },
+  "cards": {
+    "risk": {
+      "state": "Mixed",
+      "evidence": "Through 09 Oct 2026: three-month gains exceeded 1% in 3/9 equity markets; 3/3 credit spreads widened by over 5 bp. VIX\u2019s 20-session median is 15.4 (low versus its past year). One-month signals are weakening. Commodities over three months: Copper +6.9%, Oil (Brent) +37.2%, Gold +1.8%. One-month reversals: Copper / Gold.",
+      "metrics": [
+        {
+          "pillar": "equities",
+          "state": "Mixed"
+        },
+        {
+          "pillar": "credit",
+          "state": "Risk-off"
+        },
+        {
+          "pillar": "volatility",
+          "state": "Risk-on"
+        }
+      ],
+      "context": ""
+    },
+    "global_inflation": {
+      "state": "Mixed",
+      "evidence": "Aug 2026 vs May 2026: headline inflation eased in 23/46 countries and rose in 20. Core rose in 21/38. Major-economy headline rose in India / Japan / UK; cooled in US / China; was little changed in euro area. ",
+      "metrics": [
+        {
+          "country": "USA",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 3.396548,
+          "change": -0.8521260000000002
+        },
+        {
+          "country": "CHN",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 0.8,
+          "change": -0.3999999999999999
+        },
+        {
+          "country": "IND",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 4.96261,
+          "change": 0.24038799999999938
+        },
+        {
+          "country": "JPN",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 1.9,
+          "change": 0.3999999999999999
+        },
+        {
+          "country": "GBR",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 3.3,
+          "change": 0.2999999999999998
+        },
+        {
+          "country": "EA",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 3.2,
+          "change": 0.0
+        }
+      ],
+      "context": ""
+    },
+    "india_activity": {
+      "state": "Expanding",
+      "evidence": "Sep 2026: manufacturing PMI 55.1, services 55.8 (+2.3 and +1.7 points; both gaining momentum). Aug 2026 IIP grew 8.0% YoY, versus 7.4% previously. Aug 2026: 18/23 manufacturing industries expanded, and growth accelerated in 14/23.",
+      "metrics": [],
+      "context": ""
+    },
+    "india_inflation": {
+      "state": "Broadening",
+      "evidence": "Sep 2026 headline CPI 5.54% (+0.71 pp from the prior month). Largest weighted contributions: Food +2.71 pp, Other Consumption +1.32 pp. Prices were above a year earlier in 322/358 items. YoY inflation accelerated in 274/358 matched items and eased in 45. Item counts are unweighted.",
+      "metrics": [],
+      "context": ""
+    }
+  },
+  "methodology": "Three-month market environment; one-month momentum; sustained VIX; commodity context. Two-thirds agreement within breadth pillars; 80% matched inflation coverage; \u00b10.05 pp = little changed. Unweighted counts; no GDP/GVA.",
+  "market_methodology": "Calendar three-month/one-month observed closes, anchors within four days; equity/commodity price changes in percent, spread changes in basis points. VIX: 20-session median versus preceding 252 rolling medians. No interpolation or supply/demand causal attribution.",
+  "market_inputs": {
+    "as_of": "2026-10-09",
+    "rows": {
+      "sp500": {
+        "latest": 7811.5400390625,
+        "observation": "2026-10-09",
+        "quarter": 3.55133460091428,
+        "quarter_anchor": "2026-07-09",
+        "month": 2.2940272448864985,
+        "month_anchor": "2026-09-09"
+      },
+      "stoxx50": {
+        "latest": 6173.3701171875,
+        "observation": "2026-10-09",
+        "quarter": -1.7647221077241704,
+        "quarter_anchor": "2026-07-09",
+        "month": -2.189473602775782,
+        "month_anchor": "2026-09-09"
+      },
+      "ftse100": {
+        "latest": 10552.099609375,
+        "observation": "2026-10-09",
+        "quarter": 0.7600822093578374,
+        "quarter_anchor": "2026-07-09",
+        "month": -1.105894080841785,
+        "month_anchor": "2026-09-09"
+      },
+      "nikkei": {
+        "latest": 69030.921875,
+        "observation": "2026-10-09",
+        "quarter": 1.8999071986814275,
+        "quarter_anchor": "2026-07-09",
+        "month": 5.968643877943114,
+        "month_anchor": "2026-09-09"
+      },
+      "hangseng": {
+        "latest": 24211.349609375,
+        "observation": "2026-10-09",
+        "quarter": 0.7539266215693008,
+        "quarter_anchor": "2026-07-09",
+        "month": -4.208162104602664,
+        "month_anchor": "2026-09-09"
+      },
+      "shanghai": {
+        "latest": 3813.791015625,
+        "observation": "2026-10-09",
+        "quarter": -5.519435747142953,
+        "quarter_anchor": "2026-07-09",
+        "month": -3.4851529217151844,
+        "month_anchor": "2026-09-09"
+      },
+      "nifty50": {
+        "latest": 22520.44921875,
+        "observation": "2026-10-09",
+        "quarter": -6.019127628973098,
+        "quarter_anchor": "2026-07-09",
+        "month": -3.888145365213491,
+        "month_anchor": "2026-09-09"
+      },
+      "korea": {
+        "latest": 177.24000549316406,
+        "observation": "2026-10-09",
+        "quarter": -4.064949665405104,
+        "quarter_anchor": "2026-07-09",
+        "month": -7.097176524147331,
+        "month_anchor": "2026-09-09"
+      },
+      "taiwan": {
+        "latest": 114.30999755859375,
+        "observation": "2026-10-09",
+        "quarter": 8.814844586223924,
+        "quarter_anchor": "2026-07-09",
+        "month": 2.2816708783299333,
+        "month_anchor": "2026-09-09"
+      },
+      "us_ig": {
+        "latest": 0.82,
+        "observation": "2026-10-08",
+        "quarter": 5.999999999999995,
+        "quarter_anchor": "2026-07-09",
+        "month": 0.9999999999999898,
+        "month_anchor": "2026-09-09"
+      },
+      "us_hy": {
+        "latest": 3.15,
+        "observation": "2026-10-08",
+        "quarter": 44.99999999999997,
+        "quarter_anchor": "2026-07-09",
+        "month": 43.99999999999999,
+        "month_anchor": "2026-09-09"
+      },
+      "em_corp": {
+        "latest": 1.58,
+        "observation": "2026-10-08",
+        "quarter": 13.00000000000001,
+        "quarter_anchor": "2026-07-09",
+        "month": 23.0,
+        "month_anchor": "2026-09-09"
+      },
+      "vix": {
+        "latest": 14.84000015258789,
+        "observation": "2026-10-09",
+        "median_20d": 15.424999713897705,
+        "percentile": 14.682539682539684,
+        "month_change_pct": 1.5136559637564773
+      },
+      "copper": {
+        "latest": 6.642499923706055,
+        "observation": "2026-10-09",
+        "quarter": 6.878515858767198,
+        "quarter_anchor": "2026-07-09",
+        "month": -2.366432683434938,
+        "month_anchor": "2026-09-09"
+      },
+      "brent": {
+        "latest": 104.72000122070312,
+        "observation": "2026-10-09",
+        "quarter": 37.247702532418934,
+        "quarter_anchor": "2026-07-09",
+        "month": 3.4680388973236997,
+        "month_anchor": "2026-09-09"
+      },
+      "gold": {
+        "latest": 4216.2998046875,
+        "observation": "2026-10-09",
+        "quarter": 1.8233192513806618,
+        "quarter_anchor": "2026-07-09",
+        "month": -5.478969218371288,
+        "month_anchor": "2026-09-09"
+      }
+    },
+    "missing": {},
+    "methodology": "Calendar three-month/one-month observed closes, anchors within four days; equity/commodity price changes in percent, spread changes in basis points. VIX: 20-session median versus preceding 252 rolling medians. No interpolation or supply/demand causal attribution.",
+    "sources": {
+      "sp500": {
+        "source": "yfinance",
+        "series": "^GSPC"
+      },
+      "stoxx50": {
+        "source": "yfinance",
+        "series": "^STOXX50E"
+      },
+      "ftse100": {
+        "source": "yfinance",
+        "series": "^FTSE"
+      },
+      "nikkei": {
+        "source": "yfinance",
+        "series": "^N225"
+      },
+      "hangseng": {
+        "source": "yfinance",
+        "series": "^HSI"
+      },
+      "shanghai": {
+        "source": "yfinance",
+        "series": "000001.SS"
+      },
+      "nifty50": {
+        "source": "yfinance",
+        "series": "^NSEI"
+      },
+      "korea": {
+        "source": "yfinance",
+        "series": "EWY"
+      },
+      "taiwan": {
+        "source": "yfinance",
+        "series": "EWT"
+      },
+      "us_ig": {
+        "source": "fred",
+        "series": "BAMLC0A0CM"
+      },
+      "us_hy": {
+        "source": "fred",
+        "series": "BAMLH0A0HYM2"
+      },
+      "em_corp": {
+        "source": "fred",
+        "series": "BAMLEMCBPIOAS"
+      },
+      "vix": {
+        "source": "yfinance",
+        "series": "^VIX"
+      },
+      "copper": {
+        "source": "yfinance",
+        "series": "HG=F"
+      },
+      "brent": {
+        "source": "yfinance",
+        "series": "BZ=F"
+      },
+      "gold": {
+        "source": "yfinance",
+        "series": "GC=F"
+      }
+    }
+  },
+  "refresh_errors": {}
+}

@@ -313,6 +313,7 @@ generate_weekly.py          Weekly Markets: 40 charts (every chart in one functi
 generate_market_matrix.py   Weekly same-edition market_matrix.json; explicit return methods and provenance
 generate_news.py            Weekly Markets: "The Week in Headlines" (news.json); --collect feeds the week-long pool
 generate_signals.py         Analysis page "Signal or noise" board: writes signals.json into a weekly edition
+generate_macro_cards.py     Four overview cards: --publish --only markets/world/india; assets/macro_cards.json
 generate_macro.py           World page: 22 charts (including inflation breadth, yields, banking liquidity, CFNAI, NFCI, European stress/sector rotation and supply chains) + world_snapshot.json
 generate_india.py           India page: core charts plus optional validated-source charts (chart_* functions)
 generate_soe.py             India page: RBI's "State of the Economy" briefing (soe.json) + rate-transmission history

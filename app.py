@@ -4006,8 +4006,28 @@ def _eh_front_page(charts: list[Path]) -> None:
         snapshot = _load_world_snapshot(world_charts) or {}
     except (OSError, ValueError):
         snapshot = {}
+    # Precomputed summaries keep source validation out of page rendering.
+    # output/ is the local preview; workflows update the shared published artifact.
+    richer = {}
+    preview = PROJECT_ROOT / 'output/card_preview/macro_cards.json'
+    published = PROJECT_ROOT / 'assets/macro_cards.json'
+    artifact = preview if preview.exists() else published
+    if artifact and artifact.exists():
+        try:
+            payload = json.loads(artifact.read_text())
+            if payload.get('schema_version') == 1:
+                richer = payload.get('cards', {})
+                # Keep the existing growth logic on the same published World
+                # edition used by this local preview, avoiding older output/ data.
+                if artifact == preview and payload.get('editions', {}).get('macro'):
+                    snapshot = json.loads((PROJECT_ROOT / payload['editions']['macro'] / 'world_snapshot.json').read_text())
+        except (OSError, ValueError):
+            pass
     brief = _eh_brief()
-    activity, inflation = _eh_front_india(_eh_india_observations())
+    if 'india_activity' in richer and 'india_inflation' in richer:
+        activity, inflation = richer['india_activity'], richer['india_inflation']
+    else:
+        activity, inflation = _eh_front_india(_eh_india_observations())
     rows = {r["id"]: r for r in signals.get("rows", [])}
     # Same direction labels as the existing Sentinel, with no new scoring/LLM call.
     stance = _eh_front_stance(brief)
@@ -4030,11 +4050,11 @@ def _eh_front_page(charts: list[Path]) -> None:
             f'{r["name"]} moved {_sig_amount(r["move"], r["measure"])}' for r in evidence_rows) + "."
     risk = _eh_result(risk_state, risk_evidence, [])
     cards = [
-        ("Are global markets risk-on or risk-off?", risk, "#" + _anchor("weekly", "Cross-Asset Signals")),
+        ("Are global markets risk-on or risk-off?", richer.get('risk', risk), "#" + _anchor("weekly", "Cross-Asset Signals")),
         ("Is global growth strengthening or slowing?", _eh_world_answer(snapshot, "mfg_pmi", "Strengthening", "Slowing"), "/world"),
-        ("Are global inflation pressures building or easing?", _eh_world_answer(snapshot, "cpi_yoy", "Building", "Easing"), "/world#global-inflation-breadth"),
-        (_EH_QUESTIONS[0], activity, "/india?chart=" + _anchor("india", _EH_ANCHORS[0]) + "-question"),
-        ("Are India’s inflation pressures broadening or cooling?", inflation, "/india?chart=" + _anchor("india", _EH_ANCHORS[1]) + "-question"),
+        ("Are global inflation pressures building or easing?", richer.get('global_inflation', _eh_world_answer(snapshot, "cpi_yoy", "Building", "Easing")), "/world#global-inflation-breadth"),
+        (_EH_QUESTIONS[0], richer.get('india_activity', activity), "/india?chart=" + _anchor("india", _EH_ANCHORS[0]) + "-question"),
+        ("Are India’s inflation pressures broadening or cooling?", richer.get('india_inflation', inflation), "/india?chart=" + _anchor("india", _EH_ANCHORS[1]) + "-question"),
         ("How hawkish is the RBI?", stance, "/rbi-sentinel"),
     ]
     st.markdown(
