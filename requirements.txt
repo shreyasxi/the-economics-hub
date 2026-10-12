@@ -19,6 +19,7 @@ jugaad-data>=0.26.0
 matplotlib>=3.7.0
 
 # Dashboard / App
+altair>=4.2,<6          # native country CPI panels, hover values and responsive dashboard sizing
 streamlit==1.50.0       # pinned: match local; later releases change the DOM the custom CSS targets
 
 # Environment / Config

@@ -79,6 +79,20 @@ MACRO_INDICATORS = {
     },
 
     # ═══════════════════════════════════════════
+    # US ECONOMIC ACTIVITY
+    # ═══════════════════════════════════════════
+    "us_cfnai": {
+        "series": "CFNAI", "name": "Chicago Fed National Activity Index",
+        "frequency": "monthly", "transform": "level", "unit": "index",
+        "group": "activity", "history_years": 8, "max_age": 100,
+    },
+    "us_cfnai_ma3": {
+        "series": "CFNAIMA3", "name": "CFNAI published three-month average",
+        "frequency": "monthly", "transform": "level", "unit": "index",
+        "group": "activity", "history_years": 8, "max_age": 100,
+    },
+
+    # ═══════════════════════════════════════════
     # FED BALANCE SHEET
     # ═══════════════════════════════════════════
     "fed_balance_sheet": {
@@ -86,11 +100,29 @@ MACRO_INDICATORS = {
         "name": "Fed Balance Sheet (Total Assets)",
         "frequency": "weekly",
         "transform": "level",
-        "unit": "$B",
+        "unit": "$M",
         "group": "balance_sheet",
-        "history_years": 6,
+        "history_years": 8,
         "max_age": 21,
     },
+
+    # ═══════════════════════════════════════════
+    # BANK RESERVES AND OVERNIGHT FUNDING (percent rates; USD millions reserves)
+    # Extra year fetched by MacroDataEngine supplies moving-average warm-up.
+    # The chart enforces IORB's 29 July 2021 inception and a rolling five years.
+    # ═══════════════════════════════════════════
+    "us_effr": {"series": "EFFR", "name": "Effective Federal Funds Rate",
+                "frequency": "daily", "transform": "level", "unit": "%",
+                "group": "banking_liquidity", "history_years": 5, "max_age": 10},
+    "us_sofr": {"series": "SOFR", "name": "Secured Overnight Financing Rate",
+                "frequency": "daily", "transform": "level", "unit": "%",
+                "group": "banking_liquidity", "history_years": 5, "max_age": 10},
+    "us_iorb": {"series": "IORB", "name": "Interest on Reserve Balances",
+                "frequency": "daily", "transform": "level", "unit": "%",
+                "group": "banking_liquidity", "history_years": 5, "max_age": 10},
+    "us_reserves": {"series": "WRESBAL", "name": "Bank reserve balances (week average)",
+                    "frequency": "weekly", "transform": "level", "unit": "$M",
+                    "group": "banking_liquidity", "history_years": 5, "max_age": 21},
 
     # ═══════════════════════════════════════════
     # EMERGING MARKETS

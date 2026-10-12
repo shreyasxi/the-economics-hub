@@ -129,7 +129,7 @@ st.markdown(
         font-size: 0.9rem; font-weight: 400; color: #4A5262;
         line-height: 1.5; margin: 0; max-width: 46rem;
     }
-    /* Jump links under a page's standfirst (Weekly Markets) */
+    /* Jump links under each page's standfirst */
     .tab-jump {
         display: flex; flex-wrap: wrap; gap: 0.4rem 0.45rem;
         margin: 0.75rem 0 0 0;
@@ -146,7 +146,7 @@ st.markdown(
         background: #0A1F3D; border-color: #0A1F3D; color: #FFFFFF !important;
     }
     /* Land a jumped-to section below Streamlit's fixed top bar, and glide there */
-    .section-header[id] { scroll-margin-top: 4.5rem; }
+    .section-header[id], .w-eyebrow[id] { scroll-margin-top: 4.5rem; }
     html, [data-testid="stAppViewContainer"], [data-testid="stMain"] { scroll-behavior: smooth; }
     @media (prefers-reduced-motion: reduce) {
         html, [data-testid="stAppViewContainer"], [data-testid="stMain"] { scroll-behavior: auto; }
@@ -256,6 +256,12 @@ st.markdown(
     /* ── Executive summary ──────────────────────────────────────────────
        Heading sits on the page with a rule beneath it rather than in a
        tinted box; the narrative below keeps the locked body typography. */
+    .tab-jump a.rbi-archive-link {
+        background:#0A1F3D; border-color:#0A1F3D; color:#FFFFFF!important;
+        border-radius:999px; padding:.5rem 1.1rem;
+        text-decoration:underline!important; text-underline-offset:3px;
+    }
+    .tab-jump a.rbi-archive-link:hover {background:#16365A;border-color:#16365A;}
     .mpc-exec-head {
         padding: 0 0 0.65rem 0; margin-bottom: 1rem;
         border-bottom: 2px solid #0A1F3D;
@@ -1047,48 +1053,32 @@ st.markdown(
     }
     .about-lede .about-tag { margin-left: 0.15rem; margin-right: 0.15rem; }
 
-    /* "How it is built": bullets on the left, the schedule table on the right.
-       The bullets only run to about half the column, and the rest of the row
-       was white space. */
-    .about-built {
-        display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-        gap: 0 3rem;
-        align-items: start;
+    .research-methods {
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem 2rem; margin: 1.4rem 0;
     }
-    .about-built .about-build { max-width: none; }
-
-    /* What each page is built from, moved here from the sidebar where the
-       column was too narrow to read it. Name and cadence share a line, sources
-       sit under them: this now lives in a half-width column, so the three
-       across that the full page allowed would be cramped. */
-    .about-arch { margin: 0.2rem 0 0 0; }
-    .about-arch-row {
-        display: grid;
-        gap: 0.2rem;
-        padding: 0.55rem 0 0.6rem 0;
-        border-bottom: 1px solid rgba(10, 31, 61, 0.09);
+    .research-method {
+        border-top: 3px solid #0A1F3D;
+        padding: 1.1rem 1.3rem 0.6rem;
+        background: rgba(10, 31, 61, 0.025);
     }
-    .about-arch-row:last-child { border-bottom: none; }
-    .about-arch-top {
-        display: flex; align-items: baseline; justify-content: space-between;
-        gap: 0.8rem;
+    .research-method h3 {
+        font-family: 'Lora', Georgia, serif !important;
+        font-size: 1.35rem !important; color: #0A1F3D !important;
+        margin: 0 0 0.35rem !important; padding: 0 !important;
     }
-    .about-arch-name {
+    .research-method p {
         font-family: 'Inter', -apple-system, sans-serif !important;
-        font-size: 0.92rem !important; font-weight: 700 !important; color: #0A1F3D !important;
+        font-size: 1rem !important; line-height: 1.7 !important;
+        color: #24282F !important; margin: 0 0 1rem !important;
     }
-    .about-arch-when {
-        font-family: 'Inter', -apple-system, sans-serif !important;
-        font-size: 0.6rem !important; font-weight: 700 !important;
-        letter-spacing: 0.08em !important; text-transform: uppercase !important;
-        color: #7A828F !important; white-space: nowrap;
-        border: 1px solid rgba(10, 31, 61, 0.16); border-radius: 3px;
-        padding: 0.1rem 0.34rem;
+    .research-method p strong { display: block; color: #0A1F3D; }
+    .research-method p.research-method-cadence {
+        font-size: 0.85rem !important; color: #596579 !important;
+        margin-bottom: 1.2rem !important;
     }
-    .about-arch-src {
-        font-family: 'Inter', -apple-system, sans-serif !important;
-        font-size: 0.86rem !important; line-height: 1.5 !important; color: #4A5262 !important;
+    @media (max-width: 760px) {
+        .research-methods { grid-template-columns: minmax(0, 1fr); }
     }
     /* Four groups across on a wide screen, so none is left alone on a row of
        its own; it reflows to three, two and one as the column narrows. */
@@ -1145,7 +1135,6 @@ st.markdown(
     /* The schedule table drops under the bullets before the text gets narrow
        enough to break the bullets themselves. */
     @media (max-width: 900px) {
-        .about-built { grid-template-columns: minmax(0, 1fr); gap: 1.6rem 0; }
     }
     @media (max-width: 640px) {
         .about-prose p { font-size: 0.96rem !important; }
@@ -1222,11 +1211,11 @@ st.markdown(
        the four, so a hairline sets it apart. The rule is drawn inside the
        link's own box, level with the capitals: the row scrolls sideways on a
        phone and would clip anything drawn outside it. */
-    .st-key-ehnav [class*="st-key-ehnav-analysis"] {
+    .st-key-ehnav [class*="st-key-ehnav-research"] {
         position: relative;
         padding-left: 1.05rem !important;
     }
-    .st-key-ehnav [class*="st-key-ehnav-analysis"]::before {
+    .st-key-ehnav [class*="st-key-ehnav-research"]::before {
         content: "";
         position: absolute;
         left: 0;
@@ -1700,32 +1689,6 @@ st.markdown(
     .sig-table td:nth-child(2) { color: var(--an-ink); font-weight: 600; }
     .sig-table .num { text-align: right; }
 
-    /* ── What I'm watching: threads ── */
-    /* Default frame for every current and future watching chart; preserves size and gaps. */
-    [class*="st-key-ehwatch-"] [data-testid="stImageContainer"] { position: relative; }
-    [class*="st-key-ehwatch-"] [data-testid="stImageContainer"]::after {
-        content: ""; position: absolute; inset: 0;
-        border: 1.5px solid #292929; pointer-events: none;
-    }
-    [class*="st-key-ehwatch-"] [data-testid="stImageContainer"] img { border-radius: 0; }
-    .wt { margin: 3.6rem 0 0 0; }
-    .wt-head { font-family: 'Inter', -apple-system, sans-serif; margin: 2.3rem 0 1.2rem 0; }
-    .wt-title {
-        font-family: 'Newsreader', Georgia, 'Times New Roman', serif; font-optical-sizing: auto;
-        font-size: 1.7rem; font-weight: 600; line-height: 1.14; letter-spacing: -0.016em;
-        color: var(--an-ink); text-wrap: balance;
-    }
-    .wt-why { font-size: 0.92rem; line-height: 1.68; color: #24282F; margin-top: 0.6rem; max-width: 62rem; }
-    .wt-cap { font-family: 'Inter', -apple-system, sans-serif; margin: 0.35rem 0 0.4rem 0; }
-    .wt-cap-title { font-size: 0.82rem; font-weight: 700; line-height: 1.35; color: var(--an-ink); margin-bottom: 0.25rem; }
-    .wt-cap-meta {
-        display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem 0.55rem;
-        font-size: 0.72rem; line-height: 1.35; color: var(--an-muted);
-    }
-    .wt-cap-src { font-weight: 600; color: var(--an-text); }
-    .wt-cap-note { font-size: 0.84rem; line-height: 1.55; color: var(--an-text); margin-top: 0.35rem; }
-    .wt-head.is-later { margin-top: 3rem; padding-top: 2.2rem; border-top: 1px solid var(--an-rule); }
-
     /* ── From the newsletter: the essay shelf ── */
     .es { margin: 3.8rem 0 0 0; }
     .es-grid {
@@ -1795,7 +1758,6 @@ st.markdown(
         .sig-move { grid-area: move; }
         .sig-since { grid-area: since; text-align: right; align-self: end; font-size: 0.74rem; }
         .sig-bar { grid-area: bar; }
-        .wt-title { font-size: 1.42rem; }
         .es-grid { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
         a.es-card { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); column-gap: 0.9rem; align-items: start; }
         .es-cover { grid-row: 1 / span 3; aspect-ratio: 4 / 3; }
@@ -1936,7 +1898,7 @@ with st.sidebar:
     )
 
     # ── 4. Data Architecture ───────────────────────────────────────────────────
-    # Moved to the About page (config/resources.py::ARCHITECTURE), where the
+    # Moved to the About page (config/resources.py::METHODS), where the
     # column is wide enough to read it. The sidebar keeps the byline and the
     # links only.
 
@@ -2051,13 +2013,155 @@ def _render_rbi_chart(
                 st.markdown(insight)
 
 
-def _render_chart(chart_path: Path) -> None:
+def _render_chart(chart_path: Path, image_source=None) -> None:
     _chart_anchor(chart_path)
     st.image(
-        str(chart_path),
+        str(chart_path if image_source is None else image_source),
         caption=_chart_title(chart_path.name),
         use_container_width=True,
     )
+    insight = get_insight(chart_path)
+    if insight:
+        with st.expander("Chart insights"):
+            st.markdown(insight)
+
+
+def _render_global_inflation(chart_path: Path, snapshot: dict) -> None:
+    """Render monthly country panels directly from this edition's CPI data."""
+    from charts.world_charts.world_inflation_dashboard import (
+        BLUE, SORT_OPTIONS, panel, panel_notes, region_options, select_countries,
+    )
+    import pandas as pd
+
+    audit_path = chart_path.with_suffix(".json")
+    report = json.loads(audit_path.read_text()) if audit_path.exists() else snapshot.get("inflation_breadth")
+    if not report or not report.get("countries"):
+        # Older published editions may have only the export image.
+        _render_chart(chart_path)
+        return
+    _chart_anchor(chart_path)
+    countries, breadth = report["countries"], report["breadth"]
+    st.subheader("Global Inflation Breadth")
+    st.caption(f"Monthly CPI · % year-on-year · {breadth['total_countries']} countries"
+               + (" and the euro area" if any(c["aggregate"] for c in countries) else "")
+               + " · Last three years")
+    region_column, sort_column = st.columns(2)
+    with region_column:
+        region = st.selectbox(
+            "Region", region_options(countries, report["as_of"]),
+            key="global-inflation-region",
+            help="Europe includes the euro area. Euro area shows member countries and the aggregate. "
+                 "Türkiye appears in both Asia and Europe. Only available country panels are shown.",
+        )
+    with sort_column:
+        sort = st.selectbox(
+            "Sort charts", SORT_OPTIONS, key="global-inflation-sort",
+            help="Inflation sorting uses each country's latest headline CPI observation; dates may differ.",
+        )
+    countries = select_countries(countries, region, sort, report["as_of"])
+    st.caption(f"Showing {len(countries)} panels · {region}")
+    month = pd.Period(breadth["month"], freq="M").strftime("%B %Y")
+    st.markdown('<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 24px">'
+                f'<strong>Global · {month}: {breadth["easing"]} easing · {breadth["rising"]} rising · '
+                f'{breadth["little_changed"]} little changed</strong>'
+                '<span style="color:#1F5596;font-weight:600">━ Headline CPI</span>'
+                '<span style="color:#C8620A;font-weight:600">┄ Excluding food &amp; energy</span>'
+                '</div>', unsafe_allow_html=True)
+    with st.container(key="global-inflation-panels"):
+        for start in range(0, len(countries), 5):
+            for column, country in zip(st.columns(5, gap="medium"), countries[start:start + 5]):
+                with column:
+                    headline = country["series"]["headline"]
+                    latest = headline[-1]
+                    values = {r["month"]: r["value"] for r in headline}
+                    previous = str(pd.Period(latest["month"], freq="M") - 3)
+                    delta = (f" · Δ3m {latest['value'] - values[previous]:+.1f} pp"
+                             if previous in values else " · Δ3m unavailable")
+                    st.markdown('<div style="display:flex;align-items:baseline;justify-content:space-between;'
+                                'gap:12px;margin-top:22px;font-size:17px;font-weight:650">'
+                                f'<span>{html.escape(country["label"])}</span>'
+                                f'<span style="color:{BLUE};white-space:nowrap;font-size:22px">'
+                                f'{latest["value"]:.1f}%</span></div>', unsafe_allow_html=True)
+                    st.caption(pd.Period(latest["month"], freq="M").strftime("%b %Y") + delta)
+                    st.altair_chart(panel(country, report["start_month"], report["end_month"]),
+                                    use_container_width=True, theme=None)
+                    notes = panel_notes(country)
+                    if notes:
+                        st.caption(notes)
+    st.caption("Source: OECD national CPI · COICOP 1999 / 2018 · As of " + report["as_of"]
+               + ". National CPI baskets differ. Missing months remain gaps. "
+               "Breadth excludes the euro area; little changed means within ±0.05 pp over three months.")
+    insight = get_insight(chart_path)
+    if insight:
+        with st.expander("Chart insights"):
+            st.markdown(insight)
+
+
+def _render_global_yields(chart_path: Path, snapshot: dict) -> None:
+    """One series per country with national-first data and dated OECD fallback."""
+    from charts.world_charts.global_yields import BLUE, panel, select_countries, history_percentile, ytd_change
+    import pandas as pd
+
+    report = snapshot.get("global_yields")
+    if not report:
+        _render_chart(chart_path)
+        return
+    _chart_anchor(chart_path)
+    st.subheader("Bond Yields")
+    st.caption("20 countries · Nominal local-currency yields · Five-year history where available")
+    left, right = st.columns(2)
+    with left:
+        region = st.selectbox("Region", ["All regions"] + list(dict.fromkeys(c["region"] for c in report["countries"])),
+                              key="global-yields-region")
+    with right:
+        sort = st.selectbox("Sort by", ["Highest yield", "Lowest yield", "Highest versus own history", "Largest YTD rise (bp)", "Alphabetical"],
+                            key="global-yields-sort")
+    countries = select_countries(report, region, sort)
+    st.caption(f"Showing {len(countries)} countries · {region} · Refreshed {report['as_of']}")
+    if sort == "Highest versus own history":
+        st.caption("Ranked by the latest yield’s percentile within available five-year history, using one observation per month. "
+                   "Countries with fewer than 12 months appear last.")
+    if sort == "Largest YTD rise (bp)":
+        st.caption("Yield change in basis points versus the last available observation before 1 January. "
+                   "OECD baselines are December monthly averages, not year-end closes. Missing baselines appear last.")
+    if report.get("issues"):
+        st.caption("Some sources could not refresh; original observation dates are retained. See source details below.")
+    for start in range(0, len(countries), 4):
+        for column, country in zip(st.columns(4, gap="medium"), countries[start:start + 4]):
+            with column:
+                latest = country["latest"]
+                frequency = country["latest_frequency"]
+                ytd_label = ""
+                if sort == "Largest YTD rise (bp)":
+                    change = ytd_change(country, report["as_of"])
+                    change_text = f"{change:+.0f} bp YTD" if change is not None else "YTD baseline unavailable"
+                    ytd_label = f'<span style="font-size:0.78rem;font-weight:500;color:#4B5563">{change_text}</span>'
+                st.markdown('<div style="display:flex;justify-content:space-between;gap:10px;margin-top:22px;font-weight:650">'
+                            f'<span>{html.escape(country["label"])}</span>'
+                            '<span style="display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:2px">'
+                            f'<span style="color:{BLUE}">{latest["value"]:.2f}%</span>{ytd_label}</span></div>', unsafe_allow_html=True)
+                when = pd.Timestamp(latest["date"]).strftime("%d %b %Y" if frequency.startswith("National") else "%b %Y")
+                st.caption(when + (" · Stale" if country["stale"] and country["code"] != "IND" else ""))
+                st.altair_chart(panel(country, report["start_date"], report["as_of"]),
+                                use_container_width=True, theme=None)
+                if sort == "Highest versus own history":
+                    percentile = history_percentile(country)
+                    st.caption(f"{percentile:.0f}th percentile in available history" if percentile is not None else "Insufficient history to rank")
+    st.caption("Latest observation dates differ by country. Panels have individual scales. Saturday refresh · Monday retry.")
+    with st.expander("Sources and observation dates"):
+        st.dataframe([{"Country": c["label"], "Latest observation": c["latest"]["date"][:7]
+                       if c["latest_frequency"] == "OECD monthly average" else c["latest"]["date"],
+                       "Latest source": c["national"].get("source", "National source") if c["latest_frequency"].startswith("National") else "OECD",
+                       "OECD through": c["monthly"][-1]["date"][:7] if c["monthly"] else "Unavailable",
+                       "National definition": c["national"].get("yield_type", "Not enabled"),
+                       "National source": c["national"].get("url", ""),
+                       "National retrieved": c["national"].get("retrieved_at", ""),
+                       "Collection": c["national"].get("collection_mode", "Automated official feed" if c["national"] else "OECD only"),
+                       "Refresh issue": c["national_issue"] or ""} for c in report["countries"]],
+                     hide_index=True, use_container_width=True)
+        st.caption("OECD retrieved: " + str(report.get("monthly_retrieved_at", "Unavailable")))
+        for issue in report.get("issues", []):
+            st.write(issue)
     insight = get_insight(chart_path)
     if insight:
         with st.expander("Chart insights"):
@@ -2993,7 +3097,7 @@ function ehScrollToChart(outer, slug) {
   const doc = outer.document, id = "chart-" + slug;
   const box = () => doc.querySelector('[data-testid="stMain"]');
   const place = () => {
-    const target = doc.getElementById(id);
+    const target = doc.getElementById(id) || doc.getElementById(slug);
     if (!target) return false;
     const main = box();
     if (main) {
@@ -3926,7 +4030,7 @@ def _eh_front_page(charts: list[Path]) -> None:
     cards = [
         ("Are global markets risk-on or risk-off?", risk, "#" + _anchor("weekly", "Cross-Asset Signals")),
         ("Is global growth strengthening or slowing?", _eh_world_answer(snapshot, "mfg_pmi", "Strengthening", "Slowing"), "/world"),
-        ("Are global inflation pressures building or easing?", _eh_world_answer(snapshot, "cpi_yoy", "Building", "Easing"), "/world"),
+        ("Are global inflation pressures building or easing?", _eh_world_answer(snapshot, "cpi_yoy", "Building", "Easing"), "/world#global-inflation-breadth"),
         (_EH_QUESTIONS[0], activity, "/india?chart=" + _anchor("india", _EH_ANCHORS[0]) + "-question"),
         ("Are India’s inflation pressures broadening or cooling?", inflation, "/india?chart=" + _anchor("india", _EH_ANCHORS[1]) + "-question"),
         ("How hawkish is the RBI?", stance, "/rbi-sentinel"),
@@ -4145,6 +4249,32 @@ def page_world() -> None:
             "or trigger the World workflow on GitHub Actions."
         )
     else:
+        # Partition once so jump links follow exactly the sections this edition renders.
+        cycle, charts = _pop_summary(charts, ["rate_cycle"])
+        world_sections = (
+            ("Global Inflation Breadth", ("global_inflation_breadth",)),
+            ("United States", ("inflation", "labour", "balance_sheet", "banking_liquidity", "cfnai", "nfci")),
+            ("Europe", ("euro_area_ciss", "europe_sector_rotation")),
+            ("US Equity Valuations", ("macro_cape", "equity_risk_premium")),
+            ("Global Government Bond Yields", ("global_yields",)),
+            ("Country and Supply Chain Risks", ("country_erp", "regional_erp", "ratings_vs_markets", "supply_chain_pressure")),
+            ("Emerging Markets", ("macro_em_",)),
+            ("Global Growth", ("oecd_cli",)),
+        )
+        section_charts = {}
+        for title, keywords in world_sections:
+            section_charts[title] = [c for c in charts if any(k in c.name for k in keywords)]
+            charts = [c for c in charts if c not in section_charts[title]]
+        nav_labels = {
+            "Global Inflation Breadth": "Inflation",
+            "Country and Supply Chain Risks": "Country Risks",
+            "Global Government Bond Yields": "Bond Yields",
+        }
+        nav = [("Policy rates", _anchor("world", "Global Rate Cycle"))]
+        nav += [(nav_labels.get(title, title), _anchor("world", title))
+                for title, _ in world_sections if section_charts[title]]
+        if charts:
+            nav.append(("Other", _anchor("world", "Other")))
         _as_of = datetime.strptime(snapshot["generated_at"], "%Y-%m-%d %H:%M")
         st.markdown(
             _page_header_html(
@@ -4152,6 +4282,7 @@ def page_world() -> None:
                 "Central banks, growth and inflation, equity valuations and country risk "
                 "across the world&rsquo;s major economies.",
                 "Data as of", _fmt_day(_as_of.date()),
+                nav=nav,
             ),
             unsafe_allow_html=True,
         )
@@ -4163,7 +4294,7 @@ def page_world() -> None:
         world_brief = _load_cycle_brief()
 
         # 1. Central banks
-        st.markdown('<p class="w-eyebrow">Central banks</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="w-eyebrow" id="{_anchor("world", "Central Banks")}">Central banks</p>', unsafe_allow_html=True)
         st.markdown(_central_bank_strip_html(snapshot, world_brief), unsafe_allow_html=True)
         # Rates are refreshed on weekdays (rates.yml) between the Saturday runs.
         if snapshot.get("rates_updated_at", "") > snapshot["generated_at"]:
@@ -4172,23 +4303,42 @@ def page_world() -> None:
                         unsafe_allow_html=True)
 
         # 2. Global rate cycle and calendar
-        cycle, charts = _pop_summary(charts, ["rate_cycle"])
         col_cycle, col_cal = st.columns([3, 2], gap="large")
         with col_cycle:
-            st.markdown('<p class="w-eyebrow">The global rate cycle</p>', unsafe_allow_html=True)
-            if cycle:
-                _chart_anchor(cycle)
-                st.image(str(cycle), use_container_width=True)
-                _cycle_insight = get_insight(cycle.name)
+            st.markdown(f'<p class="w-eyebrow is-ruled" id="{_anchor("world", "Global Rate Cycle")}">The global rate cycle</p>', unsafe_allow_html=True)
+            rate_data = snapshot.get("rate_cycle")
+            if rate_data and rate_data.get("hikes"):
+                from charts.world_charts.world_rate_cycle_dashboard import chart, latest_summary, frames, legend_html
+                _chart_anchor(cycle or Path("10_macro_rate_cycle.png"))
+                weighted = st.toggle("GDP weighted", value=False, key="world-rate-cycle-weighted",
+                                     disabled=not bool(rate_data.get("weighted")))
+                st.caption("GDP (PPP)-weighted monthly rate moves · basis points" if weighted
+                           else "Central banks hiking or cutting each month · unweighted counts")
+                st.markdown(legend_html(weighted), unsafe_allow_html=True)
+                st.altair_chart(chart(rate_data, weighted), use_container_width=True, theme=None)
+                st.markdown("**" + latest_summary(rate_data, weighted) + "**")
+                _, _, partial = frames(rate_data, weighted)
+                source = f"Source: BIS policy rates · BIS data through {rate_data['bis_through']}"
+                if rate_data.get("extended"):
+                    source += " · latest moves supplemented by central bank announcements"
+                if weighted:
+                    w = rate_data["weighted"]
+                    source += f" · World Bank GDP (latest {w['gdp_year']}) · monthly moves capped at {w['cap_bp']} bp"
+                if partial:
+                    source += ". Dashed guide marks the latest month's faded bars; this incomplete month is excluded from the six-month averages."
+                st.caption(source)
+                _cycle_insight = get_insight("10_macro_rate_cycle.png")
                 if _cycle_insight:
                     with st.expander("Chart insights"):
                         st.markdown(_cycle_insight)
+            else:
+                st.info("Monthly rate-cycle data are unavailable for this edition.")
         with col_cal:
-            st.markdown('<p class="w-eyebrow is-ruled">Coming up &middot; next five weeks</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="w-eyebrow is-ruled" id="{_anchor("world", "Coming Up")}">Coming up &middot; next five weeks</p>', unsafe_allow_html=True)
             st.markdown(_calendar_html(snapshot, world_brief), unsafe_allow_html=True)
 
         # 3. Scoreboard
-        _section("Six Economies at a Glance")
+        _section("Six Economies at a Glance", anchor=_anchor("world", "Six Economies at a Glance"))
         st.markdown(_scoreboard_html(snapshot), unsafe_allow_html=True)
         st.markdown(
             '<p class="w-foot">Change beside each figure is vs the previous month (10-year: vs a month earlier). '
@@ -4197,46 +4347,76 @@ def page_world() -> None:
             unsafe_allow_html=True,
         )
 
+        # Global small multiples use the full page width. Remove them before
+        # the US keyword match, which also contains "inflation".
+        global_inflation = section_charts["Global Inflation Breadth"]
+        if global_inflation:
+            st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="chart-anchor" id="global-inflation-breadth"></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="chart-anchor" id="{_anchor("world", "Global Inflation Breadth")}"></div>', unsafe_allow_html=True)
+            for chart_path in global_inflation:
+                _render_global_inflation(chart_path, snapshot)
+
         # 4. United States
-        us_kws = ["inflation", "labour", "balance_sheet"]
-        us_charts = [c for c in charts if any(k in c.name for k in us_kws)]
-        charts = [c for c in charts if c not in us_charts]
+        us_charts = section_charts["United States"]
         if us_charts:
-            _section("United States")
+            _section("United States", anchor=_anchor("world", "United States"))
             _render_grid(us_charts, center_odd=True)
 
+        europe_charts = section_charts["Europe"]
+        if europe_charts:
+            _section("Europe", anchor=_anchor("world", "Europe"))
+            _render_grid(europe_charts)
+
         # 5. US equity valuations
-        valuations = [c for c in charts if any(k in c.name for k in ["macro_cape", "equity_risk_premium"])]
-        charts = [c for c in charts if c not in valuations]
+        valuations = section_charts["US Equity Valuations"]
         if valuations:
-            _section("US Equity Valuations")
+            _section("US Equity Valuations", anchor=_anchor("world", "US Equity Valuations"))
             _render_grid(valuations, center_odd=True)
 
+        yields = section_charts["Global Government Bond Yields"]
+        if yields:
+            st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+            st.markdown(f'<div id="{_anchor("world", "Global Government Bond Yields")}"></div>', unsafe_allow_html=True)
+            for chart_path in yields:
+                _render_global_yields(chart_path, snapshot)
+
         # 5b. Country risk (Damodaran's country and regional equity risk premiums)
-        country_risk = [c for c in charts if any(k in c.name for k in ["country_erp", "regional_erp", "ratings_vs_markets"])]
-        charts = [c for c in charts if c not in country_risk]
+        country_risk = section_charts["Country and Supply Chain Risks"]
         if country_risk:
-            _section("Country Risk")
-            _render_grid(country_risk, center_odd=True)
+            _section("Country and Supply Chain Risks", anchor=_anchor("world", "Country and Supply Chain Risks"))
+            disagreements = [c for c in country_risk if "ratings_vs_markets" in c.name]
+            supply_chain = [c for c in country_risk if "supply_chain_pressure" in c.name]
+            _render_grid([c for c in country_risk if c not in disagreements + supply_chain], center_odd=True)
+            if disagreements and supply_chain:
+                left, right = st.columns(2, gap="large")
+                with left:
+                    for chart_path in disagreements:
+                        _render_chart(chart_path)
+                with right:
+                    for chart_path in supply_chain:
+                        _render_chart(chart_path)
+            else:
+                _render_grid(disagreements, center_odd=True)
+                for chart_path in supply_chain:
+                    _render_chart(chart_path)
 
         # 6. Emerging markets
-        em = [c for c in charts if "macro_em_" in c.name]
-        charts = [c for c in charts if c not in em]
+        em = section_charts["Emerging Markets"]
         if em:
-            _section("Emerging Markets")
+            _section("Emerging Markets", anchor=_anchor("world", "Emerging Markets"))
             _render_grid(em, center_odd=True)
 
         # 7. Global growth: one wide ranked chart of every OECD leading indicator
-        growth = [c for c in charts if "oecd_cli" in c.name]
-        charts = [c for c in charts if c not in growth]
+        growth = section_charts["Global Growth"]
         if growth:
-            _section("Global Growth")
+            _section("Global Growth", anchor=_anchor("world", "Global Growth"))
             for chart_path in growth:
                 _render_wide(chart_path)
 
         # Catch-all
         if charts:
-            _section("Other")
+            _section("Other", anchor=_anchor("world", "Other"))
             _render_grid(charts)
 
 
@@ -4332,7 +4512,7 @@ def _render_cpi_items(folder: Path) -> None:
             raise ValueError('Missing item panel')
         st.markdown('<style>.cpi-items-heading{margin:24px 0 8px;font-family:Newsreader,Georgia,serif;'
                     'font-size:28px;line-height:1.2;font-weight:600;color:#28251f;'
-                    'text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;}'
+                    'text-decoration:none;}'
                     '.cpi-items-copy{font-family:Inter,sans-serif;font-size:14px;line-height:1.6;'
                     'color:#28251f;margin:0 0 16px;}'
                     '.cpi-mobile-note{display:none;}'
@@ -4504,6 +4684,8 @@ def page_rbi() -> None:
             '<p class="rbi-head-dek">Quantitative tracking of India&rsquo;s monetary policy stance '
             'across all three classes of MPC communication: the Resolution, the Minutes '
             'and the Governor&rsquo;s Statement.</p>'
+            '<nav class="tab-jump" aria-label="RBI Sentinel sections">'
+            '<a class="rbi-archive-link" href="/rbi-sentinel-archive" target="_self">Archive <span aria-hidden="true">↗</span></a></nav>'
             '</div>'
             f'{_meeting_meta}'
             '</div>',
@@ -4881,11 +5063,8 @@ I would just like to know where it goes.</p>
             _render_grid(charts)
 
 
-# ── About & Resources page ─────────────────────────────────────────────────
-# Reached from the line under the Substack button, not from the four tabs:
-# the tabs are the charts, this is the note about them. All of its words and
-# both of its lists live in config/resources.py, so adding a source is one
-# line there and this file never changes.
+# ── Research reference sections ────────────────────────────────────────────
+# Copy and source lists live in config/resources.py.
 
 def _about_list_html(items: list[dict]) -> str:
     rows = []
@@ -4917,25 +5096,26 @@ def _about_group_html(groups: list[tuple[str, list[dict]]]) -> str:
     )
 
 
-def _about_arch_html(rows: list[tuple[str, str, str]]) -> str:
-    return (
-        '<div class="about-arch">'
-        + "".join(
-            '<div class="about-arch-row">'
-            f'<div class="about-arch-top"><span class="about-arch-name">{name}</span>'
-            f'<span class="about-arch-when">{when}</span></div>'
-            f'<span class="about-arch-src">{sources}</span>'
-            '</div>'
-            for name, when, sources in rows
+def _research_methods_html(res) -> str:
+    cards = []
+    for method in res.METHODS:
+        cards.append(
+            '<article class="research-method">'
+            f'<h3>{method["name"]}</h3>'
+            f'<p class="research-method-cadence">{method["cadence"]}</p>'
+            + ''.join(f'<p><strong>{label}</strong>{body}</p>' for label, body in method['points'])
+            + '</article>'
         )
-        + '</div>'
+    return (
+        f'<p class="about-lede">{res.METHODS_INTRO}</p>'
+        '<div class="research-methods">' + ''.join(cards) + '</div>'
     )
 
 
-def page_about() -> None:
+def _render_research_reference() -> None:
     res = _fresh_config(_resources)
 
-    st.markdown(_page_header_html("About & Resources"), unsafe_allow_html=True)
+    _section("About Monetaria", anchor="research-about")
 
     st.markdown(
         '<div class="about-prose">'
@@ -4944,23 +5124,10 @@ def page_about() -> None:
         unsafe_allow_html=True,
     )
 
-    # Bullets left, the schedule table right: the bullets run to about half the
-    # column and the rest of the row was empty.
-    _section("How it is built")
-    st.markdown(
-        '<div class="about-built">'
-        '<ul class="about-build">'
-        + "".join(f"<li>{line}</li>" for line in res.BUILD_NOTES)
-        + '</ul>'
-        '<div class="about-arch-col">'
-        '<p class="about-group-title">What runs, and when</p>'
-        + _about_arch_html(res.ARCHITECTURE)
-        + '</div>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    _section("Methods & Sources", anchor="research-methods")
+    st.markdown(_research_methods_html(res), unsafe_allow_html=True)
 
-    _section("Data and where to find it")
+    _section("Research Resources", anchor="research-resources")
     st.markdown(
         '<p class="about-lede">'
         'Marked <span class="about-tag">used here</span> are the sources these charts '
@@ -4973,16 +5140,15 @@ def page_about() -> None:
     st.markdown(_about_group_html(res.SOURCES), unsafe_allow_html=True)
 
 
-# ── Analysis page ──────────────────────────────────────────────────────────
-# Connecting the dots, in three blocks: which of the week's moves were unusual
-# for their own market (signals.json, which generate_signals.py writes into the
-# Weekly edition folder, so the board and the Weekly charts describe the same
-# week); the threads the owner is following, with charts and reading
-# (config/analysis.py); and the essays from the newsletter, read from Substack
-# when the page opens. Every word written by hand lives in config/analysis.py.
+def page_about() -> None:
+    """Preserve old bookmarks and land at the About section of the combined page."""
+    st.session_state['_scroll_to'] = 'research-about'
+    st.switch_page(RESEARCH_PAGE)
 
-# Pages a thread can borrow a chart from, by the folder each keeps its charts in.
-_DASHBOARD_PAGES = ("weekly", "macro", "india")
+
+# ── Analysis page ──────────────────────────────────────────────────────────
+# Signals are read from the Weekly edition; pinned essays use config/analysis.py
+# and the Substack archive. Reference copy lives in config/resources.py.
 
 # What each group is called in a sentence ("Currencies take 5 of the top 8 places").
 _SIG_GROUP_NOUNS = {
@@ -5172,58 +5338,6 @@ def _signals_html(sig: dict) -> str:
     )
 
 
-def _dashboard_chart(name: str) -> Path | None:
-    """One of the site's own charts, from its page's newest edition."""
-    for subdir in _DASHBOARD_PAGES:
-        charts, _ = get_charts(subdir)
-        for chart in charts:
-            if chart_key(chart.name) == name:
-                return chart
-    return None
-
-
-def _thread_head_html(thread: dict, number: int) -> str:
-    return (
-        f'<div class="wt-head{" is-later" if number > 1 else ""}">'
-        f'<div class="wt-title">{_esc(thread["theme"])}</div>'
-        + (f'<div class="wt-why">{_esc(thread["why"])}</div>' if thread.get("why") else "")
-        + '</div>'
-    )
-
-
-def _thread_caption_html(chart: dict) -> str:
-    """Under a thread's chart: where it is from, named in words, and the owner's note on it."""
-    if "dashboard" in chart:
-        title, source = "", "From this dashboard"
-    else:
-        title = f'<div class="wt-cap-title">{_esc(chart.get("title"))}</div>' if chart.get("title") else ""
-        source = chart.get("source")
-    meta = f'<div class="wt-cap-meta"><span class="wt-cap-src">{_esc(source)}</span></div>' if source else ""
-    note = f'<div class="wt-cap-note">{_esc(chart["note"])}</div>' if chart.get("note") else ""
-    return f'<div class="wt-cap">{title}{meta}{note}</div>'
-
-
-def _render_thread(thread: dict, number: int) -> None:
-    """One chart-only thread: its title and why, then its charts two to a row."""
-    with st.container(key=f"ehwatch-{number}"):
-        st.markdown(_thread_head_html(thread, number), unsafe_allow_html=True)
-        shown = []
-        for chart in thread.get("charts", []):
-            if "dashboard" in chart:
-                path = _dashboard_chart(chart["dashboard"])
-            else:
-                path = PROJECT_ROOT / "assets" / chart["image"]
-            if path and path.exists():
-                shown.append((path, _thread_caption_html(chart)))
-        for start in range(0, len(shown), 2):
-            pair = shown[start:start + 2]
-            columns = st.columns(2, gap="large") if len(pair) == 2 else st.columns([1, 2, 1])[1:2]
-            for column, (path, caption) in zip(columns, pair):
-                with column:
-                    st.image(str(path), use_container_width=True)
-                    st.markdown(caption, unsafe_allow_html=True)
-
-
 @st.cache_data(ttl=3 * 60 * 60, show_spinner=False)
 def _substack_posts(base_url: str) -> tuple[list[dict], str | None]:
     """The newsletter's posts, read at most every three hours; a failed read is not kept (see page_analysis)."""
@@ -5282,7 +5396,7 @@ def _analysis_config():
         return None, exc
 
 
-def page_analysis() -> None:
+def page_research() -> None:
     cfg, problem = _analysis_config()
     if cfg is None:
         where = f", line {problem.lineno}" if getattr(problem, "lineno", None) else ""
@@ -5297,9 +5411,11 @@ def page_analysis() -> None:
 
     st.markdown(
         _page_header_html(
-            cfg.TITLE, cfg.DEK,
-            nav=[("Signal or noise", "analysis-signal"), ("What I&rsquo;m watching", "analysis-watching"),
-                 ("Essays", "analysis-essays")],
+            "Research & About", "The week’s market signals, how Monetaria is built, "
+            "and the sources and essays behind the research.",
+            nav=[("Signal or noise", "analysis-signal"),
+                 ("About", "research-about"), ("Methods", "research-methods"),
+                 ("Resources", "research-resources"), ("Essays", "analysis-essays")],
         ),
         unsafe_allow_html=True,
     )
@@ -5315,19 +5431,18 @@ def page_analysis() -> None:
             unsafe_allow_html=True,
         )
 
-    if cfg.WATCHING:
-        st.markdown(
-            '<section class="an-block wt" id="analysis-watching"><div class="an-head"><div class="an-head-l">'
-            '<span class="an-title">What I&rsquo;m watching</span></div></div></section>',
-            unsafe_allow_html=True,
-        )
-        for number, thread in enumerate(cfg.WATCHING, 1):
-            _render_thread(thread, number)
+    _render_research_reference()
 
     posts, problem = _substack_posts(cfg.SUBSTACK_URL)
     if problem:
         _substack_posts.clear()      # a failed read is tried again on the next visit, not kept for hours
     st.markdown(_essays_html(posts, cfg), unsafe_allow_html=True)
+
+
+def page_analysis() -> None:
+    """Preserve the old Analysis address and land at the signals section."""
+    st.session_state['_scroll_to'] = 'analysis-signal'
+    st.switch_page(RESEARCH_PAGE)
 
 
 # ── Site footer ────────────────────────────────────────────────────────────
@@ -5385,19 +5500,26 @@ def _footer_html() -> str:
 # top of the app it would sit above the masthead. These links keep the tabs'
 # place under the masthead and are styled to match.
 
+from portfolio_lab.page import render as page_portfolio_lab
+
+PORTFOLIO_PAGE = st.Page(page_portfolio_lab, title="Portfolio Lab", url_path="portfolio-lab")
+RESEARCH_PAGE = st.Page(page_research, title="Research & About", url_path="research")
+
 PAGES = [
     st.Page(page_weekly, title="Weekly Markets", url_path="weekly", default=True),
     st.Page(page_world, title="World", url_path="world"),
     st.Page(page_india, title="India", url_path="india"),
     st.Page(page_rbi, title="RBI Sentinel", url_path="rbi-sentinel"),
-    # Last, and set apart in the row by a hairline (.st-key-ehnav-analysis):
-    # it reads across the four pages of charts rather than adding a fifth.
-    st.Page(page_analysis, title="Analysis", url_path="analysis"),
+    PORTFOLIO_PAGE,
+    RESEARCH_PAGE,
 ]
 # Registered so it has a URL of its own to link and share, but kept out of the
-# tab row below: the tabs are the four pages of charts.
+# main tab row below.
 ABOUT_PAGE = st.Page(page_about, title="About & Resources", url_path="about")
-current = st.navigation(PAGES + [ABOUT_PAGE], position="hidden")
+ANALYSIS_PAGE = st.Page(page_analysis, title="Analysis", url_path="analysis")
+from rbi_sentinel.archive import render as page_rbi_archive
+RBI_ARCHIVE_PAGE = st.Page(page_rbi_archive, title="RBI Sentiment Archive", url_path="rbi-sentinel-archive")
+current = st.navigation(PAGES + [ABOUT_PAGE, ANALYSIS_PAGE, RBI_ARCHIVE_PAGE], position="hidden")
 if current.url_path:                      # the default page keeps the plain title
     st.set_page_config(page_title=f"{current.title} · The Economics Hub")
 
@@ -5420,22 +5542,19 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-with st.container(key="ehabout"):
-    st.page_link(ABOUT_PAGE, label="About this site & resources")
-
 st.markdown('<div class="insti-rule"></div>', unsafe_allow_html=True)
 
 nav = st.container(key="ehnav", horizontal=True, gap="medium")
 for page in PAGES:
     with nav.container(key=f"ehnav-{page.url_path or 'weekly'}"
-                           f"{'-current' if page.url_path == current.url_path else ''}"):
+                           f"{'-current' if page.url_path == current.url_path or (page.url_path == 'rbi-sentinel' and current.url_path == RBI_ARCHIVE_PAGE.url_path) else ''}"):
         st.page_link(page, label=page.title)
 
 # One box for all four pages: type what you want to see, land on the chart.
 # The suggestions appear as the reader types and lie over the page, so nothing
 # below moves until a chart is chosen. About has no charts to search, so the
 # box would only be something to ignore there.
-if current.url_path != ABOUT_PAGE.url_path:
+if current.url_path not in (ABOUT_PAGE.url_path, RBI_ARCHIVE_PAGE.url_path, "rbi-sentinel", "portfolio-lab"):
     with st.container(key="ehsearch"):
         components.html(_search_box_html(), height=_SEARCH_BOX_HEIGHT)
 

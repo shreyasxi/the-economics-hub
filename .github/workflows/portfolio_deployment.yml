@@ -1,0 +1,45 @@
+name: Portfolio Deployment Checks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-checks-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .
+      MPLBACKEND: Agg
+      PORTFOLIO_SNAPSHOT_URL: ${{ secrets.PORTFOLIO_SNAPSHOT_URL }}
+      PORTFOLIO_SNAPSHOT_SHA256: ${{ secrets.PORTFOLIO_SNAPSHOT_SHA256 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Verify private snapshot configuration
+        run: |
+          test -n "$PORTFOLIO_SNAPSHOT_URL" || { echo 'Configure PORTFOLIO_SNAPSHOT_URL in repository secrets.'; exit 1; }
+          test -n "$PORTFOLIO_SNAPSHOT_SHA256" || { echo 'Configure PORTFOLIO_SNAPSHOT_SHA256 in repository secrets.'; exit 1; }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+      - name: Install and validate private deployment data
+        run: python -m portfolio_lab.deployment --download --validate
+      - name: Verify both investor modes and snapshot integrity
+        run: python -m pytest tests/test_portfolio*.py -q
+      - name: Independently verify real portfolio calculations
+        run: |
+          python -m portfolio_lab.verify_real
+          python -m portfolio_lab.verify_expansion
+          python -m portfolio_lab.verify_research
+          python -m portfolio_lab.verify_india

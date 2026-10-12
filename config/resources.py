@@ -1,9 +1,9 @@
 """
-About page and site footer: the words and the lists, kept apart from the layout.
+Research & About page and site footer: the words and the lists, kept apart from the layout.
 
-Everything on /about is edited here. Adding a source is one line in SOURCES;
-changing how a page is built is one line in ARCHITECTURE. Nothing else has to
-change.
+Reference copy on /research is edited here. METHODS describes the published
+pages; SOURCES holds the research directory. Keep methods in step with the
+processors, source contracts and workflow schedules.
 
 INTRO is the owner's own writing, deliberately informal and personal. Do not
 smooth it into house style, and do not rewrite it without being asked.
@@ -49,44 +49,33 @@ INTRO = [
     "looking for ways to make the project better (&amp; useful!!).",
 ]
 
-# ── How it is built. ───────────────────────────────────────────────────────
-# Longer than a caption, shorter than documentation: enough that a reader can
-# judge how much to trust a chart without opening the repository.
-BUILD_NOTES = [
-    "Nothing here is drawn by hand each week. Most of it is automated "
-    "(although getting to this stage took a great deal of effort, and enough "
-    "care is taken to avoid errors \U0001F610). Each page is a Python job that "
-    "fetches its own data, draws its charts and publishes them; the site "
-    "itself only displays what the latest run produced.",
-
-    "The jobs run on a schedule rather than on demand, so a chart is as fresh "
-    "as the line under it says it is. Every chart carries its source and the "
-    "date it was drawn.",
-
-    "Revisions are respected. Series that get restated — Indian fiscal "
-    "accounts, payrolls, the national accounts — are re-read in full on each "
-    "run rather than appended to, so an old chart never disagrees with a new "
-    "one.",
-
-    "Indian data is the hard part. Several series exist only as monthly PDFs "
-    "or as a portal that resists scraping, so those are parsed on a best "
-    "effort basis and checked against the published document before they go up.",
-
-    "The code is open: the pipelines, the chart styles and these lists are all "
-    "in one repository, and the charts are drawn with Matplotlib on a house "
-    "style rather than with a charting service.",
-]
-
-# ── What each page is built from, and when it refreshes. ───────────────────
-# Moved here from the sidebar. The schedules are the crons in
-# .github/workflows; the sources are the fetchers each generator calls. Keep
-# both in step with those files when either moves.
-ARCHITECTURE = [
-    ("Weekly Markets", "Saturdays", "Yahoo Finance · NSE · FRED · Coin Metrics"),
-    ("World",          "Saturdays", "FRED · OECD · BIS · Damodaran · Shiller"),
-    ("India",          "Saturdays", "RBI Bulletin & DBIE · MoSPI · CGA · NSDL"),
-    ("RBI Sentinel",   "Weekdays",  "RBI policy documents, scored by Claude"),
-    ("Headlines",      "4-hourly",  "Nine publishers’ news feeds"),
+# ── Methods for the published pages (Portfolio Lab is intentionally omitted). ──
+METHODS_INTRO = (
+    "Each page combines published data with calculations made for Monetaria. "
+    "The notes below explain the inputs, the transformations and the timing; "
+    "individual charts and their insights provide the more specific definitions."
+)
+METHODS = [
+    dict(name="Weekly Markets", cadence="Saturday edition", points=[
+        ("Sources", "Yahoo Finance supplies market prices and investable proxies; NSE supplies Indian index observations, FRED rates and credit series, and Coin Metrics selected Bitcoin history and network measures."),
+        ("Method", "Charts use the returns, ratios, rolling averages, correlations and breadth measures stated in their captions. The performance matrix uses dividend-adjusted fund returns where available and direct Bitcoin price returns; a fund proxy is not the underlying spot market. Weekly commentary combines stored market signals and macro observations using defined rules."),
+        ("Timing &amp; interpretation", "The main edition is scheduled for Saturday at 11:30 IST. News feeds are collected every four hours and ranked into weekly themes; headlines retain the publisher’s wording and link to the original article. Price-return charts and total-return comparisons should be read according to their own labels."),
+    ]),
+    dict(name="World", cadence="Weekly + selected refreshes", points=[
+        ("Sources", "FRED, OECD, BIS and official central-bank feeds provide macro and policy series. Valuation panels use Shiller and Damodaran; specialist indicators draw on the Chicago Fed, New York Fed and ECB. Historical investment comparisons use the Global Macro Database."),
+        ("Method", "Growth, inflation, valuation and financial-condition panels retain the frequency and definition of their source. Global inflation uses published OECD monthly year-on-year rates, with classification transitions recorded. Government yields combine official national observations with OECD monthly backfill; historical percentile ranks use one observation per month."),
+        ("Timing &amp; interpretation", "The main edition is scheduled for Saturday at 15:30 IST, with weekday policy-rate checks and a Monday yield refresh. A refresh does not create a new economic observation: national publication lags, mixed yield frequencies and source joins still matter. Yield percentiles describe each country’s own history, not credit quality."),
+    ]),
+    dict(name="India", cadence="Weekly + daily monetary data", points=[
+        ("Sources", "RBI Bulletin, DBIE and official releases cover monetary, banking and external data; MoSPI supplies prices, activity and labour statistics; CGA fiscal accounts; NSDL foreign portfolio flows; NSE equity indices and valuations. RBI survey releases supply household expectations and confidence."),
+        ("Method", "Collectors validate the series concept, units, base year and reporting period before a chart uses it. Published growth rates are preferred where required; incompatible statistical bases and survey definitions are not spliced. CPI item price changes are distinct from weighted inflation contributions. Fiscal totals are interpreted in their financial-year context."),
+        ("Timing &amp; interpretation", "The main edition is scheduled for Saturday at 13:30 IST; monetary conditions have a separate daily refresh at 20:40 IST. Some inputs still require a separate collector or a verified manual update, including CPI item and external-sector stores. Their observation dates can therefore lag the edition date. Failed source checks can leave the affected panel unavailable."),
+    ]),
+    dict(name="RBI Sentinel &amp; Sentiment Archive", cadence="Policy documents as released", points=[
+        ("Sources", "The RBI’s MPC Resolution, Governor’s Statement and Minutes are grouped by the policy decision date. Repo decisions, stated stance and voting information are extracted from the saved policy text; document links let readers check the original release."),
+        ("Method", "The tone scale runs from −1 (dovish) to +1 (hawkish). Each document combines a 10% RBI-specific lexicon score with 90% language-model analysis. The meeting score weights Minutes 50%, Resolution 35% and Governor’s Statement 15%, renormalising over documents available at the time. Tone is separate from the stated policy stance and rate decision."),
+        ("Timing &amp; interpretation", "Decision-day checks and a weekday evening check look for newly released documents. When Minutes arrive, the stored meeting score and summary can change. The archive reads that saved analysis and does not preserve every prior revision. Historical meetings were analysed retrospectively, so the history is not a record of forecasts made at the time."),
+    ]),
 ]
 
 # ── Data, grouped. ─────────────────────────────────────────────────────────
@@ -108,6 +97,12 @@ SOURCES: list[tuple[str, list[dict]]] = [
         dict(name="BIS statistics", url="https://data.bis.org/",
              note="Policy rates, cross-border credit and the dollar funding picture, free and well documented.",
              used=True),
+        dict(name="Chicago Fed NFCI", url="https://www.chicagofed.org/research/data/nfci/current-data",
+             note="Weekly US financial conditions and the published contributions behind the index.",
+             used=True),
+        dict(name="New York Fed GSCPI", url="https://www.newyorkfed.org/research/policy/gscpi",
+             note="Monthly global supply-chain pressure, from the official historical workbook.",
+             used=True),
         dict(name="IMF Data", url="https://data.imf.org/",
              note="Balance of payments, reserves and the WEO vintages, for anything comparative.",
              used=False),
@@ -118,8 +113,8 @@ SOURCES: list[tuple[str, list[dict]]] = [
              note="European data at source, with an API that behaves.",
              used=True),
         dict(name="ECB Data Portal", url="https://data.ecb.europa.eu/",
-             note="Euro-area rates, balance sheet and bank lending surveys.",
-             used=False),
+             note="Euro-area rates, balance sheet and systemic stress; supplies the CISS series used here.",
+             used=True),
     ]),
     ("Markets, valuation & prices", [
         dict(name="Yahoo Finance", url="https://finance.yahoo.com/",
@@ -230,10 +225,11 @@ FOOTER_COLUMNS = [
         ("World", "/world"),
         ("India", "/india"),
         ("RBI Sentinel", "/rbi-sentinel"),
-        ("Analysis", "/analysis"),
+        ("Portfolio Lab", "/portfolio-lab"),
+        ("Research & About", "/research"),
     ]),
     ("The project", [
-        ("About & resources", "/about"),
+        ("Methods & sources", "/research#research-methods"),
         ("System architecture", "https://shreyasxi.github.io/economics-hub/"),
         ("Newsletter archive", "https://economicshub.substack.com/archive"),
         ("Source code", "https://github.com/shreyasxi/the-economics-hub"),

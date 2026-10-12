@@ -1,0 +1,55 @@
+name: Global Yields Monday Retry
+
+on:
+  schedule:
+    # Saturday collection runs within World Generator; Monday retries late releases.
+    - cron: '17 12 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: repository-publication-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
+
+permissions:
+  contents: write
+
+jobs:
+  yields:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+      - name: Verify World source and chart contracts
+        env:
+          PYTHONPATH: .
+          MPLBACKEND: Agg
+        run: python -m pytest tests/test_global_yields.py -q
+
+      - name: Refresh global yields in the published edition
+        env:
+          PYTHONPATH: .
+        run: python -m data.fetchers.global_yields --published
+      - name: Commit and push yield data and charts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/macro/ data/stores/world/global_yields.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "chore: refresh global government yields"
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep 10
+          done
+          exit 1

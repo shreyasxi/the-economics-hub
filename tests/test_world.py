@@ -34,6 +34,19 @@ def _monthly(values: dict) -> pd.Series:
     return pd.Series({pd.Timestamp(k + "-01"): v for k, v in values.items()})
 
 
+def test_japan_cpi_is_automatic_and_source_failures_are_reported():
+    today = date(2026, 10, 9)
+    problems = []
+    cell = ws._cell("JP", "cpi_yoy", _monthly({"2026-07": 1.8, "2026-08": 1.9}),
+                    today, kind="month", compare="month", problems=problems)
+    assert cell["period"] == "2026-08" and cell["change"] == .1
+    assert cell["status"] == "ok" and not cell["manual"] and not problems
+    for series, status in [(None, "unavailable"), (_monthly({"2026-01": 1.9}), "stale")]:
+        problems = []
+        cell = ws._cell("JP", "cpi_yoy", series, today, kind="month", problems=problems)
+        assert cell["status"] == status and not cell["manual"] and problems
+
+
 # ── YoY across a missing month ──────────────────────────────────────────────
 
 def test_yoy_matches_calendar_month_across_a_gap():

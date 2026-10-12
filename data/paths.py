@@ -12,6 +12,8 @@ STORES_DIR = DATA_DIR / "stores"
 INDIA_STORE_DIR = STORES_DIR / "india"
 WORLD_STORE_DIR = STORES_DIR / "world"
 SENTINEL_STORE_DIR = STORES_DIR / "rbi_sentinel"
+PORTFOLIO_STORE_DIR = STORES_DIR / "portfolio_lab"
+PORTFOLIO_INDIA_STORE_DIR = PORTFOLIO_STORE_DIR / "india"
 INPUTS_DIR = DATA_DIR / "inputs"
 
 # Owner-facing inputs: keep these two at the top level even after reorganization.

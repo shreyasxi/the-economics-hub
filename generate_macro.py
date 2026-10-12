@@ -12,6 +12,7 @@ Writes:
   10_macro_rate_cycle       the global rate cycle: central banks' moves each month (BIS),
                             in basis points weighted by GDP
   11_macro_oecd_cli         OECD composite leading indicators, one panel per economy
+  12_macro_global_inflation_breadth  monthly headline/core CPI small multiples across countries
   14_macro_em_borrowing     EM corporate dollar bond yields vs the 10-year Treasury
   15_macro_em_dollar        the dollar against EM currencies and the rupee
   16_macro_cape             Shiller CAPE and excess CAPE yield since 1881
@@ -19,6 +20,7 @@ Writes:
   18_macro_country_erp      G20 equity risk premiums: mature-market premium + country risk premium
   19_macro_regional_erp     GDP-weighted equity risk premium by region, now vs a year earlier
   20_macro_ratings_vs_markets  G20 country risk premium from ratings vs from CDS
+  21_macro_supply_chain_pressure  New York Fed monthly global supply chain pressure index
 
 Any automatic source that fails or has stopped updating makes the run exit
 non-zero after writing what it could, so the workflow publishes nothing.
@@ -64,6 +66,12 @@ from data.processors.world_snapshot import (apply_rate_update, build_rate_update
                                  rates_fingerprint, yoy_by_date)
 from data.processors.world_manual_entry import load_rows as load_world_manual_rows
 from data.processors.valuations import fetch_country_risk, fetch_damodaran_erp, fetch_shiller
+from data.fetchers.world_inflation import generate as generate_world_inflation
+from data.fetchers.global_yields import generate as generate_global_yields
+from data.fetchers.supply_chain import generate as generate_supply_chain
+from data.fetchers.nfci import generate as generate_nfci
+from data.fetchers.ciss import generate as generate_ciss
+from data.fetchers.europe_sectors import generate as generate_europe_sectors
 from rbi_sentinel.config import DB_PATH as RBI_SENTINEL_DB
 
 import dbnomics
@@ -125,12 +133,12 @@ MACRO_TITLES: dict[str, dict[str, tuple[str, str]]] = {
     "fed_balance_sheet": {
         "dashboard": (
             "Federal Reserve Balance Sheet",
-            "Total assets held by the Fed (WALCL)  ·  QE expansion and QT drawdown",
+            "Weekly total assets (WALCL)  ·  USD trillions",
         ),
         "newsletter": (
             # ── EDIT for each Substack issue ──────────────────────────────
             "Federal Reserve Balance Sheet",
-            "Total assets held by the Fed (WALCL)  ·  QE expansion and QT drawdown",
+            "Weekly total assets (WALCL)  ·  USD trillions",
         ),
     },
     "rate_cycle": {
@@ -1010,6 +1018,21 @@ def chart_hormuz_exposure(output_dir, mode="dashboard"):
 # MAIN PIPELINE
 # ═══════════════════════════════════════════════
 
+def chart_cfnai(engine, output_dir, mode="dashboard"):
+    from charts.world_charts.cfnai import draw, prepare
+    frame = prepare(engine.fetch_raw("us_cfnai"), engine.fetch_raw("us_cfnai_ma3"))
+    draw(frame, output_dir / "22_macro_cfnai.png", smoother=monotone_curve)
+    print("   ✓ US Economic Activity (CFNAI)")
+
+
+def chart_banking_liquidity(engine, output_dir, mode="dashboard"):
+    from charts.world_charts.banking_liquidity import draw, prepare
+    from data.fetchers.fedwire import fetch_monthly
+    data = prepare(*(engine.fetch_raw(key) for key in
+                     ('us_effr', 'us_sofr', 'us_iorb', 'us_reserves')), fedwire=fetch_monthly())
+    draw(data, output_dir / "07b_macro_banking_liquidity.png")
+
+
 def chart_fed_balance_sheet(engine, output_dir, mode="dashboard"):
     """Federal Reserve total assets (WALCL) with QE/QT era shading."""
     EconStyle.apply_global_style()
@@ -1028,29 +1051,35 @@ def chart_fed_balance_sheet(engine, output_dir, mode="dashboard"):
 
     # Era shading
     qe_start  = pd.to_datetime("2020-03-01")
-    qt_start  = pd.to_datetime("2022-06-01")
-    ax.axvspan(qe_start, qt_start, alpha=0.06, color="#003366", zorder=0)
-    ax.axvspan(qt_start, dates[-1], alpha=0.06, color="#B91C1C", zorder=0)
+    qe_end = pd.to_datetime("2022-03-01")  # Net purchases ended in early March.
+    qt_start = pd.to_datetime("2022-06-01")
+    qt_end = pd.to_datetime("2025-12-01")  # FOMC ended securities runoff.
+    ax.axvspan(max(qe_start, bs.index[0]), min(qe_end, bs.index[-1]),
+               alpha=0.06, color="#003366", zorder=0)
+    ax.axvspan(max(qt_start, bs.index[0]), min(qt_end, bs.index[-1]),
+               alpha=0.06, color="#B91C1C", zorder=0)
     ax.text(pd.to_datetime("2021-01-01"), 0.03, "QE Era",
             color="#003366", fontsize=9, alpha=0.7, transform=ax.get_xaxis_transform())
-    ax.text(pd.to_datetime("2022-09-01"), 0.03, "QT Era",
+    ax.text(pd.to_datetime("2023-01-01"), 0.03, "QT · Jun 2022–Nov 2025",
             color="#B91C1C", fontsize=9, alpha=0.7, transform=ax.get_xaxis_transform())
 
     ax.plot(dates, vals, color="#003366", linewidth=2.5, solid_capstyle="round", zorder=3)
-    ax.fill_between(dates, vals, min(vals), alpha=0.06, color="#003366", zorder=0)
-
-    _add_end_label(ax, dates, vals, f"${vals[-1]:.1f}T", "#003366")
+    ax.scatter([dates[-1]], [vals[-1]], color="#003366", s=32, zorder=4)
+    ax.text(.985, .965, f"{bs.index[-1]:%d %b %Y}  ${vals[-1]:.2f}T",
+            transform=ax.transAxes, ha="right", va="top", fontsize=10,
+            weight="bold", color="#003366")
     _style_axis(ax, ylabel="Total Assets (USD Trillions)")
 
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"${x:.1f}T"))
     for spine in ["top", "right", "left"]: ax.spines[spine].set_visible(False)
     ax.spines["bottom"].set_visible(True)
-    ax.set_xlim(ax.get_xlim()[0], ax.get_xlim()[1] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.12)
+    _time_axis(ax, bs.index[0], bs.index[-1], right_margin=.015)
 
     _t, _s = MACRO_TITLES["fed_balance_sheet"][mode]
     EconStyle.set_title(ax, _t, _s)
     EconStyle.add_top_rule(ax)
-    EconStyle.add_source(fig, "FRED (Federal Reserve H.4.1)")
+    EconStyle.add_source(fig, "FRED (Federal Reserve H.4.1)",
+                         f"Data: {bs.index[-1]:%d %b %Y}")
     fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
 
     filepath = output_dir / "07_macro_balance_sheet.png"
@@ -1739,6 +1768,8 @@ def generate_macro_dashboard(mode="dashboard"):
         ("US inflation", lambda: chart_inflation(engine, output_dir, mode)),
         ("US labour", lambda: chart_labour(engine, output_dir, mode)),
         ("Fed balance sheet", lambda: chart_fed_balance_sheet(engine, output_dir, mode)),
+        ("US banking liquidity", lambda: chart_banking_liquidity(engine, output_dir, mode)),
+        ("US economic activity", lambda: chart_cfnai(engine, output_dir, mode)),
         ("EM borrowing costs", lambda: chart_em_borrowing(engine, output_dir, mode)),
         ("dollar vs EM currencies", lambda: chart_em_dollar(engine, output_dir, mode)),
     ]:
@@ -1779,7 +1810,39 @@ def generate_macro_dashboard(mode="dashboard"):
     )
     problems += snapshot_problems
 
+    print("\n   Generating global monthly inflation small multiples...")
+    try:
+        # Store the complete audit in the already-published snapshot: the
+        # normal World workflow copies this JSON alongside all generated PNGs.
+        snapshot["inflation_breadth"] = generate_world_inflation(output_dir)
+    except Exception as exc:
+        problems.append(f"Global inflation breadth: {type(exc).__name__}: {exc}")
+
+    print("\n   Generating global government bond yields...")
+    try:
+        snapshot["global_yields"] = generate_global_yields(output_dir)
+    except Exception as exc:
+        problems.append(f"Global government yields: {type(exc).__name__}: {exc}")
+
+    print("\n   Generating the monthly supply chain pressure index...")
+    try:
+        snapshot["supply_chain"] = generate_supply_chain(output_dir)
+    except Exception as exc:
+        problems.append(f"Global supply chain pressure: {type(exc).__name__}: {exc}")
+
     print("\n   Generating World charts...")
+    try:
+        snapshot["europe_sectors"] = generate_europe_sectors(output_dir)
+    except Exception as exc:
+        problems.append(f"European sector rotation: {type(exc).__name__}: {exc}")
+    try:
+        snapshot["ciss"] = generate_ciss(output_dir)
+    except Exception as exc:
+        problems.append(f"Euro-area systemic stress: {type(exc).__name__}: {exc}")
+    try:
+        snapshot["nfci"] = generate_nfci(output_dir)
+    except Exception as exc:
+        problems.append(f"US financial conditions: {type(exc).__name__}: {exc}")
     for name, draw in [
         ("global rate cycle", lambda: chart_rate_cycle(snapshot["rate_cycle"], output_dir, mode)),
         ("OECD leading indicators", lambda: chart_oecd_cli(series["cli"], output_dir, mode)),

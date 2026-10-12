@@ -10,15 +10,25 @@ on:
     - cron: '0 10 * * 6'
   workflow_dispatch:  # Manual trigger from GitHub Actions UI
 
+concurrency:
+  group: repository-publication-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
+
+permissions:
+  contents: write
+
 jobs:
   generate-macro:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 1
 
       - name: Set up Python 3.11
@@ -28,7 +38,13 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt pytest
+
+      - name: Verify World source and chart contracts
+        env:
+          PYTHONPATH: .
+          MPLBACKEND: Agg
+        run: python -m pytest tests/test_world.py tests/test_world_inflation.py tests/test_global_yields.py tests/test_world_rate_cycle_dashboard.py tests/test_banking_liquidity.py tests/test_fed_balance_sheet.py tests/test_cfnai.py tests/test_nfci.py tests/test_ciss.py tests/test_supply_chain.py tests/test_europe_sectors.py -q
 
       - name: Generate World charts and snapshot
         env:
@@ -64,7 +80,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/macro/ assets/readme_showcase/ "$(python -m data.paths --relative GDP_PPP_CSV)"   # GDP weights for the rate cycle
+          git add -A assets/macro/ assets/readme_showcase/ data/stores/world/global_yields.json "$(python -m data.paths --relative GDP_PPP_CSV)"   # GDP weights and retained national yield history
           git diff --staged --quiet && echo "No changes to commit." && exit 0
           git commit -m "chore: World charts $(date -u +%Y-%m-%d)"
-          git push
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep 10
+          done
+          exit 1

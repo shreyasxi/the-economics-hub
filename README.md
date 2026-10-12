@@ -1,12 +1,12 @@
-# Automated Macro Dashboard & RBI Sentiment Tracker
+# Monetaria — Macro Dashboard & RBI Sentiment Tracker
 
-Weekly charts and analysis on global markets, the world economy, India and the RBI.
+Monetaria provides weekly charts and analysis on global markets, the world economy, India and the RBI.
 
 An automated Python pipeline tracking global equities, forex, sovereign bonds, commodities and Indian markets, published via [The Economics Hub on Substack](https://economicshub.substack.com/).
 
 <p align="center">
-  <a href="https://weekly-macro-dashboard.streamlit.app/">
-    <img src="https://img.shields.io/badge/Launch%20Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Launch Dashboard">
+  <a href="https://monetaria.streamlit.app/">
+    <img src="https://img.shields.io/badge/Launch%20Monetaria-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Launch Monetaria">
   </a>
 </p>
 
@@ -22,7 +22,7 @@ It reports its negative results as prominently as its positive one: tone does **
 rate decision once the RBI's stated stance is known, and shows no reliable relationship with
 equities or the rupee. What it does track is the 10-year government security's move on decision day.
 
-**→ [Read the write-up](https://shreyasxi.github.io/economics-hub/#sentinel)** · [see it live](https://weekly-macro-dashboard.streamlit.app/rbi-sentinel)
+**→ [Read the write-up](https://shreyasxi.github.io/economics-hub/#sentinel)** · [see it live](https://monetaria.streamlit.app/rbi-sentinel)
 
 ---
 
@@ -74,14 +74,14 @@ source ~/.bashrc
 
 ```
 economics_hub/
-├── app.py                       # Streamlit dashboard: 5 pages and About, each with its own link
+├── app.py                       # Streamlit dashboard: 6 tabs, ending with Portfolio Lab and Research & About
 ├── generate_weekly.py           # Weekly global dashboard (40 charts, every Saturday via CI)
 ├── generate_news.py             # Weekly page: The Week in Headlines (collects every 4 hours, ranks with the weekly charts)
-├── generate_macro.py            # World page: central banks, six-economy scoreboard, 12 charts (Saturdays via CI)
+├── generate_macro.py            # World page: central banks, six-economy scoreboard, 22 charts (Saturdays via CI)
 ├── generate_india.py            # India charts, Saturdays via CI + manual
 ├── generate_soe.py              # India page: RBI's State of the Economy (briefing + rate transmission history)
 ├── generate_rbi_sentinel.py     # RBI MPC sentiment pipeline (automated via CI)
-├── generate_signals.py          # Analysis page: Signal or noise, 52 markets' weekly moves against their typical week
+├── generate_signals.py          # Research & About: Signal or noise, 52 markets' weekly moves against their typical week
 │
 ├── charts/
 │   ├── make_chart.py            # CLI tool for ad-hoc charts from CSV/Excel
@@ -146,7 +146,28 @@ python generate_news.py             # rank the week for the newest weekly editio
 ```
 
 ### 2. World
-Central bank rates and meeting dates, a six-economy scoreboard (US, euro area, UK, Japan, China, India), the global rate cycle (how many of 38 central banks are hiking or cutting each month), a five-week calendar, and US, equity valuation, country risk, emerging-market and global growth charts — runs every Saturday via GitHub Actions, with central bank rates rechecked twice every weekday from the banks' own announcements. Figures with no free API (manufacturing PMIs, Japan CPI, China unemployment and 10-year yield) are entered with a CLI.
+Global Inflation adds one large grid of monthly country charts: headline CPI and
+excluding-food-and-energy inflation where available, with observation dates and
+a common-month count of countries easing or accelerating over three months.
+Coverage is discovered from the official OECD COICOP 1999 and 2018 datasets;
+stale countries are omitted and missing months remain gaps. The same-edition
+JSON records rates, source classifications and checksums, and the normal World
+generator embeds this audit and a vector SVG in its published snapshot. The
+dashboard renders individual native Altair country charts from the audited JSON,
+with monthly hover values and five columns that stack on small screens.
+SVG and PNG remain available for exports; the PNG also supports asset discovery. Refresh this chart alone
+locally with `python -m data.fetchers.world_inflation`; it writes into the current
+`output/macro/YYYY-MM/` edition. Localhost uses that edition when present.
+
+Country and Supply Chain Risks also includes the New York Fed's monthly Global
+Supply Chain Pressure Index. It uses the standard EconHub chart styling with a fixed ten-year history,
+a zero reference and labelled latest reading. The
+ratings-versus-markets chart sits on the left and supply chain pressure on the right of a shared row.
+The official workbook is archived by checksum; the audited observations are embedded
+in `world_snapshot.json` for deployment. Refresh this chart alone with
+`python -m data.fetchers.supply_chain`.
+
+Central bank rates and meeting dates, a six-economy scoreboard (US, euro area, UK, Japan, China, India), the global rate cycle, a five-week calendar, and US, equity valuation, country risk, emerging-market and global growth charts — runs every Saturday via GitHub Actions, with central bank rates rechecked twice every weekday from the banks' own announcements. The rate cycle renders natively with monthly hover details: unweighted counts of hiking/cutting central banks by default, and a **GDP weighted** switch for GDP (PPP)-weighted basis-point moves. Japan CPI refreshes automatically from monthly OECD national CPI data. Figures still entered manually (manufacturing PMIs, China unemployment and 10-year yield) are entered with a CLI.
 ```bash
 python -m data.processors.world_manual_entry status
 python generate_macro.py
@@ -264,3 +285,10 @@ is available for personal and research use with credit to **The Economics Hub**,
 
 Licensed under **CC BY-NC 4.0** — free for personal and research use with credit to **The Economics Hub**.  
 See the [LICENSE](LICENSE) file for details.
+
+## Release workflow and Portfolio Lab deployment
+
+See [RELEASE.md](RELEASE.md) for integration checks and the initial GitHub Actions run order.
+Portfolio Lab uses validated snapshots from private HTTPS storage; follow
+[the deployment guide](portfolio_lab/DEPLOYMENT.md) to upload the package and configure
+Streamlit and GitHub secrets. Source histories remain excluded from public Git.

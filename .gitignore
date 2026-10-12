@@ -43,6 +43,11 @@ Desktop.ini
 
 # ── local data, cache, logs ──
 data/cache/
+# Local market histories: public redistribution rights are unresolved.
+data/stores/portfolio_lab/
+# Private deployment packages and checksums contain full source histories.
+*.portfolio-snapshot.zip
+*.portfolio-snapshot.zip.sha256
 data/stores/india/nse_valuations/runs/
 data/stores/india/nse_indices/runs/
 data/inputs/nse/NIFTY 50/

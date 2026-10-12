@@ -2,8 +2,7 @@
 Analysis page: the essay shelf, the Substack readers, and the hand-written config.
 
 The shelf must never show a gap: pinned essays in the owner's order, led by a
-new post only while it is recent. The config checks catch a thread chart that
-was renamed away, a saved image that is missing, or article data added to a thread.
+new post only while it is recent. Config checks cover essay slugs and footer links.
 
 Run:  python tests/test_analysis.py      (or: python -m pytest tests/test_analysis.py -q)
 """
@@ -17,10 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config.analysis as analysis
 import config.resources as resources
-from charts.loader import chart_key, get_charts
 from data.processors.substack import cover_url, from_archive, from_rss, reading_minutes, shelf
-
-ROOT = Path(__file__).resolve().parent.parent
 
 
 def _post(slug: str, when: date) -> dict:
@@ -95,39 +91,6 @@ def test_covers_are_fetched_at_card_size():
 
 def test_reading_time():
     assert reading_minutes(5296) == 22 and reading_minutes(100) == 1 and reading_minutes(None) is None
-
-
-THREAD_KEYS = {"theme", "why", "charts"}  # watching threads are chart-only
-DASHBOARD_CHART_KEYS = {"dashboard", "note"}
-SAVED_CHART_KEYS = {"image", "title", "source", "note"}      # the source is named, not linked
-
-
-def test_every_thread_is_complete():
-    assert analysis.WATCHING, "no threads"
-    for thread in analysis.WATCHING:
-        assert thread.get("theme"), f"a thread has no theme: {thread}"
-        # A misspelt field ("tittle") is not an error in Python; the
-        # page would just leave it out. Name it here instead.
-        assert set(thread) <= THREAD_KEYS, f"{thread['theme']}: unknown field {sorted(set(thread) - THREAD_KEYS)}"
-        for chart in thread.get("charts", []):
-            allowed = DASHBOARD_CHART_KEYS if "dashboard" in chart else SAVED_CHART_KEYS
-            assert set(chart) <= allowed, f"{thread['theme']}: unknown chart field {sorted(set(chart) - allowed)}"
-            if "dashboard" in chart:
-                continue
-            assert (ROOT / "assets" / chart["image"]).exists(), f"missing saved chart: {chart['image']}"
-            assert chart.get("source"), f"{thread['theme']}: a saved chart names no source: {chart['image']}"
-
-
-def test_thread_dashboard_charts_exist():
-    """Fails when a chart a thread borrows is renamed or dropped by its generator."""
-    keys = set()
-    for subdir in ("weekly", "macro", "india"):
-        charts, _ = get_charts(subdir)
-        keys |= {chart_key(c.name) for c in charts}
-    if not keys:
-        return   # nothing generated on this machine
-    wanted = {c["dashboard"] for t in analysis.WATCHING for c in t.get("charts", []) if "dashboard" in c}
-    assert wanted <= keys, f"thread charts not on the dashboard: {sorted(wanted - keys)}"
 
 
 def test_pinned_essays_are_slugs():

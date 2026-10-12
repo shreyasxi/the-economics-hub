@@ -16,6 +16,7 @@ from rbi_sentinel.cleaners.policy_facts import extract_policy_facts
 from rbi_sentinel.config import DB_PATH, SCORING_MODEL_VERSION
 
 log = logging.getLogger("rbi_sentinel.db")
+_archive_loaded_mtime = Path(__file__).stat().st_mtime
 
 _SCHEMA_PATH = Path(__file__).parent / "schema.sql"
 
@@ -330,6 +331,41 @@ def get_all_policy_cycles() -> list[dict]:
 
 
 # ── meeting_composites ─────────────────────────────────────────────────────────
+
+def get_summary_archive(model_version: str = SCORING_MODEL_VERSION,
+                        db_path: Optional[Path] = None) -> list[dict]:
+    """Read saved executive summaries without altering the DB or running scoring."""
+    path = Path(db_path or DB_PATH).resolve()
+    with sqlite3.connect(path.as_uri() + "?mode=ro", uri=True) as conn:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA query_only=ON")
+        rows = conn.execute(
+            """SELECT m.policy_cycle, m.meeting_date, m.repo_rate_pct,
+                      m.rate_action, m.rate_change_bps, k.composite_narrative,
+                      k.composite_overall_score,
+                      k.computed_at, k.scoring_model_version
+               FROM meeting_composites k
+               JOIN mpc_meetings m ON m.meeting_id = k.meeting_id
+               WHERE k.scoring_model_version = ?
+                 AND length(trim(coalesce(k.composite_narrative, ''))) > 0
+               ORDER BY m.policy_cycle DESC""", (model_version,),
+        ).fetchall()
+        from rbi_sentinel.cleaners.archive_facts import stated_stance, rate_vote
+        archive = [dict(row) for row in rows]
+        for row in archive:
+            documents = conn.execute(
+                """SELECT d.doc_type, d.publication_date, d.source_url, d.raw_text
+                   FROM rbi_documents d JOIN mpc_meetings m ON m.meeting_id = d.meeting_id
+                   WHERE m.policy_cycle = ? AND d.source_kind = 'press_release'
+                     AND d.word_count > 0
+                   ORDER BY d.publication_date, d.doc_type""", (row['policy_cycle'],),
+            ).fetchall()
+            resolution = next((d['raw_text'] for d in documents if d['doc_type'] == 'resolution'), '')
+            row['stated_stance'] = stated_stance(resolution)
+            row['voting_split'] = rate_vote(resolution, row['rate_action'], row['rate_change_bps'])
+            row['documents'] = [{k: d[k] for k in ('doc_type', 'publication_date', 'source_url')} for d in documents]
+    return archive
+
 
 def upsert_composite(
     meeting_id: int,

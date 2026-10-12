@@ -19,8 +19,9 @@ on:
   workflow_dispatch: {}
 
 concurrency:
-  group: rbi-sentinel          # never two runs writing the database at once
+  group: repository-publication-${{ github.ref }}
   cancel-in-progress: false
+  queue: max
 
 permissions:
   contents: write              # commit the database, charts and live log
@@ -35,6 +36,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           fetch-depth: 1
 
       - name: Set up Python 3.11
@@ -85,7 +87,7 @@ jobs:
           fi
           git commit -m "data(rbi): automated update $(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M IST')"
           for attempt in 1 2 3; do
-            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
             echo "Push attempt $attempt failed; retrying"
             sleep $((attempt * 10))
           done

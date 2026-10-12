@@ -77,7 +77,7 @@ CELL_SOURCES = {
     },
     "JP": {
         "mfg_pmi": "manual",
-        "cpi_yoy": "manual",
+        "cpi_yoy": "OECD Prices (Statistics Bureau of Japan, national CPI)",
         "unemployment": "OECD Labour Force Statistics",
         "policy_rate": "BIS central bank policy rates + BoJ monetary policy statement",
         "ten_year": "Ministry of Finance Japan (JGB)",
@@ -117,6 +117,8 @@ MANUAL_FIELDS = {
     ("UK", "mfg_pmi"): ("S&P Global UK Manufacturing PMI", "https://www.pmi.spglobal.com/Public/Release/PressReleases"),
     ("JP", "mfg_pmi"): ("S&P Global Japan Manufacturing PMI", "https://www.pmi.spglobal.com/Public/Release/PressReleases"),
     ("CN", "mfg_pmi"): ("S&P Global China General Manufacturing PMI", "https://www.pmi.spglobal.com/Public/Release/PressReleases"),
+    # Retain legacy CPI entries for reading the historical manual ledger.
+    # The scoreboard now uses OECD; these entries are not a fallback.
     ("JP", "cpi_yoy"): ("Statistics Bureau of Japan, national CPI all items, % YoY", "https://www.stat.go.jp/english/data/cpi/"),
     ("CN", "unemployment"): ("NBS surveyed urban unemployment rate", "https://www.stats.gov.cn/english/PressRelease/"),
     ("CN", "ten_year"): ("ChinaBond 10-year government bond yield, month-end", "https://yield.chinabond.com.cn/"),
@@ -133,7 +135,7 @@ MANUAL_RANGES = {
 # ─────────────────────────────────────────────
 # OECD / BIS / YAHOO CODES
 # ─────────────────────────────────────────────
-OECD_CPI_AREAS = {"UK": "GBR", "CN": "CHN"}
+OECD_CPI_AREAS = {"UK": "GBR", "CN": "CHN", "JP": "JPN"}
 OECD_UNEMP_AREAS = {"UK": "GBR", "JP": "JPN"}
 # Every country the OECD publishes a leading indicator for, for the ranked
 # chart. Its aggregates (G7, G20, NAFTA, G4E, A5M) are deliberately left out:

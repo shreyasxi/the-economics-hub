@@ -1087,7 +1087,7 @@ def build_snapshot(fred_api_key: str, sentinel_db: Path, manual_rows: list[dict]
     us_cpi_yoy = yoy_by_date(us_cpi) if us_cpi is not None else None
     cpi = {
         "US": us_cpi_yoy, "EA": ea_hicp, "UK": oecd_cpi.get("GBR"), "CN": oecd_cpi.get("CHN"),
-        "JP": manual.get(("JP", "cpi_yoy")), "IN": india.get("cpi_yoy"),
+        "JP": oecd_cpi.get("JPN"), "IN": india.get("cpi_yoy"),
     }
     unemp = {
         "US": monthly(us_unemp) if us_unemp is not None else None, "EA": ea_unemp,

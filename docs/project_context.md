@@ -1,4 +1,4 @@
-# The Economics Hub — Project Context
+# Monetaria — Project Context
 
 > The single reference for how this project is built, run and changed. It is written so that an assistant
 > with **no access to the code** — a future Claude session, or any chatbot the owner uploads this file to —
@@ -247,11 +247,11 @@ in the production source folders.
 
 ## 1. What the project is
 
-**The Economics Hub**, by Shreyas Urgunde: an institutional-style macro and markets dashboard, plus a Substack
-newsletter. Written for an international audience (UK employers, global readers) as well as Indian ones, so
+**Monetaria**, by Shreyas Urgunde: an institutional-style macro and markets dashboard, accompanied by
+**The Economics Hub** Substack newsletter. Written for an international audience (UK employers, global readers) as well as Indian ones, so
 the World page stays global rather than India-first.
 
-- **Live site:** <https://weekly-macro-dashboard.streamlit.app> (Streamlit Community Cloud, deployed from
+- **Live site:** <https://monetaria.streamlit.app> (Streamlit Community Cloud, deployed from
   `main` of the public repo `shreyasxi/the-economics-hub`)
 - **Newsletter:** <https://economicshub.substack.com/> · **Owner's site:** <https://shreyasxi.github.io> ·
   **Architecture write-up:** <https://shreyasxi.github.io/economics-hub/>
@@ -261,11 +261,11 @@ the World page stays global rather than India-first.
 | Page | URL | Built by | Refreshed | Published files |
 |---|---|---|---|---|
 | Weekly Markets | `/` (default) | `generate_weekly.py`, `generate_market_matrix.py`, `generate_news.py`, `generate_signals.py` | `weekly.yml`, Saturday 06:00 UTC | 40 charts + `market_matrix.json` + `news.json` + `signals.json`; six cards rendered by app |
-| World | `/world` | `generate_macro.py` | `macro.yml`, Saturday 10:00 UTC; rates only: `rates.yml`, weekdays 06:30 and 21:00 UTC | 12 charts + `world_snapshot.json` |
+| World | `/world` | `generate_macro.py` | `macro.yml`, Saturday 10:00 UTC; rates only: `rates.yml`, weekdays 06:30 and 21:00 UTC; yields retry: `global_yields.yml`, Monday 12:17 UTC | 22 charts + `world_snapshot.json` |
 | India | `/india` | `generate_india.py`, `generate_soe.py`; targeted `charts.india_charts.india_monetary` | Saturday 08:00 UTC; monetary-only daily 15:10 UTC (local implementation, deployment pending); manual runs | core + optional charts and provenance sidecars + `soe.json`; daily job replaces only two monetary PNGs |
 | RBI Sentinel | `/rbi-sentinel` | `generate_rbi_sentinel.py --auto` | `rbi_sentinel.yml`, weekday evenings + MPC decision days | 5 charts + 1 research chart |
-| Analysis | `/analysis` | reads `signals.json`, `config/analysis.py` and the Substack archive | live | — (no charts of its own) |
-| About | `/about` | `config/resources.py` | live | — |
+| RBI Sentiment Archive | `/rbi-sentinel-archive` (navy Archive link below Sentinel standfirst) | `rbi_sentinel/archive.py` | reads saved database summaries and Resolution text; no generation | Executive summaries grouped by year and meeting, repo decision, stated stance, rate-decision voting split, sentiment score/tone and policy-document links; reflects the stored composite after minutes updates; current scoring version only; no archived charts |
+| Research & About | `/research` (`/analysis` and `/about` redirect here) | `signals.json`, `config/analysis.py`, `config/resources.py` and the Substack archive | live | Signals → Watching → About → Methods → Resources → Essays; Methods documents the published tabs, excluding Portfolio Lab |
 
 Weekly Markets, World, India, RBI Sentinel and (after a hairline) Analysis form the tab row under the
 masthead; About is linked from the masthead. Every page ends in the same black footer.
@@ -290,7 +290,7 @@ assets/<pipeline>/<date>/*.png      git-tracked, what Streamlit Cloud serves
 charts/loader.py  → latest dated folder, natural sort, no hard-coded file lists
         │
         ▼
-app.py  → 5 pages + About; each chart gets a "Chart insights" toggle from config/insights.py
+app.py  → 6 tabs: Weekly, World, India, RBI Sentinel, Portfolio Lab, Research & About; each chart gets a "Chart insights" toggle from config/insights.py
 ```
 
 Streamlit Cloud never runs a generator. It serves what is committed in `assets/` (and reads
@@ -313,7 +313,7 @@ generate_weekly.py          Weekly Markets: 40 charts (every chart in one functi
 generate_market_matrix.py   Weekly same-edition market_matrix.json; explicit return methods and provenance
 generate_news.py            Weekly Markets: "The Week in Headlines" (news.json); --collect feeds the week-long pool
 generate_signals.py         Analysis page "Signal or noise" board: writes signals.json into a weekly edition
-generate_macro.py           World page: 12 charts (one chart_* function each) + world_snapshot.json
+generate_macro.py           World page: 22 charts (including inflation breadth, yields, banking liquidity, CFNAI, NFCI, European stress/sector rotation and supply chains) + world_snapshot.json
 generate_india.py           India page: core charts plus optional validated-source charts (chart_* functions)
 generate_soe.py             India page: RBI's "State of the Economy" briefing (soe.json) + rate-transmission history
 generate_rbi_sentinel.py    RBI Sentinel (--auto in CI; see §8)
@@ -486,17 +486,21 @@ One function per chart. Titles are in `MACRO_TITLES` near the top of the file. S
 | File | Caption | Section | Function | What it shows | Data |
 |---|---|---|---|---|---|
 | `10_macro_rate_cycle` | The Global Rate Cycle | top, beside the calendar | `chart_rate_cycle` | Central banks that raised (up) or cut (down) their policy rate each month since 2000, of the 38 in the BIS dataset | the World snapshot's `rate_cycle` (BIS WS_CBPOL daily; Fed, ECB, BoE, BoJ, RBI announcements after BIS's last day) |
+| `22_macro_cfnai` | U.S. Economic Activity \| Above or Below Trend? | United States, beside Fed balance sheet | `chart_cfnai` → `charts.world_charts.cfnai` | Monthly CFNAI bars and the separately published CFNAIMA3 curve since January 2022, one shared index-unit axis; −0.70 reference applies only to MA3; missing months remain gaps | FRED CFNAI and CFNAIMA3 (Federal Reserve Bank of Chicago); automatic in the normal World generator |
+| `23_macro_nfci` | U.S. Financial Conditions \| What Is Driving the NFCI? | United States | `data.fetchers.nfci.generate` → `charts.world_charts.nfci` | Five-year weekly diverging areas; official workbook contributions grouped once, including dual-classified HH/NFC within Leverage. Published NFCI overlaid unchanged; small source residual disclosed. Validation and source hashes archived in companion JSON. Standalone refresh: `python -m data.fetchers.nfci` | Federal Reserve Bank of Chicago; automatic in the normal World generator |
 | `01_macro_inflation` | US Inflation Metrics | United States | `chart_inflation` | Each CPI category's contribution to headline CPI inflation over 12 months (stacked bars: energy, food, core goods, services ex-shelter, shelter), with headline CPI and core PCE lines and the 2% target | FRED CPIAUCNS CPIUFDNS CPIENGNS CUUR0000SACL1E CUUR0000SASLE CUUR0000SAH1 PCEPILFE; BLS December relative importance, typed yearly (`CPI_RELATIVE_IMPORTANCE`) |
 | `02_macro_labour` | US Labour Market | United States | `chart_labour` | Unemployment and jobless claims in two panels, payrolls badge | FRED UNRATE ICSA PAYEMS |
 | `07_macro_balance_sheet` | Federal Reserve Balance Sheet | United States | `chart_fed_balance_sheet` | Total assets | FRED WALCL |
 | `16_macro_cape` | Shiller CAPE and Excess CAPE Yield | US Equity Valuations | `chart_cape` | CAPE and excess CAPE yield, two panels | Shiller `ie_data.xls` (`data/processors/valuations.py`) |
 | `17_macro_equity_risk_premium` | US Equity Risk Premium | US Equity Valuations | `chart_equity_risk_premium` | Implied ERP (trailing 12 months) since 2008 | Damodaran `ERPbymonth.xlsx` |
-| `18_macro_country_erp` | Equity Risk Premiums Across the G20 | Country Risk | `chart_country_erp` | Mature-market premium + country risk premium, stacked | Damodaran `ctryprem*.xlsx` |
-| `19_macro_regional_erp` | Equity Risk Premiums by Region | Country Risk | `chart_regional_erp` | Every rated country as a dot on its region's row; GDP-weighted average | Damodaran |
-| `20_macro_ratings_vs_markets` | Markets vs the Rating Agencies | Country Risk | `chart_ratings_vs_markets` | CDS-implied minus rating-implied country risk, diverging bars | Damodaran |
+| `18_macro_country_erp` | Equity Risk Premiums Across the G20 | Country and Supply Chain Risks | `chart_country_erp` | Mature-market premium + country risk premium, stacked | Damodaran `ctryprem*.xlsx` |
+| `19_macro_regional_erp` | Equity Risk Premiums by Region | Country and Supply Chain Risks | `chart_regional_erp` | Every rated country as a dot on its region's row; GDP-weighted average | Damodaran |
+| `20_macro_ratings_vs_markets` | Markets vs the Rating Agencies | Country and Supply Chain Risks | `chart_ratings_vs_markets` | CDS-implied minus rating-implied country risk, diverging bars | Damodaran |
+| `21_macro_supply_chain_pressure` | Global Supply Chain Pressure Index | Country and Supply Chain Risks | `data.fetchers.supply_chain.generate` → `charts.world_charts.supply_chain` | Standard EconHub PNG chart, fixed latest ten-year window (120 calendar months), zero reference and latest-value label, full-precision observations and revisions from official workbook. Same-edition JSON and embedded snapshot; archived workbook checksum. Standalone refresh: `python -m data.fetchers.supply_chain` | Federal Reserve Bank of New York GSCPI |
 | `14_macro_em_borrowing` | EM Dollar Borrowing Costs | Emerging Markets | `chart_em_borrowing` | EM corporate HY and IG yields against the 10-year Treasury | FRED BAMLEMHBHYCRPIEY BAMLEMIBHGCRPIEY DGS10 |
 | `15_macro_em_dollar` | The Dollar vs EM Currencies | Emerging Markets | `chart_em_dollar` | Fed EM dollar index, the rupee and the two most extreme movers of nine EM currencies | FRED DTWEXEMEGS DEXINUS + `DEX*US` (`EM_FX_PEERS`) |
 | `11_macro_oecd_cli` | OECD Composite Leading Indicators | Global Growth | `chart_oecd_cli` | 17 countries ranked by distance from 100, with each one's phase | OECD SDMX (`OECD_CLI_COUNTRIES`) |
+| `12_macro_global_inflation_breadth` | Global Inflation Breadth | After scoreboard (chart title only) | `data.fetchers.world_inflation.generate` → `charts.world_charts.world_inflation.draw`; native UI: `charts.world_charts.world_inflation_dashboard` | Monthly headline and core CPI small multiples, dynamic country coverage; no interpolation; common-month three-month breadth count. Dashboard uses individual Altair charts with monthly tooltips, five columns that stack on small screens, an inline legend after the breadth summary, and independent vertical scales, reading same-edition JSON or snapshot. PNG/SVG exports retained | OECD national CPI, COICOP 1999 / 2018 |
 
 Not charts, but on the page and built in `app.py` from `world_snapshot.json`: the **central bank strip**, the
 **five-week calendar** and the **six-economy scoreboard** (§6). `chart_macro_em_vulnerability`,
@@ -652,7 +656,7 @@ Data comes from the project's fetchers: `fred_fetcher.fetch_series("DGS10", peri
 - **World and India: which section** — decided in `app.py` (`page_world()`, `page_india()`) by words in the file
   name, first match wins, in this order:
   - World: `rate_cycle` (top) → United States (`inflation`, `labour`, `balance_sheet`) → US Equity Valuations
-    (`macro_cape`, `equity_risk_premium`) → Country Risk (`country_erp`, `regional_erp`, `ratings_vs_markets`) →
+    (`macro_cape`, `equity_risk_premium`) → Country and Supply Chain Risks (`country_erp`, `regional_erp`, `ratings_vs_markets`, `supply_chain_pressure`) →
     Emerging Markets (`macro_em_`) → Global Growth (`oecd_cli`) → Other.
   - India: snapshot at top → **Growth & Activity** (PMI, IIP, investment rate, GVA; explicit order)
     → **Inflation** (headline/food CPI, contributions, item panels, inflation surveys)
@@ -682,7 +686,7 @@ preview any `set`.
 | Page | Figure | How to enter or correct it | Stored in |
 |---|---|---|---|
 | Weekly Markets | any | Nothing is stored: every number is fetched fresh each run (Yahoo, FRED, NSE, Coin Metrics). A wrong number means a wrong ticker or series (`config/settings.py`) or a wrong calculation (the chart's block). | — |
-| World | Manufacturing PMI (US, euro area, UK, Japan, China), Japan CPI, China unemployment, China 10-year | `PYTHONPATH=. .venv/bin/python -m data.processors.world_manual_entry set 2026-08 --country US --pmi 52.4` (`--cpi` Japan only, `--unemployment` and `--ten-year` China only). Running `set` again for the same month overwrites. `… status` lists what is missing. | `data/stores/world/world_manual.csv` |
+| World | Manufacturing PMI (US, euro area, UK, Japan, China), China unemployment, China 10-year | `PYTHONPATH=. .venv/bin/python -m data.processors.world_manual_entry set 2026-08 --country US --pmi 52.4` (`--unemployment` and `--ten-year` China only; Japan CPI now uses OECD automatically). Running `set` again for the same month overwrites. `… status` lists what is missing. | `data/stores/world/world_manual.csv` |
 | World | everything else | Automatic, with freshness limits (`config/world_settings.py`); no overrides by design. A stale source fails the run with a message naming it. | — |
 | India | PMIs, GST, core CPI, unemployment, FPI (NSDL); headline/food CPI and IIP have guarded manual fallbacks | `PYTHONPATH=. .venv/bin/python -m data.processors.india_manual_entry set 2026-08 --gst 2.04 --core-cpi 3.8` — flags `--mfg-pmi --svc-pmi --gst --cpi --core-cpi --food-cpi --unemployment --iip --fpi`. Units: PMI index; GST ₹ **lakh crore** (2.04, never 204000); CPI/IIP % YoY; unemployment %; FPI ₹ **crore**. Range-checked; prints before → after; setting a month again corrects it. `… status` shows 12 months, `… show 2026-08` one. Composite PMI is calculated — never enter it. | `data/stores/india/india_macro.db`, table `india_monthly` |
 | India | DBIE bank credit, deposits, M3, exports/imports and legacy reserve/RBI portfolio rows (published reserves/FPI use separate sources) | Download RBI's DBIE workbook, save it over `data/50 Macroeconomic Indicators.xlsx` (same name), then `PYTHONPATH=. .venv/bin/python data/fetchers/india_fetcher.py --dry-run` and `… --append` (updates the months present; other columns untouched). A wrong figure is corrected by RBI's next workbook, not by hand. | `india_monthly`, `india_weekly` |
@@ -925,6 +929,7 @@ The six **Macro Picture at a glance** titles, in order:
 and `_eh_brief`. Hero bodies lead with interpretation and support it with 2–3 available observations,
 normally in two sentences. Definitions and calculation prose belong in Insights/methodology notes.
 The India inflation card replaces the former monetary-conditions card; its link targets India inflation.
+The global inflation card links directly to `/world#global-inflation-breadth`.
 Detailed India answers are separate and were not rewritten by this hero-copy change.
 
 Risk requires at least three existing equity/HY-spread/VIX signals, including HY and VIX: aligned signs
@@ -1093,7 +1098,7 @@ and retry (RBI Sentinel also pushes on weekdays).
 | US | manual | FRED CPIAUCSL | FRED UNRATE | FRED + FOMC statement | FRED DGS10 | DXY (Yahoo) |
 | Euro area | manual | Eurostat prc_hicp_minr | Eurostat une_rt_m (EA21/EA20, latest wins) | FRED ECBDFR + ECB table | Bundesbank Bund | EURUSD |
 | UK | manual | OECD | OECD | BoE IUDBEDR + Bank Rate page | BoE IUDMNPY | GBPUSD |
-| Japan | manual | **manual** | OECD | BIS + BoJ statement | MoF JGB CSV | JPY |
+| Japan | manual | OECD national CPI | OECD | BIS + BoJ statement | MoF JGB CSV | JPY |
 | China | manual | OECD | **manual** | PBoC notices (7-day reverse repo) | **manual** | CNY |
 | India | India DB | India DB | India DB | Sentinel DB | DBIE workbook (FBIL) | INR |
 
@@ -1115,6 +1120,15 @@ reported by every bank is drawn faded and labelled "so far". Episode labels: 200
 financial crisis, pandemic, post-pandemic inflation. A problem if fewer than 30 banks reported in 120 days or most
 banks' data are over 45 days old. The monthly counts live in the snapshot as `rate_cycle` (lists of numbers written on
 one line by `write_snapshot`).
+
+Dashboard update (10 Oct 2026): `charts.world_charts.world_rate_cycle_dashboard` renders the snapshot directly as an
+Altair chart beside the calendar. The default is unweighted counts; the **GDP weighted** toggle selects
+the saved GDP (PPP)-weighted basis-point moves. Both show the six-month net average; weighted mode
+also shows the equal-weight basis-point average as a dashed line. The legend wraps outside the plot below
+the mode description. A dashed vertical guide, a partial-month label and a marker at the true value
+make the tiny latest bar visible across the full history. The current/incomplete latest month
+is faded and excluded from averages. Tooltips include reporting coverage, and the units and source
+caption change with the toggle. The PNG generator remains available for exports.
 
 **Calendar:** next 35 days, computed at page load: bank meetings (config), RBI (brief), PBoC LPR, US CPI / jobs / GDP / PCE
 (FRED release calendar, stored in the snapshot). Heavy navy rule under its heading; no source footnote on the page.
@@ -1637,6 +1651,7 @@ for f in tests/test_*.py; do PYTHONPATH=. python "$f" > /dev/null || echo "FAILE
 The app reads `assets/` first and falls back to `output/` for local previews.
 
 ### Streamlit Cloud
+The app is named **Monetaria**, at <https://monetaria.streamlit.app/>.
 share.streamlit.io → repo `shreyasxi/the-economics-hub`, branch `main`, file `app.py`.
 Secrets: `FRED_API_KEY` only.
 
@@ -1649,7 +1664,7 @@ Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflo
 
 ## 11. Known issues
 
-1. **World manual cells.** Manufacturing PMIs (US, euro area, UK, Japan, China), Japan CPI, China unemployment and
+1. **World manual cells.** Manufacturing PMIs (US, euro area, UK, Japan, China), China unemployment and
    China 10-year have no free API and show "awaiting entry" until keyed in (`data/processors/world_manual_entry.py`). (The old Macro Pulse cron bug — `0 8 8-14 * 6`
    running daily on the 8th–14th — was fixed on 15 Sep 2026 by the weekly Saturday schedule.)
 2. **RBI fact-extractor coverage:** `tests/test_rbi_rate_decisions.py` already covers stored decisions,
@@ -2015,3 +2030,18 @@ yields, dollar vs EM and the rupee), strip/calendar/scoreboard polish. Before th
 regime chart, calendar; overlapping and low-signal charts retired; CPI gap and table colour bugs fixed; weekly schedule);
 India tab renamed "The Indian Economy". Earlier the same day: merged instructions.md; folder reorganisation; 4-edition
 limit; mock data removed; monthly FPI from DBIE; NIFTY IT moved to India; RBI rate rows normalised.*
+# Global government bond yields
+
+World section immediately follows US Equity Valuations. Approved universe: USA, Canada, UK, Germany, France, Italy, Spain, Sweden, Switzerland, India, Japan, South Korea, Norway, Poland, Colombia, Chile, Mexico, Australia, New Zealand and South Africa (20; Singapore and Malaysia replaced by Norway and Poland).
+
+`config/global_yields.py` owns the universe. `data/fetchers/global_yields.py` fetches five years of OECD monthly IRLT history for all 20 countries, with national observations for 12 (11 automated feeds plus India’s DBIE workbook). Norway’s daily Norges Bank API is enabled; Poland uses OECD monthly. One chronological country series uses national observations first and OECD monthly backfill for months without national observations. The latest retained national value remains preferred when newer than OECD, even after a failed refresh. Source definitions can differ at joins and remain disclosed in tooltips/details. The UI has region filters and highest/lowest yield or historical-percentile sorting, with no frequency selector or source legend. Historical ranks use one observation per month with at least 12 months required. India uses the newer dated value between OECD and FBIL ten-year G-Sec yields from the manually refreshed DBIE workbook’s Weekly sheet. Workbook hash and intake mode are retained in provenance. National parsing validates units/instrument fields and never uses coupons as yields.
+
+Saturday World generation embeds the report in `world_snapshot.json` and writes `17b_macro_global_yields.png`. `.github/workflows/global_yields.yml` retries on Monday at 12:17 UTC. All three World snapshot writers share `world-publication` concurrency. The tracked `data/stores/world/global_yields.json` retains native observations and original retrieval timestamps across Actions runs. Raw response hashes/files are cached locally. `python -m data.fetchers.global_yields --published` updates only yields in the latest published edition. Source failures are disclosed, dates retained; never label cached observations fresh. `tests/test_global_yields.py` verifies semantics, fallback, source selectors, gaps, India inclusion and dashboard section order/filters.
+
+10 Oct correction: national-first country series, dated fallback, simplified Bond Yields navigation and percentile sorting. Added Australia’s validated RBA F2 daily nominal ten-year series. New Zealand’s official daily B2 feed exists but direct requests returned HTTP 403 in local verification; OECD remains its fallback. France, Italy, Colombia, Chile, Mexico, New Zealand and South Africa still need verified timely connectors; India now compares OECD with the DBIE workbook.
+
+10 Oct follow-up: centered divider before Bond Yields, thick red chart lines, and Largest YTD rise (bp) sorting. YTD uses the last available observation before 1 January, including an explicitly disclosed December monthly-average baseline where that is the available backfill. Missing baselines appear last.
+
+10 Oct yield follow-up: India’s displayed stale label suppressed in native and exported panels; actual date and backend age flag retained. Replacement research recommends Norway (verified daily official API plus OECD history) and Poland (verified OECD monthly history; daily collector unverified), with Israel as a monthly regional alternative. Greece’s current daily webpage returned HTTP 403 in direct collection tests. Country roster remains unchanged pending selection. Detailed local research: output/global_yields_research/replacements_2026-10-10.md.
+
+10 Oct approved replacement executed: removed Singapore and Malaysia from the yield universe and retained national store; added Norway and Poland. Norges Bank daily generic ten-year government bond yields are sampled weekly with validated tenor/instrument/frequency. All 20 countries now have OECD monthly history; the same Saturday/Monday refresh pipeline covers the replacements.

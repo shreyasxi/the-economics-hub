@@ -25,9 +25,12 @@ on:
 
 # Serialize asset publication with the standalone daily monetary refresh.
 concurrency:
-  group: india-dashboard-${{ github.ref }}
+  group: repository-publication-${{ github.ref }}
   cancel-in-progress: false
   queue: max
+
+permissions:
+  contents: write
 
 jobs:
   # All source updates and generation share one checkout. Optional source
@@ -318,4 +321,8 @@ jobs:
           done <<< "$SOURCE_DIRS"
           git diff --staged --quiet && echo "No chart changes to commit." && exit 0
           git commit -m "chore: india charts $(date -u +%Y-%m)"
-          git push
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep 10
+          done
+          exit 1

@@ -3,7 +3,8 @@
 Economics Hub — Weekly Dashboard Generator
 ============================================
 Run this script every Friday/Saturday to generate the full
-weekly dashboard. Produces all charts.
+Weekly Markets dashboard. World charts (including weekly indicators such as
+NFCI) are handled by generate_macro.py, whose workflow also runs every Saturday.
 
 Usage:
     python generate_weekly.py              # Live data (requires FRED_API_KEY)
@@ -2842,4 +2843,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

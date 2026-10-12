@@ -2,14 +2,14 @@
 World tab manual data entry.
 
 A handful of World scoreboard cells have no free machine-readable source:
-the manufacturing PMIs (US, euro area, UK, Japan, China), Japan's CPI, and
+the manufacturing PMIs (US, euro area, UK, Japan, China), and
 China's unemployment rate and 10-year yield. They live in
 data/stores/world/world_manual.csv and are keyed in here, one month at a time.
 
     python -m data.processors.world_manual_entry status
     python -m data.processors.world_manual_entry set 2026-08 --country US --pmi 52.4
     python -m data.processors.world_manual_entry set 2026-08 --country CN --pmi 50.2 --unemployment 5.3
-    python -m data.processors.world_manual_entry set 2026-08 --country JP --cpi 2.9 --dry-run
+    python -m data.processors.world_manual_entry set 2026-08 --country JP --pmi 51.5 --dry-run
 
 A missing month shows as "awaiting entry" on the dashboard; nothing is ever
 carried forward or estimated. Values are range-checked and every row
@@ -28,7 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from config.world_settings import COUNTRIES, MANUAL_FIELDS, MANUAL_RANGES
+from config.world_settings import CELL_SOURCES, COUNTRIES, MANUAL_FIELDS, MANUAL_RANGES
 
 from data.paths import WORLD_MANUAL_CSV
 
@@ -131,7 +131,8 @@ def cmd_status(args) -> int:
             y, m = y - 1, 12
         months.append(f"{y}-{m:02d}")
     months.reverse()
-    cells = sorted(MANUAL_FIELDS, key=lambda k: (list(COUNTRIES).index(k[0]), k[1]))
+    cells = sorted((k for k in MANUAL_FIELDS if CELL_SOURCES[k[0]][k[1]] == "manual"),
+                   key=lambda k: (list(COUNTRIES).index(k[0]), k[1]))
     print(f"{'cell':<17}" + "".join(f"{mo:>9}" for mo in months))
     for country, field in cells:
         line = f"{country + ' ' + field:<17}"
@@ -139,7 +140,7 @@ def cmd_status(args) -> int:
             v = have.get((mo, country, field))
             line += f"{v:>9g}" if v is not None else f"{'..':>9}"
         print(line)
-    print("\n.. = not entered. Releases: PMIs on the 1st business day; Japan CPI ~3rd week;")
+    print("\n.. = not entered. Releases: PMIs on the 1st business day;")
     print("China unemployment ~mid-month; China 10Y is the month-end close. Sources: docs/project_reminders.md")
     return 0
 
