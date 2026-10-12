@@ -117,14 +117,12 @@ def test_domain_refresh_preserves_other_cards_and_failure_keeps_dated_snapshot(m
 
 def test_workflows_refresh_and_publish_only_their_card_domains():
     from pathlib import Path
-    import yaml
     root=Path(__file__).resolve().parents[1]
     for name,scope in [('weekly','markets'),('macro','world'),('india','india')]:
         source=(root/'.github/workflows'/f'{name}.yml').read_text()
-        workflow=yaml.safe_load(source)
-        steps=next(iter(workflow['jobs'].values()))['steps']
-        refresh=next(s for s in steps if 'generate_macro_cards.py' in s.get('run',''))
-        assert f'--publish --only {scope}' in refresh['run']
-        assert refresh['continue-on-error'] is True
-        commit=next(s for s in steps if 'git add -A' in s.get('run',''))
-        assert 'assets/macro_cards.json' in commit['run']
+        steps=source.split('\n      - name: ')
+        refresh=next(step for step in steps if 'generate_macro_cards.py' in step)
+        assert f'--publish --only {scope}' in refresh
+        assert 'continue-on-error: true' in refresh
+        commit=next(step for step in steps if 'git add -A' in step)
+        assert 'assets/macro_cards.json' in commit
