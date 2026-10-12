@@ -2395,8 +2395,10 @@ def chart_inflation_bar(df, output_dir):
                    (df['india_cpi_yoy'].notna() | df['india_food_cpi_yoy'].notna())].copy()
     if not manual_fallback:
         # Readiness cannot authorize DB changes made after the source check.
-        # Every displayed value must still agree with the validated rate set.
-        expected = {(r['month'],r['column']):r['value'] for r in status.get('changes',[])}
+        # Compare against the accepted snapshot, including preserved manual values.
+        expected = {(r['month'],r['column']):
+                    (r['before'] if r.get('manual') and not r.get('manual_conflict_approved') else r['value'])
+                    for r in status.get('changes',[])}
         for _, row in df_subset.iterrows():
             month = row['date'].strftime('%Y-%m')
             for column in ('india_cpi_yoy','india_food_cpi_yoy'):

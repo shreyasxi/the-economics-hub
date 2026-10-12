@@ -52,9 +52,29 @@ class SaturdaySources(unittest.TestCase):
         self.assert_independent_external_failure('REER_UPDATE_FAILED', 'chart_reer',
             'chart_vulnerability', EXTERNAL_FILES[0], EXTERNAL_FILES[1])
 
-    def test_failed_vulnerability_does_not_read_old_store_or_block_reer(self):
-        self.assert_independent_external_failure('EXTERNAL_VULNERABILITY_UPDATE_FAILED',
-            'chart_vulnerability', 'chart_reer', EXTERNAL_FILES[1], EXTERNAL_FILES[0])
+    def test_failed_vulnerability_renders_validated_store_and_does_not_block_reer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output=Path(directory)
+            def render(folder, name):
+                path=folder/name
+                path.write_bytes(b'validated stored data')
+                return path
+            with patch.dict(os.environ, dict(REER_UPDATE_FAILED='false', EXTERNAL_VULNERABILITY_UPDATE_FAILED='true')), \
+                    patch.object(external,'chart_vulnerability',side_effect=lambda folder:render(folder,EXTERNAL_FILES[1])) as fallback, \
+                    patch.object(external,'chart_reer',side_effect=lambda folder:render(folder,EXTERNAL_FILES[0])):
+                self.assertEqual(set(external.generate(output)),{output/name for name in EXTERNAL_FILES})
+            fallback.assert_called_once()
+        self.assertIn('::warning title=External vulnerability refresh failed',WORKFLOW.read_text())
+
+    def test_failed_vulnerability_with_invalid_store_is_still_omitted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output=Path(directory)
+            (output/EXTERNAL_FILES[1]).write_bytes(b'old chart')
+            with patch.dict(os.environ, dict(REER_UPDATE_FAILED='false', EXTERNAL_VULNERABILITY_UPDATE_FAILED='true')), \
+                    patch.object(external,'chart_vulnerability',side_effect=ValueError('invalid stored data')), \
+                    patch.object(external,'chart_reer',return_value=None):
+                self.assertEqual(external.generate(output),[])
+            self.assertFalse((output/EXTERNAL_FILES[1]).exists())
 
     def test_invalid_external_store_cannot_abort_independent_charts(self):
         with tempfile.TemporaryDirectory() as directory:

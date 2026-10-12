@@ -1,7 +1,7 @@
 """Main CPI bridge using the contribution collector's official source layer.
 
 Published rates only. Historical CPI 2012 ends Dec 2025; CPI 2024 starts Jan
-2026. A manual conflict blocks the entire DB transaction and the main chart,
+2026. A large manual conflict blocks the entire DB transaction and the main chart,
 but never invalidates the independent contribution chart.
 """
 import argparse
@@ -24,6 +24,7 @@ ROOT = CPI_MAIN_DIR
 LOG = logging.getLogger(__name__)
 TARGETS = {'CPI (General)': 'india_cpi_yoy', 'Food and beverages': 'india_food_cpi_yoy'}
 OLD_FIELDS = {'baseyear','year','month','state','sector','group','subgroup','index','inflation','status'}
+MANUAL_REVIEW_THRESHOLD_PP = .05
 
 
 def old_history(raw):
@@ -72,9 +73,10 @@ def apply_rates(db, rates, *, accept_manual_conflicts=False):
     <=0.005 pp is equivalent at CPI's two-decimal publication precision.
     Old unflagged/FRED values may migrate, with every before/after archived.
     Official revisions may replace official values and retain an audit trail.
-    Differing manual values require an explicit, audited acceptance flag.
+    Manual differences up to 0.05 pp are preserved and warned about, allowing
+    new official months to advance. Larger differences require explicit review.
     """
-    changes, conflicts = [], []
+    changes, conflicts, warnings = [], [], []
     with sqlite3.connect(db) as conn:
         conn.row_factory = sqlite3.Row
         for rate in rates:
@@ -85,15 +87,20 @@ def apply_rates(db, rates, *, accept_manual_conflicts=False):
             before = old[column] if old else None
             manual = str(flags.get(column,'')).startswith('manual:')
             equivalent = before is not None and abs(before-value) <= .005000001
+            small_difference = manual and before is not None and abs(before-value) <= MANUAL_REVIEW_THRESHOLD_PP + 1e-9
             approved = manual and not equivalent and accept_manual_conflicts
-            if manual and not equivalent and not approved:
+            if manual and not equivalent and not approved and not small_difference:
                 conflict = dict(rate,stored=before,stored_source=flags[column])
                 conflicts.append(conflict)
                 LOG.error('MANUAL CPI CONFLICT %s %s: stored=%s official=%s (%s, base %s); NOT overwritten',
                           month,column,before,value,rate['concept'],rate['base'])
+            elif manual and not equivalent and not approved:
+                warnings.append(dict(rate,stored=before,stored_source=flags[column]))
+                LOG.warning('SMALL MANUAL CPI DIFFERENCE %s %s: stored=%s official=%s; manual value preserved',
+                            month,column,before,value)
             changes.append(dict(rate,before=before,previous_source=flags.get(column),manual=manual,equivalent=equivalent,manual_conflict_approved=approved))
         if conflicts:
-            return dict(status='conflict', conflicts=conflicts, changes=changes, committed=False)
+            return dict(status='conflict', conflicts=conflicts, warnings=warnings, changes=changes, committed=False)
         # Journal before/after inside the same SQLite transaction as values.
         # A crash after the commit cannot lose the previous manual/legacy value.
         conn.execute('''CREATE TABLE IF NOT EXISTS india_cpi_observation_audit (
@@ -104,19 +111,23 @@ def apply_rates(db, rates, *, accept_manual_conflicts=False):
             conn.execute('INSERT OR IGNORE INTO india_monthly (month) VALUES (?)',(month,))
             row = conn.execute('SELECT source_flags FROM india_monthly WHERE month=?',(month,)).fetchone()
             flags = json.loads(row[0] or '{}')
-            flags[column+':official_confirmation'] = f"mospi_api:base{change['base']}:{change['concept']}"
-            if not change['manual'] or change['manual_conflict_approved']:
+            if not change['manual'] or change['equivalent'] or change['manual_conflict_approved']:
+                flags[column+':official_confirmation'] = f"mospi_api:base{change['base']}:{change['concept']}"
+            else:
+                flags.pop(column+':official_confirmation', None)
+            if not change['manual'] or not change['equivalent']:
                 conn.execute('INSERT INTO india_cpi_observation_audit (recorded_at_utc,month,column_name,payload) VALUES (?,?,?,?)',
                              (datetime.now(timezone.utc).isoformat(),month,column,json.dumps(change)))
+            if not change['manual'] or change['manual_conflict_approved']:
                 flags[column] = f"official:mospi_api:base{change['base']}:{change['concept']}"
                 conn.execute(f'UPDATE india_monthly SET {column}=? WHERE month=?',(value,month))
             if change['manual_conflict_approved']:
                 LOG.warning('APPROVED MANUAL CPI RESOLUTION %s %s: %s -> %s; previous source archived',month,column,change['before'],value)
-            if change['before'] is not None and not change['equivalent']:
+            if change['before'] is not None and not change['equivalent'] and (not change['manual'] or change['manual_conflict_approved']):
                 LOG.warning('CPI HISTORY/REVISION %s %s: %s -> %s; previous source %s',month,column,change['before'],value,change['previous_source'])
             conn.execute('UPDATE india_monthly SET source_flags=?,fetched_at=? WHERE month=?',
                          (json.dumps(flags),datetime.now(timezone.utc).isoformat(),month))
-    return dict(status='ready',conflicts=[],changes=changes,committed=True)
+    return dict(status='ready',conflicts=[],warnings=warnings,changes=changes,committed=True)
 
 
 def update(db=DB_PATH, root=ROOT, source_root=cpi.ROOT, session=None, *, accept_manual_conflicts=False):
@@ -171,6 +182,10 @@ def main():
     logging.basicConfig(level=logging.INFO,format='%(levelname)s %(message)s')
     try:
         result=update(args.db,args.root,args.source_root,accept_manual_conflicts=args.accept_manual_conflicts)
+        for warning in result.get('warnings', []):
+            print(f"::warning title=Manual CPI value preserved::{warning['month']} {warning['column']}: "
+                  f"manual {warning['stored']} vs official {warning['value']}; difference within "
+                  f"{MANUAL_REVIEW_THRESHOLD_PP} pp; new official months continue updating")
         if result['status']!='ready': p.exit(1,f"MAIN CPI BLOCKED: {len(result['conflicts'])} manual conflicts; database unchanged\n")
         LOG.info('Main CPI ready through %s',result['latest_month'])
     except (ValueError,OSError,requests.RequestException,KeyError,TypeError) as exc:

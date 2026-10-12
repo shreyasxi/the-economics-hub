@@ -88,6 +88,40 @@ class SaturdayTests(unittest.TestCase):
         self.assertEqual(self.value('2026-08','india_food_cpi_yoy'),5.95)
         self.assertIsNone(self.value('2026-07','india_cpi_yoy'))
 
+    def test_minor_manual_difference_preserves_history_and_publishes_new_month(self):
+        with patch.object(manual,'DB_PATH',self.db):
+            manual.main(['set','2026-08','--cpi','4.82'])
+        rates=inflation.old_history(OLD)+inflation.current_rates(CURRENT)
+        for rate in rates:
+            if rate['month']=='2026-08' and rate['column']=='india_cpi_yoy':
+                rate['value']=4.83
+        rates += [dict(month='2026-09',column=column,value=value,base='2024',concept=concept)
+                  for concept,column,value in [('CPI (General)','india_cpi_yoy',4.7),
+                                               ('Food and beverages','india_food_cpi_yoy',5.5)]]
+        with self.assertLogs(inflation.LOG,level='WARNING'):
+            result=inflation.apply_rates(self.db,rates)
+        self.assertEqual(result['status'],'ready')
+        self.assertEqual(len(result['warnings']),1)
+        self.assertEqual(self.value('2026-08','india_cpi_yoy'),4.82)
+        self.assertEqual(self.value('2026-09','india_cpi_yoy'),4.7)
+        with sqlite3.connect(self.db) as conn:
+            flags=json.loads(conn.execute("SELECT source_flags FROM india_monthly WHERE month='2026-08'").fetchone()[0])
+            self.assertTrue(flags['india_cpi_yoy'].startswith('manual:'))
+            self.assertNotIn('india_cpi_yoy:official_confirmation',flags)
+            audited=conn.execute("SELECT payload FROM india_cpi_observation_audit WHERE month='2026-08' AND column_name='india_cpi_yoy'").fetchone()
+            self.assertEqual(json.loads(audited[0])['before'],4.82)
+        (self.root/'status.json').write_text(json.dumps(result))
+        with patch.object(dbm,'DB_PATH',self.db): df=dbm.get_monthly_series()
+        with patch.object(inflation,'ROOT',self.root),patch.dict(os.environ,{'CPI_MAIN_UPDATE_FAILED':'false','CPI_MANUAL_FALLBACK':'false'}):
+            with patch.object(charts.EconStyle,'save_chart') as save:
+                charts.chart_inflation_bar(df,self.root)
+            save.assert_called_once()
+            # A later unvalidated edit must still prevent publication.
+            df.loc[df['date']== '2026-08-01','india_cpi_yoy']=4.7
+            with patch.object(charts.EconStyle,'save_chart') as save:
+                self.assertIsNone(charts.chart_inflation_bar(df,self.root))
+            save.assert_not_called()
+
     def test_approved_manual_conflicts_use_official_values_and_archive_original(self):
         with patch.object(manual,'DB_PATH',self.db):
             manual.main(['set','2026-08','--food-cpi','5.95','--mfg-pmi','55.1'])

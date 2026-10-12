@@ -237,6 +237,10 @@ jobs:
           PYTHONPATH: "."
         run: python -m data.fetchers.rbi_external --series vulnerability
 
+      - name: Warn about external vulnerability refresh failure
+        if: ${{ steps.rbi-vulnerability.outcome == 'failure' }}
+        run: echo "::warning title=External vulnerability refresh failed::Publishing validated stored observations with their original dates when available. See the failed refresh step for details."
+
       - name: Generate India charts
         # CPI is optional, but failed refreshes must omit its chart.
         env:

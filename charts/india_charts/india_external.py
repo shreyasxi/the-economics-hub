@@ -154,8 +154,12 @@ def generate(output_dir):
         destination.unlink(missing_ok=True)
         try:
             if os.environ.get(flag) == 'true':
-                raise ValueError('Saturday source refresh failed')
+                if flag != 'EXTERNAL_VULNERABILITY_UPDATE_FAILED':
+                    raise ValueError('Saturday source refresh failed')
+                logging.warning('External vulnerability refresh failed; using validated stored observations with original dates')
             result=chart(output_dir)
+            if result is None and os.environ.get(flag) == 'true':
+                raise ValueError('No validated stored observations available after refresh failure')
             if result:out.append(result)
         except (ValueError, OSError, KeyError, TypeError) as exc:
             destination.unlink(missing_ok=True)
