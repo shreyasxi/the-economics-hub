@@ -470,6 +470,22 @@ def fetch_oecd(flow: str, key: str, start: str) -> dict[str, pd.Series]:
     return out
 
 
+def fetch_oecd_cpi(start: str = "2023-01") -> dict[str, pd.Series]:
+    """National headline YoY rates across OECD's COICOP transition.
+
+    Countries move between flows independently. Prefer 2018 on overlapping
+    months, preserving published 1999 history and never filling missing months.
+    """
+    from data.fetchers.world_inflation import FLOWS
+    key = f"{'+'.join(OECD_CPI_AREAS.values())}.M.N.CPI.PA._T.N.GY"
+    out = {}
+    for flow in FLOWS.values():
+        for area, series in fetch_oecd(flow, key, start).items():
+            combined = pd.concat([out.get(area, pd.Series(dtype=float)), series.dropna()])
+            out[area] = combined[~combined.index.duplicated(keep="last")].sort_index()
+    return out
+
+
 def fetch_bis_policy(start: str) -> dict[str, pd.Series]:
     """
     BIS central bank policy rates for every central bank it covers, daily,
@@ -1061,8 +1077,7 @@ def build_snapshot(fred_api_key: str, sentinel_db: Path, manual_rows: list[dict]
         print(f"   World Bank GDP has changed: {GDP_LEDGER.name} rewritten")
     rates = _policy_rates(fred_series, sentinel_db, today, c)
 
-    oecd_cpi = c.run("OECD CPI", fetch_oecd, "OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0",
-                     f"{'+'.join(OECD_CPI_AREAS.values())}.M.N.CPI.PA._T.N.GY", "2023-01") or {}
+    oecd_cpi = c.run("OECD CPI (COICOP 1999 and 2018)", fetch_oecd_cpi) or {}
     oecd_unemp = c.run("OECD unemployment", fetch_oecd, "OECD.SDD.TPS,DSD_LFS@DF_IALFS_UNE_M,1.0",
                        f"{'+'.join(OECD_UNEMP_AREAS.values())}..._Z.Y._T.Y_GE15..M", "2024-01") or {}
     oecd_cli = c.run("OECD CLI", fetch_oecd, "OECD.SDD.STES,DSD_STES@DF_CLI,4.1",

@@ -47,6 +47,29 @@ def test_japan_cpi_is_automatic_and_source_failures_are_reported():
         assert cell["status"] == status and not cell["manual"] and problems
 
 
+def test_scoreboard_cpi_reads_both_classifications_without_filling_gaps(monkeypatch):
+    from data.fetchers.world_inflation import FLOWS
+    calls = []
+    def fetch(flow, key, start):
+        calls.append(flow)
+        assert key == 'GBR+CHN+JPN.M.N.CPI.PA._T.N.GY'
+        if flow == FLOWS['1999']:
+            return {'GBR': _monthly({'2026-07': 3.0, '2026-08': 3.1}),
+                    'CHN': _monthly({'2026-08': .2})}
+        return {'JPN': _monthly({'2026-06': 1.7, '2026-08': 1.9}),
+                'GBR': _monthly({'2026-08': 3.2})}
+    monkeypatch.setattr(ws, 'fetch_oecd', fetch)
+    result = ws.fetch_oecd_cpi()
+    assert calls == list(FLOWS.values())
+    assert result['GBR'].tolist() == [3.0, 3.2]
+    assert result['JPN'].tolist() == [1.7, 1.9]
+    assert pd.Timestamp('2026-07-01') not in result['JPN'].index
+    problems = []
+    assert ws._cell('JP', 'cpi_yoy', result['JPN'], date(2026, 10, 12),
+                    kind='month', problems=problems)['status'] == 'ok'
+    assert not problems
+
+
 # ── YoY across a missing month ──────────────────────────────────────────────
 
 def test_yoy_matches_calendar_month_across_a_gap():
