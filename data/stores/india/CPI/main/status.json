@@ -763,33 +763,70 @@
       "before": 4.82,
       "column": "india_cpi_yoy",
       "concept": "CPI (General)",
-      "equivalent": true,
+      "equivalent": false,
       "manual": true,
       "manual_conflict_approved": false,
       "month": "2026-08",
       "previous_source": "manual:mospi:2026-09-15",
-      "source_retrieval": "d9761e1187004e17b58a6219ba4260a8",
-      "value": 4.82
+      "source_retrieval": "4e067de1ca9645f0be1d8f859cde24ed",
+      "value": 4.83
     },
     {
       "base": "2024",
       "before": 5.66,
       "column": "india_food_cpi_yoy",
       "concept": "Food and beverages",
-      "equivalent": true,
+      "equivalent": false,
       "manual": false,
       "manual_conflict_approved": false,
       "month": "2026-08",
       "previous_source": "official:mospi_api:base2024:Food and beverages",
-      "source_retrieval": "d9761e1187004e17b58a6219ba4260a8",
-      "value": 5.66
+      "source_retrieval": "4e067de1ca9645f0be1d8f859cde24ed",
+      "value": 5.68
+    },
+    {
+      "base": "2024",
+      "before": null,
+      "column": "india_cpi_yoy",
+      "concept": "CPI (General)",
+      "equivalent": false,
+      "manual": false,
+      "manual_conflict_approved": false,
+      "month": "2026-09",
+      "previous_source": null,
+      "source_retrieval": "4e067de1ca9645f0be1d8f859cde24ed",
+      "value": 5.54
+    },
+    {
+      "base": "2024",
+      "before": null,
+      "column": "india_food_cpi_yoy",
+      "concept": "Food and beverages",
+      "equivalent": false,
+      "manual": false,
+      "manual_conflict_approved": false,
+      "month": "2026-09",
+      "previous_source": null,
+      "source_retrieval": "4e067de1ca9645f0be1d8f859cde24ed",
+      "value": 7.36
     }
   ],
-  "checked_at_utc": "2026-10-12T08:59:44.900380+00:00",
-  "committed": true,
-  "conflicts": [],
+  "checked_at_utc": "2026-10-12T14:59:52.798294+00:00",
+  "committed": false,
+  "conflicts": [
+    {
+      "base": "2024",
+      "column": "india_cpi_yoy",
+      "concept": "CPI (General)",
+      "month": "2026-08",
+      "source_retrieval": "4e067de1ca9645f0be1d8f859cde24ed",
+      "stored": 4.82,
+      "stored_source": "manual:mospi:2026-09-15",
+      "value": 4.83
+    }
+  ],
   "history_note": "2012 through Dec 2025; 2024 from Jan 2026; food is Food and beverages, not CFPI",
-  "latest_month": "2026-08",
-  "source_run": "b022d36bd3b34d6781df0617ad61b1fa",
-  "status": "ready"
+  "latest_month": "2026-09",
+  "source_run": "f859a6c687cd41bb88d68360c287e95a",
+  "status": "conflict"
 }
