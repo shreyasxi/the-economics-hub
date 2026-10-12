@@ -105,7 +105,7 @@ class RealIndiaTests(unittest.TestCase):
     def test_real_instrument_data_and_shared_analytics(self):
         from data.fetchers.portfolio_india import current,load
         try:p,local,fx,m=load(current())
-        except OSError:self.skipTest('Private INR snapshot unavailable')
+        except OSError:self.skipTest('INR snapshot unavailable')
         self.assertEqual(len(m['assets']),12)
         self.assertEqual(m['assets']['nifty-50']['return_convention'],'Official gross total-return index')
         self.assertEqual(m['assets']['GILT5YBEES.NS']['currency'],'INR')

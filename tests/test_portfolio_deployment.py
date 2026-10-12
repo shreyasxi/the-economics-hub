@@ -1,13 +1,13 @@
-"""Deployment integrity, fail-closed activation and private URL handling."""
+"""Deployment integrity, fail-closed activation and public snapshot delivery."""
 import hashlib
 import json
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import zipfile
 
 import pytest
 
-from portfolio_lab.deployment import active_root, download, install
+from portfolio_lab.deployment import active_root, install, publish
 
 
 def package(tmp_path, members=None):
@@ -88,55 +88,13 @@ def test_file_inventory_and_individual_checksums_are_verified(tmp_path):
         install(path, digest, tmp_path / 'store')
 
 
-def test_download_requires_https_and_pinned_checksum(tmp_path):
-    with patch('requests.get') as get:
-        with pytest.raises(ValueError, match='HTTPS'):
-            download('http://private.example/snapshot', '0' * 64, tmp_path)
-        with pytest.raises(ValueError, match='SHA-256'):
-            download('https://private.example/snapshot', '', tmp_path)
-    get.assert_not_called()
-
-
-def test_private_download_installs_verified_package_without_redirects(tmp_path):
-    path, digest = package(tmp_path)
-    response = Mock(status_code=200)
-    response.iter_content.return_value = [path.read_bytes()]
-    response.__enter__ = Mock(return_value=response)
-    response.__exit__ = Mock(return_value=False)
-    with patch('requests.get', return_value=response) as get, patch('portfolio_lab.deployment.validate'):
-        result = download('https://private.example/snapshot?token=private', digest, tmp_path / 'store')
-    assert result == active_root(tmp_path / 'store')
-    assert get.call_args.kwargs['allow_redirects'] is False
-
-
-def test_bootstrap_download_is_cached_and_failure_does_not_leak_url():
-    from streamlit.testing.v1 import AppTest
-    from portfolio_lab.bootstrap import _install
-    _install.clear()
-    with patch.dict('os.environ', {'PORTFOLIO_SNAPSHOT_URL': 'https://private.example?token=hidden',
-                                  'PORTFOLIO_SNAPSHOT_SHA256': '0' * 64}), \
-            patch('portfolio_lab.bootstrap.download', return_value=Path('/private/installed')) as fetch:
-        app = AppTest.from_string('from portfolio_lab.bootstrap import ensure_snapshot\nensure_snapshot()').run()
-        app.run()
-        assert not app.exception
-        assert fetch.call_count == 1
-    _install.clear()
-    with patch.dict('os.environ', {'PORTFOLIO_SNAPSHOT_URL': 'https://private.example?token=hidden',
-                                  'PORTFOLIO_SNAPSHOT_SHA256': '0' * 64}), \
-            patch('portfolio_lab.bootstrap.download', side_effect=ValueError('token=hidden')):
-        app = AppTest.from_string('from portfolio_lab.bootstrap import ensure_snapshot\nensure_snapshot()').run()
-        assert not app.exception
-        assert app.warning and 'hidden' not in app.warning[0].value
-    _install.clear()
-
-
 def test_real_active_snapshots_export_and_install_in_fresh_store(tmp_path):
     from portfolio_lab.deployment import export
     from data.fetchers.portfolio_prices import snapshot_path, load_bundle
     try:
         snapshot_path()
     except ValueError:
-        pytest.skip('Private prepared snapshots are not present in public CI')
+        pytest.skip('Prepared snapshots are unavailable')
     destination = tmp_path / 'release.zip'
     digest = export(destination)
     root = tmp_path / 'clean-store'
@@ -145,3 +103,24 @@ def test_real_active_snapshots_export_and_install_in_fresh_store(tmp_path):
     prices, manifest = load_bundle(snapshot_path(root))
     assert {'SPY', 'BTC', 'USO'} <= set(manifest['assets'])
     assert not prices.empty
+
+
+def test_public_release_loads_all_three_bundles_in_clean_checkout(tmp_path):
+    from data.fetchers.portfolio_prices import load_bundle
+    from data.fetchers.portfolio_macro import load as load_macro
+    from data.fetchers.portfolio_india import load as load_india
+    from portfolio_lab.deployment import _bundle, validate
+    source = active_root()
+    destination = publish(tmp_path / 'published', source)
+    validate(destination)
+    assert load_bundle(_bundle(destination))[1]['publication_status'].startswith('Public')
+    assert load_macro(_bundle(destination / 'macro'))[0]
+    assert not load_india(_bundle(destination / 'india'))[0].empty
+    with patch('portfolio_lab.deployment.PUBLIC_PORTFOLIO_DIR', destination), \
+            patch('portfolio_lab.deployment.PORTFOLIO_STORE_DIR', tmp_path / 'missing'):
+        assert active_root(tmp_path / 'missing') == destination
+    before = (destination / 'deployment.json').read_bytes()
+    with patch('portfolio_lab.deployment.validate', side_effect=ValueError('Bad India data')):
+        with pytest.raises(ValueError):
+            publish(destination, source)
+    assert (destination / 'deployment.json').read_bytes() == before

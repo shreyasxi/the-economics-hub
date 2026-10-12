@@ -1,4 +1,4 @@
-> **Deployment update (12 October 2026):** Private snapshot delivery is implemented. See [DEPLOYMENT.md](DEPLOYMENT.md) for the package, secrets, validation and refresh procedure. Earlier local-only release notes below describe the previous deployment state; source-permission limitations remain recorded.
+> **Deployment update (12 October 2026):** The owner confirmed source permissions. Validated Global, macro and India datasets now ship publicly in Git under `data/published/portfolio_lab/`. See [DEPLOYMENT.md](DEPLOYMENT.md) for validation and refresh commands. No separate storage or snapshot secrets are required.
 
 # Indian Investor Mode — implementation and research report
 
@@ -8,7 +8,7 @@ The mode is available within Portfolio Lab as **Indian Investor — INR**, besid
 
 **Release boundary:** the calculations are validated reference-price simulations. They are not executable fund-NAV or exchange-order backtests. Historical public-release receipts, contemporaneous executable FX, settlement, fund cutoff rules and whole-unit constraints have not been established. No control silently implies those capabilities.
 
-The pre-implementation [architecture/source feasibility report](INDIA_FEASIBILITY.md) records the initial decisions and permission gates.
+The pre-implementation [architecture/source feasibility report](INDIA_FEASIBILITY.md) records the initial source and architecture decisions.
 
 ## 1. Architecture
 
@@ -17,14 +17,14 @@ Shared components remain the holdings simulator, allocation validation, self-fin
 New modules:
 
 - `config/portfolio_india_settings.py`: curated instruments, templates, explicit episode windows.
-- `data/fetchers/portfolio_india.py`: explicit private preparation, source/identity checks, immutable source copies and SHA-256 hashes, reconstructed normalised returns on load, atomic CURRENT activation. No downloads on UI reruns.
+- `data/fetchers/portfolio_india.py`: explicit snapshot preparation, source/identity checks, immutable source copies and SHA-256 hashes, reconstructed normalised returns on load, atomic CURRENT activation. No downloads on UI reruns.
 - `data/processors/portfolio_currency.py`: timestamp/publication-aware marks, exact FX conversion, standalone and actual-holdings FX P&L, strict permission/identity boundary for future Direct/Growth NAV imports.
 - `data/processors/portfolio_sip.py`: dated subscriptions, simulated holdings/units, shared interval simulation/rebalancing, capital/gain, flow-adjusted TWR and XIRR.
 - `data/processors/portfolio_india_regimes.py`: read-only RBI/CPI inputs, monthly ex-post labels and India equity/FX weekly design.
 - `portfolio_lab/india.py`: mode-specific builder and research presentation, independent session keys, INR formatting, actual eligibility/errors.
 - `verify_india.py` and `render_india_alternatives.py`: independent numerical demonstration and six retained layout trials.
 
-`data/paths.py` registers the new namespace beneath the already ignored `data/stores/portfolio_lab/`. Source histories, converted observations and private previews stay outside Git. No database server, paid API, new LLM inference or automatic refresh was introduced.
+`data/paths.py` registers the new namespace beneath the already ignored `data/stores/portfolio_lab/`. Active source histories and converted observations are published under `data/published/portfolio_lab/`; local previews and superseded runs stay outside Git. No database server, paid API, new LLM inference or automatic refresh was introduced.
 
 ## 2. Data and approved universe
 
@@ -51,7 +51,7 @@ The [NSE circular](https://archives.nseindia.com/content/circulars/CML52187.pdf)
 
 The NIFTY records reuse the existing validated official gross-TRI snapshot, including source receipts, hashes and independent checks. No price-index/dividend-estimate substitution. The five-year local backfill is the acquired coverage, **not the full history offered by the provider**. Official older/back-cast index history and index launch dates do not establish a fund's existence.
 
-[NSE's fixed-income portal](https://niftyindices.com/reports) distinguishes total-return histories from the 10-year clean-price exception. Composite G-Sec, 5/10yr and duration buckets, corporate-debt and liquid benchmarks were investigated, but new retrieval is permission-gated. No yield, clean-price or spot series is used as bond total return. The 5yr ETF is **medium maturity**, not a certified short-duration fund; the 8–13yr category is maturity exposure, not a validated duration number. True short-duration sovereign and corporate-debt benchmark studies remain outside this first approved universe. LIQUIDCASE is a fund with market risk/expenses, not a theoretical risk-free asset.
+[NSE's fixed-income portal](https://niftyindices.com/reports) distinguishes total-return histories from the 10-year clean-price exception. Composite G-Sec, 5/10yr and duration buckets, corporate-debt and liquid benchmarks were investigated, with source definitions retained for future additions. No yield, clean-price or spot series is used as bond total return. The 5yr ETF is **medium maturity**, not a certified short-duration fund; the 8–13yr category is maturity exposure, not a validated duration number. True short-duration sovereign and corporate-debt benchmark studies remain outside this first approved universe. LIQUIDCASE is a fund with market risk/expenses, not a theoretical risk-free asset.
 
 AMFI/AMC growth NAVs are not acquired in bulk. The import boundary validates scheme code, ISIN, AMC, plan, option, inception, permission and verified continuity; it rejects Regular/IDCW variants and pre-inception history. Enabling a scheme requires a source permission and identity audit. No renamed/merged NAVs are automatically combined.
 
@@ -147,10 +147,8 @@ Global regression tests retain previous methodology/defaults. No existing tests 
 
 Feature files changed: `data/paths.py`, `portfolio_lab/page.py`, `charts.py`, `README.md`; shared `portfolio_analytics.py`, `portfolio_attribution.py`, `portfolio_stress.py`. New files: `config/portfolio_india_settings.py`, `data/fetchers/portfolio_india.py`, the three India/currency/SIP processors, `portfolio_lab/india.py`, `verify_india.py`, `render_india_alternatives.py`, the two India test modules and the feasibility/implementation reports. Unrelated app/dashboard/database/workflow changes in this shared checkout are not part of this feature.
 
-Ready: local curated reference research, both modes, exact INR/FX accounting, SIP/XIRR, supported macro/factor/stress calculations and retained visual alternatives. Explicit CLI collection/preparation, private immutable inputs and cache separation are implemented.
+Ready: local curated reference research, both modes, exact INR/FX accounting, SIP/XIRR, supported macro/factor/stress calculations and retained visual alternatives. Explicit CLI collection/preparation, immutable inputs and cache separation are implemented.
 
-Not claimed ready: executable fund-NAV/order simulation, authorised public market-data dissemination, corporate-debt benchmarks, licensed true short-duration government indices, AMFI Direct/Growth scheme coverage, vintage-verified FX publication and real-time investability/tax/remittance eligibility.
+Not claimed ready: executable fund-NAV/order simulation, corporate-debt benchmarks, licensed true short-duration government indices, AMFI Direct/Growth scheme coverage, vintage-verified FX publication and real-time investability/tax/remittance eligibility.
 
-[NSE terms](https://www.niftyindices.com/terms-of-use) require consent for automated collection and dissemination; no new NSE retrieval was performed. [AMFI terms](https://www.amfiindia.com/terms-of-use) restrict significant electronic storage and public derivative use; no bulk collection was added. [FBIL's FAQ](https://www.fbil.org.in/uploads/Data_Fee_Schedule_FAQ_repl_3576a15203.pdf) confirms fee-liable reference-rate licensing; none was purchased or assumed. Yahoo personal-use access does not establish public display/redistribution rights. Obtain the appropriate written permissions/licensed feeds before publishing.
-
-Future release steps: review the feature diff independently of unrelated checkout work; establish source permissions; replace asynchronous reference inputs if executable research is required; refresh/validate licensed bundles; rerun numerical/browser checks; only then approve commit/push/merge/deploy. Any scheduled refresh or GitHub Actions change needs separate approval. No existing workflow was changed or triggered.
+The owner confirmed source permissions for the public datasets. The release includes the active snapshots, original source identities and validation evidence. Deployment needs no additional data storage or snapshot secrets. Refresh using DEPLOYMENT.md, then run the repository and portfolio deployment checks before accepting updated data.

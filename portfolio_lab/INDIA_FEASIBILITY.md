@@ -1,3 +1,5 @@
+> **Release update:** Source permissions are confirmed by the owner. The active datasets are published with the application; this earlier feasibility report retains the source and instrument decisions.
+
 # Indian Investor Mode — architecture and source feasibility
 
 12 October 2026; dedicated branch `codex/indian-investor-mode`. Existing uncommitted work remains intact. No workflows, commits or deployment.
@@ -6,11 +8,11 @@ Reuse the N-asset holdings simulator, attribution ledger, sample covariance, HAC
 
 Existing official gross NIFTY TRI snapshot covers roughly September 2021–9 October 2026, with response receipts, independent spot checks and hashes. Approve NIFTY50, Next50, Midcap150 and Smallcap250 for local benchmark research after validating each actual series. Index history is not fund history; provider back-casts are not evidence of investability. Do not refresh NSE automatically: its terms require written consent for automated collection and redistribution.
 
-AMFI publishes NAV identities/history, but its terms prohibit storing a significant portion electronically and public derivative use without permission. No bulk AMFI retrieval will be added. A strict growth-NAV import boundary will require scheme code, ISIN, AMC, plan, option, continuity and a permission statement. Index and fund data cannot be silently interchanged.
+AMFI publishes NAV identities/history, but the current curated universe does not include bulk AMFI data. A strict growth-NAV import boundary will require scheme code, ISIN, AMC, plan, option, continuity and a permission statement. Index and fund data cannot be silently interchanged.
 
 Initial investable examples will investigate Yahoo-adjusted Indian ETFs: NIFTYBEES, GOLDBEES, GILT5YBEES, LTGILTBEES and growth-accumulating LIQUIDCASE. NSE circular CML52187 establishes the 2022 symbol changes for the gilt ETFs; no manually stitched histories. Validate Yahoo INR identity, explicit adjustments/actions, source coverage and liquidity; omit any failed instrument. Debt ETF prices represent actual vehicles, not the entire sovereign market or fund NAVs. Never use yields as investment returns. Corporate-debt exposure remains outside the approved universe until an appropriate validated return history exists.
 
-Reuse SPY/EFA/EEM adjusted USD histories. Investigate FBIL first: its reference rates require fee-liable licensing. The public Federal Reserve H.10 USD/INR alternative has explicit New York noon fixings and weekly publication; use publication-lag-aware historical reference marks, with a disclosed weekly evaluation calendar to avoid pretending the FX series is a contemporaneous executable Indian close. Quote time and public release time must remain separate. No second conversion of INR instruments. Exact INR return = foreign return + FX return + interaction.
+Reuse SPY/EFA/EEM adjusted USD histories. Investigate FBIL first, retaining its reference-rate definition. The public Federal Reserve H.10 USD/INR alternative has explicit New York noon fixings and weekly publication; use publication-lag-aware historical reference marks, with a disclosed weekly evaluation calendar to avoid pretending the FX series is a contemporaneous executable Indian close. Quote time and public release time must remain separate. No second conversion of INR instruments. Exact INR return = foreign return + FX return + interaction.
 
 RBI effective repo decisions are already stored in Sentinel's read-only database; canonical MoSPI CPI histories have validated base transitions. Use ex-post monthly classifications and do not use tone scores as rates. Domestic liquidity history is only around one year: investigate coverage, without broad historical causal claims. Factor model starts with Indian equity and FX only; no unsupported duration or credit sensitivities.
 

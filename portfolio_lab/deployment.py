@@ -1,7 +1,7 @@
 """Package and install the three validated active snapshots, never old runs.
 
-Private HTTPS delivery uses a separately configured SHA-256. Installation is
-immutable; a single atomic pointer activates Global, macro and India together.
+The public release ships in Git with manifests, source evidence and hashes.
+Local preparation runs remain separate from the published active snapshots.
 """
 import argparse
 import hashlib
@@ -15,7 +15,7 @@ import tempfile
 import uuid
 import zipfile
 
-from data.paths import PORTFOLIO_STORE_DIR
+from data.paths import PORTFOLIO_STORE_DIR, PUBLIC_PORTFOLIO_DIR
 
 MAX_BYTES = 256 * 1024 * 1024
 
@@ -24,6 +24,8 @@ def active_root(root=PORTFOLIO_STORE_DIR):
     root = Path(root)
     pointer = root / "DEPLOYED_CURRENT"
     if not pointer.exists():
+        if root == PORTFOLIO_STORE_DIR and not (root / "CURRENT").exists() and PUBLIC_PORTFOLIO_DIR.exists():
+            return PUBLIC_PORTFOLIO_DIR
         return root
     name = pointer.read_text().strip()
     if not re.fullmatch(r"[a-f0-9]{64}", name):
@@ -46,6 +48,16 @@ def validate(root):
     from data.fetchers.portfolio_macro import load as load_macro
     from data.fetchers.portfolio_india import load as load_india
     root = Path(root)
+    receipt_path = root / 'deployment.json'
+    if receipt_path.exists():
+        receipt = json.loads(receipt_path.read_text())
+        actual = {p.relative_to(root).as_posix() for p in root.rglob('*')
+                  if p.is_file() and p != receipt_path}
+        if receipt.get('schema') != 1 or set(receipt.get('files', {})) != actual:
+            raise ValueError('Published dataset inventory mismatch')
+        for name, digest in receipt['files'].items():
+            if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest:
+                raise ValueError('Published dataset checksum mismatch')
     load_bundle(_bundle(root))
     load_macro(_bundle(root / "macro"))
     load_india(_bundle(root / "india"))
@@ -126,28 +138,46 @@ def install(archive_path, expected_sha256, root=PORTFOLIO_STORE_DIR):
     return installed
 
 
-def download(url, expected_sha256, root=PORTFOLIO_STORE_DIR):
-    """Fetch a configured deployment package, never market sources on reruns."""
-    import requests
-    from urllib.parse import urlsplit
-    if urlsplit(url).scheme != "https":
-        raise ValueError("Deployment download requires HTTPS")
-    if not re.fullmatch(r"[a-f0-9]{64}", expected_sha256):
-        raise ValueError("A lowercase SHA-256 digest is required")
-    with tempfile.TemporaryDirectory() as temporary:
-        path = Path(temporary) / "snapshot.zip"
-        # Reject redirects: credentials in a signed URL must not reach another host.
-        with requests.get(url, stream=True, timeout=(10, 60), allow_redirects=False) as response:
-            if response.status_code != 200:
-                raise ValueError("Deployment download failed")
-            total = 0
-            with path.open("wb") as handle:
-                for chunk in response.iter_content(1024 * 1024):
-                    total += len(chunk)
-                    if total > MAX_BYTES:
-                        raise ValueError("Deployment download exceeds size limit")
-                    handle.write(chunk)
-        return install(path, expected_sha256, root)
+
+def publish(destination=PUBLIC_PORTFOLIO_DIR, root=PORTFOLIO_STORE_DIR):
+    """Publish only the validated active release; keep prior data on failure."""
+    destination = Path(destination)
+    source = active_root(root)
+    validate(source)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=destination.parent) as temporary:
+        release = Path(temporary) / "release"
+        release.mkdir()
+        for namespace in ("", "macro", "india"):
+            bundle = _bundle(source / namespace)
+            target = release / namespace
+            target.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(bundle, target / bundle.name)
+            (target / "CURRENT").write_text(bundle.name)
+        for namespace, field in [("", "publication_status"), ("india", "publication")]:
+            path = _bundle(release / namespace) / "manifest.json"
+            manifest = json.loads(path.read_text())
+            manifest[field] = "Public Portfolio Lab dataset; source permissions confirmed by the owner"
+            path.write_text(json.dumps(manifest, indent=2) + "\n")
+        path = _bundle(release / "macro") / "manifest.json"
+        manifest = json.loads(path.read_text())
+        manifest['credit_rights'] = "Public Portfolio Lab dataset; source permissions confirmed by the owner"
+        path.write_text(json.dumps(manifest, indent=2) + "\n")
+        receipt = {'schema': 1, 'files': {
+            p.relative_to(release).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(release.rglob('*')) if p.is_file()}}
+        (release / 'deployment.json').write_text(json.dumps(receipt, indent=2) + "\n")
+        validate(release)
+        previous = Path(temporary) / 'previous'
+        if destination.exists():
+            destination.rename(previous)
+        try:
+            release.rename(destination)
+        except Exception:
+            if previous.exists():
+                previous.rename(destination)
+            raise
+    return destination
 
 
 def main():
@@ -155,7 +185,7 @@ def main():
     parser.add_argument("--export", type=Path)
     parser.add_argument("--install", type=Path)
     parser.add_argument("--sha256")
-    parser.add_argument("--download", action="store_true", help="Use PORTFOLIO_SNAPSHOT_URL and PORTFOLIO_SNAPSHOT_SHA256 from the environment")
+    parser.add_argument("--publish", action="store_true", help="Publish the three active snapshots into the versioned public data directory")
     parser.add_argument("--root", type=Path, default=PORTFOLIO_STORE_DIR)
     parser.add_argument("--validate", action="store_true")
     args = parser.parse_args()
@@ -165,16 +195,9 @@ def main():
         if not args.sha256:
             parser.error("--install requires --sha256")
         install(args.install, args.sha256, args.root)
-    if args.download:
-        url = os.environ.get('PORTFOLIO_SNAPSHOT_URL', '')
-        digest = os.environ.get('PORTFOLIO_SNAPSHOT_SHA256', '')
-        if not url or not digest:
-            parser.error('Configure PORTFOLIO_SNAPSHOT_URL and PORTFOLIO_SNAPSHOT_SHA256')
-        try:
-            download(url, digest, args.root)
-        except Exception:
-            # Provider exceptions may contain a signed URL or authentication token.
-            parser.exit(1, 'Private snapshot download or validation failed; previous data retained.\n')
+    if args.publish:
+        publish(root=args.root)
+        print("Published Global, macro and India snapshots")
     if args.validate:
         validate(active_root(args.root))
         print("Global, macro and India snapshots validated")

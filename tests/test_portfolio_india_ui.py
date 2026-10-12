@@ -1,4 +1,4 @@
-"""Real prepared INR inputs; no remote work on interaction."""
+"""Prepared INR inputs; no remote work on interaction."""
 import unittest
 from unittest.mock import patch
 from streamlit.testing.v1 import AppTest
@@ -8,7 +8,7 @@ class IndiaUITests(unittest.TestCase):
     def test_mode_templates_sip_research_and_global_state(self):
         from data.fetchers.portfolio_india import current
         try:current()
-        except OSError:self.skipTest('Private INR snapshot unavailable')
+        except OSError:self.skipTest('INR snapshot unavailable')
         with patch('data.fetchers.portfolio_india.collect',side_effect=AssertionError('Remote UI fetch')):
             app=AppTest.from_string('from portfolio_lab.page import render\nrender()',default_timeout=40).run()
             app.button(key='pl_enter_global').click().run()

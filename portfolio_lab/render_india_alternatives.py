@@ -22,7 +22,7 @@ def style(ax,inr=False):
 
 def finish(fig,title,subtitle,name):
     EconStyle.add_editorial_header(fig,title,subtitle)
-    EconStyle.add_source(fig,'NSE TRI; Yahoo ETF prices; Federal Reserve H.10 · private research','12 Oct 2026')
+    EconStyle.add_source(fig,'NSE TRI; Yahoo ETF prices; Federal Reserve H.10 · portfolio research','12 Oct 2026')
     EconStyle.save_chart(fig,OUT/name);plt.close(fig)
 
 

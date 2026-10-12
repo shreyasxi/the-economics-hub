@@ -1,7 +1,7 @@
 """Offline FRED research preparation, reusing Monetaria's FredFetcher.
 
 ICE credit history is source-limited to three years; never substitute a proxy.
-All stores are private, immutable, hashed and activated only after validation.
+All stores are immutable, hashed and activated only after validation.
 """
 from datetime import datetime, timezone
 from pathlib import Path
@@ -47,7 +47,7 @@ def prepare(root=ROOT):
     bundle.mkdir(parents=True)
     manifest = {'schema':1, 'retrieved_utc':datetime.now(timezone.utc).isoformat(), 'series':{},
                 'availability':'Ex-post latest revised observations. No release vintages; never an investable signal.',
-                'credit_rights':'ICE internal use only; public distribution requires permission; three-year FRED coverage.'}
+                'credit_rights':'Owner-authorised public dataset; source-limited three-year FRED credit coverage.'}
     for sid, (frequency, units, max_age) in SERIES.items():
         print('Preparing '+sid, flush=True)
         series = validate_series(fetcher.fetch_series(sid, period_years=40), sid)

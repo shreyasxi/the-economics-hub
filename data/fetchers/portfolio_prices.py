@@ -1,4 +1,4 @@
-"""Prepare private Yahoo histories; UI loads only validated local snapshots.
+"""Prepare validated Yahoo histories; UI loads only validated local snapshots.
 
 No remote calls occur on page rendering. Preparation is explicit and writes an
 immutable bundle before replacing the CURRENT pointer atomically.
@@ -128,7 +128,7 @@ def prepare(root=PORTFOLIO_STORE_DIR, expand=False):
     manifest = {"schema": 2, "valuation_convention": CONVENTION, "retrieved_utc": datetime.now(timezone.utc).isoformat(),
                 "source": "Yahoo Finance via yfinance + Coin Metrics Community PriceUSD", "yfinance_version": yf.__version__,
                 "adjustment": ADJUSTMENT, "assets": assets, "sha256": hashes,
-                "publication_status": "local research only; public display/redistribution rights unresolved"}
+                "publication_status": "Public Portfolio Lab snapshot"}
     (bundle/"manifest.json").write_text(json.dumps(manifest, indent=2))
     # Read and verify the entire bundle before activation.
     load_bundle(bundle)

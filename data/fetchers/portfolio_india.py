@@ -1,4 +1,4 @@
-"""Explicit private preparation. No NSE/AMFI automated downloads or UI I/O."""
+"""Explicit snapshot preparation. No NSE/AMFI automated downloads or UI I/O."""
 from pathlib import Path
 import json
 import hashlib
@@ -19,7 +19,7 @@ def digest(path):
 
 
 def collect():
-    """Yahoo/Fed only. Each raw response is retained privately for validation."""
+    """Yahoo/Fed only. Each raw response is retained for validation."""
     import yfinance as yf
     from data.fetchers.fred_fetcher import FredFetcher
     root=PORTFOLIO_INDIA_STORE_DIR/'inputs';root.mkdir(parents=True,exist_ok=True)
@@ -97,7 +97,7 @@ def prepare():
         fx_first=str(fx.index[0].date()),fx_latest=str(fx.index[-1].date()),fx_observations=len(fx),
         fx_availability_note='Scheduled weekly releases with federal-holiday adjustment; actual vintage-by-vintage release receipts are not available. Revised-history reference research, not a point-in-time execution strategy.',
         fx_convention='INR per USD; noon New York fixing, weekly public release',frequency='weekly',
-        publication='Local only; NSE/Yahoo/AMFI public display permissions unresolved',
+        publication='Public Portfolio Lab snapshot',
         files={str(p.relative_to(bundle)):digest(p) for p in bundle.rglob('*') if p.is_file()})
     (bundle/'manifest.json').write_text(json.dumps(manifest,indent=2))
     load(bundle)

@@ -43,9 +43,10 @@ Desktop.ini
 
 # ── local data, cache, logs ──
 data/cache/
-# Local market histories: public redistribution rights are unresolved.
+# Local preparation runs, caches and superseded snapshots. The validated public
+# active release is tracked separately under data/published/portfolio_lab/.
 data/stores/portfolio_lab/
-# Private deployment packages and checksums contain full source histories.
+# Optional local export packages; published datasets are tracked as files.
 *.portfolio-snapshot.zip
 *.portfolio-snapshot.zip.sha256
 data/stores/india/nse_valuations/runs/

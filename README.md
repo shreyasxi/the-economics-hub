@@ -289,6 +289,6 @@ See the [LICENSE](LICENSE) file for details.
 ## Release workflow and Portfolio Lab deployment
 
 See [RELEASE.md](RELEASE.md) for integration checks and the initial GitHub Actions run order.
-Portfolio Lab uses validated snapshots from private HTTPS storage; follow
-[the deployment guide](portfolio_lab/DEPLOYMENT.md) to upload the package and configure
-Streamlit and GitHub secrets. Source histories remain excluded from public Git.
+Portfolio Lab ships validated public Global, macro and India datasets in
+`data/published/portfolio_lab/`. Follow [the deployment guide](portfolio_lab/DEPLOYMENT.md)
+for refresh and validation commands. No snapshot URL or data-storage secrets are required.

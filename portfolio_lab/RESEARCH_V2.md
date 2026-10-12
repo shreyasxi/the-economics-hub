@@ -1,4 +1,4 @@
-> **Deployment update (12 October 2026):** Private snapshot delivery is implemented. See [DEPLOYMENT.md](DEPLOYMENT.md) for the package, secrets, validation and refresh procedure. Earlier local-only release notes below describe the previous deployment state; source-permission limitations remain recorded.
+> **Deployment update (12 October 2026):** The owner confirmed source permissions. Validated Global, macro and India datasets now ship publicly in Git under `data/published/portfolio_lab/`. See [DEPLOYMENT.md](DEPLOYMENT.md) for validation and refresh commands. No separate storage or snapshot secrets are required.
 
 # Portfolio Lab 2.0 — local research release
 
@@ -136,9 +136,9 @@ INDA cannot participate in the GFC; preparation does not backfill it. HYG/BIL be
 | [CPIAUCSL](https://fred.stlouisfed.org/series/CPIAUCSL) | 1986-10-01 onward | 2026-08-01 | seasonally adjusted index |
 | [CFNAIMA3](https://fred.stlouisfed.org/series/CFNAIMA3) | 1986-10-01 onward | 2026-08-01 | published three-month activity index |
 
-FRED source definitions: [DGS10](https://fred.stlouisfed.org/series/DGS10), [ICE HY OAS](https://fred.stlouisfed.org/series/BAMLH0A0HYM2), [CPIAUCSL](https://fred.stlouisfed.org/series/CPIAUCSL), [CFNAIMA3](https://fred.stlouisfed.org/series/CFNAIMA3). Existing FredFetcher is reused; World snapshots retain too little rate/CPI history and Weekly fetches short change windows, so a separate private immutable research bundle is necessary. Monthly macro data are aligned by observation month, not claimed release date. [BLS documents the October 2025 data gap](https://www.bls.gov/bls/bls-handling-of-missing-data.htm).
+FRED source definitions: [DGS10](https://fred.stlouisfed.org/series/DGS10), [ICE HY OAS](https://fred.stlouisfed.org/series/BAMLH0A0HYM2), [CPIAUCSL](https://fred.stlouisfed.org/series/CPIAUCSL), [CFNAIMA3](https://fred.stlouisfed.org/series/CFNAIMA3). Existing FredFetcher is reused; World snapshots retain too little rate/CPI history and Weekly fetches short change windows, so a separate immutable research bundle is necessary. Monthly macro data are aligned by observation month, not claimed release date. [BLS documents the October 2025 data gap](https://www.bls.gov/bls/bls-handling-of-missing-data.htm).
 
-Yahoo access is described by [yfinance](https://ranaroussi.github.io/yfinance/) as personal research use; no public-display licence has been established. FRED’s ICE notes explicitly restrict publishing and distributing top-level data without permission and limit available history to three years from April 2026. All raw bundles remain gitignored, including macro bundles. Publication requires a source-specific licence and a reviewed delivery/provisioning plan; hiding CSVs alone does not resolve derived-display rights.
+The owner confirmed permission to publish these datasets. The active research bundle is now included in the public release, with source attribution, hashes and observation dates retained.
 
 ## Implementation and quantitative methods
 
@@ -173,6 +173,7 @@ Prepare/refresh explicitly:
 
 Data loads cache by immutable bundle path, independently of allocations; all user holdings remain session-local. Simulation and weekly models are inexpensive interactive calculations; rolling models run at 13-week steps rather than daily fits. No database, LLM, authentication, extra dependencies or workflow integration. Reproducibility inputs: research JSON stores asset and macro snapshot paths, source manifests, allocations, periods and assumptions.
 
-Public readiness: local review ready, publication blocked by Yahoo/ICE rights and private snapshot provisioning. A clean public checkout intentionally displays an unavailable-data notice. After rights are settled, propose a separately approved offline refresh job that prepares both bundles, validates contracts/tests, and activates only passing snapshots. Keep old snapshots on failure. No workflow changes were made.
+Public readiness: the validated datasets ship with the application. Run Repository Checks and Portfolio Deployment Checks before accepting the release. Refresh and publish active snapshots using DEPLOYMENT.md; failed preparation retains the prior source snapshots.
+
 
 Browser QA: repaired the composite Altair box-plot dataset handoff using explicit inline observations; verified actual distributions render. Checked desktop at 1440×1000 and mobile at 390×844, including wrapped research navigation, readable attribution labels, regime sample tables/distributions and stress controls. Screenshots are local under `output/portfolio_lab/v2/screenshots/`. Source bundles remain ignored.

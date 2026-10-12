@@ -1,4 +1,4 @@
-> **Deployment update (12 October 2026):** Private snapshot delivery is implemented. See [DEPLOYMENT.md](DEPLOYMENT.md) for the package, secrets, validation and refresh procedure. Earlier local-only release notes below describe the previous deployment state; source-permission limitations remain recorded.
+> **Deployment update (12 October 2026):** The owner confirmed source permissions. Validated Global, macro and India datasets now ship publicly in Git under `data/published/portfolio_lab/`. See [DEPLOYMENT.md](DEPLOYMENT.md) for validation and refresh commands. No separate storage or snapshot secrets are required.
 
 # Portfolio Lab — asset expansion and visual redesign
 
@@ -33,7 +33,7 @@ The [issuer](https://www.uscfinvestments.com/uso) and [SEC filing](https://www.s
 
 ### Licensing
 
-[Coin Metrics Community](https://gitbook-docs.coinmetrics.io/packages/coin-metrics-community-data) and its [data repository](https://github.com/coinmetrics/data) specify **CC BY-NC 4.0**: attribution and noncommercial conditions apply. Free API access does not establish commercial rights. [yfinance's disclaimer](https://ranaroussi.github.io/yfinance/) describes personal-use access; public Yahoo ETF display/redistribution rights remain unresolved. Existing ICE credit-factor restrictions remain in `RESEARCH_V2.md`. No raw data is added to public assets.
+[Coin Metrics Community](https://gitbook-docs.coinmetrics.io/packages/coin-metrics-community-data) and its [data repository](https://github.com/coinmetrics/data) specify **CC BY-NC 4.0**: attribution and noncommercial conditions apply. Free API access does not establish commercial rights. The owner confirmed source permissions for this public release. Active source histories and evidence are included under `data/published/portfolio_lab/`.
 
 ## B. Visual redesign
 
@@ -110,4 +110,4 @@ Before public release:
 3. Review asynchronous BTC valuation and early-history execution limits; approve the feature diff separately from unrelated checkout work.
 4. Only with explicit approval, commit/push/merge/deploy. No scheduling or deployment workflow was changed.
 
-Ready for local research review. Public release remains blocked by unresolved data rights.
+Ready for deployment validation with the versioned public datasets.

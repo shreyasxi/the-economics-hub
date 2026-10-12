@@ -1,4 +1,4 @@
-> **Deployment update (12 October 2026):** Private snapshot delivery is implemented. See [DEPLOYMENT.md](DEPLOYMENT.md) for the package, secrets, validation and refresh procedure. Earlier local-only release notes below describe the previous deployment state; source-permission limitations remain recorded.
+> **Deployment update (12 October 2026):** The owner confirmed source permissions. Validated Global, macro and India datasets now ship publicly in Git under `data/published/portfolio_lab/`. See [DEPLOYMENT.md](DEPLOYMENT.md) for validation and refresh commands. No separate storage or snapshot secrets are required.
 
 > **Indian Investor Mode:** See [INDIAN_INVESTOR.md](INDIAN_INVESTOR.md) for the INR implementation, data/rights boundaries, SIP methodology, executed research and visual review.
 >
@@ -18,7 +18,7 @@ in the shared checkout. Review only this feature's files and its small app integ
 - `config/portfolio_settings.py`: approved eight-ETF universe, currency/source/adjustment metadata,
   educational templates, crisis windows, analytical defaults.
 - `data/paths.py`: adds `PORTFOLIO_STORE_DIR` under `data/stores/portfolio_lab/`.
-- `.gitignore`: excludes that complete data namespace from public Git.
+- `.gitignore`: excludes local preparation runs; the active public release is tracked separately.
 - `data/fetchers/portfolio_prices.py`: explicit preparation CLI, identity and adjustment validation,
   immutable CSV bundles, corporate-action evidence, provenance and hashes, atomic CURRENT pointer,
   local reader and freshness policy. Reuses the existing Yahoo fetcher's retries and explicit Adj Close.
@@ -51,8 +51,7 @@ Preparation requires Yahoo connectivity. It retrieves each full history only dur
 allocations never trigger remote calls. It discards the current New York session, retains all downloaded
 corporate-action fields, validates the entire bundle, then atomically activates it. Failed preparation
 leaves the previous snapshot active. Full refreshes capture upstream revisions to historical adjustments.
-No schedule was introduced. A weekly manual refresh is sufficient for v1; after authorization a private
-scheduled refresh could run this command and verify its output before replacing the snapshot.
+No schedule was introduced. Refresh the datasets with the explicit preparation and publication commands.
 
 ## Data coverage and definition
 
@@ -82,9 +81,8 @@ reinvestment and are not an independently audited investor total-return index. S
 shared by both price adjustment and action records cannot be ruled out by this internal reconciliation.
 
 Raw evidence, combined adjusted prices, observed-date metadata, retrieval timestamp, yfinance version
-and SHA-256 checksums live together in each private snapshot. Loading checks hashes, source evidence,
-identity, quality, and coverage agreement. Future refreshes retain earlier bundles; do not publicly publish
-either raw or derived histories without an established redistribution basis.
+and SHA-256 checksums live together in each published snapshot. Loading checks hashes, source evidence,
+identity, quality, and coverage agreement. Future refreshes retain earlier bundles; the current validated snapshots are published with owner-confirmed source permissions.
 
 ## Methodology
 
@@ -119,40 +117,16 @@ requires complete observed coverage for every selected asset and benchmark, then
 and costs. Windows are explicit analytical boundaries, not claims about every asset's peak/trough.
 Hypothetical shocks use immediate simultaneous weighted arithmetic, without dynamic paths or probability estimates.
 
-## Licensing and deployment audit — publication blocked
+## Public deployment
 
-The [yfinance documentation](https://ranaroussi.github.io/yfinance/) calls its API access personal use only
-and directs users to Yahoo's terms. Attempts to retrieve the directly linked Yahoo terms endpoints returned
-HTTP 999; their complete current terms were not accessible in this audit. No explicit public-display,
-bulk-redistribution or derived-data publication entitlement has been established. A downloadable endpoint
-and the open-source library licence do not establish those rights. Keeping data out of Git helps prevent bulk
-redistribution but does **not** itself resolve public display rights or server-side retrieval permission.
+The owner confirmed permission to publish the source datasets. The active
+Global, macro and India releases are versioned in `data/published/portfolio_lab/`.
+A fresh checkout loads them directly, including source evidence, manifests and
+alignment checks. No external storage, startup download or snapshot secrets
+are needed. Local preparation runs and superseded bundles stay excluded from Git.
 
-Therefore the current Yahoo snapshot is for local research and the implementation is **not ready for public
-publication** until the owner establishes appropriate rights or chooses a licensed distribution-adjusted source.
-There is no silent substitution to unadjusted data. No claim of legal clearance is made.
-
-Streamlit Cloud will not receive Git-ignored snapshots automatically. A clean checkout intentionally shows
-an unavailable-data notice rather than fabricated results. No startup download or public download control
-was added. A private, rights-compliant provisioning mechanism is an additional deployment prerequisite.
-
-Exact release sequence after those prerequisites and the owner's explicit approval:
-
-1. Establish permission covering application display, derived calculations, server access and storage.
-   If a different source is selected, adapt preparation, preserve the same return convention/provenance contract,
-   and revalidate all observations and numerical checks before release.
-2. Arrange private deployment provisioning of a complete validated bundle plus its CURRENT pointer at
-   `data/stores/portfolio_lab/`. On Streamlit Cloud this needs an approved startup/bootstrap integration with
-   a private data source or storage service; this integration has not been implemented or authorized here.
-   Never force-add the current Yahoo store to the public repository.
-3. Refresh and run the real verifier, portfolio tests and repository regression suite using the deployment data.
-4. Review and stage only Portfolio Lab files and its app/path/ignore hunks. The working tree contains unrelated
-   changes (including workflow changes made outside this task); do not include those accidentally.
-5. Obtain approval for commit/push/merge/deployment. Publish the reviewed feature to Monetaria's existing
-   Streamlit Cloud main branch and reboot the application as required.
-6. Verify the actual production `/portfolio-lab` route, Analysis entry, source dates, crisis coverage, interactions,
-   mobile layout and all existing navigation. Only then describe it as live.
-7. Consider an authorized private scheduled refresh later; no workflow YAML or schedules were changed here.
+Follow [DEPLOYMENT.md](DEPLOYMENT.md) to refresh and publish the active snapshots,
+and [the release runbook](../RELEASE.md) for the GitHub Actions sequence.
 
 ## Verification and remaining limitations
 
@@ -178,7 +152,7 @@ B duplication/normalisation/preservation, no rendering-time fetches, and absent 
 Optional best/worst calendar-year statistics, rolling 12-month range, recovery duration and static PNG exports
 are omitted. Taxes, initial-entry/liquidation costs, user-specific fees and execution slippage are excluded.
 No user accounts, persisted personal holdings, unrestricted tickers, currency conversion, recommendations or optimisation.
-Public data rights and Cloud provisioning remain the material release blockers.
+Public snapshot delivery is implemented; production checks remain part of the release workflow.
 
 Final local QA: `pytest tests -q --disable-warnings` passed **629 tests** (including the then-current
 shared-checkout work); the focused portfolio interaction suite passed **2 tests** after the final state fix.
@@ -201,4 +175,4 @@ The concurrently added Historical analogues section on Analysis was preserved.
 Screenshot evidence lives in ignored `output/portfolio_lab/screenshots/`:
 `desktop-performance.jpg`, `desktop-risk.jpg`, `mobile-performance.jpg`, `mobile-builder.jpg`,
 `mobile-stress.jpg`, and `analysis-entry.jpg`. These are local review evidence, not published assets.
-No production verification was performed because deployment has not been approved and data rights remain unresolved.
+The original feature audit did not perform production verification; current release validation is described in DEPLOYMENT.md.

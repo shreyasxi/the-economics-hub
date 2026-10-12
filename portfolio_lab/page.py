@@ -182,8 +182,6 @@ def _render():
     if not st.session_state.get('pl_entered'):
         _entry_cards()
         return
-    from portfolio_lab.bootstrap import ensure_snapshot
-    ensure_snapshot()
     mode=st.radio('Investor mode',['Global Portfolio — USD','Indian Investor — INR'],horizontal=True,key='pl_mode')
 
     def update_header(latest):
@@ -199,7 +197,7 @@ def _render():
         prices, manifest = _load_prepared(str(bundle))
     except (ValueError, OSError, KeyError) as exc:
         st.warning("Portfolio data unavailable: " + str(exc))
-        st.info("Prepare and validate data locally before using this page. Public Yahoo data-display rights remain unresolved.")
+        st.info("The published portfolio dataset is unavailable. Please try again later.")
         return
     latest = min(m["latest_observation"] for m in manifest["assets"].values())
     update_header(latest)
@@ -358,7 +356,7 @@ The current surviving ETF universe is not the historical investment opportunity 
 No duration/convexity metadata has been validated, so direct duration scenarios are deferred.
 
 **Operations.** Interactions use cached prepared data and never trigger downloads. Allocations remain in session state.
-Refresh is an explicit preparation command; no scheduled workflow has been added. Yahoo public-display rights remain unresolved.
+Validated datasets ship with the application. Refresh uses the preparation and publication commands in the deployment guide.
         """)
         st.markdown('**Bitcoin calendar and execution convention.** '+BTC_DISCLOSURE)
         st.markdown('[Coin Metrics PriceUSD definition](https://github.com/coinmetrics/docs-website/blob/master/asset-metrics/market/priceusd.md) · [Community license: CC BY-NC 4.0](https://gitbook-docs.coinmetrics.io/packages/coin-metrics-community-data) · [USO issuer](https://www.uscfinvestments.com/uso)')

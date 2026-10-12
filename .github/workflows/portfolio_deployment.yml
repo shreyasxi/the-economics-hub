@@ -17,24 +17,18 @@ jobs:
     env:
       PYTHONPATH: .
       MPLBACKEND: Agg
-      PORTFOLIO_SNAPSHOT_URL: ${{ secrets.PORTFOLIO_SNAPSHOT_URL }}
-      PORTFOLIO_SNAPSHOT_SHA256: ${{ secrets.PORTFOLIO_SNAPSHOT_SHA256 }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - name: Verify private snapshot configuration
-        run: |
-          test -n "$PORTFOLIO_SNAPSHOT_URL" || { echo 'Configure PORTFOLIO_SNAPSHOT_URL in repository secrets.'; exit 1; }
-          test -n "$PORTFOLIO_SNAPSHOT_SHA256" || { echo 'Configure PORTFOLIO_SNAPSHOT_SHA256 in repository secrets.'; exit 1; }
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt pytest
-      - name: Install and validate private deployment data
-        run: python -m portfolio_lab.deployment --download --validate
+      - name: Validate the versioned public datasets
+        run: python -m portfolio_lab.deployment --validate
       - name: Verify both investor modes and snapshot integrity
         run: python -m pytest tests/test_portfolio*.py -q
       - name: Independently verify real portfolio calculations
