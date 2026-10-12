@@ -3,12 +3,12 @@
   "source_url": "https://www.niftyindices.com/reports/historical-data",
   "index_variant": "price return; excludes dividends",
   "requested_start": "2016-10-04",
-  "requested_end": "2026-10-11",
+  "requested_end": "2026-10-12",
   "base_date": "2016-10-04",
-  "last_date": "2026-10-09",
-  "matched_dates": 2483,
+  "last_date": "2026-10-12",
+  "matched_dates": 2484,
   "unmatched_dates": [],
-  "imported_at": "2026-10-12T17:34:22.423839+00:00",
+  "imported_at": "2026-10-12T18:50:26.001386+00:00",
   "sources": [
     {
       "role": "smallcap",
@@ -621,12 +621,34 @@
       "date": "2026-10-09",
       "rows": 1,
       "retrieved_at": "2026-10-12T08:56:07.019730+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/e8e8f6ec16018d437c97aa302c17aae033d262b1a030101ecdf887d1be4ee621.csv",
+      "sha256": "e8e8f6ec16018d437c97aa302c17aae033d262b1a030101ecdf887d1be4ee621",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_12102026.csv",
+      "format": "daily",
+      "date": "2026-10-12",
+      "rows": 1,
+      "retrieved_at": "2026-10-12T18:50:25.705455+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/e8e8f6ec16018d437c97aa302c17aae033d262b1a030101ecdf887d1be4ee621.csv",
+      "sha256": "e8e8f6ec16018d437c97aa302c17aae033d262b1a030101ecdf887d1be4ee621",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_12102026.csv",
+      "format": "daily",
+      "date": "2026-10-12",
+      "rows": 1,
+      "retrieved_at": "2026-10-12T18:50:25.705470+00:00"
     }
   ],
   "refresh": {
-    "started_at": "2026-10-12T17:34:18.128390+00:00",
+    "started_at": "2026-10-12T18:50:19.852781+00:00",
     "requested_start": "2026-09-25",
-    "requested_end": "2026-10-11",
+    "requested_end": "2026-10-12",
     "received_dates": [
       "2026-09-25",
       "2026-09-28",
@@ -637,7 +659,8 @@
       "2026-10-06",
       "2026-10-07",
       "2026-10-08",
-      "2026-10-09"
+      "2026-10-09",
+      "2026-10-12"
     ],
     "unavailable_dates": [
       "2026-09-26",
@@ -661,7 +684,7 @@
       "2026-10-11"
     ]
   },
-  "signal_path": "signals/0ade531dccedb421d16297d2b4082f12f302f0017c63854f528815149b219e71.csv",
-  "signal_sha256": "0ade531dccedb421d16297d2b4082f12f302f0017c63854f528815149b219e71",
+  "signal_path": "signals/9594f356f412d0f4da03e781d7417ed09f670dcd0641ccf6e2bb0b92052125d0.csv",
+  "signal_sha256": "9594f356f412d0f4da03e781d7417ed09f670dcd0641ccf6e2bb0b92052125d0",
   "calendar_note": "Matched source dates; missing dates in both exports cannot be detected without a separate exchange calendar."
 }

@@ -768,7 +768,7 @@
       "manual_conflict_approved": false,
       "month": "2026-08",
       "previous_source": "manual:mospi:2026-09-15",
-      "source_retrieval": "1e8cf899e3134fe2b4bb4a3cbdeab5b9",
+      "source_retrieval": "c21fdaf297ef4534aaf699d3a0cba9bc",
       "value": 4.83
     },
     {
@@ -781,7 +781,7 @@
       "manual_conflict_approved": false,
       "month": "2026-08",
       "previous_source": "official:mospi_api:base2024:Food and beverages",
-      "source_retrieval": "1e8cf899e3134fe2b4bb4a3cbdeab5b9",
+      "source_retrieval": "c21fdaf297ef4534aaf699d3a0cba9bc",
       "value": 5.68
     },
     {
@@ -794,7 +794,7 @@
       "manual_conflict_approved": false,
       "month": "2026-09",
       "previous_source": null,
-      "source_retrieval": "1e8cf899e3134fe2b4bb4a3cbdeab5b9",
+      "source_retrieval": "c21fdaf297ef4534aaf699d3a0cba9bc",
       "value": 5.54
     },
     {
@@ -807,26 +807,27 @@
       "manual_conflict_approved": false,
       "month": "2026-09",
       "previous_source": null,
-      "source_retrieval": "1e8cf899e3134fe2b4bb4a3cbdeab5b9",
+      "source_retrieval": "c21fdaf297ef4534aaf699d3a0cba9bc",
       "value": 7.36
     }
   ],
-  "checked_at_utc": "2026-10-12T17:37:55.564567+00:00",
-  "committed": false,
-  "conflicts": [
+  "checked_at_utc": "2026-10-12T18:54:30.178534+00:00",
+  "committed": true,
+  "conflicts": [],
+  "history_note": "2012 through Dec 2025; 2024 from Jan 2026; food is Food and beverages, not CFPI",
+  "latest_month": "2026-09",
+  "source_run": "04d7bee7736d452999a5c51ebbe39ddb",
+  "status": "ready",
+  "warnings": [
     {
       "base": "2024",
       "column": "india_cpi_yoy",
       "concept": "CPI (General)",
       "month": "2026-08",
-      "source_retrieval": "1e8cf899e3134fe2b4bb4a3cbdeab5b9",
+      "source_retrieval": "c21fdaf297ef4534aaf699d3a0cba9bc",
       "stored": 4.82,
       "stored_source": "manual:mospi:2026-09-15",
       "value": 4.83
     }
-  ],
-  "history_note": "2012 through Dec 2025; 2024 from Jan 2026; food is Food and beverages, not CFPI",
-  "latest_month": "2026-09",
-  "source_run": "13e3c8ee4df84360b1e8da917ec92fa9",
-  "status": "conflict"
+  ]
 }
