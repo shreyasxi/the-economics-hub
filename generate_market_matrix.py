@@ -20,17 +20,24 @@ def main():
         out = editions[-1] if editions else None
     if out is None or not out.is_dir() or not any(out.glob('*.png')):
         parser.error('Use an existing Weekly chart edition directory')
-    cutoff = pd.Timestamp(out.name)
+    edition = pd.Timestamp(out.name)
     today = pd.Timestamp.now(tz='Asia/Kolkata').date()
     # Saturday editions are generated that Saturday, after Friday's close.
     # A current weekday cutoff could include an uncompleted Yahoo session.
-    if cutoff.date() > today or (cutoff.date() == today and cutoff.weekday() < 5):
-        parser.error('Use a completed trading cutoff (a current Saturday edition is valid)')
+    if edition.date() > today:
+        parser.error('Use an edition dated today or earlier')
+    # Manual weekday runs still publish to today's edition, but only use
+    # observations through yesterday; today's session may be incomplete.
+    cutoff = edition
+    if edition.date() == today and edition.weekday() < 5:
+        cutoff = edition - pd.Timedelta(days=1)
     target = out/'market_matrix.json'
     try:
         from data.fetchers.nse_tri import NiftyTRIFetcher
         payload = build(YFinanceFetcher(), cutoff, nse_fetcher=NiftyTRIFetcher(
             audit_dir=out/'market_matrix_sources'/'nse_tri'))
+        payload['as_of'] = str(edition.date())
+        payload['observation_cutoff'] = str(cutoff.date())
     except Exception as exc:
         # A failed rerun must not leave a prior successful payload publishable.
         target.unlink(missing_ok=True)

@@ -245,7 +245,8 @@ def test_saturday_cli_atomic_write_and_failed_rerun(tmp_path,monkeypatch):
         def now(tz=None):return real_timestamp('2026-10-10',tz=tz)
     monkeypatch.setattr(cli.pd,'Timestamp',SaturdayClock)
     monkeypatch.setattr(cli,'YFinanceFetcher',lambda:object())
-    p={'groups':[],'left_out':[],'as_of':'2026-10-10'}
+    p={'groups':[],'left_out':[],'as_of':'2026-10-10',
+       'observation_cutoff':'2026-10-10'}
     monkeypatch.setattr(cli,'build',lambda fetch,cutoff,**kwargs:p)
     monkeypatch.setattr(sys,'argv',['generate_market_matrix.py','--out',str(edition)])
     assert cli.main()==0
@@ -254,6 +255,29 @@ def test_saturday_cli_atomic_write_and_failed_rerun(tmp_path,monkeypatch):
     def fail(*args,**kwargs):raise ValueError('threshold exceeded')
     monkeypatch.setattr(cli,'build',fail)
     assert cli.main()==1 and not target.exists()
+
+
+@pytest.mark.parametrize('day,expected', [('2026-10-12','2026-10-11'),
+                                         ('2026-10-13','2026-10-12')])
+def test_weekday_cli_uses_completed_observations_in_current_edition(tmp_path,monkeypatch,day,expected):
+    import generate_market_matrix as cli
+    import sys
+    edition=tmp_path/day;edition.mkdir();(edition/'chart.png').write_bytes(b'chart')
+    real_timestamp=pd.Timestamp
+    class WeekdayClock:
+        def __new__(cls,value):return real_timestamp(value)
+        @staticmethod
+        def now(tz=None):return real_timestamp(day,tz=tz)
+    monkeypatch.setattr(cli.pd,'Timestamp',WeekdayClock)
+    monkeypatch.setattr(cli,'YFinanceFetcher',lambda:object())
+    def build(fetch,cutoff,**kwargs):
+        assert str(cutoff.date())==expected
+        return {'groups':[],'left_out':[],'as_of':expected}
+    monkeypatch.setattr(cli,'build',build)
+    monkeypatch.setattr(sys,'argv',['generate_market_matrix.py','--out',str(edition)])
+    assert cli.main()==0
+    saved=json.loads((edition/'market_matrix.json').read_text())
+    assert saved['as_of']==day and saved['observation_cutoff']==expected
 
 
 def test_raw_front_month_oil_cannot_pass_proxy_gate():
