@@ -6117,7 +6117,8 @@
           "value": 5.22
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:19.650548+00:00"
+      "retrieved_at": "2026-10-10T17:48:19.650548+00:00",
+      "error": "National refresh failed: ReadTimeout"
     },
     "CAN": {
       "source": "CAN national official source",
@@ -6245,7 +6246,7 @@
           "value": 3.93
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:19.650560+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996369+00:00"
     },
     "GBR": {
       "source": "GBR national official source",
@@ -6371,9 +6372,13 @@
         {
           "date": "2026-10-07",
           "value": 5.3852
+        },
+        {
+          "date": "2026-10-08",
+          "value": 5.4292
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:19.954779+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996415+00:00"
     },
     "DEU": {
       "source": "DEU national official source",
@@ -6513,7 +6518,7 @@
           "value": 3.5
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:20.797713+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996442+00:00"
     },
     "JPN": {
       "source": "JPN national official source",
@@ -6637,11 +6642,11 @@
           "value": 3.089
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:22.296317+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996464+00:00"
     },
     "SWE": {
       "source": "SWE national official source",
-      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-08-26",
+      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-08-28",
       "yield_type": "10-year government benchmark",
       "observations": [
         {
@@ -6777,7 +6782,7 @@
           "value": 3.197
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:22.296333+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996485+00:00"
     },
     "KOR": {
       "source": "KOR national official source",
@@ -6803,9 +6808,13 @@
         {
           "date": "2026-10-08",
           "value": 4.395
+        },
+        {
+          "date": "2026-10-12",
+          "value": 4.306
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:24.511753+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996496+00:00"
     },
     "ESP": {
       "source": "ESP national official source",
@@ -6937,7 +6946,7 @@
           "value": 4.1
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:26.900149+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996526+00:00"
     },
     "CHE": {
       "source": "CHE national official source",
@@ -6949,7 +6958,7 @@
           "value": 0.579
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:26.900187+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996564+00:00"
     },
     "AUS": {
       "source": "AUS national official source",
@@ -7077,7 +7086,7 @@
           "value": 5.404
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:26.900198+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996583+00:00"
     },
     "IND": {
       "source": "RBI DBIE workbook / FBIL",
@@ -8132,7 +8141,7 @@
       "collection_mode": "Manually refreshed DBIE workbook",
       "workbook": "50 Macroeconomic Indicators.xlsx",
       "sha256": "4389f9fff51a6ac40315a804b6a39e6b0701a7d5ff87cbe5c565340ae1f1a914",
-      "retrieved_at": "2026-10-10T17:48:26.900300+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.997095+00:00"
     },
     "NOR": {
       "source": "NOR national official source",
@@ -8266,10 +8275,14 @@
         {
           "date": "2026-10-08",
           "value": 4.641
+        },
+        {
+          "date": "2026-10-09",
+          "value": 4.582
         }
       ],
-      "retrieved_at": "2026-10-10T17:48:26.900182+00:00"
+      "retrieved_at": "2026-10-12T08:47:04.996553+00:00"
     }
   },
-  "monthly_retrieved_at": "2026-10-10T17:48:19.221265+00:00"
+  "monthly_retrieved_at": "2026-10-12T08:46:29.750762+00:00"
 }
