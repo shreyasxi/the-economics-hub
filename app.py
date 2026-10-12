@@ -2739,7 +2739,7 @@ def _scoreboard_html(snapshot: dict) -> str:
         if column == "fx_ytd" and country != "US":
             cls = "wsb-good" if v > 0 else "wsb-bad"
             text = f'<span class="{cls}">{text}</span>'
-        stale = status == "stale"
+        stale = status == "stale" and column != "mfg_pmi"
         if stale:
             meta.append('<span class="wsb-flag">not updated</span>')
         return (f'<td class="{"wsb-stale" if stale else ""}"{title}>'
@@ -3898,7 +3898,8 @@ def _eh_world_answer(snapshot: dict, key: str, up: str, down: str) -> dict:
         if row.get("country") not in ("US", "EA", "CN"):
             continue
         cell = row.get("cells", {}).get(key, {})
-        if cell.get("status") != "ok" or not _eh_number(cell.get("value")):
+        usable = cell.get("status") == "ok" or (key == "mfg_pmi" and cell.get("status") == "stale")
+        if not usable or not _eh_number(cell.get("value")):
             continue
         change = cell.get("change")
         metrics.append({"label": row["label"], "value": cell["value"],

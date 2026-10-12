@@ -14,6 +14,7 @@ Run:  python tests/test_world.py      (or: python -m pytest tests/test_world.py 
 from __future__ import annotations
 
 import csv
+import ast
 import sys
 import tempfile
 from datetime import date
@@ -404,6 +405,45 @@ def test_old_hand_refreshed_cell_is_flagged_not_failed():
     old = _monthly({"2026-04": 5.0, "2026-05": 5.1})
     cell = ws._cell("IN", "unemployment", old, date(2026, 11, 1), kind="month", compare="month", problems=problems)
     assert cell["status"] == "stale" and problems == []
+
+
+def test_pmi_keeps_latest_uploaded_month_for_all_six_economies():
+    for country in ("US", "EA", "UK", "JP", "CN", "IN"):
+        problems = []
+        cell = ws._cell(country, "mfg_pmi", _monthly({"2026-04": 51.0, "2026-05": 52.0}),
+                        date(2026, 11, 1), kind="month", compare="month", problems=problems)
+        assert cell["status"] == "ok" and cell["value"] == 52.0
+        assert cell["period"] == "2026-05" and cell["change"] == 1.0
+        assert not problems
+
+
+def test_saved_stale_pmi_remains_visible_and_supports_growth_card():
+    # Older published editions can still contain a stale PMI status.
+    import math
+    from datetime import datetime
+    from config import world_settings
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text()
+    names = {"_scoreboard_html", "_eh_world_answer", "_eh_number", "_eh_direction", "_eh_result"}
+    nodes = [n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name in names]
+    namespace = dict(math=math, date=date, datetime=datetime, _world_config=lambda: world_settings)
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), "app.py", "exec"), namespace)
+    snapshot = {"scoreboard": [
+        {"country": country, "label": cfg["label"], "cells": {
+            key: {"status": "stale" if key == "mfg_pmi" else "ok",
+                  "value": 55.9 if key == "mfg_pmi" else 2.0,
+                  "period": "2026-09" if key == "mfg_pmi" else "2026-09-01", "change": 0.1}
+            for key in world_settings.SCOREBOARD_COLUMNS}}
+        for country, cfg in world_settings.COUNTRIES.items()]}
+    rendered = namespace["_scoreboard_html"](snapshot)
+    assert "not updated" not in rendered and "wsb-stale" not in rendered
+    assert "55.9" in rendered and "Sep" in rendered
+    answer = namespace["_eh_world_answer"](snapshot, "mfg_pmi", "Strengthening", "Slowing")
+    assert answer["state"] == "Strengthening" and len(answer["metrics"]) == 3
+    # Inflation still requires current observations.
+    for row in snapshot["scoreboard"]:
+        row["cells"]["cpi_yoy"]["status"] = "stale"
+    assert "not updated" in namespace["_scoreboard_html"](snapshot)
+    assert namespace["_eh_world_answer"](snapshot, "cpi_yoy", "Building", "Easing")["state"] == "Awaiting data"
 
 
 def test_missing_automatic_cell_is_a_problem():

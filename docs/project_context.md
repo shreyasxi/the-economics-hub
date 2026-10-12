@@ -1105,7 +1105,9 @@ and retry (RBI Sentinel also pushes on weekdays).
 **Freshness rule:** an automatic cell that fails or is older than its limit (`SCOREBOARD_COLUMNS[...]["max_age"]`, days from
 the period start; overrides in `MAX_AGE_OVERRIDES`) is a *problem*: the generator writes what it has, prints
 `FINISHED WITH PROBLEMS`, exits 1, and the workflow publishes nothing. Manual cells show "awaiting entry"; manual or
-hand-refreshed (India DB, DBIE) cells past the limit show "not updated" — neither fails the run. US FRED series have the
+hand-refreshed (India DB, DBIE) cells past the limit show "not updated" — neither fails the run. Manufacturing PMI
+keeps the latest uploaded observation and its period without a stale flag, including in the front-page growth card.
+US FRED series have the
 same check (`max_age` in `macro_settings.py`).
 
 **Global rate cycle chart** (`10_macro_rate_cycle`, replaced the growth-vs-inflation regime chart on 24 Sep 2026 at

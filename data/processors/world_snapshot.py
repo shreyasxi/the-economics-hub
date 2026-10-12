@@ -17,6 +17,7 @@ Rules (see docs/project_context.md §10):
     and nothing half-broken is published.
   * A manual or hand-refreshed cell that is missing or old is shown as
     "awaiting entry" / "stale" on the page; that is not a problem.
+    Manufacturing PMI keeps the latest upload and its period without an age flag.
 
 The pure helpers at the top (yoy_by_date, last_move, the announcement
 parsers, rate_moves_by_month, gdp_weighted_moves, …) are covered by tests/test_world.py.
@@ -860,7 +861,8 @@ def _cell(country: str, column: str, series: pd.Series | None, today: date, *,
         cell["display"] = display
     max_age = MAX_AGE_OVERRIDES.get((country, column), SCOREBOARD_COLUMNS[column]["max_age"])
     age = age_days(period, today)
-    stale = age > max_age and not (country == "IN" and column == "policy_rate")  # holds until the next MPC
+    # PMI holds the latest upload; India's policy rate holds until the next MPC.
+    stale = age > max_age and column != "mfg_pmi" and not (country == "IN" and column == "policy_rate")
     if stale and not manual and (country, column) not in HAND_REFRESHED:
         problems.append(
             f"{COUNTRIES[country]['label']} {column}: latest {period} from {source} is {age} days old "
