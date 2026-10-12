@@ -454,7 +454,7 @@ draws them instead — the snapshot table (00), the trend lines (02, 04, 08) and
 | `12_breakeven_inflation` | Breakeven Inflation | Rates, Inflation & Credit | 5- and 10-year breakevens | FRED T5YIE T10YIE |
 | `11_credit_spreads` | Credit Spreads | Rates, Inflation & Credit | IG and HY option-adjusted spreads, 2 years | FRED BAMLC0A0CM BAMLH0A0HYM2 |
 | `18_bond_etf_returns` | Bond ETF Returns | Rates, Inflation & Credit | Trailing 12-month total returns | Yahoo: TLT, LQD, HYG |
-| `03_fx_weekly` | FX Weekly | Currencies | Ranked weekly % change, completed Friday closes | Yahoo: DXY, EUR/USD, GBP/USD, USD/INR, USD/JPY, USD/CNY, AUD/USD, USD/CAD, USD/CHF, NZD/USD |
+| `03_fx_weekly` | FX Weekly | Currencies | Ranked weekly % change, completed Friday closes | Yahoo: DXY, EUR/USD, GBP/USD, USD/INR, USD/JPY, USD/CNY, GBP/INR, USD/CAD, USD/CHF, NZD/USD |
 | `04_fx_trend` | FX TTM | Currencies | Ranked trailing 12-month % change; same ten rates | Yahoo: same set as FX Weekly; `charts/weekly_fx.py`, universe in `config/weekly_settings.py` |
 | `21_em_equity_weekly` | EM Equity Weekly | Emerging Markets & India | Week's % change of EM country ETFs | Yahoo: INDA MCHI EWZ EWY EWT EWW EZA |
 | `20_em_fx_weekly` | EM FX Weekly | Emerging Markets & India | Week's % change vs USD | Yahoo: INR KRW IDR BRL MXN ZAR TRY |
