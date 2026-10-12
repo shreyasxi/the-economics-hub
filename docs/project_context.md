@@ -72,7 +72,7 @@ only after commit/push and a successful GitHub Actions run. Source code and work
   These checks establish local readiness, not successful deployment. Rollout and tracking discussion: §5.7.1–5.7.2.
 - **Saturday India job:** 08:00 UTC / 13:30 IST. GVA/IIP contract tests → `india_fetcher.py --append` (including GVA)
   → official IIP industries/monthly PLFS/General IIP → RBI transmission → NSE checks/risk appetite/rotation/valuations → CPI checks/collector → main
-  inflation bridge → dashboard → RBI briefing → copy/prune/persist. Check `india.yml` for exact conditions:
+  inflation bridge → CPI items/REER/external vulnerability → dashboard → RBI briefing → copy/prune/persist. Check `india.yml` for exact conditions:
   `skip_fetch` skips the initial India/IIP updates, but does not skip every independent source updater.
 - **Daily India monetary job:** standalone `rbi_monetary_conditions.yml`, daily 15:10 UTC / 20:40 IST,
   including weekends. Refresh official RBI MMO with a ten-operations-date overlap → validate canonical CSV →
@@ -90,7 +90,7 @@ only after commit/push and a successful GitHub Actions run. Source code and work
 - **Additional India sources:** 23-industry IIP breadth/heatmap and monthly urban youth PLFS come from
   validated MoSPI releases; CPI item panels have a separate 358-item store. Forex uses canonical RBI WSS,
   while REER and external vulnerability use official RBI/DEA stores. These are not DBIE substitutes (§6).
-  Item CPI and RBI external collectors currently run separately; do not imply Saturday refreshes them.
+  Item CPI, REER and external vulnerability are wired locally into Saturday India with independent failure gates and source publication; deployment requires publication and a verified Actions run.
 - **SQLite:** database-manager operations commit/roll back and explicitly close connections. A connection
   context alone does not close SQLite; delayed WAL checkpoints can invalidate dry-run byte checks.
 - **IIP:** General, base 2022–23, published `growth_rate` (% YoY), continuous history from Apr 2023. Official
@@ -1225,19 +1225,22 @@ supported derived value requires exact same-code/same-base indices twelve months
 YoY is not repaired by derivation. Panels rank the largest increases/declines, not weighted contributions
 or inflation diffusion. `app._render_cpi_items` checks edition JSON against the canonical snapshot and both
 PNGs; invalid/missing data gives an unavailable state. No new hero dependency was introduced. The normal
-India generator renders these panels, but `india.yml` does **not** yet refresh/persist the independent
-item store. Collect separately with `PYTHONPATH=. .venv/bin/python -m data.fetchers.mospi_cpi_items --update`.
-Tests: `test_cpi_items.py`.
+India workflow now refreshes/persists the independent item store, copies both panels with their audit,
+and removes omitted artifacts. `skip_fetch` uses the validated saved store. Standalone refresh:
+`PYTHONPATH=. .venv/bin/python -m data.fetchers.mospi_cpi_items --update`.
+Tests: `test_cpi_items.py`, `test_india_source_workflow.py`. Deployment verification is pending.
 
 **External:** `charts.india_charts.india_external.load_forex` reads `data/stores/india/rbi_wss_reserves.csv`, converting official
 USD million to USD billion; week-on-week changes require adjacent seven-day observations. Legacy DBIE
 reserves are never the rendering fallback. `rbi_reer.csv` holds the official 40-currency CPI-based REER
 (2015–16 = 100, not fair value). `india_external_vulnerability.csv` holds official current-account/GDP
 and short-term debt/reserves observations, with publication dates/source metadata; gaps remain gaps.
-Collectors reject challenge pages, unofficial URLs, changed definitions and invalid rows. Refresh separately:
+Collectors reject challenge pages, unofficial URLs, changed definitions and invalid rows. Standalone refresh:
 `PYTHONPATH=. .venv/bin/python -m data.fetchers.rbi_external --series all` (or `wss`, `reer`, `vulnerability`).
-These collectors are not currently steps in Saturday India. `generate_india.py` reads the existing stores;
-missing/invalid optional sources omit affected charts. Tests: `test_rbi_external.py`.
+Saturday India collects WSS through its India fetcher, then REER and vulnerability independently;
+source CSVs retain publication metadata. Failed REER/vulnerability refreshes omit only their chart,
+including removal from published assets; `skip_fetch` uses saved stores. Tests: `test_rbi_external.py`,
+`test_india_source_workflow.py`. New wiring awaits deployment verification.
 
 Merchandise quick estimates in `data/stores/india/india_trade_releases.json` are verified release inputs, not guesses.
 The India fetcher supplements missing DBIE months only and validates the official release; retain month,
@@ -1579,7 +1582,7 @@ Test pipeline changes on a copy: `RBI_SENTINEL_DB=/path/to/copy.db python …`
 | `headlines.yml` ("Headline Collector") | every 4 h at :41 | `generate_news.py --collect` into the headline pool (Actions cache only; previous copy deleted) | nothing |
 | `rates.yml` ("Central Bank Rates") | Mon–Fri 06:30 and 21:00 | `generate_macro.py --rates-only` (strip, policy-rate cells, rate cycle chart into the newest `assets/macro/` edition; writes nothing when no rate changed) | `assets/macro/`, `data/stores/world/pboc_reverse_repo.csv` |
 | `macro.yml` ("World Generator") | Sat 10:00 | `generate_macro.py --mode dashboard` (fails on stale/failed sources), copies PNGs + `world_snapshot.json`, keeps the last 4 months | `assets/macro/`, showcase |
-| `india.yml` ("India Dashboard Generator") | Sat 08:00 + manual (`skip_fetch` option) | GVA/General IIP/industry IIP/monthly PLFS tests and updates, RBI transmission, NSE updates, CPI tests/update/bridge, generation, RBI briefing, copy/prune; see §0.1; keeps the last 4 months | `india_macro.db`, `rbi_transmission.csv`, NSE stores, CPI/main/contributions, MoSPI activity CSVs/raw archives, GVA/IIP archives, `assets/india/` and showcase |
+| `india.yml` ("India Dashboard Generator") | Sat 08:00 + manual (`skip_fetch` option) | GVA/General IIP/industry IIP/monthly PLFS tests and updates, RBI transmission, NSE updates, CPI tests/update/bridge/items, REER/vulnerability, generation, RBI briefing, copy/prune; see §0.1; keeps the last 4 months | `india_macro.db`, `rbi_transmission.csv`, NSE stores, CPI/main/contributions/items, WSS/REER/external CSVs, MoSPI activity CSVs/raw archives, GVA/IIP archives, `assets/india/` and showcase |
 | `rbi_monetary_conditions.yml` ("RBI Monetary Conditions Daily") | Daily 15:10, including weekends + manual; 20:40 IST | `python -m data.fetchers.rbi_money_market --refresh-recent --overlap 10`, then targeted `python -m charts.india_charts.india_monetary --refresh-current` only on data change | only `data/stores/india/rbi_money_market.csv` and the two current-edition monetary PNGs, only when changed; local implementation, deployment pending |
 | `rbi_sentinel.yml` | weekdays, see §8 | `generate_rbi_sentinel.py --auto`, keeps the last 4 months of charts | `rbi_sentinel.db`, `assets/rbi_sentinel/`, live log |
 | `keep_alive.yml` ("Keep Streamlit App Alive") | 00:00, 10:00, 20:00 | `.github/scripts/keep_alive.py` visits the app so it doesn't hibernate | nothing |

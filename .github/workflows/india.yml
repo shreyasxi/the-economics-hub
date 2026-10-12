@@ -201,6 +201,42 @@ jobs:
           PYTHONPATH: "."
         run: python -m data.fetchers.mospi_inflation
 
+      - name: Verify CPI item and RBI external source contracts
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: |
+          python -m unittest discover -s tests -p 'test_cpi_items.py'
+          python -m unittest discover -s tests -p 'test_rbi_external.py'
+          python -m unittest discover -s tests -p 'test_india_source_workflow.py'
+
+      - name: Refresh official MoSPI CPI items
+        id: mospi-cpi-items
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.mospi_cpi_items --update
+
+      - name: Refresh official RBI REER
+        id: rbi-reer
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.rbi_external --series reer
+
+      - name: Refresh official RBI DEA external vulnerability
+        id: rbi-vulnerability
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.rbi_external --series vulnerability
+
       - name: Generate India charts
         # CPI is optional, but failed refreshes must omit its chart.
         env:
@@ -217,6 +253,9 @@ jobs:
           CPI_MANUAL_FALLBACK: ${{ github.event.inputs.manual_cpi_fallback == 'true' }}
           NSE_VALUATIONS_UPDATE_FAILED: ${{ steps.nse-valuations.outcome != 'success' }}
           CPI_UPDATE_FAILED: ${{ steps.mospi-cpi.outcome != 'success' }}
+          CPI_ITEMS_UPDATE_FAILED: ${{ steps.mospi-cpi-items.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          REER_UPDATE_FAILED: ${{ steps.rbi-reer.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          EXTERNAL_VULNERABILITY_UPDATE_FAILED: ${{ steps.rbi-vulnerability.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
         run: python generate_india.py --mode dashboard
 
       # Part 2 of 2: the briefing shown at the top of the tab, written into the
@@ -262,6 +301,16 @@ jobs:
             cp "output/india/$MONTH_FOLDER/24_india_cpi_contributions."{png,json} "assets/india/$MONTH_FOLDER/"
           fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
+          # Clear omitted external charts; publish CPI item panels with their audit.
+          for NAME in 30_india_reer 31_india_external_vulnerability; do
+            if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
+              rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
+            fi
+          done
+          rm -f "assets/india/$MONTH_FOLDER/06b_india_cpi_items.json" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png"
+          if [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" ]; then
+            cp "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" "assets/india/$MONTH_FOLDER/"
+          fi
           # Publish the heatmap and leader metrics together; clear an omitted edition.
           rm -f "assets/india/$MONTH_FOLDER/india_equity_matrix.json"
           if [ -f "output/india/$MONTH_FOLDER/india_equity_matrix.json" ]; then
@@ -305,7 +354,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A assets/india/ assets/readme_showcase/ "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
           # Include canonical monthly histories and the raw evidence their loaders verify.
-          SOURCE_PATHS=$(python -m data.paths --relative MOSPI_IIP_CSV MOSPI_PLFS_CSV MOSPI_SOURCES_DIR)
+          SOURCE_PATHS=$(python -m data.paths --relative MOSPI_IIP_CSV MOSPI_PLFS_CSV MOSPI_SOURCES_DIR RBI_WSS_CSV RBI_REER_CSV INDIA_EXTERNAL_CSV)
           while IFS= read -r SOURCE_PATH; do
             if [ -e "$SOURCE_PATH" ]; then
               git add -A "$SOURCE_PATH"
@@ -316,7 +365,7 @@ jobs:
             git add "$EQUITY_TRI"
           fi
           # A skipped optional source may never create its directory.
-          SOURCE_DIRS=$(python -m data.paths --relative CPI_CONTRIBUTIONS_DIR CPI_MAIN_DIR NSE_ROTATION_DIR GVA_DIR IIP_DIR)
+          SOURCE_DIRS=$(python -m data.paths --relative CPI_CONTRIBUTIONS_DIR CPI_MAIN_DIR CPI_ITEMS_DIR NSE_ROTATION_DIR GVA_DIR IIP_DIR)
           while IFS= read -r SOURCE_DIR; do
             if [ -d "$SOURCE_DIR" ]; then
               git add -A "$SOURCE_DIR"

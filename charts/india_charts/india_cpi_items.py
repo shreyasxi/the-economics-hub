@@ -1,5 +1,6 @@
 """Coordinated CPI item bar panels; headings and provenance render on the page."""
 import logging
+import os
 from pathlib import Path
 import textwrap
 import matplotlib.pyplot as plt
@@ -60,6 +61,8 @@ def generate(output_dir, root=items.ROOT):
     metadata = output_dir/(NAME+'.json')
     for path in paths+[metadata]: path.unlink(missing_ok=True)
     try:
+        if os.environ.get('CPI_ITEMS_UPDATE_FAILED') == 'true':
+            raise ValueError('Saturday CPI item refresh failed')
         rows, manifest = items.load_current(root)
         data = items.snapshot(rows)
         for side, path in zip(('increases','declines'), paths):

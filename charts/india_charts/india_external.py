@@ -1,5 +1,7 @@
 """Research charts from validated official RBI / DEA external-sector datasets."""
 from pathlib import Path
+import logging
+import os
 
 import matplotlib.dates as mdates
 import numpy as np
@@ -141,9 +143,21 @@ def chart_vulnerability(output_dir, path=VULNERABILITY_PATH):
 
 
 def generate(output_dir):
-    Path(output_dir).mkdir(parents=True,exist_ok=True)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True,exist_ok=True)
     out=[]
-    for chart in (chart_reer,chart_vulnerability):
-        result=chart(output_dir)
-        if result:out.append(result)
+    for chart, name, flag in (
+        (chart_reer, '30_india_reer.png', 'REER_UPDATE_FAILED'),
+        (chart_vulnerability, '31_india_external_vulnerability.png', 'EXTERNAL_VULNERABILITY_UPDATE_FAILED'),
+    ):
+        destination = output_dir / name
+        destination.unlink(missing_ok=True)
+        try:
+            if os.environ.get(flag) == 'true':
+                raise ValueError('Saturday source refresh failed')
+            result=chart(output_dir)
+            if result:out.append(result)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            destination.unlink(missing_ok=True)
+            logging.warning('%s OMITTED: %s', name, exc)
     return out
