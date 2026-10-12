@@ -13,8 +13,11 @@ def main():
     parser.add_argument('--out', type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parent
-    editions = sorted(p for p in (root/'output/weekly').iterdir() if p.is_dir() and any(p.glob('*.png')))
-    out = args.out or (editions[-1] if editions else None)
+    out = args.out
+    if out is None:
+        weekly = root/'output/weekly'
+        editions = sorted(p for p in weekly.iterdir() if p.is_dir() and any(p.glob('*.png'))) if weekly.is_dir() else []
+        out = editions[-1] if editions else None
     if out is None or not out.is_dir() or not any(out.glob('*.png')):
         parser.error('Use an existing Weekly chart edition directory')
     cutoff = pd.Timestamp(out.name)
