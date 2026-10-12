@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-10",
+  "as_of": "2026-10-12",
   "start_date": "2021-10-01",
   "countries": [
     {
@@ -342,7 +342,8 @@
         "source": "USA national official source",
         "url": "https://fred.stlouisfed.org/graph/fredgraph.csv",
         "yield_type": "10-year constant-maturity par",
-        "retrieved_at": "2026-10-10T17:48:19.650548+00:00"
+        "retrieved_at": "2026-10-10T17:48:19.650548+00:00",
+        "error": "National refresh failed: ReadTimeout"
       },
       "latest": {
         "date": "2026-10-08",
@@ -350,7 +351,7 @@
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
-      "national_issue": null,
+      "national_issue": "National refresh failed: ReadTimeout",
       "monthly_note": "OECD long-term rate; monthly average, country definitions vary"
     },
     {
@@ -693,7 +694,7 @@
         "source": "CAN national official source",
         "url": "https://www.bankofcanada.ca/valet/observations/BD.CDN.10YR.DQ.YLD/json",
         "yield_type": "10-year benchmark",
-        "retrieved_at": "2026-10-10T17:48:19.650560+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444081+00:00"
       },
       "latest": {
         "date": "2026-10-08",
@@ -1036,19 +1037,19 @@
           "value": 5.3341
         },
         {
-          "date": "2026-10-07",
-          "value": 5.3852
+          "date": "2026-10-08",
+          "value": 5.4292
         }
       ],
       "national": {
         "source": "GBR national official source",
         "url": "https://www.bankofengland.co.uk/statistics/yield-curves",
         "yield_type": "10-year fitted nominal par",
-        "retrieved_at": "2026-10-10T17:48:19.954779+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444122+00:00"
       },
       "latest": {
-        "date": "2026-10-07",
-        "value": 5.3852
+        "date": "2026-10-08",
+        "value": 5.4292
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -1389,17 +1390,21 @@
         {
           "date": "2026-10-09",
           "value": 3.5
+        },
+        {
+          "date": "2026-10-12",
+          "value": 3.49
         }
       ],
       "national": {
         "source": "DEU national official source",
         "url": "https://api.statistiken.bundesbank.de/rest/data/BBSIS/D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A",
         "yield_type": "10-year fitted par",
-        "retrieved_at": "2026-10-10T17:48:20.797713+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444147+00:00"
       },
       "latest": {
-        "date": "2026-10-09",
-        "value": 3.5
+        "date": "2026-10-12",
+        "value": 3.49
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -2377,7 +2382,7 @@
         "source": "ESP national official source",
         "url": "https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/uoi_sindi.csv",
         "yield_type": "10-year secondary-market government yield",
-        "retrieved_at": "2026-10-10T17:48:26.900149+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444234+00:00"
       },
       "latest": {
         "date": "2026-10-07",
@@ -2726,9 +2731,9 @@
       ],
       "national": {
         "source": "SWE national official source",
-        "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-08-26",
+        "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-08-28",
         "yield_type": "10-year government benchmark",
-        "retrieved_at": "2026-10-10T17:48:22.296333+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444196+00:00"
       },
       "latest": {
         "date": "2026-10-09",
@@ -3049,17 +3054,21 @@
         {
           "date": "2026-10-09",
           "value": 0.579
+        },
+        {
+          "date": "2026-10-12",
+          "value": 0.572
         }
       ],
       "national": {
         "source": "CHE national official source",
         "url": "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates",
         "yield_type": "10-year fitted spot",
-        "retrieved_at": "2026-10-10T17:48:26.900187+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444268+00:00"
       },
       "latest": {
-        "date": "2026-10-09",
-        "value": 0.579
+        "date": "2026-10-12",
+        "value": 0.572
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -3398,19 +3407,19 @@
           "value": 4.588
         },
         {
-          "date": "2026-10-08",
-          "value": 4.641
+          "date": "2026-10-09",
+          "value": 4.582
         }
       ],
       "national": {
         "source": "NOR national official source",
         "url": "https://data.norges-bank.no/api/data/GOVT_GENERIC_RATES/all",
         "yield_type": "10-year generic government bond mid-yield",
-        "retrieved_at": "2026-10-10T17:48:26.900182+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444257+00:00"
       },
       "latest": {
-        "date": "2026-10-08",
-        "value": 4.641
+        "date": "2026-10-09",
+        "value": 4.582
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -5094,7 +5103,7 @@
         "collection_mode": "Manually refreshed DBIE workbook",
         "workbook": "50 Macroeconomic Indicators.xlsx",
         "sha256": "4389f9fff51a6ac40315a804b6a39e6b0701a7d5ff87cbe5c565340ae1f1a914",
-        "retrieved_at": "2026-10-10T17:48:26.900300+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444493+00:00"
       },
       "latest": {
         "date": "2026-09-25",
@@ -5445,7 +5454,7 @@
         "source": "JPN national official source",
         "url": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
         "yield_type": "10-year JGB",
-        "retrieved_at": "2026-10-10T17:48:22.296317+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444171+00:00"
       },
       "latest": {
         "date": "2026-10-08",
@@ -5770,17 +5779,21 @@
         {
           "date": "2026-10-08",
           "value": 4.395
+        },
+        {
+          "date": "2026-10-12",
+          "value": 4.306
         }
       ],
       "national": {
         "source": "KOR national official source",
         "url": "https://ecos.bok.or.kr/api/",
         "yield_type": "10-year Treasury benchmark",
-        "retrieved_at": "2026-10-10T17:48:24.511753+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444207+00:00"
       },
       "latest": {
-        "date": "2026-10-08",
-        "value": 4.395
+        "date": "2026-10-12",
+        "value": 4.306
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -7031,7 +7044,7 @@
         "source": "AUS national official source",
         "url": "https://www.rba.gov.au/statistics/tables/csv/f2-data.csv",
         "yield_type": "10-year nominal government yield, interpolated maturity",
-        "retrieved_at": "2026-10-10T17:48:26.900198+00:00"
+        "retrieved_at": "2026-10-12T21:19:46.444286+00:00"
       },
       "latest": {
         "date": "2026-10-07",
@@ -7684,49 +7697,46 @@
     {
       "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_FINMARK,/USA+CAN+GBR+DEU+FRA+ITA+ESP+SWE+CHE+NOR+POL+IND+JPN+KOR+COL+CHL+MEX+AUS+NZL+ZAF.M.IRLT.PA.....?startPeriod=2021-10&format=csvfile",
       "sha256": "971bc33557d9abc64fc4a1e4e0dc159c388da79d53458ae2ad0fea628369b6e6",
-      "retrieved_at": "2026-10-10T17:48:19.209592+00:00"
+      "retrieved_at": "2026-10-12T21:19:11.254471+00:00"
     },
     {
-      "url": "https://www.bankofcanada.ca/valet/observations/BD.CDN.10YR.DQ.YLD/json?start_date=2026-08-26",
-      "sha256": "7af45b8e53b95bc949d50a6a29417dc9950d1890919eadcbc63c2ce7b25d1c76",
-      "retrieved_at": "2026-10-10T17:48:19.445961+00:00"
-    },
-    {
-      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10&cosd=2026-08-26",
-      "sha256": "a737f9bb87986b5a157ff8a1d1473fa4cc70bb1047a34ecbac83b7cbade71f09",
-      "retrieved_at": "2026-10-10T17:48:19.648846+00:00"
-    },
-    {
-      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-08-26",
-      "sha256": "d197bf41062293e5d2f42f29a08281679953a0a083522c108c3838956e69792b",
-      "retrieved_at": "2026-10-10T17:48:20.946599+00:00"
-    },
-    {
-      "url": "https://data.norges-bank.no/api/data/GOVT_GENERIC_RATES/all?format=csv&startPeriod=2026-08-26",
-      "sha256": "3d028337290cfc5c17e8aba02aaa36aee78da4167919dbfc7d2585a72e456b54",
-      "retrieved_at": "2026-10-10T17:48:21.950733+00:00"
-    },
-    {
-      "url": "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates",
-      "sha256": "cf375f3f6f3411a49d5ba2955a04c77cb0a3e516b995ad8ef04586a239a400fb",
-      "retrieved_at": "2026-10-10T17:48:22.520021+00:00"
+      "url": "https://www.bankofcanada.ca/valet/observations/BD.CDN.10YR.DQ.YLD/json?start_date=2026-08-28",
+      "sha256": "69848ca9fca52d84c41bb971eadd1b76e146d81053b30b7b7f5b356c7d4c03ca",
+      "retrieved_at": "2026-10-12T21:19:11.444215+00:00"
     },
     {
       "url": "https://ecos.bok.or.kr/api/",
-      "sha256": "3f5007140731a75d1f08c1fc6b097113a277218ab69739099cf280fcb61b8abc",
-      "retrieved_at": "2026-10-10T17:48:24.511039+00:00"
+      "sha256": "9a74519f3e5a4c84a5d9a168aa4885de6ae610af8e652d4831c9233e3abd9d1c",
+      "retrieved_at": "2026-10-12T21:19:12.074458+00:00"
+    },
+    {
+      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-08-28",
+      "sha256": "f192c5b271c0e420fcc807d3960cb7ee2fcce5d3846702ea3dc7d759a02cece0",
+      "retrieved_at": "2026-10-12T21:19:12.160794+00:00"
+    },
+    {
+      "url": "https://data.norges-bank.no/api/data/GOVT_GENERIC_RATES/all?format=csv&startPeriod=2026-08-28",
+      "sha256": "108151d1229c759861a7173b803424f235d9f044e0402518852f17afa7464d76",
+      "retrieved_at": "2026-10-12T21:19:12.537938+00:00"
     },
     {
       "url": "https://www.rba.gov.au/statistics/tables/csv/f2-data.csv",
       "sha256": "92b111ea04a5e2c62119e811156578593331bfcdd5902eb83b694b64778b9fa2",
-      "retrieved_at": "2026-10-10T17:48:24.936329+00:00"
+      "retrieved_at": "2026-10-12T21:19:12.769856+00:00"
+    },
+    {
+      "url": "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates",
+      "sha256": "cafaccbce49dfe396c9af97fe2d16108ea2377ecda5492ce3e2456270e967f8b",
+      "retrieved_at": "2026-10-12T21:19:12.819249+00:00"
     },
     {
       "url": "https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/uoi_sindi.csv",
       "sha256": "ab3c0b2dae92cc49e6fb4cca515d90a1f445ee1dccae46fea8fec464d6723b11",
-      "retrieved_at": "2026-10-10T17:48:26.853886+00:00"
+      "retrieved_at": "2026-10-12T21:19:14.255691+00:00"
     }
   ],
-  "issues": [],
-  "monthly_retrieved_at": "2026-10-10T17:48:19.221265+00:00"
+  "issues": [
+    "USA: National refresh failed: ReadTimeout"
+  ],
+  "monthly_retrieved_at": "2026-10-12T21:19:11.283694+00:00"
 }
