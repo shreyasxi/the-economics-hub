@@ -1,0 +1,952 @@
+{
+  "api_request_count": 44,
+  "base_year": "2024",
+  "completed_at_utc": "2026-10-12T09:01:29.864114+00:00",
+  "data_page_count": 43,
+  "observation_months": [
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08"
+  ],
+  "request_record_count": 44,
+  "requests": [
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [],
+      "query": {
+        "base_year": "2024",
+        "level": "Group",
+        "series_code": "Current"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:07.026692+00:00",
+      "sha256": "92b55ab9ce80930300f07d1b8c8f6f4a2323cc43b5ae5fd0fd012890128d4954",
+      "url": "https://api.mospi.gov.in/api/cpi/getCpiFilterByLevelAndBaseYear"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "division_code": "0",
+        "limit": 100,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:07.286904+00:00",
+      "sha256": "7473b5e25853271150000feccb52e2bbb0f133653cd444a9a40d57d6f89031a0",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:08.041915+00:00",
+      "sha256": "5d17c40adb617b45a0493ac2c0ab4569fa38019ffdf170a3201d12d3469d9900",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 2,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:08.789623+00:00",
+      "sha256": "a205fa4290f3b8eebd1ff6c6bd02d0baff4f610049ebe6645d3ce2610f380c13",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 3,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:09.537811+00:00",
+      "sha256": "3884a0fa78bf1b84eb44e9ae8431882a19e0c4faa4fd428b8d0c532795934363",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 4,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:10.286461+00:00",
+      "sha256": "c7059b2ebf65e79b2d63274824559a26fc68e47fb5df0e65ea4bcee5e0b7b263",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 5,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:11.034100+00:00",
+      "sha256": "d261c2db6ec657c3dedd0bd001bbf4b111149ad4d5768a594899d13a1676cca6",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 6,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:11.783671+00:00",
+      "sha256": "93765cc4f772545428306c187258ffc5b2e38a4fa3f20ed9191196e6298bd73d",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 7,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:12.287257+00:00",
+      "sha256": "6c95d9c8054ae1203a37a7a1faef4e226f32bd4536dbcdbc0b4569f9e3e5e413",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:12.823768+00:00",
+      "sha256": "f8f041746000b46b088f749be7fae8f8c4ddc02c279a538febe4582e35e0a875",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 2,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:13.331269+00:00",
+      "sha256": "6d2739bf80c1d27f6b5947a7fe99ee56dc5461e8cfb3268bd4395695ed2f963f",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 3,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:13.834874+00:00",
+      "sha256": "f35a527a57a7ff2500e1faafe5636b03346b39f772ff81bb66ce052ddccf24ca",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 4,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:14.342544+00:00",
+      "sha256": "95b52137fdfca8794ee4f274a7df15462bf383d77e5aa72d0934dd373f47edfe",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 5,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:14.846081+00:00",
+      "sha256": "1a428ad955133cc82b0693a893ac70a2495d8172aa22c871900ca22f2c63bd30",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 6,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:15.353071+00:00",
+      "sha256": "f7e997ffd0acbe206700c153d46bb5a04e75edf17132479d62363c2b25d632b5",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 7,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:15.854621+00:00",
+      "sha256": "70e81565a4710d470de67f7635d9d9a2dc6f7e32e8fcc26e624232090a2ba683",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:16.395514+00:00",
+      "sha256": "ede1c7d0225e25996d423a50604c85fdd7d236ab3c1b023d84fe784f38dff388",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 2,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:16.898445+00:00",
+      "sha256": "9b1b7aa2a4d06e9ae502c01404cc20352fcc0bb35b1fd5ff254f9aa4841467b0",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 3,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:17.404474+00:00",
+      "sha256": "14544b568e67e2dc580c206a0e271c08da579615c269ab467e18010624811ab7",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 4,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:17.907955+00:00",
+      "sha256": "fba6a849797ad6829ab93ae91c72a65ae98e984432df0e7dfa5bd5a740e076ea",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 5,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:18.414774+00:00",
+      "sha256": "386f8400325c2bff3e594ce8241e3ea69622716b5c2c37ccd5c13044a3b7384d",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 6,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:18.917703+00:00",
+      "sha256": "a63dd41de807305e5e9af84be2365c7db64d9716233e3b1a615c360e5b4eab6e",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2025-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 7,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2025"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:19.425494+00:00",
+      "sha256": "1fad54d0eb0a99ad6c5c64efe2311c70a00df0d99ef3ea429d873221a38c1423",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:19.962288+00:00",
+      "sha256": "ff64d1ad0a05595f6f0106b0e90f0146c89f25a6d831cb03ee0068871d7e1ef7",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 2,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:20.466917+00:00",
+      "sha256": "4acd5fa0bb77384ef69775c37e72b67960b744b3f37e26dd06cf827fe04a360a",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 3,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:20.969779+00:00",
+      "sha256": "0243d359afe2208ca50fe994a03e82be42598e94921a4473510789cc1b3480f7",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 4,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:21.475055+00:00",
+      "sha256": "fa134ef48f891ee6bc6e984920eb6be53a292fd96360d9f26d0d5661236c5ab7",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 5,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:21.983112+00:00",
+      "sha256": "c67a30a9ad446b32c701b4941c19a9ade1332b42f8590124acd2fb6bd9449280",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 6,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:22.486862+00:00",
+      "sha256": "1ea3bb1d25c4cbd675e18e8f48d429959361810454edbcf1a2de7e076008e51c",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-06"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 6,
+        "page": 7,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:22.745363+00:00",
+      "sha256": "557de6fdc8d4186fa05d88a3ce216eb3680d109856bbdff62a6b57b6b63fa595",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:23.282224+00:00",
+      "sha256": "469f10af54ede67119e5fdf021f2ae7de75317acbd26e2b1688f9224a7bc4bb5",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 2,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:23.787513+00:00",
+      "sha256": "f6bbacf8f284457cd37a5a4f2c61a91d9524ba21de377165d5e622b596e074c6",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 3,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:24.293143+00:00",
+      "sha256": "27355b2ff2ee8be6144578d16fb3f20fc45836beb5d3423788545455fc123741",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 4,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:24.798685+00:00",
+      "sha256": "78aa10031bca7af4232d8f9851603032d2e913a870a57a020b5d27d17e4946e3",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 5,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:25.302969+00:00",
+      "sha256": "faa74df5697b435f79b8edbbb768fdcdd3515a9674d61dd58250ece762acef72",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 6,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:25.807236+00:00",
+      "sha256": "994ed5aef7ed0d6c21f91d1d406659328c3238c8b897d3ad8b42f663e445bb39",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-07"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 7,
+        "page": 7,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:26.064363+00:00",
+      "sha256": "b12f8aceea6fc9e0690daf9d818f7eaa996c48a15fa07d37a641200218eaaffd",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 1,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:26.354911+00:00",
+      "sha256": "7ca30d0229b04b2b95550d0118a57746b20e0fe27f080b0abb7f23a599624939",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 2,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:26.858332+00:00",
+      "sha256": "303cf1b7f0d1b39a05ee7e1cdc72b50c17303df9f0f25a4acfe2c4976507f4af",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 3,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:27.361666+00:00",
+      "sha256": "33d0e62cb2e87e3a8a81b3e33b7d1a8b823c5f551f944617b70f05d19f9112e8",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 4,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:27.864730+00:00",
+      "sha256": "9eb7541d8ce0576bbb7c21d4bb5bf29f6bcd36f118525c5fa60656863ae23d67",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 5,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:28.365910+00:00",
+      "sha256": "d84dd6927ff36ec28d45e29f1e643055c595582596b0d3be066134d975b07665",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 6,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:28.905928+00:00",
+      "sha256": "f500322523fd0ef0b82b763c1603bd6049463925fcbd504fb9ce699b3a87da6f",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    },
+    {
+      "http_status": 200,
+      "kind": "api",
+      "observation_months": [
+        "2026-08"
+      ],
+      "query": {
+        "Format": "JSON",
+        "base_year": "2024",
+        "limit": 100,
+        "month_code": 8,
+        "page": 7,
+        "sector_code": 3,
+        "series": "Current",
+        "state_code": 1,
+        "year": "2026"
+      },
+      "retrieved_at_utc": "2026-10-12T09:01:29.165309+00:00",
+      "sha256": "181d781367b997d5e906513acda6edd6ba35937a0a3831cd6d696ef475613c0e",
+      "url": "https://api.mospi.gov.in/api/cpi/getCPIData"
+    }
+  ],
+  "retrieval_id": "3d8f281abb8543a49dc4dd7b44dfad25",
+  "sector_code": 3,
+  "series": "Current",
+  "started_at_utc": "2026-10-12T09:01:01.771968+00:00",
+  "state_code": 1,
+  "status_note": "API exposes no provisional/final or vintage field",
+  "success": true
+}
