@@ -1,9 +1,17 @@
 {
-  "workbook": "/home/runner/work/the-economics-hub/the-economics-hub/data/inputs/rbi/rbi_bimonthly_manual/inflation_survey/IESH05082026.xlsx",
-  "workbook_sha256": "062a1f451d0bfab1a2690e8759433e3c59ab14a0a116e55f7dd881043ef5e1b1",
+  "workbook": "/home/runner/work/the-economics-hub/the-economics-hub/data/inputs/rbi/rbi_bimonthly_manual/inflation_survey/IESH07102026.xlsx",
+  "workbook_sha256": "3b8dfffb84af93032caa6a3adfd317f7088b7d0f7cd807748132c7ff9f4dff3e",
   "source": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Inflation%20Expectations%20Survey%20of%20Households%20-%20Bi-monthly",
   "statistic": "Median",
   "latest": {
+    "date": "2026-09-01",
+    "round": "85",
+    "source_row": 147,
+    "current": 8.37117527544011,
+    "three_month": 9.90092033489579,
+    "one_year": 10.0409419822465
+  },
+  "previous": {
     "date": "2026-07-01",
     "round": "84",
     "source_row": 145,
@@ -11,21 +19,13 @@
     "three_month": 9.23152316113977,
     "one_year": 9.40702419788694
   },
-  "previous": {
-    "date": "2026-05-01",
-    "round": "83B",
-    "source_row": 143,
-    "current": 7.76373992885387,
-    "three_month": 9.32568168466109,
-    "one_year": 9.27841836756172
-  },
   "year_earlier": {
-    "date": "2025-07-01",
-    "round": "80",
-    "source_row": 133,
-    "current": 7.16482933520055,
-    "three_month": 8.30999497105732,
-    "one_year": 8.97904641526999
+    "date": "2025-09-01",
+    "round": "81",
+    "source_row": 135,
+    "current": 7.41045835555363,
+    "three_month": 8.14207811366797,
+    "one_year": 8.71445177018498
   },
   "missing_fields": [
     {

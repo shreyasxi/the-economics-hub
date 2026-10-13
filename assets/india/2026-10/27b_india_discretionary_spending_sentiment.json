@@ -17,10 +17,11 @@
     "2026-01-01",
     "2026-03-01",
     "2026-05-01",
-    "2026-07-01"
+    "2026-07-01",
+    "2026-09-01"
   ],
-  "latest_date": "2026-07-01",
-  "previous_date": "2026-05-01",
+  "latest_date": "2026-09-01",
+  "previous_date": "2026-07-01",
   "statistic": "RBI supplied Net Response: increased minus decreased (pp)",
   "series": {
     "Urban": [
@@ -383,6 +384,26 @@
         "ahead_same_cell": "H69",
         "ahead_decrease": 22.9,
         "ahead_decrease_cell": "I69"
+      },
+      {
+        "date": "2026-09-01",
+        "source_date_cell": "B70",
+        "current_net": 4.619999999999997,
+        "current_net_cell": "F70",
+        "current_increase": 34.62,
+        "current_increase_cell": "C70",
+        "current_same": 35.38,
+        "current_same_cell": "D70",
+        "current_decrease": 30.0,
+        "current_decrease_cell": "E70",
+        "ahead_net": 18.410000000000004,
+        "ahead_net_cell": "J70",
+        "ahead_increase": 42.2,
+        "ahead_increase_cell": "G70",
+        "ahead_same": 34.01,
+        "ahead_same_cell": "H70",
+        "ahead_decrease": 23.79,
+        "ahead_decrease_cell": "I70"
       }
     ],
     "Rural": [
@@ -745,6 +766,26 @@
         "ahead_same_cell": "H23",
         "ahead_decrease": 15.98,
         "ahead_decrease_cell": "I23"
+      },
+      {
+        "date": "2026-09-01",
+        "source_date_cell": "B24",
+        "current_net": 39.31,
+        "current_net_cell": "F24",
+        "current_increase": 56.01,
+        "current_increase_cell": "C24",
+        "current_same": 27.3,
+        "current_same_cell": "D24",
+        "current_decrease": 16.7,
+        "current_decrease_cell": "E24",
+        "ahead_net": 45.29,
+        "ahead_net_cell": "J24",
+        "ahead_increase": 60.37,
+        "ahead_increase_cell": "G24",
+        "ahead_same": 24.55,
+        "ahead_same_cell": "H24",
+        "ahead_decrease": 15.08,
+        "ahead_decrease_cell": "I24"
       }
     ]
   },
@@ -754,8 +795,8 @@
   },
   "sources": {
     "Urban": {
-      "path": "/home/runner/work/the-economics-hub/the-economics-hub/data/inputs/rbi/rbi_bimonthly_manual/consumer_survey/UCCSH05082026.xlsx",
-      "sha256": "6b447210ad2d71c762e86f6e4277553376f26d5f6a9ad51050c1996eb640b002",
+      "path": "/home/runner/work/the-economics-hub/the-economics-hub/data/inputs/rbi/rbi_bimonthly_manual/consumer_survey/UCCSH07102026.xlsx",
+      "sha256": "27deac3e443bd41ce2bd05e287fba248642d7b6c378e14b75f524dac7707d6b0",
       "url": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Urban%20Consumer%20Confidence%20Survey%20-%20Bi-monthly",
       "sheet": "T8 Non-essential spending",
       "columns": {
@@ -770,8 +811,8 @@
       }
     },
     "Rural": {
-      "path": "/home/runner/work/the-economics-hub/the-economics-hub/data/inputs/rbi/rbi_bimonthly_manual/consumer_survey/RCCSH05082026.xlsx",
-      "sha256": "56681b8c1d6647c81bdfe2d03ca01f8aa33617962c2f5b74c74fc54632ee5d24",
+      "path": "/home/runner/work/the-economics-hub/the-economics-hub/data/inputs/rbi/rbi_bimonthly_manual/consumer_survey/RCCSH07102026.xlsx",
+      "sha256": "6fde0e8bf6dc407003fd5b7cf77264a12a4dfce3c6e33086dd86de3a6b782acd",
       "url": "https://www.rbi.org.in/Scripts/BimonthlyPublications.aspx?head=Rural%20Consumer%20Confidence%20Survey%20-%20Bi-monthly",
       "sheet": "T8 Non-essential spending",
       "columns": {
