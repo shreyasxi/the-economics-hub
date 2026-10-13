@@ -32,3 +32,8 @@ data/stores/india/nse_indices/raw/*.csv -text
 data/stores/india/nse_indices/signals/*.csv -text
 data/stores/india/nse_valuations/*.csv -text
 data/stores/india/nse_valuations/sources/**/raw.csv -text
+
+# Official fiscal source HTML and PDF-extracted text retain source whitespace.
+data/inputs/fiscal_interest/sources/*.html -text -whitespace
+data/inputs/fiscal_interest/sources/*.txt -whitespace
+data/inputs/gst/sources/*.txt -whitespace

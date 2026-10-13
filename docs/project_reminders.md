@@ -162,7 +162,7 @@ Full command: `python -m data.processors.india_manual_entry set 2026-09 --gst 2.
 
 | When | Released | Command |
 |---|---|---|
-| 1st | GST (PIB) | `set YYYY-MM --gst 2.04` (₹ lakh crore, never `204000`) |
+| ~1st of following month | Gross/net GST (GSTN) | Add the prior month's amounts to `data/inputs/gst/gst_monthly.csv` (₹ crore; details below); `--gst 2.04` still updates the summary's gross level (₹ lakh crore) |
 | month-end / 1st | FPI final monthly net investment (NSDL) | `set YYYY-MM --fpi -34574` (₹ crore, total of all segments) |
 | during current month, optional | FPI month-to-date (NSDL) | `set YYYY-MM --fpi-mtd -9508 --fpi-mtd-asof YYYY-MM-DD` |
 | 1st business day | Manufacturing PMI | `set YYYY-MM --mfg-pmi 53.1` |
@@ -177,6 +177,12 @@ Full command: `python -m data.processors.india_manual_entry set 2026-09 --gst 2.
 Full command: `PYTHONPATH=. .venv/bin/python -m data.processors.india_manual_entry set 2026-09 --gst 2.04`.
 Values are range-checked; add `--dry-run` to preview. Composite PMI is calculated — never enter it.
 Keep each command on one line (a stray trailing `\` leaves the shell waiting).
+
+**GST:** <https://www.gst.gov.in/newsandupdates> → "Gross and Net GST revenue collections" → report PDF.
+In `data/inputs/gst/gst_monthly.csv`, add `month` (`YYYY-MM`), `gross_gst_crore`, `net_gst_crore`, `refunds_crore`
+from the **Monthly** totals, excluding compensation cess; copy `basis` from the previous row and fill
+`source_report_month`, `source_url`, `notes`. Check the year-earlier figures for revisions. Save the PDF in
+`data/inputs/gst/sources/`, then run `generate_india.py`; growth and the latest 12-month window update themselves.
 
 **DBIE workbook (~5th):** download from <https://data.rbi.org.in/DBIE/#/dbie/ind1>, replace
 `data/50 Macroeconomic Indicators.xlsx` (same filename), then:
@@ -224,6 +230,7 @@ Worth knowing:
 **Workbook not updated but figures on the CGA web page?** Fill `docs/templates/cag_fill.xlsx` each month
 ("Actuals up to" column, ₹ crore) and send it to Claude:
 - *Accounts at a glance:* Revenue Expenditure (row 8), Interest Payments (9), Capital Expenditure (10), Fiscal Deficit (13)
+- Interest/revenue chart: also fill `net_tax_revenue` (row 2), `non_tax_revenue` (row 3), and `revenue_source` in `data/inputs/cag/cag_manual_accounts.csv` (YTD ₹ crore, including the BE row). Annual actuals in `data/inputs/fiscal_interest/annual.csv` update once a year.
 - *Sources of financing the deficit:* External, Domestic total, and every domestic row (a) to the last row below Cash Balance
 - The sheet's check rows should read 0: external + domestic = fiscal deficit, and the domestic rows add up to their total
 A new financial year also needs the BE column (same pages) and nominal GDP from the Budget.
@@ -265,7 +272,7 @@ Missing/misaligned workbooks omit that survey family; never substitute an older 
 
 | Source | URL |
 |---|---|
-| GST | <https://pib.gov.in/allRel.aspx> — search "GST Revenue Collection" |
+| GST | <https://www.gst.gov.in/newsandupdates> — "Gross and Net GST revenue collections" |
 | Manufacturing PMI | <https://www.spglobal.com/marketintelligence/en/mi/research-analysis/india-manufacturing-pmi.html> |
 | Services PMI | <https://www.spglobal.com/marketintelligence/en/mi/research-analysis/india-services-pmi.html> |
 | CPI | <https://mospi.gov.in/web/cpi> |

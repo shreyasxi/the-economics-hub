@@ -1514,57 +1514,49 @@ def chart_sector_valuations(output_dir):
 # ═══════════════════════════════════════════
 
 def chart_gst(df, output_dir):
-    """Monthly GST collection bar chart with trend line."""
-    if "india_gst_revenue" not in df.columns:
-        print("   ⚠ Skipping GST — column not found")
-        return None
-
+    """Latest 12 months of gross and net GST YoY growth, excluding cess."""
+    from data.processors.gst_revenue import load_gst_growth
+    panel = load_gst_growth()
     fig, ax = EconStyle.create_figure(size="wide")
-
-    dates = df["date"].tolist()
-    vals = df["india_gst_revenue"].values
-
-    # Subtle gridlines behind bars
+    x = np.arange(len(panel))
+    width = 0.36
+    colors = ("#1E3A8A", "#D97706")
+    for offset, kind, color in zip((-width/2, width/2), ('gross', 'net'), colors):
+        values = panel[f'{kind}_yoy'].to_numpy()
+        ax.bar(x + offset, values, width=width, color=color,
+               label=f'{kind.title()} GST', edgecolor='none', zorder=3)
+        ax.annotate(f'{values[-1]:.1f}%', (x[-1] + offset, values[-1]),
+                    xytext=(0, 6 if values[-1] >= 0 else -12), textcoords='offset points',
+                    ha='right' if kind == 'gross' else 'center',
+                    fontsize=9, fontweight='bold', color=color, zorder=10)
     ax.yaxis.grid(True, linestyle='-', alpha=0.15, color='#9CA3AF', zorder=0)
     ax.set_axisbelow(True)
-
-    # Uniform color for all bars
-    bar_width = 20  # days
-    ax.bar(dates, vals, width=bar_width, color=C_GST, alpha=0.75,
-           edgecolor="none", zorder=3, label="Monthly GST")
-
-    # 3-month moving average trend
-    if len(vals) >= 3:
-        ma3 = pd.Series(vals).rolling(3).mean().values
-        ax.plot(dates, ma3, color="#000000", linewidth=2, linestyle="-",
-                label="3M Avg", zorder=5, solid_capstyle="round")
-        # End label for MA
-        valid_ma = [(d, v) for d, v in zip(dates, ma3) if not np.isnan(v)]
-        if valid_ma:
-            _add_end_label(ax, [d for d, _ in valid_ma],
-                          [v for _, v in valid_ma], "3M Avg", "#000000")
-
-    # ₹2 Lakh Cr reference
-    ax.axhline(y=2.0, color="#FF9933", linewidth=1.5, linestyle="--",
-               alpha=0.7, zorder=2, label="₹2L Cr Target")
-
-    _format_date_axis(ax, len(dates))
-    ax.set_ylim(bottom=1.3, top=np.nanmax(df["india_gst_revenue"].values) * 1.05)
-    ax.set_ylabel("₹ Lakh Crore", fontsize=EconStyle.FONT_SIZE_AXIS)
-    
-    # Legend at top-right, inline with subtitle
-    ax.legend(loc="lower right", bbox_to_anchor=(1.0, 1.02),
-              ncol=3, frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
-
-    EconStyle.set_title(ax, "GST Revenue Collections",
-                        "Monthly Gross GST Revenue (₹ Lakh Crore)")
+    ax.axhline(0, color='black', linewidth=1, zorder=2)
+    ax.set_xticks(x)
+    ax.set_xticklabels(panel.date.dt.strftime("%b '%y"), fontsize=8)
+    ax.set_ylabel('Year-on-year change (%)', fontsize=EconStyle.FONT_SIZE_AXIS)
+    values = panel[['gross_yoy', 'net_yoy']].to_numpy()
+    low, high = min(0, values.min()), max(0, values.max())
+    margin = max(2, (high-low)*0.15)
+    ax.set_ylim(low - (margin if low < 0 else 0), high + margin)
+    ax.legend(loc='lower right', bbox_to_anchor=(1.0, 1.02), ncol=2,
+              frameon=False, fontsize=9, handletextpad=0.4, borderaxespad=0)
+    latest = panel.iloc[-1]
+    EconStyle.set_title(ax, 'GST Revenue Growth',
+                        'Gross vs. net collections (% YoY; excluding compensation cess)')
     EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "PIB / GST Council")
-
-    fp = output_dir / "02_india_gst.png"
+    fig.tight_layout(rect=[0.02, 0.12, 0.98, 0.96])
+    font = EconStyle._get_font('regular')
+    fig.text(0.04, 0.088,
+             f"{latest.date:%b %Y}: Gross ₹{latest.gross_gst_crore/100000:.2f} lakh crore"
+             f"  |  Net after refunds ₹{latest.net_gst_crore/100000:.2f} lakh crore",
+             fontsize=9, fontproperties=font, color=EconStyle.TEXT_MUTED)
+    fig.text(0.04, 0.025, f'Source: GSTN monthly reports | Provisional | Data through {latest.date:%b %Y}',
+             fontsize=8, fontproperties=font, color=EconStyle.TEXT_MUTED)
+    EconStyle.draw_credit(fig, x=0.96, y=0.025)
+    fp = output_dir / '02_india_gst.png'
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ GST Revenue")
+    print('   ✓ GST Revenue Growth (gross and net, 12 months)')
     return fp
 
 
@@ -3484,10 +3476,12 @@ def main():
         # Tax composition and monthly capex were retired in Sep 2026: CGA no longer
         # publishes tax by head, and monthly capex repeated the other charts. The
         # consolidation tracker gave way to deficit financing: capex against its
-        # Budget moved into Expenditure Quality, and the deficit target is on chart 11.
+        # Budget moved into Expenditure Quality; the deficit remains in the snapshot.
         chart_expenditure_quality(cag_data, df_monthly, output_dir)
+        from charts.india_charts.india_fiscal_interest import generate as chart_fiscal_interest
+        chart_fiscal_interest(output_dir)
         chart_deficit_financing(output_dir)
-        chart_fiscal_deficit_gdp(args.cag, output_dir)
+        # Fiscal deficit remains in the India snapshot; its standalone chart is retired.
 
     chart_count = len(list(output_dir.glob("*.png")))
     print(f"\n India Dashboard complete! {chart_count} charts saved to:")

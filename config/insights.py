@@ -628,11 +628,11 @@ The percentile is the share of valid historical multiples at or below the curren
 """,
 
     "india_gst": """\
-**How to read this chart:** Monthly GST (Goods and Services Tax) collections in India, shown as a bar chart with the year-on-year growth rate as a secondary signal. GST is India's broadest indirect tax, covering consumption across most goods and services. Total monthly collections above ₹1.5 lakh crore are considered robust; consistent growth above 10–12% YoY signals healthy nominal consumption. The chart reveals both the level of economic activity and the fiscal health of the central government's revenue mobilisation.
+**How to read this chart:** Paired bars show the latest 12 months of gross and net GST collection growth against the same month a year earlier. Both series exclude compensation cess consistently. Net GST is gross collections after refunds across the GST system, not the Centre's share. Growth uses exact official rupees-crore amounts, and the latest collection levels appear below the chart.
 
-**Practical takeaway:** GST collections are among the most timely indicators of India's economic momentum — they are released on the first day of every month for the prior month, with minimal revision risk. A sustained acceleration in GST collections (3+ months of sequential growth) is a strong leading signal for NIFTY earnings revisions, particularly in consumer discretionary, FMCG, and banking sectors. Seasonality matters significantly: April (start of fiscal year) and October–December (festive season) structurally print higher collections. Strip out seasonal effects and focus on the underlying YoY trend. Weak GST collections also directly constrain the government's fiscal space, limiting the scope for discretionary capex in the second half of the fiscal year.
+**Practical takeaway:** Compare collection momentum with revenue retained after refunds. Weaker net than gross growth can reflect faster refunds; stronger net growth can reflect slower refunds. Neither alone proves a change in real consumption: inflation, imports, tax rates, compliance and base effects also matter. May 2026 has a one-off spectrum receipt in the May 2025 comparison base; the bars show unadjusted growth. Figures are provisional. October amounts are harmonised by removing cess from the older report's totals.
 
-**Source:** PIB / Ministry of Finance, monthly GST revenue releases — https://pib.gov.in/allRel.aspx
+**Source:** GSTN official monthly gross and net revenue reports, with source PDFs and amounts archived in data/inputs/gst/.
 """,
 
     "india_credit": """\
@@ -689,6 +689,14 @@ Here W_i is the official division weight in percent, I is the division index, G 
 **Practical takeaway:** A higher capital share means more of each rupee goes into assets such as roads, railways and defence equipment rather than salaries, interest and subsidies, which supports growth beyond the current year. Monthly capex is lumpy, so the pattern across the year matters more than any single month. A badge share well below the part of the year that has passed (a third by July, half by September) points to underspending, which can happen when revenue disappoints and spending is held back to protect the deficit target; weak spending in the first half followed by a rush in the final quarter points to execution delays.
 
 **Source:** Controller General of Accounts, Monthly Accounts — https://cga.nic.in/index.aspx#account-section
+""",
+
+    "india_interest_revenue": """\
+**How to read this chart:** Interest payments divided by revenue receipts (net central tax revenue plus non-tax revenue). The annual panel shows ten years of Budget-reported actuals, the latest CGA provisional full-year outcome and the current Budget estimate in distinct colours. The monthly panel uses cumulative April-to-month interest and revenue for the current fiscal year. Its dashed line is the full-year Budget ratio, not a forecast of the next month's reading.
+
+**Practical takeaway:** A higher share means less recurring income is available for services and investment after servicing existing debt. Receipt timing matters: large non-tax transfers or quarterly tax payments can lower the year-to-date ratio without reducing interest costs. Evaluate the annual trajectory and compare matching periods, rather than treating a monthly move as structural improvement. Borrowing and non-debt capital receipts are excluded; these are Union-government finances, not combined Centre-state finances.
+
+**Source:** Ministry of Finance, Budget at a Glance actuals; CGA Union Government Accounts at a Glance for provisional annual and current-year figures. Source reports are archived in data/inputs/fiscal_interest/.
 """,
 
     "india_deficit_financing": """\

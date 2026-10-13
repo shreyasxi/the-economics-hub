@@ -14,6 +14,7 @@ class IndiaLoaderTests(unittest.TestCase):
                 edition = root/base/'india/2026-10'
                 edition.mkdir(parents=True)
                 (edition/'21_india_real_policy_rate.png').write_bytes(b'stale')
+                (edition/'11_india_fiscal_deficit_gdp.png').write_bytes(b'retired')
                 kept = edition/'19_india_money_market_corridor.png'
                 kept.write_bytes(b'current')
                 with patch.object(loader, '_get_base_dirs', return_value=[root/base]):

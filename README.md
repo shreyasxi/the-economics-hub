@@ -31,8 +31,8 @@ equities or the rupee. What it does track is the 10-year government security's m
 | **Market Snapshot** | **World: Shiller CAPE and Excess CAPE Yield** |
 |:---:|:---:|
 | <img src="assets/readme_showcase/weekly_summary_table.png" width="100%"> | <img src="assets/readme_showcase/macro_cape.png" width="100%"> |
-| **The Crude Oil Futures Curve** | **Fiscal Deficit** |
-| <img src="assets/readme_showcase/weekly_crude_curve.png" width="100%"> | <img src="assets/readme_showcase/india_fiscal_deficit_gdp.png" width="100%"> |
+| **The Crude Oil Futures Curve** | **Interest Burden** |
+| <img src="assets/readme_showcase/weekly_crude_curve.png" width="100%"> | <img src="assets/readme_showcase/india_interest_revenue.png" width="100%"> |
 | **Expenditure Quality** | **World: OECD Composite Leading Indicators** |
 | <img src="assets/readme_showcase/india_expenditure_quality.png" width="100%"> | <img src="assets/readme_showcase/macro_oecd_cli.png" width="100%"> |
 

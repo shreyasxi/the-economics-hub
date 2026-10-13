@@ -527,10 +527,10 @@ words in the file name (§5.3). Where the data is typed by hand, §5.4 says how 
 | `16_india_forex_reserves` | India Forex Reserves | External Sector | `chart_forex_reserves` / `charts.india_charts.india_external.load_forex` | Reserves, weekly | canonical `data/stores/india/rbi_wss_reserves.csv`, RBI WSS |
 | `17_india_trade` | India Trade | External Sector | `chart_trade_balance` | Exports, imports, deficit | `india_exports_usd_bn`, `india_imports_usd_bn` (DBIE; verified official release supplement for missing months) |
 | `03_india_fpi_monthly` | India FPI Monthly | Equity Markets | `chart_fpi_flows` | Net foreign portfolio investment per month | NSDL only: completed-month `india_fpi_net_inr_cr` (typed, ₹ crore), optional current-month MTD; no RBI fallback (`fpi_series()`) |
-| `02_india_gst` | India GST | Fiscal Policy & Public Finances | `chart_gst` | Monthly GST collections | `india_gst_revenue` (typed, PIB, ₹ lakh crore) |
+| `02_india_gst` | GST Revenue Growth | Fiscal Policy & Public Finances | `chart_gst` | Latest 12 months of gross/net YoY growth, excluding cess | `data/inputs/gst/gst_monthly.csv`, exact ₹ crore; official reports archived alongside |
 | `07_india_expenditure_quality` | India Expenditure Quality | Fiscal Policy & Public Finances | `chart_expenditure_quality` | Capital against revenue spending, year to date; capex Budget ÷ 12 line | `data/inputs/cag/cag_monthly_accounts.xlsx` + `data/inputs/cag/cag_manual_accounts.csv` |
 | `09_india_deficit_financing` | India Deficit Financing | Fiscal Policy & Public Finances | `chart_deficit_financing` | How the deficit is financed | `cag_manual_accounts.csv`, `fin_*` columns |
-| `11_india_fiscal_deficit_gdp` | India's Fiscal Deficit, % of GDP | Fiscal Policy & Public Finances | `chart_fiscal_deficit_gdp` | Deficit as % of GDP against the Budget target | CAG workbook/CSV + the BE row's GDP |
+| `08_india_interest_revenue` | How Much Revenue Goes to Interest? | Fiscal Policy & Public Finances | `india_fiscal_interest.generate` | Annual actuals, provisional and BE; current-year cumulative interest/revenue | `data/inputs/fiscal_interest/annual.csv` + fiscal CSV interest, net taxes and non-tax revenue |
 
 | `20_india_gross_fixed_capital_formation` | India Investment Rate | Growth & Activity | `chart_investment_rate` | Gross fixed capital formation as % of GDP | saved GMD CSV + JSON provenance |
 | `22_india_gva_contributions` | Real GVA contributions | Growth & Activity | `chart_gva_contributions` | Primary, secondary and tertiary contributions to real growth | official MoSPI constant-price GVA, base 2022–23 |
@@ -1154,13 +1154,17 @@ sign; now by meaning (`good` per column in `SCOREBOARD_COLUMNS`, applied in `_sc
 - **Manual series** (`python -m data.processors.india_manual_entry set …`): manufacturing and services PMI,
   GST, core CPI, the legacy monthly unemployment field and **FPI** (NSDL, ₹ crore).
   The new urban youth PLFS chart/snapshot use the separate official monthly store, not `--unemployment`. Headline/food CPI and IIP are official automated series; emergency manual rules are in §0.1
-- **CAG fiscal charts (4 since Sep 2026):** GST, expenditure quality (with a capex Budget ÷ 12 line and a
-  "capex to date, % of Budget" badge), deficit financing, fiscal deficit % of GDP.
+- **Fiscal charts (4 since Oct 2026):** gross/net GST YoY growth (12 months, excluding cess), expenditure quality
+  (with a "capex to date, % of Budget" badge), annual/current-year interest burden, and deficit financing.
+  The standalone fiscal deficit/GDP chart is retired and filtered from archived editions; its snapshot metric remains.
+  GST amounts come from `data/inputs/gst/gst_monthly.csv` (24-month minimum; exact ₹ crore, source URLs and archives).
+  Interest annuals come from `data/inputs/fiscal_interest/annual.csv`; monthly cumulative receipts are
+  `net_tax_revenue` + `non_tax_revenue` in the existing fiscal CSV, alongside `interest_payments` and `revenue_source`.
   Tax composition and monthly capex were retired (CGA stopped publishing tax by head; monthly capex repeated the others);
   the fiscal consolidation tracker was replaced by deficit financing on 15 Sep 2026.
   While CGA does not publish the workbook, months typed from its web page go in `data/inputs/cag/cag_manual_accounts.csv`
   (year-to-date ₹ crore: revenue expenditure, capex, fiscal deficit required; interest, subsidies optional;
-  BE rows with GDP, and a BE fiscal deficit sets the deficit chart's target line). `load_cag_tables()` merges them, the workbook wins on overlap,
+  BE rows with GDP; deficit/GDP remains in the snapshot). `load_cag_tables()` merges them, the workbook wins on overlap,
   and bad figures stop the run (`tests/test_cag_manual.py`)
 - **Deficit financing (`09_india_deficit_financing.png`):** `fin_*` columns in the same CSV, from CGA's "Sources of
   financing the deficit" page (monthly rows and the BE row). Checked to ₹1 crore: external + domestic = fiscal deficit,
@@ -1663,7 +1667,7 @@ Secrets: `FRED_API_KEY` only.
 
 ### README showcase
 Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflows: `weekly_summary_table.png`,
-`weekly_crude_curve.png` (weekly), `macro_cape.png`, `macro_oecd_cli.png` (macro), `india_fiscal_deficit_gdp.png`,
+`weekly_crude_curve.png` (weekly), `macro_cape.png`, `macro_oecd_cli.png` (macro), `india_interest_revenue.png`,
 `india_expenditure_quality.png` (india).
 
 ---
@@ -1680,10 +1684,10 @@ Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflo
 4. **`meeting_composites`** stores one row per document date; charts group by policy cycle.
 5. **EM FX tickers** (`BRL=X` etc.) can be stale at weekends; weekly change uses 30 days of data.
 6. **No chart explanation** for the two summary tables, Weekly "Market Snapshot" and "India Economic Snapshot" (by design).
-7. **CAG fiscal data** ends Feb 2026 in the workbook; Mar 2026 (provisional) to Jul 2026 and BE 2026-27 are in
+7. **CAG fiscal data** ends Feb 2026 in the workbook; Mar 2026 (provisional) to Aug 2026 and BE 2026-27 are in
    `data/inputs/cag/cag_manual_accounts.csv` (BE from Budget at a Glance via PRS; July FD and total spending match CGA press
    reports). GDP 2026-27 is KPMG's rounded ₹393 lakh crore — replace with the exact Budget at a Glance figure.
-   Financing rows (Apr–Jul 2026 and BE 2026-27) are in the same file. Next owner task: add any newer CGA accounts and financing rows after checking the
+   Financing and current-year interest/revenue rows (Apr–Aug 2026 and BE 2026-27) are in the same file. Next owner task: add any newer CGA accounts and financing rows after checking the
    official release. FPI coverage is dynamic; inspect `data.processors.india_manual_entry status` rather than relying
    on an old month recorded here.
 8. **India source availability:** MoSPI/NSE endpoints can fail or change schema. Failed optional refreshes

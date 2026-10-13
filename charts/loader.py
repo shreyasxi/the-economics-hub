@@ -78,7 +78,8 @@ def get_charts(subdir: str) -> tuple[list[Path], str | None]:
     # Retired India charts can still exist in archived or local editions.
     if subdir == "india":
         retired = {"india_money_supply", "india_promoter_holdings", "india_real_policy_rate",
-                   "india_consumer_confidence_drivers", "india_urban_youth_unemployment"}
+                   "india_consumer_confidence_drivers", "india_urban_youth_unemployment",
+                   "india_fiscal_deficit_gdp"}
         pngs = [p for p in pngs if chart_key(p.name) not in retired]
     return pngs, label
 
@@ -212,6 +213,7 @@ _TITLE_OVERRIDES = {
     "india_investment_rate":      "India’s Investment Rate vs Emerging Asia",
     "india_gva_contributions":    "What Is Driving India’s Growth?",
     "india_fiscal_deficit_gdp":  "India's Fiscal Deficit, % of GDP",
+    "india_interest_revenue":    "How Much Revenue Goes to Interest?",
     "india_inflation_bar":       "India Inflation",
     "india_cpi_contributions":   "What’s Driving Indian Inflation?",
     "india_inflation_expectations": "Inflation Expectations - India",

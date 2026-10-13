@@ -285,7 +285,7 @@ jobs:
           echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
           mkdir -p "assets/india/$MONTH_FOLDER"
           # Remove omitted optional artifacts before copying this run's output.
-          for NAME in 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
+          for NAME in 08_india_interest_revenue 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
             if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
               rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
             fi
@@ -305,6 +305,8 @@ jobs:
             cp "output/india/$MONTH_FOLDER/24_india_cpi_contributions."{png,json} "assets/india/$MONTH_FOLDER/"
           fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
+          # Fiscal deficit remains in the snapshot; its standalone chart is retired.
+          rm -f "assets/india/$MONTH_FOLDER/11_india_fiscal_deficit_gdp.png"
           # Clear omitted external charts; publish CPI item panels with their audit.
           for NAME in 30_india_reer 31_india_external_vulnerability; do
             if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
@@ -354,7 +356,11 @@ jobs:
         run: |
           mkdir -p assets/readme_showcase
           MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
-          cp "output/india/$MONTH_FOLDER/11_india_fiscal_deficit_gdp.png" "assets/readme_showcase/india_fiscal_deficit_gdp.png"
+          if [ -f "output/india/$MONTH_FOLDER/08_india_interest_revenue.png" ]; then
+            cp "output/india/$MONTH_FOLDER/08_india_interest_revenue.png" "assets/readme_showcase/india_interest_revenue.png"
+          else
+            rm -f "assets/readme_showcase/india_interest_revenue.png"
+          fi
           cp "output/india/$MONTH_FOLDER/07_india_expenditure_quality.png" "assets/readme_showcase/india_expenditure_quality.png"
           echo "README showcase updated from $MONTH_FOLDER"
 
