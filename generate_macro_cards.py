@@ -1,7 +1,9 @@
-"""Prepare the four overview cards before rendering.
+"""Prepare the market and economic overview cards before rendering.
 
 Default: local preview, using cached market inputs. --refresh-market downloads
-market histories. --publish writes assets/macro_cards.json; --only selects the
+market histories and commodity breadth; --refresh-commodities refreshes only the
+commodity inputs at the cached market cutoff; --refresh-oil-curve refreshes the
+WTI near–six-month spread alone. --publish writes assets/macro_cards.json; --only selects the
 workflow's domain. Failed sources retain previously validated, dated cards and
 emit Actions warnings. No database writes or inference during page rendering.
 """
@@ -13,13 +15,14 @@ from pathlib import Path
 
 from data.paths import INDIA_DB
 from data.processors.macro_cards import (
-    answer, market_risk, global_inflation, india_activity, india_inflation,
+    answer, market_risk, commodities, global_inflation, india_activity, india_inflation,
 )
 
 ROOT = Path(__file__).resolve().parent
 PREVIEW = ROOT / 'output/card_preview/macro_cards.json'
 PUBLISHED = ROOT / 'assets/macro_cards.json'
 MARKET_INPUTS = PREVIEW.parent / 'market_inputs.json'
+COMMODITY_INPUTS = PREVIEW.parent / 'commodity_inputs.json'
 
 
 def read(folder, filename):
@@ -55,7 +58,7 @@ def inflation_card(folder):
     return india_inflation(derived, items)
 
 
-def generate(destination=PREVIEW, scope='all', refresh_market=False):
+def generate(destination=PREVIEW, scope='all', refresh_market=False, refresh_commodities=False, refresh_oil_curve=False):
     destination = Path(destination)
     payload = json.loads(destination.read_text()) if destination.exists() else dict(schema_version=1, cards={}, editions={})
     if payload.get('schema_version') != 1:
@@ -75,6 +78,22 @@ def generate(destination=PREVIEW, scope='all', refresh_market=False):
                 else:
                     inputs = payload['market_inputs']
                 candidates = {'risk':market_risk(inputs)}
+                try:
+                    if refresh_market or refresh_commodities:
+                        from data.processors.market_regime import fetch_commodities
+                        commodity_inputs = fetch_commodities(inputs['as_of'])
+                    elif COMMODITY_INPUTS.exists():
+                        commodity_inputs = json.loads(COMMODITY_INPUTS.read_text())
+                    else:
+                        commodity_inputs = payload.get('commodity_inputs', {})
+                    if refresh_oil_curve:
+                        from data.processors.market_regime import fetch_oil_curve
+                        commodity_inputs['oil_curve'] = fetch_oil_curve(commodity_inputs['as_of'])
+                    candidates['commodities'] = commodities(commodity_inputs)
+                    if candidates['commodities']['state'] != 'Awaiting data':
+                        payload['commodity_inputs'] = commodity_inputs
+                except Exception as exc:
+                    errors['commodities'] = type(exc).__name__
             elif domain == 'world':
                 candidates = {'global_inflation':global_inflation(read(folder, 'world_snapshot.json'))}
             else:
@@ -100,11 +119,18 @@ def generate(destination=PREVIEW, scope='all', refresh_market=False):
         except Exception as exc:
             errors[domain] = type(exc).__name__
     payload['cards'].update(updates)
-    for key in ('risk','global_inflation','india_activity','india_inflation'):
+    for key in ('risk','commodities','global_inflation','india_activity','india_inflation'):
         payload['cards'].setdefault(key, answer('Awaiting data','A validated dated snapshot is unavailable.'))
     payload['generated_at'] = datetime.now(timezone.utc).isoformat()
-    payload['refresh_errors'] = errors
-    payload['methodology'] = ('Three-month market environment; one-month momentum; sustained VIX; commodity context. '
+    domain_keys = {'markets': {'markets', 'risk', 'commodities'},
+                   'world': {'world', 'global_inflation'},
+                   'india': {'india', 'india_activity', 'india_inflation'}}
+    refreshed_keys = set().union(*(domain_keys[d] for d in domains))
+    retained_errors = {key: value for key, value in payload.get('refresh_errors', {}).items()
+                       if key not in refreshed_keys}
+    payload['refresh_errors'] = {**retained_errors, **errors}
+    payload['methodology'] = ('Three-month market environment; one-month momentum; sustained VIX. '
+                              'Commodity futures: matched 200-session trend breadth (12/13 minimum); Brent price pressure; WTI near–six-month curve tightness. '
                               'Two-thirds agreement within breadth pillars; 80% matched inflation coverage; '
                               '±0.05 pp = little changed. Unweighted counts; no GDP/GVA.')
     destination.parent.mkdir(parents=True,exist_ok=True)
@@ -123,7 +149,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--publish',action='store_true')
     parser.add_argument('--refresh-market',action='store_true')
+    parser.add_argument('--refresh-commodities',action='store_true')
+    parser.add_argument('--refresh-oil-curve',action='store_true')
     parser.add_argument('--only',choices=['all','markets','world','india'],default='all')
     args = parser.parse_args()
-    errors = generate(PUBLISHED if args.publish else PREVIEW,args.only,args.refresh_market)
+    errors = generate(PUBLISHED if args.publish else PREVIEW,args.only,args.refresh_market,args.refresh_commodities,args.refresh_oil_curve)
     raise SystemExit(1 if errors else 0)

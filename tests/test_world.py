@@ -417,7 +417,7 @@ def test_pmi_keeps_latest_uploaded_month_for_all_six_economies():
         assert not problems
 
 
-def test_saved_stale_pmi_remains_visible_and_supports_growth_card():
+def test_saved_stale_pmi_remains_visible_but_cannot_support_current_card():
     # Older published editions can still contain a stale PMI status.
     import math
     from datetime import datetime
@@ -438,7 +438,8 @@ def test_saved_stale_pmi_remains_visible_and_supports_growth_card():
     assert "not updated" not in rendered and "wsb-stale" not in rendered
     assert "55.9" in rendered and "Sep" in rendered
     answer = namespace["_eh_world_answer"](snapshot, "mfg_pmi", "Strengthening", "Slowing")
-    assert answer["state"] == "Strengthening" and len(answer["metrics"]) == 3
+    assert answer["state"] == "Awaiting data" and len(answer["metrics"]) == 3
+    assert "older reading" in answer["evidence"]
     # Inflation still requires current observations.
     for row in snapshot["scoreboard"]:
         row["cells"]["cpi_yoy"]["status"] = "stale"

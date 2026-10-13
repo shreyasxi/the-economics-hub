@@ -8,8 +8,9 @@ def test_equity_count_cannot_outvote_credit_pillar():
     signals['rows']['vix']=dict(median_20d=16,percentile=30,month_change_pct=-10)
     result = market_risk(signals)
     assert result['state'] == 'Mixed'
-    assert '9/9' in result['evidence'] and '3/3 credit spreads widened' in result['evidence']
-    assert '09 Oct 2026' in result['evidence']
+    assert '9/9' in result['evidence'] and '3/3 credit spreads have widened' in result['evidence']
+    assert result['evidence'].startswith('Three-month gains currently exceed')
+    assert result['observation_date']=='2026-10-09' and 'Through' not in result['evidence']
 
 
 def test_commodity_surge_cannot_override_risk_off_and_low_vix_is_not_weekly_change():
@@ -20,7 +21,7 @@ def test_commodity_surge_cannot_override_risk_off_and_low_vix_is_not_weekly_chan
     rows['vix']=dict(median_20d=30,percentile=90,month_change_pct=10)
     result=market_risk(dict(as_of='2026-10-09',rows=rows))
     assert result['state']=='Risk-off'
-    assert 'Copper +40.0%' in result['evidence']
+    assert 'Copper' not in result['evidence']
     # A persistently low volatility level qualifies separately from its recent change.
     rows['vix'].update(median_20d=15,percentile=20,month_change_pct=-30)
     assert market_risk(dict(as_of='2026-10-09',rows=rows))['state']=='Mixed'
@@ -39,16 +40,15 @@ def test_market_returns_use_calendar_anchors_and_reject_missing_annual_vix_histo
     assert not prepare({'sp500':pd.Series([100,120],index=dates[[1,2]])},'2026-10-09')['rows']
 
 
-def test_global_breadth_excludes_aggregate_and_missing_comparisons():
-    def country(aggregate=False, complete=True):
-        return {'aggregate':aggregate,'series':{'headline':[
-            {'month':'2026-05','value':4}, {'month':'2026-08','value':3}] if complete else
-            [{'month':'2026-08','value':3}], 'core':[]}}
+def test_major_economy_inflation_requires_matched_headline_comparisons():
+    countries = [dict(code=code, series={'headline':[
+        dict(month='2026-05', value=4), dict(month='2026-08', value=3)], 'core':[]})
+        for code in ('USA','EA','CHN','JPN','GBR','IND')]
     snapshot={'inflation_breadth':{'breadth':{'month':'2026-08','comparison_month':'2026-05'},
-                                 'countries':[country() for _ in range(4)] + [country(complete=False),country(True)]}}
+                                 'countries':countries}}
     result=global_inflation(snapshot)
-    assert result['state']=='Easing' and '4/4 countries' in result['evidence']
-    snapshot['inflation_breadth']['countries'].append(country(complete=False))
+    assert result['state']=='Easing' and 'headline eased in US / euro area / China' in result['evidence']
+    countries[0]['series']['headline'].pop(0)
     assert global_inflation(snapshot)['state']=='Awaiting data'
 
 
@@ -70,12 +70,12 @@ def test_price_level_breadth_is_separate_from_inflation_acceleration():
     result=india_inflation(derived,items)
     assert result['state']=='Cooling'
     assert '3/3 items' in result['evidence'] and 'accelerated in 0/3' in result['evidence']
-    assert 'unweighted' in result['evidence'] and 'weighted contributions' in result['evidence']
+    assert 'unweighted' in result['evidence'] and 'Weighted contributions' in result['evidence']
     items=[r for r in items if r['month_key']=='2026-09']
     assert india_inflation(derived,items)['state']=='Awaiting data'
 
 
-def test_major_economies_can_challenge_country_breadth_and_use_same_month():
+def test_broad_and_major_economy_inflation_both_inform_verdict():
     countries=[]
     for code in ('USA','EA','CHN','JPN','GBR','IND'):
         series=[{'month':'2026-05','value':2},{'month':'2026-08','value':3},
@@ -86,8 +86,9 @@ def test_major_economies_can_challenge_country_breadth_and_use_same_month():
     result=global_inflation({'inflation_breadth':{'breadth':{'month':'2026-08','comparison_month':'2026-05'},
                                                'countries':countries}})
     assert result['state']=='Mixed'
-    assert 'Major-economy headline rose' in result['evidence']
-    assert 'Country breadth and major economies diverge' in result['evidence']
+    assert 'headline inflation eased in 20/25 countries' in result['evidence']
+    assert 'Major-economy headline rose in US / euro area / China' in result['evidence']
+    assert 'Unweighted' not in result['evidence']
     assert len(result['metrics'])==6
     assert all(m['period']=='2026-08' and m['change']==1 for m in result['metrics'])
 

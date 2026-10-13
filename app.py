@@ -3498,14 +3498,20 @@ _EH_STYLE = """
 .eh-question h2 {font-size:1rem!important;line-height:1.5!important;margin:0 0 14px!important;padding:0!important;}
 p.eh-evidence {font-size:.86rem!important;line-height:1.6!important;margin:12px 0!important;}
 .eh-front {--nh-ink:#0A1F3D;color:#172331;margin:2.2rem 0 36px;font-family:Inter,sans-serif;}
-.eh-cards {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:22px;padding:0 5px 5px 0;}
-.eh-card {display:flex;flex-direction:column;background:#f8f0e3;border:2px solid #28251f;
-    box-shadow:4px 4px 0 #28251f;padding:20px 20px 14px;min-width:0;}
-.eh-card .eh-card-title {letter-spacing:0;text-transform:none;}
+.eh-cards {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;grid-auto-rows:1fr;margin-top:22px;padding:0 5px 5px 0;}
+.eh-card {position:relative;display:flex;flex-direction:column;background:#f8f0e3;border:2px solid #28251f;
+    box-shadow:4px 4px 0 #28251f;padding:20px 20px 14px;min-width:0;transition:transform 180ms ease;}
+@media(hover:hover) and (pointer:fine) {.eh-card:hover {transform:scale(1.025);z-index:1;}}
+@media(prefers-reduced-motion:reduce) {.eh-card {transition:none;}}
+.eh-card .eh-card-title {letter-spacing:0;text-transform:none;padding-right:28px!important;min-height:76px;}
 .eh-card .eh-card-title a {display:block;color:#28251f!important;text-decoration:none!important;}
 .eh-card .eh-card-title a:hover {text-decoration:underline!important;text-underline-offset:3px;}
 .eh-card .eh-card-title a:focus-visible {outline:2px solid #853342;outline-offset:4px;}
-.eh-card .eh-arrow {white-space:nowrap;}
+.eh-card .eh-arrow {position:absolute;top:20px;right:20px;white-space:nowrap;line-height:1.4;}
+.eh-card .eh-card-title a::after {content:"";position:absolute;inset:0;}
+.eh-card:focus-within {outline:2px solid #0A1F3D;outline-offset:6px;}
+.eh-card p.eh-conclusion {font-family:'Newsreader',Georgia,serif;font-size:1.08rem!important;
+    line-height:1.45!important;font-weight:600;color:#28251f;margin:0 0 8px!important;overflow-wrap:break-word;}
 .eh-card .eh-state {align-self:flex-start;border:1px solid #a84439;color:#923d34;
     font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:.76rem;
     line-height:1.4;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;margin:0;
@@ -3520,7 +3526,7 @@ p.eh-evidence {font-size:.86rem!important;line-height:1.6!important;margin:12px 
 .eh-metric {font-size:.75rem;color:#606773;}
 .eh-metric b {display:block;color:#172331;font-size:1.15rem;font-variant-numeric:tabular-nums;}
 @media(max-width:1000px) {.eh-cards {grid-template-columns:repeat(2,minmax(0,1fr));}}
-@media(max-width:640px) {.eh-cards {grid-template-columns:minmax(0,1fr);}.eh-card {padding:18px 18px 14px;}}
+@media(max-width:640px) {.eh-cards {grid-template-columns:minmax(0,1fr);}.eh-card {padding:18px 18px 14px;}.eh-card .eh-arrow {top:18px;right:18px;}.eh-card .eh-card-title {min-height:0;}}
 </style>
 """
 
@@ -3887,45 +3893,47 @@ def _eh_question_header(index: int, answer: dict) -> str:
 def _eh_state_card(question: str, answer: dict, destination: str) -> str:
     return (f'<article class="eh-card"><div class="eh-card-title" role="heading" aria-level="3"><a href="{_esc(destination)}" target="_self">'
             f'{_esc(question)} <span class="eh-arrow" aria-hidden="true">↗</span></a></div>'
+            f'<p class="eh-conclusion">{_esc((answer.get("conclusion") or "Comparable evidence is still being assembled."))}</p>'
             f'<p class="eh-evidence">{_esc(answer["evidence"])}</p>'
             f'<div class="eh-state">{_esc(answer["state"])}</div></article>')
 
 
 def _eh_world_answer(snapshot: dict, key: str, up: str, down: str) -> dict:
-    # A fixed three-economy lens, labelled explicitly, rather than a global score.
+    from data.processors.macro_cards import month_label
     metrics = []
     for row in snapshot.get("scoreboard", []):
         if row.get("country") not in ("US", "EA", "CN"):
             continue
         cell = row.get("cells", {}).get(key, {})
-        usable = cell.get("status") == "ok" or (key == "mfg_pmi" and cell.get("status") == "stale")
-        if not usable or not _eh_number(cell.get("value")):
+        if not _eh_number(cell.get("value")) or not cell.get('period'):
             continue
-        change = cell.get("change")
-        metrics.append({"label": row["label"], "value": cell["value"],
-                        "change": change,
-                        "display": f'{cell["value"]:.2f}' + ('%' if key == 'cpi_yoy' else ''),
-                        "period": cell.get("period", "")})
-    state = _eh_direction(metrics, up, down) if len(metrics) == 3 else "Awaiting data"
-    growth = key == "mfg_pmi"
-    opening = ({up: "Manufacturing momentum is strengthening across major economies.",
-                down: "Manufacturing momentum is slowing across major economies.",
-                "Mixed": "Global manufacturing remains uneven."} if growth else
-               {up: "Inflation pressures are building across major economies.",
-                down: "Inflation pressures are easing across major economies.",
-                "Mixed": "Inflation trends diverge across major economies."})
-    levels = ", ".join(f'{m["label"]} {m["value"]:.1f}' + ("" if growth else "%") for m in metrics)
-    changes = [m["change"] for m in metrics if _eh_number(m.get("change"))]
-    direction = "improved" if growth else "accelerated"
-    count = sum(c > 0 for c in changes)
-    if state == down:
-        count = sum(c < 0 for c in changes)
-        direction = "weakened" if growth else "decelerated"
-    trend = f", with {count} of {len(changes)} readings having {direction} from the prior month" if changes else ""
-    evidence = opening.get(state, "The global trend is awaiting comparable data.")
-    if levels:
-        evidence += f' {"PMI readings" if growth else "Headline inflation"}: {levels}{trend}.'
-    return _eh_result(state, evidence, metrics)
+        try:
+            age = (date.today() - date.fromisoformat(cell['period'][:7] + '-01')).days
+        except ValueError:
+            continue
+        metrics.append(dict(label=row['label'], value=cell['value'], change=cell.get('change'),
+                            period=cell['period'], usable=cell.get('status') == 'ok' and 0 <= age <= 75))
+    aligned = len({m['period'][:7] for m in metrics}) == 1
+    complete = (len(metrics) == 3 and aligned and all(m['usable'] for m in metrics)
+                and all(_eh_number(m['change']) for m in metrics))
+    state = _eh_direction(metrics, up, down) if complete else 'Awaiting data'
+    growth = key == 'mfg_pmi'
+    conclusions = ({up: 'PMI readings are rising in the three-economy sample.',
+                    down: 'PMI readings are falling in the three-economy sample.',
+                    'Mixed': 'Manufacturing survey momentum differs across the sample.'} if growth else
+                   {up: 'Headline inflation rose across the sampled economies.',
+                    down: 'Headline inflation eased across the sampled economies.',
+                    'Mixed': 'Headline inflation directions differ across the sample.'})
+    evidence = '; '.join(f"{m['label']} {m['value']:.1f}{'' if growth else '%'} ({month_label(m['period'])}" +
+                         (f", {m['change']:+.1f} {'points' if growth else 'pp'} MoM" if _eh_number(m['change']) else ', change unavailable') +
+                         (', older reading' if not m['usable'] else '') + ')' for m in metrics) + '.' if metrics else 'Comparable observations unavailable.'
+    if growth:
+        levels = [m['value'] for m in metrics]
+        evidence += (' All are above 50, indicating month-on-month expansion.' if len(levels) == 3 and min(levels) > 50 else
+                     ' Above 50 indicates expansion; below 50 indicates contraction, even when the reading rises.')
+    result = _eh_result(state, evidence, metrics)
+    result['conclusion'] = conclusions.get(state, 'Aligned, current readings are needed to assess momentum.')
+    return result
 
 
 def _eh_front_india(obs: dict) -> tuple[dict, dict]:
@@ -3983,7 +3991,7 @@ def _eh_front_stance(brief: dict) -> dict:
         tone = f'The Sentinel {verb} {score:+.2f} from {previous:+.2f}' if score != previous else f'The Sentinel was unchanged at {score:+.2f}'
         cycle = brief.get("previous_cycle")
         if cycle:
-            tone += " in " + date.fromisoformat(cycle).strftime("%B")
+            tone += " on " + date.fromisoformat(cycle).strftime("%d %b %Y")
         else:
             tone += " at the prior meeting"
     repo, bps, action = brief.get("repo_rate_pct"), brief.get("rate_change_bps"), brief.get("rate_action")
@@ -3996,16 +4004,19 @@ def _eh_front_stance(brief: dict) -> dict:
     stance = (brief.get("facts") or {}).get("stated_stance")
     if stance:
         tone += f' and a ‘{stance}’ stance'
-    return _eh_result(state, opening + " " + tone + ".", [])
+    result = _eh_result(state, tone + ". Tone is separate from the rate decision.", [])
+    result['conclusion'] = {'Hawkish': 'The policy message leans towards tighter conditions.',
+                            'Dovish': 'The policy message leans towards easier conditions.',
+                            'Neutral': 'The policy message has no strong directional tilt.'}.get(state, opening)
+    cycle = brief.get('policy_cycle')
+    if cycle:
+        result['evidence'] = date.fromisoformat(cycle).strftime('%d %b %Y') + ': ' + result['evidence']
+        result['observation_date'] = cycle
+    from data.processors.macro_cards import dated_card
+    return dated_card(result, date.today(), 120)
 
 
 def _eh_front_page(charts: list[Path]) -> None:
-    signals = _load_signals(charts) or {}
-    world_charts, _ = get_charts("macro")
-    try:
-        snapshot = _load_world_snapshot(world_charts) or {}
-    except (OSError, ValueError):
-        snapshot = {}
     # Precomputed summaries keep source validation out of page rendering.
     # output/ is the local preview; workflows update the shared published artifact.
     richer = {}
@@ -4017,42 +4028,30 @@ def _eh_front_page(charts: list[Path]) -> None:
             payload = json.loads(artifact.read_text())
             if payload.get('schema_version') == 1:
                 richer = payload.get('cards', {})
-                # Keep the existing growth logic on the same published World
-                # edition used by this local preview, avoiding older output/ data.
-                if artifact == preview and payload.get('editions', {}).get('macro'):
-                    snapshot = json.loads((PROJECT_ROOT / payload['editions']['macro'] / 'world_snapshot.json').read_text())
         except (OSError, ValueError):
             pass
+    from data.processors.macro_cards import dated_card
+    for key, max_age, domain in [('risk', 14, 'markets'), ('commodities', 14, 'markets'), ('global_inflation', 100, 'world'),
+                                 ('india_activity', 75, 'india'), ('india_inflation', 75, 'india')]:
+        if key in richer:
+            errors = payload.get('refresh_errors', {})
+            richer[key] = dated_card(richer[key], date.today(), max_age, key in errors or domain in errors)
     brief = _eh_brief()
     if 'india_activity' in richer and 'india_inflation' in richer:
         activity, inflation = richer['india_activity'], richer['india_inflation']
     else:
-        activity, inflation = _eh_front_india(_eh_india_observations())
-    rows = {r["id"]: r for r in signals.get("rows", [])}
+        from data.processors.macro_cards import answer
+        activity = answer('Awaiting data', 'Validated PMI, industrial production and manufacturing breadth are unavailable.')
+        inflation = answer('Awaiting data', 'Validated CPI contributions and matched item observations are unavailable.')
     # Same direction labels as the existing Sentinel, with no new scoring/LLM call.
     stance = _eh_front_stance(brief)
-    risk_ids = (("sp500", 1), ("stoxx50", 1), ("us_hy", -1), ("vix", -1))
-    available = [(rows[k], sign) for k, sign in risk_ids if k in rows and _eh_number(rows[k].get("move"))]
-    directions = [r["move"] * sign for r, sign in available]
-    risk_keys = {r["id"] for r, _ in available}
-    risk_state = "Awaiting data" if len(directions) < 3 or not {"us_hy", "vix"} <= risk_keys else (
-        "Risk-on" if all(d > 0 for d in directions) else "Risk-off" if all(d < 0 for d in directions) else "Mixed")
-    risk_evidence = "Awaiting weekly cross-asset observations."
-    if risk_state != "Awaiting data":
-        opening = {"Risk-on": "Markets favour risk across equities, credit and volatility.",
-                   "Risk-off": "Markets are defensive across equities, credit and volatility.",
-                   "Mixed": "Markets show a mixed appetite for risk."}[risk_state]
-        # One equity market plus credit and volatility keeps the evidence concise.
-        evidence_rows = [r for r, _ in available if r["id"] != "stoxx50"]
-        if not any(r["id"] == "sp500" for r in evidence_rows):
-            evidence_rows = [r for r, _ in available]
-        risk_evidence = opening + " " + ", ".join(
-            f'{r["name"]} moved {_sig_amount(r["move"], r["measure"])}' for r in evidence_rows) + "."
-    risk = _eh_result(risk_state, risk_evidence, [])
+    from data.processors.macro_cards import answer
+    risk = answer('Awaiting data', 'Validated three-month equity, credit and volatility evidence is unavailable.',
+                  conclusion='The cross-asset assessment needs comparable observations.')
     cards = [
         ("Are global markets risk-on or risk-off?", richer.get('risk', risk), "#" + _anchor("weekly", "Cross-Asset Signals")),
-        ("Is global growth strengthening or slowing?", _eh_world_answer(snapshot, "mfg_pmi", "Strengthening", "Slowing"), "/world"),
-        ("Are global inflation pressures building or easing?", richer.get('global_inflation', _eh_world_answer(snapshot, "cpi_yoy", "Building", "Easing")), "/world#global-inflation-breadth"),
+        ("Are commodity gains broadening or staying concentrated?", richer.get('commodities', answer('Awaiting data', 'Validated commodity breadth and price observations are unavailable.')), "#" + _anchor("weekly", "Commodities")),
+        ("Are global inflation pressures building or easing?", richer.get('global_inflation', answer('Awaiting data', 'Validated headline and core country comparisons are unavailable.')), "/world#global-inflation-breadth"),
         (_EH_QUESTIONS[0], richer.get('india_activity', activity), "/india?chart=" + _anchor("india", _EH_ANCHORS[0]) + "-question"),
         ("Are India’s inflation pressures broadening or cooling?", richer.get('india_inflation', inflation), "/india?chart=" + _anchor("india", _EH_ANCHORS[1]) + "-question"),
         ("How hawkish is the RBI?", stance, "/rbi-sentinel"),

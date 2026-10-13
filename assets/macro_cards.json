@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-12T19:49:13.977654+00:00",
+  "generated_at": "2026-10-13T06:51:04.730593+00:00",
   "editions": {
     "weekly": "assets/weekly/2026-10-12",
     "macro": "assets/macro/2026-10",
@@ -9,7 +9,7 @@
   "cards": {
     "risk": {
       "state": "Mixed",
-      "evidence": "Through 09 Oct 2026: three-month gains exceeded 1% in 3/9 equity markets; 3/3 credit spreads widened by over 5 bp. VIX\u2019s 20-session median is 15.4 (low versus its past year). One-month signals are weakening. Commodities over three months: Copper +6.9%, Oil (Brent) +37.2%, Gold +1.8%. One-month reversals: Copper / Gold.",
+      "evidence": "Three-month gains currently exceed 1% in 3/9 equity markets; 3/3 credit spreads have widened by over 5 bp. VIX\u2019s 20-session median is 15.4 (low versus its past year). One-month signals are weakening.",
       "metrics": [
         {
           "pillar": "equities",
@@ -24,14 +24,17 @@
           "state": "Risk-on"
         }
       ],
-      "context": ""
+      "context": "",
+      "conclusion": "Equities, credit and volatility do not agree.",
+      "observation_date": "2026-10-09"
     },
     "global_inflation": {
       "state": "Mixed",
-      "evidence": "Aug 2026 vs May 2026: headline inflation eased in 23/46 countries and rose in 20. Core rose in 21/38. Major-economy headline rose in India / Japan / UK; cooled in US / China; was little changed in euro area. ",
+      "evidence": "Aug 2026 vs May 2026: headline inflation eased in 23/46 countries and rose in 20. Core rose in 21/38 and eased in 13. Major-economy headline rose in Japan / UK / India; eased in US / China; was little changed in euro area.",
       "metrics": [
         {
           "country": "USA",
+          "label": "US",
           "measure": "headline",
           "period": "2026-08",
           "comparison_month": "2026-05",
@@ -39,7 +42,17 @@
           "change": -0.8521260000000002
         },
         {
+          "country": "EA",
+          "label": "euro area",
+          "measure": "headline",
+          "period": "2026-08",
+          "comparison_month": "2026-05",
+          "value": 3.2,
+          "change": 0.0
+        },
+        {
           "country": "CHN",
+          "label": "China",
           "measure": "headline",
           "period": "2026-08",
           "comparison_month": "2026-05",
@@ -47,15 +60,8 @@
           "change": -0.3999999999999999
         },
         {
-          "country": "IND",
-          "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 4.96261,
-          "change": 0.24038799999999938
-        },
-        {
           "country": "JPN",
+          "label": "Japan",
           "measure": "headline",
           "period": "2026-08",
           "comparison_month": "2026-05",
@@ -64,6 +70,7 @@
         },
         {
           "country": "GBR",
+          "label": "UK",
           "measure": "headline",
           "period": "2026-08",
           "comparison_month": "2026-05",
@@ -71,30 +78,62 @@
           "change": 0.2999999999999998
         },
         {
-          "country": "EA",
+          "country": "IND",
+          "label": "India",
           "measure": "headline",
           "period": "2026-08",
           "comparison_month": "2026-05",
-          "value": 3.2,
-          "change": 0.0
+          "value": 4.96261,
+          "change": 0.24038799999999938
         }
       ],
-      "context": ""
+      "context": "",
+      "conclusion": "Broad country inflation and major-economy trends are uneven.",
+      "observation_date": "2026-08-01"
     },
     "india_activity": {
       "state": "Expanding",
-      "evidence": "Sep 2026: manufacturing PMI 55.1, services 55.8 (+2.3 and +1.7 points; both gaining momentum). Aug 2026 IIP grew 8.0% YoY, versus 7.4% previously. Aug 2026: 18/23 manufacturing industries expanded, and growth accelerated in 14/23.",
+      "evidence": "Sep 2026: manufacturing PMI 55.1, services 55.8 (+2.3 and +1.7 points; both gaining momentum). Aug 2026 IIP grew 8.0% YoY, versus 7.4% previously. Aug 2026: 18/23 manufacturing industries expanded YoY, and growth accelerated in 14/23.",
       "metrics": [],
-      "context": ""
+      "context": "",
+      "conclusion": "Both PMI surveys indicate expansion in activity.",
+      "observation_date": "2026-09-01"
     },
     "india_inflation": {
       "state": "Broadening",
-      "evidence": "Sep 2026 headline CPI 5.54% (+0.71 pp from the prior month). Largest weighted contributions: Food +2.71 pp, Other Consumption +1.32 pp. Prices were above a year earlier in 322/358 items. YoY inflation accelerated in 274/358 matched items and eased in 45. Item counts are unweighted.",
+      "evidence": "Sep 2026 headline CPI 5.54% (+0.71 pp from the prior month). Weighted contributions: Food +2.71 pp, Other Consumption +1.32 pp. Positive YoY inflation in 322/358 items. YoY inflation accelerated in 274/358 matched items. Item counts are unweighted; same-base comparisons only.",
       "metrics": [],
-      "context": ""
+      "context": "",
+      "conclusion": "Inflation is accelerating across more matched items.",
+      "observation_date": "2026-09-01"
+    },
+    "commodities": {
+      "state": "Mixed",
+      "evidence": "9/13 futures are currently above their 200-day averages (8/13 a month earlier). Three-month prices: Brent +37.2%, copper +6.9%, gold +1.8%. WTI near\u2013six-month spread +6.67 $/bbl (+15.32 a month earlier). Backwardation narrowed, suggesting less prompt tightness.",
+      "metrics": [
+        {
+          "pillar": "breadth",
+          "state": "Broad"
+        },
+        {
+          "pillar": "prices",
+          "state": "Rising"
+        },
+        {
+          "pillar": "energy",
+          "state": "rising"
+        },
+        {
+          "pillar": "oil_curve",
+          "state": "Backwardation"
+        }
+      ],
+      "context": "",
+      "conclusion": "Commodity uptrends are widespread; oil\u2019s prompt premium has narrowed.",
+      "observation_date": "2026-10-09"
     }
   },
-  "methodology": "Three-month market environment; one-month momentum; sustained VIX; commodity context. Two-thirds agreement within breadth pillars; 80% matched inflation coverage; \u00b10.05 pp = little changed. Unweighted counts; no GDP/GVA.",
+  "methodology": "Three-month market environment; one-month momentum; sustained VIX. Commodity futures: matched 200-session trend breadth (12/13 minimum); Brent price pressure; WTI near\u2013six-month curve tightness. Two-thirds agreement within breadth pillars; 80% matched inflation coverage; \u00b10.05 pp = little changed. Unweighted counts; no GDP/GVA.",
   "market_methodology": "Calendar three-month/one-month observed closes, anchors within four days; equity/commodity price changes in percent, spread changes in basis points. VIX: 20-session median versus preceding 252 rolling medians. No interpolation or supply/demand causal attribution.",
   "market_inputs": {
     "as_of": "2026-10-09",
@@ -296,5 +335,220 @@
       }
     }
   },
-  "refresh_errors": {}
+  "refresh_errors": {},
+  "commodity_inputs": {
+    "as_of": "2026-10-09",
+    "rows": {
+      "brent": {
+        "latest": 104.72000122070312,
+        "observation": "2026-10-09",
+        "quarter": 37.247702532418934,
+        "quarter_anchor": "2026-07-09",
+        "month": 3.4680388973236997,
+        "month_anchor": "2026-09-09"
+      },
+      "copper": {
+        "latest": 6.642499923706055,
+        "observation": "2026-10-09",
+        "quarter": 6.878515858767198,
+        "quarter_anchor": "2026-07-09",
+        "month": -2.366432683434938,
+        "month_anchor": "2026-09-09"
+      },
+      "gold": {
+        "latest": 4216.2998046875,
+        "observation": "2026-10-09",
+        "quarter": 1.8233192513806618,
+        "quarter_anchor": "2026-07-09",
+        "month": -5.478969218371288,
+        "month_anchor": "2026-09-09"
+      }
+    },
+    "members": [
+      {
+        "ticker": "BZ=F",
+        "label": "Brent",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "CL=F",
+        "label": "WTI",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "NG=F",
+        "label": "Natural gas",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": false,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "GC=F",
+        "label": "Gold",
+        "observation": "2026-10-09",
+        "above_200d": false,
+        "previous_above_200d": false,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "SI=F",
+        "label": "Silver",
+        "observation": "2026-10-09",
+        "above_200d": false,
+        "previous_above_200d": false,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "PL=F",
+        "label": "Platinum",
+        "observation": "2026-10-09",
+        "above_200d": false,
+        "previous_above_200d": false,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "HG=F",
+        "label": "Copper",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "ZW=F",
+        "label": "Wheat",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "ZC=F",
+        "label": "Corn",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "ZS=F",
+        "label": "Soybeans",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "KC=F",
+        "label": "Coffee",
+        "observation": "2026-10-09",
+        "above_200d": false,
+        "previous_above_200d": false,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "SB=F",
+        "label": "Sugar",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      },
+      {
+        "ticker": "CC=F",
+        "label": "Cocoa",
+        "observation": "2026-10-09",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-09-09"
+      }
+    ],
+    "missing": {},
+    "methodology": "13-futures research basket; matched current/prior-month members above their own 200-session average; at least 12 valid members. Observations within four calendar days; no interpolation. Three-month/one-month futures price changes; Brent alone for energy commentary.",
+    "sources": {
+      "BZ=F": {
+        "source": "Yahoo Finance",
+        "series": "BZ=F"
+      },
+      "CL=F": {
+        "source": "Yahoo Finance",
+        "series": "CL=F"
+      },
+      "NG=F": {
+        "source": "Yahoo Finance",
+        "series": "NG=F"
+      },
+      "GC=F": {
+        "source": "Yahoo Finance",
+        "series": "GC=F"
+      },
+      "SI=F": {
+        "source": "Yahoo Finance",
+        "series": "SI=F"
+      },
+      "PL=F": {
+        "source": "Yahoo Finance",
+        "series": "PL=F"
+      },
+      "HG=F": {
+        "source": "Yahoo Finance",
+        "series": "HG=F"
+      },
+      "ZW=F": {
+        "source": "Yahoo Finance",
+        "series": "ZW=F"
+      },
+      "ZC=F": {
+        "source": "Yahoo Finance",
+        "series": "ZC=F"
+      },
+      "ZS=F": {
+        "source": "Yahoo Finance",
+        "series": "ZS=F"
+      },
+      "KC=F": {
+        "source": "Yahoo Finance",
+        "series": "KC=F"
+      },
+      "SB=F": {
+        "source": "Yahoo Finance",
+        "series": "SB=F"
+      },
+      "CC=F": {
+        "source": "Yahoo Finance",
+        "series": "CC=F"
+      }
+    },
+    "oil_curve": {
+      "as_of": "2026-10-09",
+      "benchmark": "WTI",
+      "contracts": [
+        {
+          "maturity": "2026-11",
+          "ticker": "CLX26.NYM"
+        },
+        {
+          "maturity": "2027-05",
+          "ticker": "CLK27.NYM"
+        }
+      ],
+      "observation": "2026-10-09",
+      "comparison_date": "2026-09-09",
+      "near_price": 91.8499984741211,
+      "far_price": 85.18000030517578,
+      "spread": 6.6699981689453125,
+      "previous_spread": 15.319999694824219,
+      "change": -8.650001525878906,
+      "state": "Backwardation",
+      "source": "Yahoo Finance / NYMEX monthly contracts",
+      "methodology": "Near-month minus six-month-deferred WTI; same contracts and common observed dates at current/prior-month cutoffs, within four calendar days; \u00b1$0.25/bbl = flat. A prompt premium is consistent with near-term tightness, not proof of its cause."
+    }
+  }
 }
