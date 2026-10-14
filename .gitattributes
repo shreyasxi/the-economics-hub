@@ -37,3 +37,7 @@ data/stores/india/nse_valuations/sources/**/raw.csv -text
 data/inputs/fiscal_interest/sources/*.html -text -whitespace
 data/inputs/fiscal_interest/sources/*.txt -whitespace
 data/inputs/gst/sources/*.txt -whitespace
+
+# Emerging Opportunity source bytes are checksum-verified before display.
+data/stores/india/emerging_opportunity/**/sources/** -text -whitespace
+tests/fixtures/emerging_opportunity/*.gz binary

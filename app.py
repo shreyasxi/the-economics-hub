@@ -4580,7 +4580,7 @@ def page_india() -> None:
                 nav=[(label, _anchor("india", anchor)) for label, anchor in zip(
                     ("Growth & Activity", "Inflation", "Monetary Conditions", "Equity Markets",
                      "External Sector", "Public Finances", "Consumer Confidence"),
-                    (_EH_ANCHORS[i] for i in (0, 1, 2, 5, 3, 4, 6)))],
+                    [_EH_ANCHORS[i] for i in (0, 1, 2, 5, 3, 4, 6)])],
             ),
             unsafe_allow_html=True,
         )
@@ -4654,8 +4654,8 @@ def page_india() -> None:
                 equity_keys = ("fpi_monthly", "risk_appetite", "sector_valuations", "sector_rotation")
                 equity = [c for c in charts if any(k in c.name for k in equity_keys)]
                 charts = [c for c in charts if c not in equity]
+                st.markdown(_eh_question_header(5, answers[5]), unsafe_allow_html=True)
                 if equity:
-                    st.markdown(_eh_question_header(5, answers[5]), unsafe_allow_html=True)
                     first = [c for c in equity if any(k in c.name for k in ('fpi_monthly', 'risk_appetite'))]
                     first.sort(key=lambda c: 0 if 'fpi_monthly' in c.name else 1)
                     last = [c for c in equity if c not in first]
@@ -4663,6 +4663,15 @@ def page_india() -> None:
                     _render_grid(first)
                     _render_india_equity_matrix(equity[0].parent)
                     _render_grid(last)
+                # Subsection of Equity Markets, after valuation and rotation.
+                # Preserve the old fragment for previously shared links.
+                st.markdown('<span id="india-emerging-opportunity"></span>'
+                            '<h3 id="india-institutional-flows-ownership" '
+                            'style="font-family:Newsreader,Georgia,serif;color:#28251f;margin-top:1.5rem;'
+                            'border-bottom:1px solid #333638;padding-bottom:.65rem;margin-bottom:1rem">'
+                            'Institutional Flows &amp; Ownership</h3>', unsafe_allow_html=True)
+                from charts.india_charts.emerging_opportunity import render as render_emerging_opportunity
+                render_emerging_opportunity()
         consumer = [c for c in charts if "consumer_confidence" in c.name or "discretionary_spending_sentiment" in c.name]
         charts = [c for c in charts if c not in consumer]
         if consumer:

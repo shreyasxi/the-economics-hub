@@ -1,0 +1,2287 @@
+{
+  "schema_version": 1,
+  "sector": "Consumer Services",
+  "as_of": "2026-09-30",
+  "collected_at": "2026-10-14T06:08:35.309614+00:00",
+  "window_start": "2026-03-31",
+  "universe_scope": "Consumer Services members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
+  "universe_complete": false,
+  "quarters": [
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31",
+    "2026-06-30",
+    "2026-09-30"
+  ],
+  "flows": [
+    {
+      "date": "2026-04-15",
+      "start": "2026-04-01",
+      "equity_flow_cr": -5336.0,
+      "end_equity_auc_cr": 242478.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
+      "opening_equity_auc_cr": 224138.0,
+      "flow_pct_opening_auc": -2.380676190561172
+    },
+    {
+      "date": "2026-04-30",
+      "start": "2026-04-16",
+      "equity_flow_cr": -2434.0,
+      "end_equity_auc_cr": 241133.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
+      "opening_equity_auc_cr": 242478.0,
+      "flow_pct_opening_auc": -1.0038024068162885
+    },
+    {
+      "date": "2026-05-15",
+      "start": "2026-05-01",
+      "equity_flow_cr": -365.0,
+      "end_equity_auc_cr": 236223.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
+      "opening_equity_auc_cr": 241133.0,
+      "flow_pct_opening_auc": -0.15136874670824815
+    },
+    {
+      "date": "2026-05-31",
+      "start": "2026-05-16",
+      "equity_flow_cr": -1630.0,
+      "end_equity_auc_cr": 236943.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
+      "opening_equity_auc_cr": 236223.0,
+      "flow_pct_opening_auc": -0.6900259500556677
+    },
+    {
+      "date": "2026-06-15",
+      "start": "2026-06-01",
+      "equity_flow_cr": -1852.0,
+      "end_equity_auc_cr": 238868.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
+      "opening_equity_auc_cr": 236943.0,
+      "flow_pct_opening_auc": -0.7816225843346291
+    },
+    {
+      "date": "2026-06-30",
+      "start": "2026-06-16",
+      "equity_flow_cr": 3081.0,
+      "end_equity_auc_cr": 253655.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
+      "opening_equity_auc_cr": 238868.0,
+      "flow_pct_opening_auc": 1.289833715692349
+    },
+    {
+      "date": "2026-07-15",
+      "start": "2026-07-01",
+      "equity_flow_cr": 7361.0,
+      "end_equity_auc_cr": 269852.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
+      "opening_equity_auc_cr": 253655.0,
+      "flow_pct_opening_auc": 2.9019731525102994
+    },
+    {
+      "date": "2026-07-31",
+      "start": "2026-07-16",
+      "equity_flow_cr": 2840.0,
+      "end_equity_auc_cr": 275806.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
+      "opening_equity_auc_cr": 269852.0,
+      "flow_pct_opening_auc": 1.052428738716037
+    },
+    {
+      "date": "2026-08-15",
+      "start": "2026-08-01",
+      "equity_flow_cr": 3398.0,
+      "end_equity_auc_cr": 287925.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
+      "opening_equity_auc_cr": 275806.0,
+      "flow_pct_opening_auc": 1.2320254091644127
+    },
+    {
+      "date": "2026-08-31",
+      "start": "2026-08-16",
+      "equity_flow_cr": 5019.0,
+      "end_equity_auc_cr": 295704.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
+      "opening_equity_auc_cr": 287925.0,
+      "flow_pct_opening_auc": 1.7431622818442303
+    },
+    {
+      "date": "2026-09-15",
+      "start": "2026-09-01",
+      "equity_flow_cr": 422.0,
+      "end_equity_auc_cr": 288175.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "opening_equity_auc_cr": 295704.0,
+      "flow_pct_opening_auc": 0.14271027784541299
+    },
+    {
+      "date": "2026-09-30",
+      "start": "2026-09-16",
+      "equity_flow_cr": 1911.0,
+      "end_equity_auc_cr": 289584.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "opening_equity_auc_cr": 288175.0,
+      "flow_pct_opening_auc": 0.6631387177930077
+    }
+  ],
+  "companies": [
+    {
+      "symbol": "ABFRL",
+      "name": "Aditya Birla Fashion and Retail Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "ABFRL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 222843846,
+          "total_shares": 1220294773,
+          "fpi_pct": 18.261476729278755,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1551314_17102025124300_WEB.xml",
+          "filed_at": "17-OCT-2025 12:43:06"
+        },
+        {
+          "symbol": "ABFRL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 220724848,
+          "total_shares": 1220520552,
+          "fpi_pct": 18.084484332386726,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607108_21012026042143_WEB.xml",
+          "filed_at": "21-JAN-2026 16:21:49"
+        },
+        {
+          "symbol": "ABFRL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 185967300,
+          "total_shares": 1220538192,
+          "fpi_pct": 15.236499866937388,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1679654_05062026011231_WEB.xml",
+          "filed_at": "05-JUN-2026 14:54:05"
+        },
+        {
+          "symbol": "ABFRL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 157108018,
+          "total_shares": 1220538192,
+          "fpi_pct": 12.872028014343364,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1706796_03082026123230_WEB.xml",
+          "filed_at": "06-AUG-2026 12:14:35"
+        }
+      ],
+      "reference_price": 46.32
+    },
+    {
+      "symbol": "ABLBL",
+      "name": "Aditya Birla Lifestyle Brands Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "ABLBL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 261604714,
+          "total_shares": 1220294773,
+          "fpi_pct": 21.437829595620173,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1551299_17102025123819_WEB.xml",
+          "filed_at": "17-OCT-2025 12:38:26"
+        },
+        {
+          "symbol": "ABLBL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 197193474,
+          "total_shares": 1220504009,
+          "fpi_pct": 16.156724807611837,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607120_21012026042650_WEB.xml",
+          "filed_at": "21-JAN-2026 16:26:57"
+        },
+        {
+          "symbol": "ABLBL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 156026289,
+          "total_shares": 1220521649,
+          "fpi_pct": 12.7835740666981,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653385_17042026053649_WEB.xml",
+          "filed_at": "17-APR-2026 17:36:56"
+        },
+        {
+          "symbol": "ABLBL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 154928413,
+          "total_shares": 1220521649,
+          "fpi_pct": 12.69362269214448,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698464_21072026052501_WEB.xml",
+          "filed_at": "21-JUL-2026 17:25:07"
+        }
+      ],
+      "reference_price": 76.52
+    },
+    {
+      "symbol": "ARVINDFASN",
+      "name": "Arvind Fashions Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "ARVINDFASN",
+          "quarter": "2025-09-30",
+          "fpi_shares": 15947620,
+          "total_shares": 133504210,
+          "fpi_pct": 11.945406066220682,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1581473_01122025123504_WEB.xml",
+          "filed_at": "01-DEC-2025 18:11:04"
+        },
+        {
+          "symbol": "ARVINDFASN",
+          "quarter": "2025-12-31",
+          "fpi_shares": 16170458,
+          "total_shares": 133622989,
+          "fpi_pct": 12.101553872589992,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1605783_20012026050201_WEB.xml",
+          "filed_at": "20-JAN-2026 17:02:09"
+        },
+        {
+          "symbol": "ARVINDFASN",
+          "quarter": "2026-03-31",
+          "fpi_shares": 16000456,
+          "total_shares": 133654989,
+          "fpi_pct": 11.971461835966332,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655368_20042026063026_WEB.xml",
+          "filed_at": "20-APR-2026 18:30:34"
+        },
+        {
+          "symbol": "ARVINDFASN",
+          "quarter": "2026-06-30",
+          "fpi_shares": 16238803,
+          "total_shares": 133654989,
+          "fpi_pct": 12.14979187944866,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696595_20072026012813_WEB.xml",
+          "filed_at": "20-JUL-2026 13:28:20"
+        }
+      ],
+      "reference_price": 387.45
+    },
+    {
+      "symbol": "AVL",
+      "name": "Aditya Vision Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "AVL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 24142497,
+          "total_shares": 128663050,
+          "fpi_pct": 18.76412614188767,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1683002_20062026122846_WEB.xml",
+          "filed_at": "25-AUG-2026 17:01:26"
+        },
+        {
+          "symbol": "AVL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 22907634,
+          "total_shares": 129138050,
+          "fpi_pct": 17.73887247019759,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1605391_20012026024605_WEB.xml",
+          "filed_at": "20-JAN-2026 14:46:08"
+        },
+        {
+          "symbol": "AVL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 20892539,
+          "total_shares": 129138050,
+          "fpi_pct": 16.178453213440964,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1651510_15042026052517_WEB.xml",
+          "filed_at": "15-APR-2026 17:25:20"
+        },
+        {
+          "symbol": "AVL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 19436216,
+          "total_shares": 129138050,
+          "fpi_pct": 15.050727496659583,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694830_17072026113506_WEB.xml",
+          "filed_at": "17-JUL-2026 11:35:11"
+        }
+      ],
+      "reference_price": 594.35
+    },
+    {
+      "symbol": "BLS",
+      "name": "BLS International Services Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "BLS",
+          "quarter": "2025-09-30",
+          "fpi_shares": 28061097,
+          "total_shares": 411740908,
+          "fpi_pct": 6.81523172820127,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655472_20042026070312_WEB.xml",
+          "filed_at": "21-AUG-2026 17:09:01"
+        },
+        {
+          "symbol": "BLS",
+          "quarter": "2025-12-31",
+          "fpi_shares": 26244659,
+          "total_shares": 411740908,
+          "fpi_pct": 6.37407128853954,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607222_21012026050230_WEB.xml",
+          "filed_at": "21-JAN-2026 17:02:34"
+        },
+        {
+          "symbol": "BLS",
+          "quarter": "2026-03-31",
+          "fpi_shares": 25277145,
+          "total_shares": 411740908,
+          "fpi_pct": 6.139090022116529,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1707797_04082026061357_WEB.xml",
+          "filed_at": "21-AUG-2026 17:15:23"
+        },
+        {
+          "symbol": "BLS",
+          "quarter": "2026-06-30",
+          "fpi_shares": 17049634,
+          "total_shares": 411740908,
+          "fpi_pct": 4.14086472068498,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698333_21072026043633_WEB.xml",
+          "filed_at": "21-JUL-2026 16:36:38"
+        }
+      ],
+      "reference_price": 218.26
+    },
+    {
+      "symbol": "CARTRADE",
+      "name": "Cartrade Tech Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "CARTRADE",
+          "quarter": "2025-09-30",
+          "fpi_shares": 28239305,
+          "total_shares": 47605960,
+          "fpi_pct": 59.31884369100003,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1553916_18102025092115_WEB.xml",
+          "filed_at": "18-OCT-2025 21:21:33"
+        },
+        {
+          "symbol": "CARTRADE",
+          "quarter": "2025-12-31",
+          "fpi_shares": 26526274,
+          "total_shares": 47842935,
+          "fpi_pct": 55.44449561884111,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606335_20012026080442_WEB.xml",
+          "filed_at": "20-JAN-2026 20:04:46"
+        },
+        {
+          "symbol": "CARTRADE",
+          "quarter": "2026-03-31",
+          "fpi_shares": 24438398,
+          "total_shares": 47878035,
+          "fpi_pct": 51.043026306321885,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653331_17042026051200_WEB.xml",
+          "filed_at": "17-APR-2026 17:12:04"
+        },
+        {
+          "symbol": "CARTRADE",
+          "quarter": "2026-06-30",
+          "fpi_shares": 21753751,
+          "total_shares": 48023035,
+          "fpi_pct": 45.29857598546198,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695609_17072026063133_WEB.xml",
+          "filed_at": "17-JUL-2026 18:31:37"
+        }
+      ],
+      "reference_price": 2899.8
+    },
+    {
+      "symbol": "CHALET",
+      "name": "Chalet Hotels Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "CHALET",
+          "quarter": "2025-09-30",
+          "fpi_shares": 12525806,
+          "total_shares": 218685415,
+          "fpi_pct": 5.727773843536845,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550487_16102025051103_WEB.xml",
+          "filed_at": "16-OCT-2025 17:11:10"
+        },
+        {
+          "symbol": "CHALET",
+          "quarter": "2025-12-31",
+          "fpi_shares": 11108833,
+          "total_shares": 218753432,
+          "fpi_pct": 5.078243983847531,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607179_21012026044732_WEB.xml",
+          "filed_at": "21-JAN-2026 16:47:39"
+        },
+        {
+          "symbol": "CHALET",
+          "quarter": "2026-03-31",
+          "fpi_shares": 10300514,
+          "total_shares": 218994127,
+          "fpi_pct": 4.703557187175161,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656406_21042026052141_WEB.xml",
+          "filed_at": "21-APR-2026 17:21:50"
+        },
+        {
+          "symbol": "CHALET",
+          "quarter": "2026-06-30",
+          "fpi_shares": 9322773,
+          "total_shares": 218994127,
+          "fpi_pct": 4.2570881364320785,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698311_21072026042952_WEB.xml",
+          "filed_at": "21-JUL-2026 16:29:59"
+        }
+      ],
+      "reference_price": 845.2
+    },
+    {
+      "symbol": "DEVYANI",
+      "name": "Devyani International Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "DEVYANI",
+          "quarter": "2025-09-30",
+          "fpi_shares": 80648653,
+          "total_shares": 1231937291,
+          "fpi_pct": 6.546490116760334,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1543538_09102025045957_WEB.xml",
+          "filed_at": "09-OCT-2025 17:00:04"
+        },
+        {
+          "symbol": "DEVYANI",
+          "quarter": "2025-12-31",
+          "fpi_shares": 71133069,
+          "total_shares": 1232872291,
+          "fpi_pct": 5.769702954577961,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1601423_15012026015539_WEB.xml",
+          "filed_at": "15-JAN-2026 13:55:46"
+        },
+        {
+          "symbol": "DEVYANI",
+          "quarter": "2026-03-31",
+          "fpi_shares": 75609506,
+          "total_shares": 1232939791,
+          "fpi_pct": 6.132457282336182,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655329_20042026061333_WEB.xml",
+          "filed_at": "20-APR-2026 18:13:40"
+        },
+        {
+          "symbol": "DEVYANI",
+          "quarter": "2026-06-30",
+          "fpi_shares": 83940534,
+          "total_shares": 1232939791,
+          "fpi_pct": 6.808161648503402,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698688_21072026064214_WEB.xml",
+          "filed_at": "21-JUL-2026 18:42:21"
+        }
+      ],
+      "reference_price": 130.29
+    },
+    {
+      "symbol": "DMART",
+      "name": "Avenue Supermarts Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "DMART",
+          "quarter": "2025-09-30",
+          "fpi_shares": 56838526,
+          "total_shares": 650733068,
+          "fpi_pct": 8.734537830494885,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552650_17102025065518_WEB.xml",
+          "filed_at": "17-OCT-2025 18:55:23"
+        },
+        {
+          "symbol": "DMART",
+          "quarter": "2025-12-31",
+          "fpi_shares": 56667458,
+          "total_shares": 650733068,
+          "fpi_pct": 8.708249324744628,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1664146_06052026064459_WEB.xml",
+          "filed_at": "12-MAY-2026 10:51:56"
+        },
+        {
+          "symbol": "DMART",
+          "quarter": "2026-03-31",
+          "fpi_shares": 58668569,
+          "total_shares": 651959123,
+          "fpi_pct": 8.998810957661835,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656717_21042026072904_WEB.xml",
+          "filed_at": "21-APR-2026 19:29:10"
+        },
+        {
+          "symbol": "DMART",
+          "quarter": "2026-06-30",
+          "fpi_shares": 60174174,
+          "total_shares": 652245977,
+          "fpi_pct": 9.225687259394165,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1692414_14072026052337_WEB.xml",
+          "filed_at": "14-JUL-2026 17:23:43"
+        }
+      ],
+      "reference_price": 3801.4
+    },
+    {
+      "symbol": "EIHOTEL",
+      "name": "EIH Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "EIHOTEL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 37054738,
+          "total_shares": 625364182,
+          "fpi_pct": 5.9253054566530965,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548065_14102025064716_WEB.xml",
+          "filed_at": "14-OCT-2025 18:47:22"
+        },
+        {
+          "symbol": "EIHOTEL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 38573322,
+          "total_shares": 625364182,
+          "fpi_pct": 6.16813740061627,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1599671_13012026032438_WEB.xml",
+          "filed_at": "13-JAN-2026 15:24:45"
+        },
+        {
+          "symbol": "EIHOTEL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 41411308,
+          "total_shares": 625364182,
+          "fpi_pct": 6.621950727584203,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653258_17042026043648_WEB.xml",
+          "filed_at": "17-APR-2026 16:36:55"
+        },
+        {
+          "symbol": "EIHOTEL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 41613495,
+          "total_shares": 625364182,
+          "fpi_pct": 6.6542818085478395,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697827_21072026120829_WEB.xml",
+          "filed_at": "21-JUL-2026 12:08:36"
+        }
+      ],
+      "reference_price": 301.1
+    },
+    {
+      "symbol": "EMIL",
+      "name": "Electronics Mart India Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "EMIL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 26398463,
+          "total_shares": 384748762,
+          "fpi_pct": 6.861221037535138,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1545000_11102025113946_WEB.xml",
+          "filed_at": "11-OCT-2025 11:39:49"
+        },
+        {
+          "symbol": "EMIL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 23640574,
+          "total_shares": 384748762,
+          "fpi_pct": 6.144418471189259,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1596824_08012026044110_WEB.xml",
+          "filed_at": "08-JAN-2026 16:41:13"
+        },
+        {
+          "symbol": "EMIL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 19958599,
+          "total_shares": 384748762,
+          "fpi_pct": 5.187436834429632,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653580_17042026071126_WEB.xml",
+          "filed_at": "17-APR-2026 19:11:29"
+        },
+        {
+          "symbol": "EMIL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 18367661,
+          "total_shares": 384748762,
+          "fpi_pct": 4.7739363486243,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1691377_13072026034009_WEB.xml",
+          "filed_at": "13-JUL-2026 15:40:12"
+        }
+      ],
+      "reference_price": 205.36
+    },
+    {
+      "symbol": "ENTERO",
+      "name": "Entero Healthcare Solutions Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "ENTERO",
+          "quarter": "2025-09-30",
+          "fpi_shares": 6383851,
+          "total_shares": 43508907,
+          "fpi_pct": 14.672515216252158,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1714942_14082026070840_WEB.xml",
+          "filed_at": "17-AUG-2026 13:15:33"
+        },
+        {
+          "symbol": "ENTERO",
+          "quarter": "2025-12-31",
+          "fpi_shares": 2236405,
+          "total_shares": 43510937,
+          "fpi_pct": 5.139868626593815,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1714954_14082026071351_WEB.xml",
+          "filed_at": "17-AUG-2026 13:15:44"
+        },
+        {
+          "symbol": "ENTERO",
+          "quarter": "2026-03-31",
+          "fpi_shares": 1753117,
+          "total_shares": 43510937,
+          "fpi_pct": 4.029140995056025,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1722322_07092026091539_WEB.xml",
+          "filed_at": "08-SEP-2026 17:21:07"
+        },
+        {
+          "symbol": "ENTERO",
+          "quarter": "2026-06-30",
+          "fpi_shares": 1900973,
+          "total_shares": 43523072,
+          "fpi_pct": 4.367736266410606,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1722324_07092026091730_WEB.xml",
+          "filed_at": "08-SEP-2026 17:23:19"
+        }
+      ],
+      "reference_price": 1708.9
+    },
+    {
+      "symbol": "ETERNAL",
+      "name": "Eternal Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "ETERNAL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 3580019036,
+          "total_shares": 9650350647,
+          "fpi_pct": 37.09729487511336,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1546259_13102025043921_WEB.xml",
+          "filed_at": "13-OCT-2025 16:39:25"
+        },
+        {
+          "symbol": "ETERNAL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 3318928522,
+          "total_shares": 9650350647,
+          "fpi_pct": 34.39179200220827,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1598777_12012026040707_WEB.xml",
+          "filed_at": "12-JAN-2026 16:07:12"
+        },
+        {
+          "symbol": "ETERNAL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 2975983106,
+          "total_shares": 9650350647,
+          "fpi_pct": 30.83808262371422,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1645714_03042026011438_WEB.xml",
+          "filed_at": "03-APR-2026 13:14:47"
+        },
+        {
+          "symbol": "ETERNAL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 2647432153,
+          "total_shares": 9650350647,
+          "fpi_pct": 27.43353324496044,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1689462_08072026071407_WEB.xml",
+          "filed_at": "08-JUL-2026 19:14:17"
+        },
+        {
+          "symbol": "ETERNAL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 3035615154,
+          "total_shares": 9650350647,
+          "fpi_pct": 31.45600885438997,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1736668_13102026124040_WEB.xml",
+          "filed_at": "13-OCT-2026 12:40:46"
+        }
+      ],
+      "reference_price": 320.0
+    },
+    {
+      "symbol": "FIRSTCRY",
+      "name": "Brainbees Solutions Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "FIRSTCRY",
+          "quarter": "2025-09-30",
+          "fpi_shares": 25729640,
+          "total_shares": 521909906,
+          "fpi_pct": 4.929900679064712,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1551188_17102025120136_WEB.xml",
+          "filed_at": "17-OCT-2025 12:01:41"
+        },
+        {
+          "symbol": "FIRSTCRY",
+          "quarter": "2025-12-31",
+          "fpi_shares": 20250739,
+          "total_shares": 522014159,
+          "fpi_pct": 3.879346690287763,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1605421_20012026030349_WEB.xml",
+          "filed_at": "20-JAN-2026 15:03:56"
+        },
+        {
+          "symbol": "FIRSTCRY",
+          "quarter": "2026-03-31",
+          "fpi_shares": 18378802,
+          "total_shares": 522050127,
+          "fpi_pct": 3.52050522535358,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1680710_10062026045528_WEB.xml",
+          "filed_at": "11-JUN-2026 12:41:39"
+        },
+        {
+          "symbol": "FIRSTCRY",
+          "quarter": "2026-06-30",
+          "fpi_shares": 18830545,
+          "total_shares": 522088240,
+          "fpi_pct": 3.606774402733147,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694104_16072026032035_WEB.xml",
+          "filed_at": "16-JUL-2026 15:20:39"
+        },
+        {
+          "symbol": "FIRSTCRY",
+          "quarter": "2026-09-30",
+          "fpi_shares": 29418510,
+          "total_shares": 522090584,
+          "fpi_pct": 5.634752072065717,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1737199_13102026061712_WEB.xml",
+          "filed_at": "13-OCT-2026 18:17:17"
+        }
+      ],
+      "reference_price": 179.94
+    },
+    {
+      "symbol": "INDHOTEL",
+      "name": "Indian Hotels Co. Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "INDHOTEL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 372050342,
+          "total_shares": 1423432227,
+          "fpi_pct": 26.137552244698476,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554745_21102025015112_WEB.xml",
+          "filed_at": "21-OCT-2025 13:51:19"
+        },
+        {
+          "symbol": "INDHOTEL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 357058068,
+          "total_shares": 1423432227,
+          "fpi_pct": 25.084304066413413,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1621660_09022026052517_WEB.xml",
+          "filed_at": "09-FEB-2026 17:46:45"
+        },
+        {
+          "symbol": "INDHOTEL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 330684208,
+          "total_shares": 1423432227,
+          "fpi_pct": 23.23146839923275,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656374_21042026050435_WEB.xml",
+          "filed_at": "21-APR-2026 17:04:44"
+        },
+        {
+          "symbol": "INDHOTEL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 309050371,
+          "total_shares": 1423432227,
+          "fpi_pct": 21.71163228834217,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697682_20072026115559_WEB.xml",
+          "filed_at": "20-JUL-2026 23:56:08"
+        }
+      ],
+      "reference_price": 728.65
+    },
+    {
+      "symbol": "INDIAMART",
+      "name": "Indiamart Intermesh Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "INDIAMART",
+          "quarter": "2025-09-30",
+          "fpi_shares": 12927860,
+          "total_shares": 60032148,
+          "fpi_pct": 21.53489493662629,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550106_16102025031019_WEB.xml",
+          "filed_at": "16-OCT-2025 15:10:23"
+        },
+        {
+          "symbol": "INDIAMART",
+          "quarter": "2025-12-31",
+          "fpi_shares": 10980657,
+          "total_shares": 60087148,
+          "fpi_pct": 18.27455182262936,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1604602_19012026060238_WEB.xml",
+          "filed_at": "19-JAN-2026 18:02:42"
+        },
+        {
+          "symbol": "INDIAMART",
+          "quarter": "2026-03-31",
+          "fpi_shares": 11517803,
+          "total_shares": 60087148,
+          "fpi_pct": 19.168496730781765,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1649774_13042026034022_WEB.xml",
+          "filed_at": "13-APR-2026 15:40:27"
+        },
+        {
+          "symbol": "INDIAMART",
+          "quarter": "2026-06-30",
+          "fpi_shares": 11979775,
+          "total_shares": 60143148,
+          "fpi_pct": 19.918769466473552,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698641_21072026062311_WEB.xml",
+          "filed_at": "21-JUL-2026 18:23:16"
+        }
+      ],
+      "reference_price": 1629.0
+    },
+    {
+      "symbol": "IRCTC",
+      "name": "Indian Railway Catering And Tourism Corporation Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "IRCTC",
+          "quarter": "2025-09-30",
+          "fpi_shares": 58184868,
+          "total_shares": 800000000,
+          "fpi_pct": 7.2731085,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1547941_14102025062416_WEB.xml",
+          "filed_at": "14-OCT-2025 18:24:20"
+        },
+        {
+          "symbol": "IRCTC",
+          "quarter": "2025-12-31",
+          "fpi_shares": 57486678,
+          "total_shares": 800000000,
+          "fpi_pct": 7.18583475,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1601699_15012026054553_WEB.xml",
+          "filed_at": "15-JAN-2026 17:45:58"
+        },
+        {
+          "symbol": "IRCTC",
+          "quarter": "2026-03-31",
+          "fpi_shares": 38875823,
+          "total_shares": 800000000,
+          "fpi_pct": 4.859477875,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1650182_13042026071657_WEB.xml",
+          "filed_at": "13-APR-2026 19:17:02"
+        },
+        {
+          "symbol": "IRCTC",
+          "quarter": "2026-06-30",
+          "fpi_shares": 31232828,
+          "total_shares": 800000000,
+          "fpi_pct": 3.9041035,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694538_16072026063705_WEB.xml",
+          "filed_at": "16-JUL-2026 18:37:10"
+        },
+        {
+          "symbol": "IRCTC",
+          "quarter": "2026-09-30",
+          "fpi_shares": 27710018,
+          "total_shares": 800000000,
+          "fpi_pct": 3.46375225,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1734943_09102026042705_WEB.xml",
+          "filed_at": "09-OCT-2026 16:27:10"
+        }
+      ],
+      "reference_price": 455.4
+    },
+    {
+      "symbol": "ITCHOTELS",
+      "name": "ITC Hotels Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "ITCHOTELS",
+          "quarter": "2025-09-30",
+          "fpi_shares": 212502388,
+          "total_shares": 2082719588,
+          "fpi_pct": 10.20312044042676,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1547892_14102025060703_WEB.xml",
+          "filed_at": "14-OCT-2025 18:07:11"
+        },
+        {
+          "symbol": "ITCHOTELS",
+          "quarter": "2025-12-31",
+          "fpi_shares": 204441443,
+          "total_shares": 2082853588,
+          "fpi_pct": 9.815449543734324,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606819_21012026020752_WEB.xml",
+          "filed_at": "21-JAN-2026 14:08:02"
+        },
+        {
+          "symbol": "ITCHOTELS",
+          "quarter": "2026-03-31",
+          "fpi_shares": 172788704,
+          "total_shares": 2082976309,
+          "fpi_pct": 8.295279367961356,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656772_21042026075912_WEB.xml",
+          "filed_at": "21-APR-2026 19:59:21"
+        },
+        {
+          "symbol": "ITCHOTELS",
+          "quarter": "2026-06-30",
+          "fpi_shares": 111033962,
+          "total_shares": 2082976309,
+          "fpi_pct": 5.3305436802257935,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698499_21072026053921_WEB.xml",
+          "filed_at": "21-JUL-2026 17:39:30"
+        }
+      ],
+      "reference_price": 164.13
+    },
+    {
+      "symbol": "IXIGO",
+      "name": "Le Travenues Technology Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "IXIGO",
+          "quarter": "2025-09-30",
+          "fpi_shares": 101809909,
+          "total_shares": 390403607,
+          "fpi_pct": 26.07811689608698,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552708_17102025070841_WEB.xml",
+          "filed_at": "17-OCT-2025 19:08:46"
+        },
+        {
+          "symbol": "IXIGO",
+          "quarter": "2025-12-31",
+          "fpi_shares": 113640926,
+          "total_shares": 437579188,
+          "fpi_pct": 25.970368133687384,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1599718_13012026034254_WEB.xml",
+          "filed_at": "13-JAN-2026 15:42:59"
+        },
+        {
+          "symbol": "IXIGO",
+          "quarter": "2026-03-31",
+          "fpi_shares": 119247897,
+          "total_shares": 438183527,
+          "fpi_pct": 27.214144223180714,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1648552_10042026010219_WEB.xml",
+          "filed_at": "10-APR-2026 13:02:26"
+        },
+        {
+          "symbol": "IXIGO",
+          "quarter": "2026-06-30",
+          "fpi_shares": 107894327,
+          "total_shares": 438669111,
+          "fpi_pct": 24.59583414798495,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695664_17072026070239_WEB.xml",
+          "filed_at": "17-JUL-2026 19:02:43"
+        },
+        {
+          "symbol": "IXIGO",
+          "quarter": "2026-09-30",
+          "fpi_shares": 88299893,
+          "total_shares": 441085150,
+          "fpi_pct": 20.018786168611662,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1734736_09102026010319_WEB.xml",
+          "filed_at": "09-OCT-2026 13:03:24"
+        }
+      ],
+      "reference_price": 162.89
+    },
+    {
+      "symbol": "JSLL",
+      "name": "Jeena Sikho Lifecare Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "JSLL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 8191120,
+          "total_shares": 124300730,
+          "fpi_pct": 6.589760172768092,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1546024_13102025032531_WEB.xml",
+          "filed_at": "13-OCT-2025 15:25:35"
+        },
+        {
+          "symbol": "JSLL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 7845309,
+          "total_shares": 124300730,
+          "fpi_pct": 6.311555048791749,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1603252_17012026040436_WEB.xml",
+          "filed_at": "17-JAN-2026 16:04:40"
+        },
+        {
+          "symbol": "JSLL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 7665699,
+          "total_shares": 124300730,
+          "fpi_pct": 6.167058713170872,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1652795_17042026103206_WEB.xml",
+          "filed_at": "17-APR-2026 10:32:09"
+        },
+        {
+          "symbol": "JSLL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 5945581,
+          "total_shares": 124300730,
+          "fpi_pct": 4.783222914298251,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697341_20072026063531_WEB.xml",
+          "filed_at": "20-JUL-2026 18:35:36"
+        }
+      ],
+      "reference_price": 500.8
+    },
+    {
+      "symbol": "JUBLFOOD",
+      "name": "Jubilant Foodworks Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "JUBLFOOD",
+          "quarter": "2025-09-30",
+          "fpi_shares": 132650414,
+          "total_shares": 659845200,
+          "fpi_pct": 20.103262704646482,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1551929_17102025041353_WEB.xml",
+          "filed_at": "17-OCT-2025 16:13:57"
+        },
+        {
+          "symbol": "JUBLFOOD",
+          "quarter": "2025-12-31",
+          "fpi_shares": 122615493,
+          "total_shares": 659845200,
+          "fpi_pct": 18.58246343233231,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1603748_19012026114031_WEB.xml",
+          "filed_at": "19-JAN-2026 11:40:36"
+        },
+        {
+          "symbol": "JUBLFOOD",
+          "quarter": "2026-03-31",
+          "fpi_shares": 114065338,
+          "total_shares": 659845200,
+          "fpi_pct": 17.28668148226281,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1654483_20042026101527_WEB.xml",
+          "filed_at": "20-APR-2026 10:15:33"
+        },
+        {
+          "symbol": "JUBLFOOD",
+          "quarter": "2026-06-30",
+          "fpi_shares": 87913852,
+          "total_shares": 659845200,
+          "fpi_pct": 13.323405550271488,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696717_20072026030416_WEB.xml",
+          "filed_at": "20-JUL-2026 15:04:23"
+        }
+      ],
+      "reference_price": 456.7
+    },
+    {
+      "symbol": "JUSTDIAL",
+      "name": "Justdial Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "JUSTDIAL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 5045516,
+          "total_shares": 85044657,
+          "fpi_pct": 5.932784231230423,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550962_16102025082257_WEB.xml",
+          "filed_at": "16-OCT-2025 20:23:01"
+        },
+        {
+          "symbol": "JUSTDIAL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 5064947,
+          "total_shares": 85044657,
+          "fpi_pct": 5.955632227430819,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1604475_19012026052549_WEB.xml",
+          "filed_at": "19-JAN-2026 17:25:52"
+        },
+        {
+          "symbol": "JUSTDIAL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 4105444,
+          "total_shares": 85044657,
+          "fpi_pct": 4.827397916367633,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656186_21042026034458_WEB.xml",
+          "filed_at": "21-APR-2026 15:45:01"
+        },
+        {
+          "symbol": "JUSTDIAL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 2727057,
+          "total_shares": 85049032,
+          "fpi_pct": 3.2064527201203186,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697310_20072026062546_WEB.xml",
+          "filed_at": "20-JUL-2026 18:25:51"
+        }
+      ],
+      "reference_price": 666.15
+    },
+    {
+      "symbol": "LEMONTREE",
+      "name": "Lemon Tree Hotels Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "LEMONTREE",
+          "quarter": "2025-09-30",
+          "fpi_shares": 169897658,
+          "total_shares": 792246464,
+          "fpi_pct": 21.445050968381477,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554996_21102025063143_WEB.xml",
+          "filed_at": "21-OCT-2025 18:31:47"
+        },
+        {
+          "symbol": "LEMONTREE",
+          "quarter": "2025-12-31",
+          "fpi_shares": 170312607,
+          "total_shares": 792246464,
+          "fpi_pct": 21.49742721982032,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1603523_17012026064454_WEB.xml",
+          "filed_at": "17-JAN-2026 18:44:58"
+        },
+        {
+          "symbol": "LEMONTREE",
+          "quarter": "2026-03-31",
+          "fpi_shares": 171087429,
+          "total_shares": 792246464,
+          "fpi_pct": 21.595227845661928,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653152_17042026035709_WEB.xml",
+          "filed_at": "17-APR-2026 15:57:13"
+        },
+        {
+          "symbol": "LEMONTREE",
+          "quarter": "2026-06-30",
+          "fpi_shares": 154064664,
+          "total_shares": 792246464,
+          "fpi_pct": 19.44655747936541,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1689097_08072026113706_WEB.xml",
+          "filed_at": "08-JUL-2026 11:37:10"
+        }
+      ],
+      "reference_price": 104.25
+    },
+    {
+      "symbol": "LENSKART",
+      "name": "Lenskart Solutions Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "LENSKART",
+          "quarter": "2025-12-31",
+          "fpi_shares": 67032221,
+          "total_shares": 1734870187,
+          "fpi_pct": 3.863817679403122,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1633097_06032026030247_WEB.xml",
+          "filed_at": "30-MAR-2026 15:26:04"
+        },
+        {
+          "symbol": "LENSKART",
+          "quarter": "2026-03-31",
+          "fpi_shares": 73909770,
+          "total_shares": 1736416007,
+          "fpi_pct": 4.25645523319574,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1665476_11052026034628_WEB.xml",
+          "filed_at": "12-MAY-2026 10:45:30"
+        },
+        {
+          "symbol": "LENSKART",
+          "quarter": "2026-06-30",
+          "fpi_shares": 221806670,
+          "total_shares": 1738720607,
+          "fpi_pct": 12.756889698495417,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694639_16072026073651_WEB.xml",
+          "filed_at": "16-JUL-2026 19:36:57"
+        },
+        {
+          "symbol": "LENSKART",
+          "quarter": "2026-09-30",
+          "fpi_shares": 317567989,
+          "total_shares": 1739306168,
+          "fpi_pct": 18.25831442690543,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1735992_12102026022956_WEB.xml",
+          "filed_at": "12-OCT-2026 14:30:04"
+        }
+      ],
+      "reference_price": 685.05
+    },
+    {
+      "symbol": "MANYAVAR",
+      "name": "Vedant Fashions Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "MANYAVAR",
+          "quarter": "2025-09-30",
+          "fpi_shares": 23703418,
+          "total_shares": 242957104,
+          "fpi_pct": 9.75621523707329,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550767_16102025063519_WEB.xml",
+          "filed_at": "16-OCT-2025 18:35:22"
+        },
+        {
+          "symbol": "MANYAVAR",
+          "quarter": "2025-12-31",
+          "fpi_shares": 22589166,
+          "total_shares": 242973103,
+          "fpi_pct": 9.296982143739589,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600834_14012026044908_WEB.xml",
+          "filed_at": "14-JAN-2026 16:49:11"
+        },
+        {
+          "symbol": "MANYAVAR",
+          "quarter": "2026-03-31",
+          "fpi_shares": 20134828,
+          "total_shares": 242973103,
+          "fpi_pct": 8.286854697657626,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1651090_15042026122138_WEB.xml",
+          "filed_at": "15-APR-2026 12:21:42"
+        },
+        {
+          "symbol": "MANYAVAR",
+          "quarter": "2026-06-30",
+          "fpi_shares": 19317629,
+          "total_shares": 242977245,
+          "fpi_pct": 7.950386053640537,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696536_20072026124022_WEB.xml",
+          "filed_at": "20-JUL-2026 12:40:27"
+        }
+      ],
+      "reference_price": 535.1
+    },
+    {
+      "symbol": "MEDPLUS",
+      "name": "Medplus Health Services Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "MEDPLUS",
+          "quarter": "2025-09-30",
+          "fpi_shares": 19813745,
+          "total_shares": 119822581,
+          "fpi_pct": 16.535902360507492,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1546355_13102025051027_WEB.xml",
+          "filed_at": "13-OCT-2025 17:10:31"
+        },
+        {
+          "symbol": "MEDPLUS",
+          "quarter": "2025-12-31",
+          "fpi_shares": 20170555,
+          "total_shares": 119822581,
+          "fpi_pct": 16.833684295283206,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1605807_20012026050941_WEB.xml",
+          "filed_at": "20-JAN-2026 17:09:45"
+        },
+        {
+          "symbol": "MEDPLUS",
+          "quarter": "2026-03-31",
+          "fpi_shares": 18643976,
+          "total_shares": 120054642,
+          "fpi_pct": 15.529575274565394,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653424_17042026054643_WEB.xml",
+          "filed_at": "17-APR-2026 17:46:47"
+        },
+        {
+          "symbol": "MEDPLUS",
+          "quarter": "2026-06-30",
+          "fpi_shares": 17276370,
+          "total_shares": 120137061,
+          "fpi_pct": 14.380549895423195,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695942_18072026121553_WEB.xml",
+          "filed_at": "18-JUL-2026 12:15:57"
+        },
+        {
+          "symbol": "MEDPLUS",
+          "quarter": "2026-09-30",
+          "fpi_shares": 15114342,
+          "total_shares": 120137061,
+          "fpi_pct": 12.580915392961044,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1735142_09102026062519_WEB.xml",
+          "filed_at": "09-OCT-2026 18:25:23"
+        }
+      ],
+      "reference_price": 654.9
+    },
+    {
+      "symbol": "MEESHO",
+      "name": "Meesho Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "MEESHO",
+          "quarter": "2025-12-31",
+          "fpi_shares": 194334340,
+          "total_shares": 4513131000,
+          "fpi_pct": 4.305976050772734,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606308_20012026074932_WEB.xml",
+          "filed_at": "20-JAN-2026 19:49:38"
+        },
+        {
+          "symbol": "MEESHO",
+          "quarter": "2026-03-31",
+          "fpi_shares": 190265862,
+          "total_shares": 4564055196,
+          "fpi_pct": 4.168789679992292,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1649195_10042026095234_WEB.xml",
+          "filed_at": "10-APR-2026 21:52:42"
+        },
+        {
+          "symbol": "MEESHO",
+          "quarter": "2026-06-30",
+          "fpi_shares": 239182522,
+          "total_shares": 4608660851,
+          "fpi_pct": 5.189848629197818,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1714225_14082026110947_WEB.xml",
+          "filed_at": "14-AUG-2026 15:20:20"
+        },
+        {
+          "symbol": "MEESHO",
+          "quarter": "2026-09-30",
+          "fpi_shares": 455074351,
+          "total_shares": 4628520929,
+          "fpi_pct": 9.831960532980016,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1733161_05102026071536_WEB.xml",
+          "filed_at": "05-OCT-2026 19:15:47"
+        }
+      ],
+      "reference_price": 227.75
+    },
+    {
+      "symbol": "NAUKRI",
+      "name": "Info Edge (India) Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "NAUKRI",
+          "quarter": "2025-09-30",
+          "fpi_shares": 196287964,
+          "total_shares": 648420600,
+          "fpi_pct": 30.271703890962133,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1551777_17102025033729_WEB.xml",
+          "filed_at": "17-OCT-2025 15:37:36"
+        },
+        {
+          "symbol": "NAUKRI",
+          "quarter": "2025-12-31",
+          "fpi_shares": 192301082,
+          "total_shares": 648420600,
+          "fpi_pct": 29.65684341305628,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1603728_19012026112714_WEB.xml",
+          "filed_at": "19-JAN-2026 11:27:21"
+        },
+        {
+          "symbol": "NAUKRI",
+          "quarter": "2026-03-31",
+          "fpi_shares": 181348652,
+          "total_shares": 648420600,
+          "fpi_pct": 27.967749945020255,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1654599_20042026115924_WEB.xml",
+          "filed_at": "20-APR-2026 11:59:30"
+        },
+        {
+          "symbol": "NAUKRI",
+          "quarter": "2026-06-30",
+          "fpi_shares": 153808037,
+          "total_shares": 648420600,
+          "fpi_pct": 23.72041187463816,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697876_21072026123605_WEB.xml",
+          "filed_at": "21-JUL-2026 12:36:13"
+        }
+      ],
+      "reference_price": 1219.5
+    },
+    {
+      "symbol": "NYKAA",
+      "name": "FSN E-Commerce Ventures Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "NYKAA",
+          "quarter": "2025-09-30",
+          "fpi_shares": 358881784,
+          "total_shares": 2861279076,
+          "fpi_pct": 12.54270465996306,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552819_17102025073844_WEB.xml",
+          "filed_at": "17-OCT-2025 19:38:49"
+        },
+        {
+          "symbol": "NYKAA",
+          "quarter": "2025-12-31",
+          "fpi_shares": 347616323,
+          "total_shares": 2862523756,
+          "fpi_pct": 12.143700895804898,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606240_20012026071553_WEB.xml",
+          "filed_at": "20-JAN-2026 19:15:59"
+        },
+        {
+          "symbol": "NYKAA",
+          "quarter": "2026-03-31",
+          "fpi_shares": 355146319,
+          "total_shares": 2863227356,
+          "fpi_pct": 12.403706546592522,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653695_17042026073712_WEB.xml",
+          "filed_at": "17-APR-2026 19:37:18"
+        },
+        {
+          "symbol": "NYKAA",
+          "quarter": "2026-06-30",
+          "fpi_shares": 393211724,
+          "total_shares": 2863824106,
+          "fpi_pct": 13.730302890327023,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697378_20072026064645_WEB.xml",
+          "filed_at": "20-JUL-2026 18:46:51"
+        }
+      ],
+      "reference_price": 320.0
+    },
+    {
+      "symbol": "PWL",
+      "name": "Physicswallah Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "PWL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 106984861,
+          "total_shares": 2859692500,
+          "fpi_pct": 3.74113164265039,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607613_21012026070632_WEB.xml",
+          "filed_at": "21-JAN-2026 19:06:38"
+        },
+        {
+          "symbol": "PWL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 83125251,
+          "total_shares": 2859692500,
+          "fpi_pct": 2.9067898384179416,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1654043_18042026024419_WEB.xml",
+          "filed_at": "18-APR-2026 14:44:26"
+        },
+        {
+          "symbol": "PWL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 101103611,
+          "total_shares": 2900886652,
+          "fpi_pct": 3.4852658214099708,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1699042_22072026113705_WEB.xml",
+          "filed_at": "22-JUL-2026 11:37:14"
+        }
+      ],
+      "reference_price": 123.48
+    },
+    {
+      "symbol": "RBA",
+      "name": "Restaurant Brands Asia Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "RBA",
+          "quarter": "2025-09-30",
+          "fpi_shares": 120229445,
+          "total_shares": 582251739,
+          "fpi_pct": 20.649048675490516,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1547453_14102025033022_WEB.xml",
+          "filed_at": "14-OCT-2025 15:30:29"
+        },
+        {
+          "symbol": "RBA",
+          "quarter": "2025-12-31",
+          "fpi_shares": 98034654,
+          "total_shares": 582746905,
+          "fpi_pct": 16.82285279576045,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1599441_13012026123149_WEB.xml",
+          "filed_at": "13-JAN-2026 12:31:54"
+        },
+        {
+          "symbol": "RBA",
+          "quarter": "2026-03-31",
+          "fpi_shares": 61729351,
+          "total_shares": 582876287,
+          "fpi_pct": 10.59047217681717,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1651324_15042026034508_WEB.xml",
+          "filed_at": "15-APR-2026 15:45:14"
+        },
+        {
+          "symbol": "RBA",
+          "quarter": "2026-06-30",
+          "fpi_shares": 65861034,
+          "total_shares": 711718862,
+          "fpi_pct": 9.253799149698523,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1693687_15072026082503_WEB.xml",
+          "filed_at": "15-JUL-2026 20:25:11"
+        }
+      ],
+      "reference_price": 91.58
+    },
+    {
+      "symbol": "SAMHI",
+      "name": "Samhi Hotels Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "SAMHI",
+          "quarter": "2025-09-30",
+          "fpi_shares": 63506561,
+          "total_shares": 221206154,
+          "fpi_pct": 28.709219816732585,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550591_16102025054012_WEB.xml",
+          "filed_at": "16-OCT-2025 17:40:15"
+        },
+        {
+          "symbol": "SAMHI",
+          "quarter": "2025-12-31",
+          "fpi_shares": 59666706,
+          "total_shares": 221206154,
+          "fpi_pct": 26.9733481284612,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1601831_15012026082423_WEB.xml",
+          "filed_at": "15-JAN-2026 20:24:26"
+        },
+        {
+          "symbol": "SAMHI",
+          "quarter": "2026-03-31",
+          "fpi_shares": 60415228,
+          "total_shares": 222134736,
+          "fpi_pct": 27.19755995298277,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653776_17042026091153_WEB.xml",
+          "filed_at": "17-APR-2026 21:11:56"
+        },
+        {
+          "symbol": "SAMHI",
+          "quarter": "2026-06-30",
+          "fpi_shares": 61151013,
+          "total_shares": 222134736,
+          "fpi_pct": 27.52879360569704,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1693656_15072026075248_WEB.xml",
+          "filed_at": "15-JUL-2026 19:52:52"
+        }
+      ],
+      "reference_price": 153.68
+    },
+    {
+      "symbol": "SAPPHIRE",
+      "name": "Sapphire Foods India Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "SAPPHIRE",
+          "quarter": "2025-09-30",
+          "fpi_shares": 0,
+          "total_shares": 321382905,
+          "fpi_pct": 0.0,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1546774_13102025075116_WEB.xml",
+          "filed_at": "13-OCT-2025 19:51:22"
+        },
+        {
+          "symbol": "SAPPHIRE",
+          "quarter": "2025-12-31",
+          "fpi_shares": 0,
+          "total_shares": 321382905,
+          "fpi_pct": 0.0,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606348_20012026081117_WEB.xml",
+          "filed_at": "20-JAN-2026 20:11:23"
+        },
+        {
+          "symbol": "SAPPHIRE",
+          "quarter": "2026-03-31",
+          "fpi_shares": 0,
+          "total_shares": 321382905,
+          "fpi_pct": 0.0,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656788_21042026081406_WEB.xml",
+          "filed_at": "21-APR-2026 20:14:12"
+        },
+        {
+          "symbol": "SAPPHIRE",
+          "quarter": "2026-06-30",
+          "fpi_shares": 0,
+          "total_shares": 321382905,
+          "fpi_pct": 0.0,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698063_21072026023716_WEB.xml",
+          "filed_at": "21-JUL-2026 14:37:21"
+        }
+      ],
+      "reference_price": 212.08
+    },
+    {
+      "symbol": "SWIGGY",
+      "name": "Swiggy Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "SWIGGY",
+          "quarter": "2025-09-30",
+          "fpi_shares": 305121349,
+          "total_shares": 2493646892,
+          "fpi_pct": 12.235948480872567,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550753_16102025062956_WEB.xml",
+          "filed_at": "16-OCT-2025 18:29:59"
+        },
+        {
+          "symbol": "SWIGGY",
+          "quarter": "2025-12-31",
+          "fpi_shares": 443583179,
+          "total_shares": 2760313555,
+          "fpi_pct": 16.07002864571304,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1597620_09012026050146_WEB.xml",
+          "filed_at": "09-JAN-2026 17:01:50"
+        },
+        {
+          "symbol": "SWIGGY",
+          "quarter": "2026-03-31",
+          "fpi_shares": 402681100,
+          "total_shares": 2760313555,
+          "fpi_pct": 14.588237603318222,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1654920_20042026034029_WEB.xml",
+          "filed_at": "20-APR-2026 15:40:33"
+        },
+        {
+          "symbol": "SWIGGY",
+          "quarter": "2026-06-30",
+          "fpi_shares": 385306099,
+          "total_shares": 2760313555,
+          "fpi_pct": 13.958780092285567,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695908_18072026113751_WEB.xml",
+          "filed_at": "18-JUL-2026 11:37:54"
+        },
+        {
+          "symbol": "SWIGGY",
+          "quarter": "2026-09-30",
+          "fpi_shares": 244640835,
+          "total_shares": 2760313555,
+          "fpi_pct": 8.862791495439366,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1735908_12102026125855_WEB.xml",
+          "filed_at": "12-OCT-2026 12:58:59"
+        }
+      ],
+      "reference_price": 250.1
+    },
+    {
+      "symbol": "TBOTEK",
+      "name": "TBO Tek Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "TBOTEK",
+          "quarter": "2025-09-30",
+          "fpi_shares": 8471036,
+          "total_shares": 108587787,
+          "fpi_pct": 7.801094611127861,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552099_17102025045543_WEB.xml",
+          "filed_at": "17-OCT-2025 16:55:48"
+        },
+        {
+          "symbol": "TBOTEK",
+          "quarter": "2025-12-31",
+          "fpi_shares": 9278951,
+          "total_shares": 108587787,
+          "fpi_pct": 8.545114746651942,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606619_21012026120137_WEB.xml",
+          "filed_at": "21-JAN-2026 12:01:41"
+        },
+        {
+          "symbol": "TBOTEK",
+          "quarter": "2026-03-31",
+          "fpi_shares": 8044814,
+          "total_shares": 108587787,
+          "fpi_pct": 7.408580856335161,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655357_20042026062237_WEB.xml",
+          "filed_at": "20-APR-2026 18:22:43"
+        },
+        {
+          "symbol": "TBOTEK",
+          "quarter": "2026-06-30",
+          "fpi_shares": 7199402,
+          "total_shares": 108587787,
+          "fpi_pct": 6.630029213137938,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698569_21072026055730_WEB.xml",
+          "filed_at": "21-JUL-2026 17:57:35"
+        }
+      ],
+      "reference_price": 1685.2
+    },
+    {
+      "symbol": "THELEELA",
+      "name": "Leela Palaces Hotels & Resorts Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "THELEELA",
+          "quarter": "2025-09-30",
+          "fpi_shares": 28383026,
+          "total_shares": 333957878,
+          "fpi_pct": 8.498983814958843,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1555140_21102025114741_WEB.xml",
+          "filed_at": "21-OCT-2025 23:47:51"
+        },
+        {
+          "symbol": "THELEELA",
+          "quarter": "2025-12-31",
+          "fpi_shares": 30114213,
+          "total_shares": 333957878,
+          "fpi_pct": 9.017368651504007,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606903_21012026030510_WEB.xml",
+          "filed_at": "21-JAN-2026 15:05:13"
+        },
+        {
+          "symbol": "THELEELA",
+          "quarter": "2026-03-31",
+          "fpi_shares": 28783750,
+          "total_shares": 333957878,
+          "fpi_pct": 8.618976193159305,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656399_21042026051634_WEB.xml",
+          "filed_at": "21-APR-2026 17:16:38"
+        },
+        {
+          "symbol": "THELEELA",
+          "quarter": "2026-06-30",
+          "fpi_shares": 26290221,
+          "total_shares": 333957878,
+          "fpi_pct": 7.87231646022137,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694963_17072026012256_WEB.xml",
+          "filed_at": "17-JUL-2026 13:23:00"
+        }
+      ],
+      "reference_price": 573.8
+    },
+    {
+      "symbol": "THOMASCOOK",
+      "name": "Thomas Cook (India) Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "THOMASCOOK",
+          "quarter": "2025-09-30",
+          "fpi_shares": 25006064,
+          "total_shares": 470380562,
+          "fpi_pct": 5.316134640784752,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607623_21012026071033_WEB.xml",
+          "filed_at": "02-APR-2026 12:33:56"
+        },
+        {
+          "symbol": "THOMASCOOK",
+          "quarter": "2025-12-31",
+          "fpi_shares": 34243165,
+          "total_shares": 470380562,
+          "fpi_pct": 7.279885217705914,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1605500_20012026033230_WEB.xml",
+          "filed_at": "20-JAN-2026 15:32:37"
+        },
+        {
+          "symbol": "THOMASCOOK",
+          "quarter": "2026-03-31",
+          "fpi_shares": 35575064,
+          "total_shares": 470380562,
+          "fpi_pct": 7.563038712471286,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656429_21042026053354_WEB.xml",
+          "filed_at": "21-APR-2026 17:34:02"
+        },
+        {
+          "symbol": "THOMASCOOK",
+          "quarter": "2026-06-30",
+          "fpi_shares": 29047445,
+          "total_shares": 470380562,
+          "fpi_pct": 6.175307261102342,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694625_16072026072633_WEB.xml",
+          "filed_at": "16-JUL-2026 19:26:40"
+        }
+      ],
+      "reference_price": 102.39
+    },
+    {
+      "symbol": "TRENT",
+      "name": "Trent Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "TRENT",
+          "quarter": "2025-09-30",
+          "fpi_shares": 59790081,
+          "total_shares": 355487461,
+          "fpi_pct": 16.819181422548123,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1689009_07072026070412_WEB.xml",
+          "filed_at": "08-JUL-2026 19:17:48"
+        },
+        {
+          "symbol": "TRENT",
+          "quarter": "2025-12-31",
+          "fpi_shares": 55509728,
+          "total_shares": 355487461,
+          "fpi_pct": 15.615101540810747,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1687661_02072026065451_WEB.xml",
+          "filed_at": "08-JUL-2026 19:19:19"
+        },
+        {
+          "symbol": "TRENT",
+          "quarter": "2026-03-31",
+          "fpi_shares": 55422836,
+          "total_shares": 355487461,
+          "fpi_pct": 15.590658484575917,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1652246_16042026042008_WEB.xml",
+          "filed_at": "16-APR-2026 16:20:15"
+        },
+        {
+          "symbol": "TRENT",
+          "quarter": "2026-06-30",
+          "fpi_shares": 80745420,
+          "total_shares": 533232301,
+          "fpi_pct": 15.142634804488335,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1692317_14072026044019_WEB.xml",
+          "filed_at": "14-JUL-2026 16:40:28"
+        },
+        {
+          "symbol": "TRENT",
+          "quarter": "2026-09-30",
+          "fpi_shares": 81455758,
+          "total_shares": 533232301,
+          "fpi_pct": 15.27584841489188,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1736910_13102026035013_WEB.xml",
+          "filed_at": "13-OCT-2026 15:50:24"
+        }
+      ],
+      "reference_price": 2621.6
+    },
+    {
+      "symbol": "URBANCO",
+      "name": "Urban Company Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "URBANCO",
+          "quarter": "2025-09-30",
+          "fpi_shares": 44725932,
+          "total_shares": 1435901931,
+          "fpi_pct": 3.114831941820127,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554037_19102025113601_WEB.xml",
+          "filed_at": "19-OCT-2025 11:36:07"
+        },
+        {
+          "symbol": "URBANCO",
+          "quarter": "2025-12-31",
+          "fpi_shares": 26668148,
+          "total_shares": 1446109569,
+          "fpi_pct": 1.844130525907612,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606900_21012026030417_WEB.xml",
+          "filed_at": "21-JAN-2026 15:04:24"
+        },
+        {
+          "symbol": "URBANCO",
+          "quarter": "2026-03-31",
+          "fpi_shares": 27954000,
+          "total_shares": 1542180603,
+          "fpi_pct": 1.812628167260122,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656142_21042026031306_WEB.xml",
+          "filed_at": "21-APR-2026 15:13:12"
+        },
+        {
+          "symbol": "URBANCO",
+          "quarter": "2026-06-30",
+          "fpi_shares": 20437795,
+          "total_shares": 1542180603,
+          "fpi_pct": 1.3252530190201075,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698101_21072026030054_WEB.xml",
+          "filed_at": "21-JUL-2026 15:01:01"
+        },
+        {
+          "symbol": "URBANCO",
+          "quarter": "2026-09-30",
+          "fpi_shares": 47803951,
+          "total_shares": 1542180603,
+          "fpi_pct": 3.09976347173652,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1735757_11102026045751_WEB.xml",
+          "filed_at": "11-OCT-2026 16:58:02"
+        }
+      ],
+      "reference_price": 157.48
+    },
+    {
+      "symbol": "V2RETAIL",
+      "name": "V2 Retail Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "V2RETAIL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 727771,
+          "total_shares": 34589341,
+          "fpi_pct": 2.1040325688772157,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1545405_11102025073213_WEB.xml",
+          "filed_at": "11-OCT-2025 19:32:17"
+        },
+        {
+          "symbol": "V2RETAIL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 1096190,
+          "total_shares": 36463755,
+          "fpi_pct": 3.006245516952382,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1596117_07012026042905_WEB.xml",
+          "filed_at": "07-JAN-2026 16:29:09"
+        },
+        {
+          "symbol": "V2RETAIL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 9564658,
+          "total_shares": 364637550,
+          "fpi_pct": 2.623058980074872,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1647968_09042026033416_WEB.xml",
+          "filed_at": "09-APR-2026 15:34:21"
+        },
+        {
+          "symbol": "V2RETAIL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 11347720,
+          "total_shares": 364637550,
+          "fpi_pct": 3.112054696506161,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1694783_17072026104319_WEB.xml",
+          "filed_at": "17-JUL-2026 10:43:24"
+        }
+      ],
+      "reference_price": 208.74
+    },
+    {
+      "symbol": "VMART",
+      "name": "V-Mart Retail Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "VMART",
+          "quarter": "2025-09-30",
+          "fpi_shares": 13861398,
+          "total_shares": 79387132,
+          "fpi_pct": 17.46050984686032,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548794_15102025033348_WEB.xml",
+          "filed_at": "15-OCT-2025 15:33:52"
+        },
+        {
+          "symbol": "VMART",
+          "quarter": "2025-12-31",
+          "fpi_shares": 13512922,
+          "total_shares": 79439025,
+          "fpi_pct": 17.010432844562228,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1601343_15012026122546_WEB.xml",
+          "filed_at": "15-JAN-2026 12:25:51"
+        },
+        {
+          "symbol": "VMART",
+          "quarter": "2026-03-31",
+          "fpi_shares": 13438047,
+          "total_shares": 79458289,
+          "fpi_pct": 16.912076976638648,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1663153_04052026121518_WEB.xml",
+          "filed_at": "25-MAY-2026 16:32:58"
+        },
+        {
+          "symbol": "VMART",
+          "quarter": "2026-06-30",
+          "fpi_shares": 13102635,
+          "total_shares": 79548002,
+          "fpi_pct": 16.47135650245496,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697090_20072026052336_WEB.xml",
+          "filed_at": "20-JUL-2026 17:23:40"
+        }
+      ],
+      "reference_price": 753.7
+    },
+    {
+      "symbol": "VMM",
+      "name": "Vishal Mega Mart Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "baskets": [
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "VMM",
+          "quarter": "2025-09-30",
+          "fpi_shares": 719074909,
+          "total_shares": 4671067926,
+          "fpi_pct": 15.394229336668396,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1544019_10102025120817_WEB.xml",
+          "filed_at": "10-OCT-2025 12:08:22"
+        },
+        {
+          "symbol": "VMM",
+          "quarter": "2025-12-31",
+          "fpi_shares": 725241055,
+          "total_shares": 4673002806,
+          "fpi_pct": 15.51980782183164,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600509_14012026124823_WEB.xml",
+          "filed_at": "14-JAN-2026 12:48:27"
+        },
+        {
+          "symbol": "VMM",
+          "quarter": "2026-03-31",
+          "fpi_shares": 1028614736,
+          "total_shares": 4673117806,
+          "fpi_pct": 22.011316185509404,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1648536_10042026124600_WEB.xml",
+          "filed_at": "10-APR-2026 12:46:06"
+        },
+        {
+          "symbol": "VMM",
+          "quarter": "2026-06-30",
+          "fpi_shares": 955403021,
+          "total_shares": 4676375306,
+          "fpi_pct": 20.430417972958136,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1689817_09072026042243_WEB.xml",
+          "filed_at": "09-JUL-2026 16:22:48"
+        },
+        {
+          "symbol": "VMM",
+          "quarter": "2026-09-30",
+          "fpi_shares": 878416198,
+          "total_shares": 4684808639,
+          "fpi_pct": 18.750311179999514,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1733720_07102026012928_WEB.xml",
+          "filed_at": "07-OCT-2026 13:29:33"
+        }
+      ],
+      "reference_price": 101.0
+    },
+    {
+      "symbol": "WESTLIFE",
+      "name": "Westlife Foodworld Ltd.",
+      "sector": "Consumer Services",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "WESTLIFE",
+          "quarter": "2025-09-30",
+          "fpi_shares": 16232606,
+          "total_shares": 155936165,
+          "fpi_pct": 10.40977633379659,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1626697_16022026070545_WEB.xml",
+          "filed_at": "18-FEB-2026 10:36:44"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "quarter": "2025-12-31",
+          "fpi_shares": 3123482,
+          "total_shares": 155936165,
+          "fpi_pct": 2.0030516974686403,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1599605_13012026023722_WEB.xml",
+          "filed_at": "13-JAN-2026 14:37:26"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "quarter": "2026-03-31",
+          "fpi_shares": 12022237,
+          "total_shares": 155936165,
+          "fpi_pct": 7.709716985793514,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1648691_10042026032647_WEB.xml",
+          "filed_at": "10-APR-2026 15:26:54"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "quarter": "2026-06-30",
+          "fpi_shares": 10812854,
+          "total_shares": 155936165,
+          "fpi_pct": 6.934154113640027,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696523_20072026123412_WEB.xml",
+          "filed_at": "20-JUL-2026 12:34:17"
+        }
+      ],
+      "reference_price": 589.85
+    }
+  ],
+  "price_date": "2026-09-30",
+  "failures": [],
+  "sources": []
+}

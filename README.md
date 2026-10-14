@@ -197,6 +197,21 @@ python generate_soe.py --history    # read any editions missing from data/stores
 
 ### India data refresh and publication
 
+The India Equity Markets page includes **Institutional Flows & Ownership**, covering all
+22 named NSDL equity sectors and the official Nifty AI Catalysts basket. Sectors are
+ranked by foreign buying; native fortnightly/monthly charts offer INR crore and USD
+million, alongside a searchable company explorer with quarterly FPI, DII, mutual-fund
+and insurer ownership changes. Company coverage uses verified index constituents,
+not the complete NSE/BSE universe. AI is a cross-sector theme without its own NSDL
+cash-flow series. Collection, coverage and comparison rules are documented in
+[docs/emerging_opportunity.md](docs/emerging_opportunity.md).
+
+Refresh with `python -m data.fetchers.emerging_opportunity --refresh --latest-flows --sector all`.
+The weekly Saturday workflow checks new FPI releases independently of quarterly
+ownership, preserves verified history during delays, validates archives and cutoffs,
+and publishes the refreshed snapshot. Ownership changes do not measure actual cash
+purchases or sales.
+
 Run these commands from the repository root after installing `requirements.txt`:
 
 ```bash
@@ -292,3 +307,8 @@ See [RELEASE.md](RELEASE.md) for integration checks and the initial GitHub Actio
 Portfolio Lab ships validated public Global, macro and India datasets in
 `data/published/portfolio_lab/`. Follow [the deployment guide](portfolio_lab/DEPLOYMENT.md)
 for refresh and validation commands. No snapshot URL or data-storage secrets are required.
+
+Institutional Flows & Ownership now covers all 22 named NSDL equity sectors plus the official
+Nifty AI Catalysts theme, using a searchable selector and sortable quarterly
+institutional ownership rankings. AI is a cross-sector basket with no separate
+NSDL cash-flow series. See [collection and coverage notes](docs/emerging_opportunity.md).

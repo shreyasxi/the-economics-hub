@@ -1,0 +1,575 @@
+{
+  "schema_version": 1,
+  "sector": "Utilities",
+  "as_of": "2026-09-30",
+  "collected_at": "2026-10-14T08:10:46.009345+00:00",
+  "window_start": "2026-03-31",
+  "universe_scope": "Utilities members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
+  "universe_complete": false,
+  "kind": "sector",
+  "quarters": [
+    "2025-09-30",
+    "2025-12-31",
+    "2026-03-31",
+    "2026-06-30",
+    "2026-09-30"
+  ],
+  "flows": [
+    {
+      "date": "2026-04-15",
+      "start": "2026-04-01",
+      "equity_flow_cr": 4.0,
+      "end_equity_auc_cr": 1983.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
+      "opening_equity_auc_cr": 1628.0,
+      "flow_pct_opening_auc": 0.2457002457002457,
+      "equity_flow_usd_m": 0.0
+    },
+    {
+      "date": "2026-04-30",
+      "start": "2026-04-16",
+      "equity_flow_cr": -12.0,
+      "end_equity_auc_cr": 2102.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
+      "opening_equity_auc_cr": 1983.0,
+      "flow_pct_opening_auc": -0.6051437216338881,
+      "equity_flow_usd_m": -1.0
+    },
+    {
+      "date": "2026-05-15",
+      "start": "2026-05-01",
+      "equity_flow_cr": -28.0,
+      "end_equity_auc_cr": 1927.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
+      "opening_equity_auc_cr": 2102.0,
+      "flow_pct_opening_auc": -1.3320647002854424,
+      "equity_flow_usd_m": -3.0
+    },
+    {
+      "date": "2026-05-31",
+      "start": "2026-05-16",
+      "equity_flow_cr": -19.0,
+      "end_equity_auc_cr": 2027.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
+      "opening_equity_auc_cr": 1927.0,
+      "flow_pct_opening_auc": -0.9859885832900882,
+      "equity_flow_usd_m": -2.0
+    },
+    {
+      "date": "2026-06-15",
+      "start": "2026-06-01",
+      "equity_flow_cr": 7.0,
+      "end_equity_auc_cr": 2127.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
+      "opening_equity_auc_cr": 2027.0,
+      "flow_pct_opening_auc": 0.3453379378391712,
+      "equity_flow_usd_m": 1.0
+    },
+    {
+      "date": "2026-06-30",
+      "start": "2026-06-16",
+      "equity_flow_cr": 216.0,
+      "end_equity_auc_cr": 2851.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
+      "opening_equity_auc_cr": 2127.0,
+      "flow_pct_opening_auc": 10.155148095909732,
+      "equity_flow_usd_m": 23.0
+    },
+    {
+      "date": "2026-07-15",
+      "start": "2026-07-01",
+      "equity_flow_cr": 119.0,
+      "end_equity_auc_cr": 3078.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
+      "opening_equity_auc_cr": 2851.0,
+      "flow_pct_opening_auc": 4.1739740441950195,
+      "equity_flow_usd_m": 12.0
+    },
+    {
+      "date": "2026-07-31",
+      "start": "2026-07-16",
+      "equity_flow_cr": -163.0,
+      "end_equity_auc_cr": 2749.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
+      "opening_equity_auc_cr": 3078.0,
+      "flow_pct_opening_auc": -5.295646523716699,
+      "equity_flow_usd_m": -17.0
+    },
+    {
+      "date": "2026-08-15",
+      "start": "2026-08-01",
+      "equity_flow_cr": 7.0,
+      "end_equity_auc_cr": 2649.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
+      "opening_equity_auc_cr": 2749.0,
+      "flow_pct_opening_auc": 0.25463805020007274,
+      "equity_flow_usd_m": 1.0
+    },
+    {
+      "date": "2026-08-31",
+      "start": "2026-08-16",
+      "equity_flow_cr": -38.0,
+      "end_equity_auc_cr": 2689.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
+      "opening_equity_auc_cr": 2649.0,
+      "flow_pct_opening_auc": -1.4345035862589657,
+      "equity_flow_usd_m": -4.0
+    },
+    {
+      "date": "2026-09-15",
+      "start": "2026-09-01",
+      "equity_flow_cr": 194.0,
+      "end_equity_auc_cr": 3056.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "opening_equity_auc_cr": 2689.0,
+      "flow_pct_opening_auc": 7.214577910003719,
+      "equity_flow_usd_m": 20.0
+    },
+    {
+      "date": "2026-09-30",
+      "start": "2026-09-16",
+      "equity_flow_cr": -33.0,
+      "end_equity_auc_cr": 2971.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "opening_equity_auc_cr": 3056.0,
+      "flow_pct_opening_auc": -1.0798429319371727,
+      "equity_flow_usd_m": -3.0
+    }
+  ],
+  "companies": [
+    {
+      "symbol": "EIEL",
+      "name": "Enviro Infra Engineers Ltd.",
+      "sector": "Utilities",
+      "industry": "Utilities",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "EIEL",
+          "quarter": "2025-09-30",
+          "fpi_shares": 731416,
+          "total_shares": 175530000,
+          "fpi_pct": 0.41669002449723697,
+          "dii_shares": 2226931,
+          "dii_pct": 1.2686896826753262,
+          "mf_shares": 183088,
+          "mf_pct": 0.10430581666951519,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1546232_13102025043009_WEB.xml",
+          "filed_at": "13-OCT-2025 16:30:14"
+        },
+        {
+          "symbol": "EIEL",
+          "quarter": "2025-12-31",
+          "fpi_shares": 705953,
+          "total_shares": 175530000,
+          "fpi_pct": 0.4021836723067282,
+          "dii_shares": 1808639,
+          "dii_pct": 1.0303873981655558,
+          "mf_shares": 182519,
+          "mf_pct": 0.10398165555745456,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1596427_08012026100855_WEB.xml",
+          "filed_at": "08-JAN-2026 10:08:59"
+        },
+        {
+          "symbol": "EIEL",
+          "quarter": "2026-03-31",
+          "fpi_shares": 1022850,
+          "total_shares": 175530000,
+          "fpi_pct": 0.5827209024098444,
+          "dii_shares": 1518616,
+          "dii_pct": 0.8651603714464764,
+          "mf_shares": 157873,
+          "mf_pct": 0.08994075086879735,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1651431_15042026044517_WEB.xml",
+          "filed_at": "15-APR-2026 16:45:21"
+        },
+        {
+          "symbol": "EIEL",
+          "quarter": "2026-06-30",
+          "fpi_shares": 1162693,
+          "total_shares": 175530000,
+          "fpi_pct": 0.6623899048595682,
+          "dii_shares": 1220201,
+          "dii_pct": 0.6951523956018915,
+          "mf_shares": 150666,
+          "mf_pct": 0.0858349000170911,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1693061_15072026025508_WEB.xml",
+          "filed_at": "15-JUL-2026 14:55:14"
+        },
+        {
+          "symbol": "EIEL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 1274008,
+          "total_shares": 175530000,
+          "fpi_pct": 0.725806414857859,
+          "dii_shares": 1169357,
+          "dii_pct": 0.6661864068820145,
+          "mf_shares": 149822,
+          "mf_pct": 0.08535407052925426,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1737120_13102026053040_WEB.xml",
+          "filed_at": "13-OCT-2026 17:30:46"
+        }
+      ],
+      "reference_price": 189.62
+    },
+    {
+      "symbol": "IONEXCHANG",
+      "name": "Ion Exchange (India) Ltd.",
+      "sector": "Utilities",
+      "industry": "Utilities",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "IONEXCHANG",
+          "quarter": "2025-09-30",
+          "fpi_shares": 7110121,
+          "total_shares": 146666590,
+          "fpi_pct": 4.847812306810979,
+          "dii_shares": 20962936,
+          "dii_pct": 14.292918380389153,
+          "mf_shares": 17113772,
+          "mf_pct": 11.6684870085273,
+          "insurance_shares": 151212,
+          "insurance_pct": 0.10309914480182569,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550588_16102025053949_WEB.xml",
+          "filed_at": "16-OCT-2025 17:39:55"
+        },
+        {
+          "symbol": "IONEXCHANG",
+          "quarter": "2025-12-31",
+          "fpi_shares": 6864565,
+          "total_shares": 146666590,
+          "fpi_pct": 4.680387673839011,
+          "dii_shares": 20846589,
+          "dii_pct": 14.213590838922483,
+          "mf_shares": 16957938,
+          "mf_pct": 11.562236498441806,
+          "insurance_shares": 40164,
+          "insurance_pct": 0.027384559769201698,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1602609_16012026054626_WEB.xml",
+          "filed_at": "16-JAN-2026 17:46:32"
+        },
+        {
+          "symbol": "IONEXCHANG",
+          "quarter": "2026-03-31",
+          "fpi_shares": 6786138,
+          "total_shares": 146666590,
+          "fpi_pct": 4.626914691341771,
+          "dii_shares": 21699987,
+          "dii_pct": 14.795453415805195,
+          "mf_shares": 17120858,
+          "mf_pct": 11.673318374689151,
+          "insurance_shares": 68770,
+          "insurance_pct": 0.04688866087361818,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653351_17042026052145_WEB.xml",
+          "filed_at": "17-APR-2026 17:21:51"
+        },
+        {
+          "symbol": "IONEXCHANG",
+          "quarter": "2026-06-30",
+          "fpi_shares": 7126129,
+          "total_shares": 146666590,
+          "fpi_pct": 4.858726857970858,
+          "dii_shares": 22472820,
+          "dii_pct": 15.322385282155944,
+          "mf_shares": 18304898,
+          "mf_pct": 12.480618796687098,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695301_17072026044117_WEB.xml",
+          "filed_at": "17-JUL-2026 16:41:23"
+        }
+      ],
+      "reference_price": 411.15
+    },
+    {
+      "symbol": "REFEX",
+      "name": "Refex Industries Ltd.",
+      "sector": "Utilities",
+      "industry": "Utilities",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [
+        {
+          "symbol": "REFEX",
+          "quarter": "2025-09-30",
+          "fpi_shares": 2210446,
+          "total_shares": 129280607,
+          "fpi_pct": 1.7098047814704336,
+          "dii_shares": 190170,
+          "dii_pct": 0.1470986286442792,
+          "mf_shares": 179640,
+          "mf_pct": 0.13895355550117428,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1545180_11102025031142_WEB.xml",
+          "filed_at": "11-OCT-2025 15:11:46"
+        },
+        {
+          "symbol": "REFEX",
+          "quarter": "2025-12-31",
+          "fpi_shares": 2779011,
+          "total_shares": 137129532,
+          "fpi_pct": 2.026559093047878,
+          "dii_shares": 219235,
+          "dii_pct": 0.15987438796188702,
+          "mf_shares": 208705,
+          "mf_pct": 0.15219551686357394,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600748_14012026040711_WEB.xml",
+          "filed_at": "14-JAN-2026 16:07:16"
+        },
+        {
+          "symbol": "REFEX",
+          "quarter": "2026-03-31",
+          "fpi_shares": 1875491,
+          "total_shares": 137199391,
+          "fpi_pct": 1.366982015248158,
+          "dii_shares": 181210,
+          "dii_pct": 0.13207784573912576,
+          "mf_shares": 181210,
+          "mf_pct": 0.13207784573912576,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655196_20042026052107_WEB.xml",
+          "filed_at": "20-APR-2026 17:21:12"
+        },
+        {
+          "symbol": "REFEX",
+          "quarter": "2026-06-30",
+          "fpi_shares": 1272567,
+          "total_shares": 137219448,
+          "fpi_pct": 0.9273955102923894,
+          "dii_shares": 519717,
+          "dii_pct": 0.37874879076907525,
+          "mf_shares": 173106,
+          "mf_pct": 0.12615267188656815,
+          "insurance_shares": 0,
+          "insurance_pct": 0.0,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1721359_04092026042110_WEB.xml",
+          "filed_at": "04-SEP-2026 16:42:03"
+        }
+      ],
+      "reference_price": 265.25
+    },
+    {
+      "symbol": "WABAG",
+      "name": "Va Tech Wabag Ltd.",
+      "sector": "Utilities",
+      "industry": "Utilities",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [],
+      "reference_price": 2061.4
+    }
+  ],
+  "price_date": "2026-09-30",
+  "failures": [
+    {
+      "stage": "holding",
+      "identity": "WABAG:2025-09-30",
+      "error": "Missing share count"
+    },
+    {
+      "stage": "holding",
+      "identity": "WABAG:2025-12-31",
+      "error": "Missing share count"
+    },
+    {
+      "stage": "holding",
+      "identity": "WABAG:2026-03-31",
+      "error": "Missing share count"
+    },
+    {
+      "stage": "holding",
+      "identity": "WABAG:2026-06-30",
+      "error": "Missing share count"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1546232_13102025043009_WEB.xml",
+      "file": "sources/EIEL-2025-09-30.xml.gz",
+      "sha256": "5c8c85ce8f2c7c1861f9553bb5b7c24b7db96a81ec2f55fc18c6b9d5f2e780cf"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1596427_08012026100855_WEB.xml",
+      "file": "sources/EIEL-2025-12-31.xml.gz",
+      "sha256": "da315d6002f03e789c0dd39029b4fc9eceba790d06872210f0057756c5ddcb47"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1651431_15042026044517_WEB.xml",
+      "file": "sources/EIEL-2026-03-31.xml.gz",
+      "sha256": "99a0b0089d91a938b86048fdb9b21d93e44629083012d1254167365c0243611a"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1693061_15072026025508_WEB.xml",
+      "file": "sources/EIEL-2026-06-30.xml.gz",
+      "sha256": "3df6e0f40752b0e5ad4ce5026b8ed52dd02bbf2f622ee0ebf6d5e92d35a658fa"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1737120_13102026053040_WEB.xml",
+      "file": "sources/EIEL-2026-09-30.xml.gz",
+      "sha256": "5d5865e02de20d9a5f353094712aaf144cf5523bb4fa23d8988b2c875b75b14c"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550588_16102025053949_WEB.xml",
+      "file": "sources/IONEXCHANG-2025-09-30.xml.gz",
+      "sha256": "daa2e5066616e51a8ce100e49570c7669902b99eceb52f5e0474e176fc755289"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1602609_16012026054626_WEB.xml",
+      "file": "sources/IONEXCHANG-2025-12-31.xml.gz",
+      "sha256": "da263ac2a729438f88a8a5f11c989ae98be5dc4fdea2293ee67626eb1aa2ca9f"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653351_17042026052145_WEB.xml",
+      "file": "sources/IONEXCHANG-2026-03-31.xml.gz",
+      "sha256": "d8e2a86718ee29518bd065618a868e5df452feec2d6abc38ba7c026b7759bbc3"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695301_17072026044117_WEB.xml",
+      "file": "sources/IONEXCHANG-2026-06-30.xml.gz",
+      "sha256": "74570eab19b270fb2cff0b9917993f85bee820f20766c7cd324ffc121cdb739a"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1545180_11102025031142_WEB.xml",
+      "file": "sources/REFEX-2025-09-30.xml.gz",
+      "sha256": "b271a3916f420ae42e4bfd35ad68f9d476866170d943de136effb7a80445250b"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600748_14012026040711_WEB.xml",
+      "file": "sources/REFEX-2025-12-31.xml.gz",
+      "sha256": "cc704ffd33203f229a4782824e18d7542bb2c7ace8983a1affd796ee13c415a9"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655196_20042026052107_WEB.xml",
+      "file": "sources/REFEX-2026-03-31.xml.gz",
+      "sha256": "687d7aaff1086230f999293102da27e9c0e50b3ed7bfc1caba820195071ab602"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1721359_04092026042110_WEB.xml",
+      "file": "sources/REFEX-2026-06-30.xml.gz",
+      "sha256": "ff08c26d1e5a362846a8926e3d52b076fd60ace80e5b5dc1c95b448a1c84d157"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1555110_21102025102729_WEB.xml",
+      "file": "sources/WABAG-2025-09-30.xml.gz",
+      "sha256": "d6e6059a1885bcd33af85c946b4b551ac896d06ed569bda882a374df71ed7161"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607723_21012026075952_WEB.xml",
+      "file": "sources/WABAG-2025-12-31.xml.gz",
+      "sha256": "3dadea4f061fd7578335f68e9610ce956566bdacdf572c2920df9e9a438a8c7d"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1656553_21042026061607_WEB.xml",
+      "file": "sources/WABAG-2026-03-31.xml.gz",
+      "sha256": "b3c8eccaa16956e27738610b0968ff89e7947a14d1fcfe3454f8e89e14a015b2"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698580_21072026060141_WEB.xml",
+      "file": "sources/WABAG-2026-06-30.xml.gz",
+      "sha256": "874ed31054fad545d0b0ad1192383f4689fb66ad143acdccc631b6f73995a31b"
+    },
+    {
+      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=EIEL",
+      "file": "sources/filings-EIEL.json",
+      "sha256": "2227b40b796d5bae2f9944f87cb598ca6402645df5e6ea77cf9c6076179dcd73"
+    },
+    {
+      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IONEXCHANG",
+      "file": "sources/filings-IONEXCHANG.json",
+      "sha256": "b1edfc40a0d669e641ab07c93781335e5cfcd6008fcf457ecbfbf2924814c861"
+    },
+    {
+      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=REFEX",
+      "file": "sources/filings-REFEX.json",
+      "sha256": "e8f4f33a6d998087e44984d43f59fa093898cf2f1eb0485c2c1d20546272a9d1"
+    },
+    {
+      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=WABAG",
+      "file": "sources/filings-WABAG.json",
+      "sha256": "fe0f5deee79a699f988d15ca7839902ed428bc6b7009c15ba6cca564bc96ed1d"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "file": "sources/niftymicrocap250.csv",
+      "sha256": "974ff2493bbb8b7102efc5c282805a84bff3abf18ceb33e52961cdf5976116a5"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
+      "file": "sources/niftytotalmarket.csv",
+      "sha256": "692caee1b8e4fd11912c71e1c2519c4070e9675f9a0a9e6d40294cdf032890fc"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Mar312026.html",
+      "file": "sources/nsdl-2026-03-31.html",
+      "sha256": "578f0feebe828079867a92eef1e27b8f7d3da5b04900229e08d71825411b6b0c"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
+      "file": "sources/nsdl-2026-04-30.html",
+      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
+      "file": "sources/nsdl-2026-05-31.html",
+      "sha256": "ce3e045b4ed487b8fb5a898f4ac31f5f5d5bbdac712e33eaf9a36de9e56e4b3b"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
+      "file": "sources/nsdl-2026-06-30.html",
+      "sha256": "a96d1a0101315e74b9d48b6731dd62c985c9aee25c3c4803897cb7a2215a34c0"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
+      "file": "sources/nsdl-2026-07-31.html",
+      "sha256": "b6c480ae55a41fc840f3910a02885ebb73a9e59d3e6513043c38c7a8229ce228"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
+      "file": "sources/nsdl-2026-08-31.html",
+      "sha256": "e3eaf4974f08d1751d77d072e9375cba10b4d9ce1ce5165ec8b8979b759e6a64"
+    },
+    {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "file": "sources/nsdl-2026-09-30.html",
+      "sha256": "e5571d43029a894efdf0a9240bcdd8cfbcb3d155f56ea0ea0977a29f09be37aa"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
+      "file": "sources/prices-2026-09-30.zip",
+      "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
+    }
+  ],
+  "ownership_as_of": "2026-09-30",
+  "flows_as_of": "2026-09-30",
+  "flows_checked_through": "2026-09-30",
+  "digest": "613c1c06addb2799f3092ae00ef1e88abead705d5db90ed72d4e1c81cf7d8d8b"
+}
