@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-13T18:34:28.485653+00:00",
+  "generated_at": "2026-10-16T10:16:32.098591+00:00",
   "editions": {
-    "weekly": "assets/weekly/2026-10-12",
+    "weekly": "assets/weekly/2026-10-16",
     "macro": "assets/macro/2026-10",
     "india": "assets/india/2026-10"
   },
@@ -211,27 +211,27 @@
         "month_anchor": "2026-09-09"
       },
       "us_ig": {
-        "latest": 0.82,
-        "observation": "2026-10-08",
-        "quarter": 5.999999999999995,
+        "latest": 0.83,
+        "observation": "2026-10-09",
+        "quarter": 6.999999999999995,
         "quarter_anchor": "2026-07-09",
-        "month": 0.9999999999999898,
+        "month": 1.9999999999999907,
         "month_anchor": "2026-09-09"
       },
       "us_hy": {
-        "latest": 3.15,
-        "observation": "2026-10-08",
-        "quarter": 44.99999999999997,
+        "latest": 3.11,
+        "observation": "2026-10-09",
+        "quarter": 40.99999999999997,
         "quarter_anchor": "2026-07-09",
-        "month": 43.99999999999999,
+        "month": 39.99999999999999,
         "month_anchor": "2026-09-09"
       },
       "em_corp": {
-        "latest": 1.58,
-        "observation": "2026-10-08",
-        "quarter": 13.00000000000001,
+        "latest": 1.55,
+        "observation": "2026-10-09",
+        "quarter": 10.000000000000009,
         "quarter_anchor": "2026-07-09",
-        "month": 23.0,
+        "month": 19.999999999999996,
         "month_anchor": "2026-09-09"
       },
       "vix": {
@@ -471,7 +471,7 @@
       }
     ],
     "missing": {},
-    "methodology": "13-futures research basket; matched current/prior-month members above their own 200-session average; at least 12 valid members. Observations within four calendar days; no interpolation. Three-month/one-month futures price changes; Brent alone for energy commentary.",
+    "methodology": "13-futures research basket; matched current/prior-month members above their own 200-session average; at least 12 valid members. Observations within four calendar days; no interpolation. Three-month/one-month futures price changes; Brent price pressure; WTI near\u2013six-month curve for prompt tightness.",
     "sources": {
       "BZ=F": {
         "source": "Yahoo Finance",
