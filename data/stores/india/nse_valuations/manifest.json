@@ -1,7 +1,7 @@
 {
   "audit_only": true,
-  "cutoff": "2026-10-14",
-  "generated_at": "2026-10-13T18:31:23.806534+00:00",
+  "cutoff": "2026-10-17",
+  "generated_at": "2026-10-17T11:58:19.927691+00:00",
   "start_month": "2016-10",
   "expected_months": 121,
   "validated_months": 121,
@@ -3981,11 +3981,11 @@
       "month": "2026-10",
       "status": "validated",
       "source": {
-        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_13102026.csv",
-        "observation_date": "2026-10-13",
-        "retrieved_at": "2026-10-13T18:31:23.313558+00:00",
-        "sha256": "875c9cf4c4c23780de2047eae5cd28f5afc78a83750be13c699815d6c3aa8696",
-        "bytes": 17563,
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_16102026.csv",
+        "observation_date": "2026-10-16",
+        "retrieved_at": "2026-10-17T11:58:19.452977+00:00",
+        "sha256": "0ec4b642fc4d13ce901c0ae8ada4f262f0363d2ac1382a2ab1ed292f2c506728",
+        "bytes": 17508,
         "content_type": "text/csv",
         "exact_target_names": [
           "Nifty 50",
@@ -4006,30 +4006,30 @@
       },
       "attempts": [
         {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_14102026.csv",
-          "requested_date": "2026-10-14",
-          "retrieved_at": "2026-10-13T18:31:22.853458+00:00",
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_17102026.csv",
+          "requested_date": "2026-10-17",
+          "retrieved_at": "2026-10-17T11:58:18.933508+00:00",
           "http_status": 404,
           "content_type": "text/html;charset=UTF-8",
-          "sha256": "5018096e5c1856b6796dab8dbc5b8f121674f54423b8c04fd83d836faa8069f7",
+          "sha256": "30c296ae5b944ce6c081644144f9546005b5c6259b9d4f40b338e0c29f9c0dfa",
           "outcome": "archive_not_found"
         },
         {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_13102026.csv",
-          "requested_date": "2026-10-13",
-          "retrieved_at": "2026-10-13T18:31:23.313558+00:00",
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_16102026.csv",
+          "requested_date": "2026-10-16",
+          "retrieved_at": "2026-10-17T11:58:19.452977+00:00",
           "http_status": 200,
           "content_type": "text/csv",
-          "sha256": "875c9cf4c4c23780de2047eae5cd28f5afc78a83750be13c699815d6c3aa8696",
+          "sha256": "0ec4b642fc4d13ce901c0ae8ada4f262f0363d2ac1382a2ab1ed292f2c506728",
           "outcome": "validated_csv"
         }
       ]
     }
   ],
   "outputs": {
-    "monthly.csv": "59599b586fc7244707ea168ce48d5b9fcb0dde755d1e69b5358ebf09d2561538",
-    "extracted.csv": "f35aa788ed46eef618210a3db7be02b99d863900fad4240da81104b384c4779d",
+    "monthly.csv": "e8e867af08aa2d90096bf7985f033e12c287611de25c34a46aca9e0d5e4f07bc",
+    "extracted.csv": "29b611c793a1ab679958dd37cdbc3002d51a8e9281f0c41adc8cb77dbe3216db",
     "coverage.csv": "9649b739f20c2aa4afc2fdab23a971c1bc07c90e218efa0b309aae7c7967d2c9",
-    "metric_details.json": "6f997495f02fe487ff56923e15cafb221b08e74ecae291610af45f828ee7b5cc"
+    "metric_details.json": "909c3defd669133605b6b94bbf0eeb9e7817c189367871aae0c9d3f54a894a59"
   }
 }
