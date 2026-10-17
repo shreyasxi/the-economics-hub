@@ -1,0 +1,159 @@
+{
+ "generated_at": "2026-10-17 10:07 UTC",
+ "reads": {
+  "count": 27,
+  "first": "2026-10-10 14:42 UTC"
+ },
+ "headlines": {
+  "from": "2026-10-10",
+  "to": "2026-10-17",
+  "world": {
+   "items": [
+    {
+     "title": "UK economy unexpectedly grows in August despite fall in consumer spending",
+     "url": "https://www.theguardian.com/business/2026/oct/15/uk-economy-unexpectedly-grows-01-in-august-despite-fuel-hit-to-household-budgets",
+     "publisher": "The Guardian",
+     "date": "2026-10-15",
+     "theme": "Growth & jobs",
+     "also": [
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Bets on Fed rate hold in October strengthen after Warsh comments",
+     "url": "https://www.ft.com/content/95a8e05d-fc20-441d-b271-64e87fe41f76?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-16",
+     "theme": "Central banks",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 6
+    },
+    {
+     "title": "John Healey poised to raise taxes on banks in budget",
+     "url": "https://www.theguardian.com/uk-news/2026/oct/15/john-healey-raise-taxes-banks-budget",
+     "publisher": "The Guardian",
+     "date": "2026-10-15",
+     "theme": "Public finances",
+     "also": [
+      "BBC News",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "US inflation rises more than expected - here's what is happening with prices",
+     "url": "https://www.bbc.co.uk/news/articles/cwy8lx3pg4k2o?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-10-14",
+     "theme": "Inflation",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "China's exports and imports surge past expectations in September",
+     "url": "https://www.cnbc.com/2026/10/14/chinas-exports-likely-grew-by-double-digits-in-september.html",
+     "publisher": "CNBC",
+     "date": "2026-10-14",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Crude oil futures brace for volatility amid geopolitical uncertainties",
+     "url": "https://www.business-standard.com/markets/commodities/crude-oil-futures-brace-for-volatility-amid-geopolitical-uncertainties-126101100308_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-11",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 7
+    },
+    {
+     "title": "US Fed rate hike: US inflation heats up — experts decode impact on Indian stock market, gold rates; recommend 10 stocks",
+     "url": "https://www.livemint.com/market/stock-market-news/us-fed-rate-hike-buzz-american-inflation-highest-since-covid-what-does-it-mean-for-nifty-sensex-gold-rates-decoded-11792135225649.html",
+     "publisher": "Mint",
+     "date": "2026-10-16",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 4
+    },
+    {
+     "title": "India's retail inflation jumps to 5.54% in Sept; highest under new CPI series",
+     "url": "https://www.livemint.com/economy/indias-retail-inflation-jumps-to-5-54-in-sept-records-new-high-in-2-years-11791802350715.html",
+     "publisher": "Mint",
+     "date": "2026-10-12",
+     "theme": "Inflation",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 4
+    },
+    {
+     "title": "India's exports up 23% to $44.4 billion in Sep; trade deficit narrows to $30.21 billion",
+     "url": "https://www.thehindubusinessline.com/economy/indias-exports-up-23-to-444-billion-in-sep-trade-deficit-narrows-to-3021-billion/article71587406.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-10-16",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 4
+    },
+    {
+     "title": "Net direct tax collection grows 13% to ₹13.38 trillion till October 14",
+     "url": "https://www.business-standard.com/economy/news/net-direct-tax-collection-grows-13-to-13-38-trillion-till-october-14-126101500580_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-15",
+     "theme": "Public finances",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 4
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
