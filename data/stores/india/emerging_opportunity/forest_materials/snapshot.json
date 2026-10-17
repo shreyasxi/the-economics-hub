@@ -2,8 +2,11 @@
   "schema_version": 1,
   "sector": "Forest Materials",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-14T08:10:39.743143+00:00",
+  "collected_at": "2026-10-17T12:29:19.173747+00:00",
   "window_start": "2026-03-31",
+  "ownership_as_of": "2026-09-30",
+  "flows_as_of": "2026-09-30",
+  "flows_checked_through": "2026-10-15",
   "universe_scope": "Forest Materials members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -19,121 +22,121 @@
       "date": "2026-04-15",
       "start": "2026-04-01",
       "equity_flow_cr": -19.0,
+      "equity_flow_usd_m": -2.0,
       "end_equity_auc_cr": 2586.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
       "opening_equity_auc_cr": 2139.0,
-      "flow_pct_opening_auc": -0.8882655446470313,
-      "equity_flow_usd_m": -2.0
+      "flow_pct_opening_auc": -0.8882655446470313
     },
     {
       "date": "2026-04-30",
       "start": "2026-04-16",
       "equity_flow_cr": 73.0,
+      "equity_flow_usd_m": 8.0,
       "end_equity_auc_cr": 2725.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
       "opening_equity_auc_cr": 2586.0,
-      "flow_pct_opening_auc": 2.822892498066512,
-      "equity_flow_usd_m": 8.0
+      "flow_pct_opening_auc": 2.822892498066512
     },
     {
       "date": "2026-05-15",
       "start": "2026-05-01",
       "equity_flow_cr": -41.0,
+      "equity_flow_usd_m": -4.0,
       "end_equity_auc_cr": 2490.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
       "opening_equity_auc_cr": 2725.0,
-      "flow_pct_opening_auc": -1.5045871559633028,
-      "equity_flow_usd_m": -4.0
+      "flow_pct_opening_auc": -1.5045871559633028
     },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
       "equity_flow_cr": 1.0,
+      "equity_flow_usd_m": 0.0,
       "end_equity_auc_cr": 2420.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
       "opening_equity_auc_cr": 2490.0,
-      "flow_pct_opening_auc": 0.040160642570281124,
-      "equity_flow_usd_m": 0.0
+      "flow_pct_opening_auc": 0.040160642570281124
     },
     {
       "date": "2026-06-15",
       "start": "2026-06-01",
       "equity_flow_cr": -12.0,
+      "equity_flow_usd_m": -1.0,
       "end_equity_auc_cr": 2375.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
       "opening_equity_auc_cr": 2420.0,
-      "flow_pct_opening_auc": -0.49586776859504134,
-      "equity_flow_usd_m": -1.0
+      "flow_pct_opening_auc": -0.49586776859504134
     },
     {
       "date": "2026-06-30",
       "start": "2026-06-16",
       "equity_flow_cr": -12.0,
+      "equity_flow_usd_m": -1.0,
       "end_equity_auc_cr": 1084.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_June302026.html",
       "opening_equity_auc_cr": 2375.0,
-      "flow_pct_opening_auc": -0.5052631578947369,
-      "equity_flow_usd_m": -1.0
+      "flow_pct_opening_auc": -0.5052631578947369
     },
     {
       "date": "2026-07-15",
       "start": "2026-07-01",
       "equity_flow_cr": -11.0,
+      "equity_flow_usd_m": -1.0,
       "end_equity_auc_cr": 1110.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
       "opening_equity_auc_cr": 1084.0,
-      "flow_pct_opening_auc": -1.014760147601476,
-      "equity_flow_usd_m": -1.0
+      "flow_pct_opening_auc": -1.014760147601476
     },
     {
       "date": "2026-07-31",
       "start": "2026-07-16",
       "equity_flow_cr": 40.0,
+      "equity_flow_usd_m": 4.0,
       "end_equity_auc_cr": 1213.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Jul312026.html",
       "opening_equity_auc_cr": 1110.0,
-      "flow_pct_opening_auc": 3.6036036036036037,
-      "equity_flow_usd_m": 4.0
+      "flow_pct_opening_auc": 3.6036036036036037
     },
     {
       "date": "2026-08-15",
       "start": "2026-08-01",
       "equity_flow_cr": -9.0,
+      "equity_flow_usd_m": -1.0,
       "end_equity_auc_cr": 1173.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
       "opening_equity_auc_cr": 1213.0,
-      "flow_pct_opening_auc": -0.7419620774938169,
-      "equity_flow_usd_m": -1.0
+      "flow_pct_opening_auc": -0.7419620774938169
     },
     {
       "date": "2026-08-31",
       "start": "2026-08-16",
       "equity_flow_cr": -7.0,
+      "equity_flow_usd_m": -1.0,
       "end_equity_auc_cr": 1199.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Aug312026.html",
       "opening_equity_auc_cr": 1173.0,
-      "flow_pct_opening_auc": -0.5967604433077579,
-      "equity_flow_usd_m": -1.0
+      "flow_pct_opening_auc": -0.5967604433077579
     },
     {
       "date": "2026-09-15",
       "start": "2026-09-01",
       "equity_flow_cr": 7.0,
+      "equity_flow_usd_m": 1.0,
       "end_equity_auc_cr": 1253.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
       "opening_equity_auc_cr": 1199.0,
-      "flow_pct_opening_auc": 0.5838198498748958,
-      "equity_flow_usd_m": 1.0
+      "flow_pct_opening_auc": 0.5838198498748958
     },
     {
       "date": "2026-09-30",
       "start": "2026-09-16",
       "equity_flow_cr": 6.0,
+      "equity_flow_usd_m": 1.0,
       "end_equity_auc_cr": 1244.0,
       "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
       "opening_equity_auc_cr": 1253.0,
-      "flow_pct_opening_auc": 0.4788507581803671,
-      "equity_flow_usd_m": 1.0
+      "flow_pct_opening_auc": 0.4788507581803671
     }
   ],
   "companies": [
@@ -213,27 +216,33 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [],
+  "failures": [
+    {
+      "stage": "sector_flows",
+      "identity": "2026-10-15",
+      "error": "NSDL report date mismatch"
+    }
+  ],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548416_15102025114307_WEB.xml",
       "file": "sources/JKPAPER-2025-09-30.xml.gz",
-      "sha256": "e0343ec573363470eda5de206f4a65793fa8f3f468abf05c7a5b19fa8c9f7cd4"
+      "sha256": "1ffd34847fd429ec09c2edcd725d53fd97d8e1efbbfffd8254c80f9496b58663"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600417_14012026114004_WEB.xml",
       "file": "sources/JKPAPER-2025-12-31.xml.gz",
-      "sha256": "72b2609f2609c590e9daa92fe32ee3d4bdb1a54fd8f347a2db3f238763fcd617"
+      "sha256": "e0ca443cf4f2a157165782b71b15cb73c6e227560efb44acfb96b6afd029ff57"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1650010_13042026053419_WEB.xml",
       "file": "sources/JKPAPER-2026-03-31.xml.gz",
-      "sha256": "bd80678efeb41e418a2a09ca9337c5c64e32ece97eb9cd8bbce177577d908f69"
+      "sha256": "63c0bc97dd9ce1a304ce89f3729f7b056361aad5c7dddc4310d7a0c4ef8b3ae3"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696718_20072026030453_WEB.xml",
       "file": "sources/JKPAPER-2026-06-30.xml.gz",
-      "sha256": "95fb1f7ec7a5cd1fd7b4d983ec3f75ec61105b826dc922fca7eb7fb89c3c6cca"
+      "sha256": "f7d1511faa1aaf3c2f6dc5a60321368a3648843552ca232bdd41ad89cdbfc7b6"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JKPAPER",
@@ -249,11 +258,6 @@
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
       "sha256": "692caee1b8e4fd11912c71e1c2519c4070e9675f9a0a9e6d40294cdf032890fc"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Mar312026.html",
-      "file": "sources/nsdl-2026-03-31.html",
-      "sha256": "578f0feebe828079867a92eef1e27b8f7d3da5b04900229e08d71825411b6b0c"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -286,13 +290,15 @@
       "sha256": "e5571d43029a894efdf0a9240bcdd8cfbcb3d155f56ea0ea0977a29f09be37aa"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "file": "sources/nsdl-2026-10-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-09-30",
-  "flows_checked_through": "2026-09-30",
-  "digest": "dc0e9eaa2b6f263e38b22835ebde71784d33b905276276aa7a2dc10f2dbc91f5"
+  "digest": "60ded67ddd2443586923bae0b4672fc3db01526420443043585f7c573229801f"
 }
