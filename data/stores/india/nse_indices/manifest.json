@@ -3,12 +3,12 @@
   "source_url": "https://www.niftyindices.com/reports/historical-data",
   "index_variant": "price return; excludes dividends",
   "requested_start": "2016-10-04",
-  "requested_end": "2026-10-16",
+  "requested_end": "2026-10-23",
   "base_date": "2016-10-04",
-  "last_date": "2026-10-16",
-  "matched_dates": 2488,
+  "last_date": "2026-10-23",
+  "matched_dates": 2492,
   "unmatched_dates": [],
-  "imported_at": "2026-10-17T11:55:00.343287+00:00",
+  "imported_at": "2026-10-24T12:25:23.123122+00:00",
   "sources": [
     {
       "role": "smallcap",
@@ -731,17 +731,101 @@
       "date": "2026-10-16",
       "rows": 1,
       "retrieved_at": "2026-10-17T11:55:00.166624+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/ebff93c77dc6cdf82f1536a92c36a611a644fa6f87e267aa7c2ed5edfcf46502.csv",
+      "sha256": "ebff93c77dc6cdf82f1536a92c36a611a644fa6f87e267aa7c2ed5edfcf46502",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_19102026.csv",
+      "format": "daily",
+      "date": "2026-10-19",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:21.523951+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/ebff93c77dc6cdf82f1536a92c36a611a644fa6f87e267aa7c2ed5edfcf46502.csv",
+      "sha256": "ebff93c77dc6cdf82f1536a92c36a611a644fa6f87e267aa7c2ed5edfcf46502",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_19102026.csv",
+      "format": "daily",
+      "date": "2026-10-19",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:21.523965+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/ccaff4c523834856afae73d2072d45b62bd766ed6766057534eaaf3f9e7d420c.csv",
+      "sha256": "ccaff4c523834856afae73d2072d45b62bd766ed6766057534eaaf3f9e7d420c",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_21102026.csv",
+      "format": "daily",
+      "date": "2026-10-21",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:22.126625+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/ccaff4c523834856afae73d2072d45b62bd766ed6766057534eaaf3f9e7d420c.csv",
+      "sha256": "ccaff4c523834856afae73d2072d45b62bd766ed6766057534eaaf3f9e7d420c",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_21102026.csv",
+      "format": "daily",
+      "date": "2026-10-21",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:22.126637+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/869e842e64deacb77ab47733367a1b77c4acfed5a91616dff9310f03fc4ddb51.csv",
+      "sha256": "869e842e64deacb77ab47733367a1b77c4acfed5a91616dff9310f03fc4ddb51",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_22102026.csv",
+      "format": "daily",
+      "date": "2026-10-22",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:22.426145+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/869e842e64deacb77ab47733367a1b77c4acfed5a91616dff9310f03fc4ddb51.csv",
+      "sha256": "869e842e64deacb77ab47733367a1b77c4acfed5a91616dff9310f03fc4ddb51",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_22102026.csv",
+      "format": "daily",
+      "date": "2026-10-22",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:22.426158+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/ab72ff5e441a84057dd8ccb44232d168616a4deeca7266d1c762583beeb0e635.csv",
+      "sha256": "ab72ff5e441a84057dd8ccb44232d168616a4deeca7266d1c762583beeb0e635",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_23102026.csv",
+      "format": "daily",
+      "date": "2026-10-23",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:22.743037+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/ab72ff5e441a84057dd8ccb44232d168616a4deeca7266d1c762583beeb0e635.csv",
+      "sha256": "ab72ff5e441a84057dd8ccb44232d168616a4deeca7266d1c762583beeb0e635",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_23102026.csv",
+      "format": "daily",
+      "date": "2026-10-23",
+      "rows": 1,
+      "retrieved_at": "2026-10-24T12:25:22.743049+00:00"
     }
   ],
   "refresh": {
-    "started_at": "2026-10-17T11:54:54.733981+00:00",
-    "requested_start": "2026-09-28",
-    "requested_end": "2026-10-16",
+    "started_at": "2026-10-24T12:25:15.057842+00:00",
+    "requested_start": "2026-10-02",
+    "requested_end": "2026-10-23",
     "received_dates": [
-      "2026-09-28",
-      "2026-09-29",
-      "2026-09-30",
-      "2026-10-01",
       "2026-10-05",
       "2026-10-06",
       "2026-10-07",
@@ -751,14 +835,21 @@
       "2026-10-13",
       "2026-10-14",
       "2026-10-15",
-      "2026-10-16"
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-21",
+      "2026-10-22",
+      "2026-10-23"
     ],
     "unavailable_dates": [
       "2026-10-02",
       "2026-10-03",
       "2026-10-04",
       "2026-10-10",
-      "2026-10-11"
+      "2026-10-11",
+      "2026-10-17",
+      "2026-10-18",
+      "2026-10-20"
     ],
     "status": "validated_with_unavailable_reports",
     "unresolved_report_dates": [
@@ -770,10 +861,13 @@
       "2026-10-03",
       "2026-10-04",
       "2026-10-10",
-      "2026-10-11"
+      "2026-10-11",
+      "2026-10-17",
+      "2026-10-18",
+      "2026-10-20"
     ]
   },
-  "signal_path": "signals/761de197df90d4e384786eefd9074f396ea7d320cfeffa777733008890f4925d.csv",
-  "signal_sha256": "761de197df90d4e384786eefd9074f396ea7d320cfeffa777733008890f4925d",
+  "signal_path": "signals/196ae71b23c78df460b7b3bed4fad12aa1496a7f83e8e5e5895ce38d08c9c465.csv",
+  "signal_sha256": "196ae71b23c78df460b7b3bed4fad12aa1496a7f83e8e5e5895ce38d08c9c465",
   "calendar_note": "Matched source dates; missing dates in both exports cannot be detected without a separate exchange calendar."
 }
