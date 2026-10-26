@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-19",
+  "as_of": "2026-10-26",
   "start_date": "2021-10-01",
   "countries": [
     {
@@ -646,7 +646,7 @@
         },
         {
           "date": "2026-07-01",
-          "value": 3.547273,
+          "value": 3.65,
           "status": "A"
         },
         {
@@ -692,17 +692,21 @@
         {
           "date": "2026-10-16",
           "value": 3.84
+        },
+        {
+          "date": "2026-10-23",
+          "value": 3.83
         }
       ],
       "national": {
         "source": "CAN national official source",
         "url": "https://www.bankofcanada.ca/valet/observations/BD.CDN.10YR.DQ.YLD/json",
         "yield_type": "10-year benchmark",
-        "retrieved_at": "2026-10-19T18:46:24.562534+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027647+00:00"
       },
       "latest": {
-        "date": "2026-10-16",
-        "value": 3.84
+        "date": "2026-10-23",
+        "value": 3.83
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -1045,19 +1049,23 @@
           "value": 5.3993
         },
         {
-          "date": "2026-10-15",
-          "value": 5.3092
+          "date": "2026-10-16",
+          "value": 5.2987
+        },
+        {
+          "date": "2026-10-22",
+          "value": 5.2784
         }
       ],
       "national": {
         "source": "GBR national official source",
         "url": "https://www.bankofengland.co.uk/statistics/yield-curves",
         "yield_type": "10-year fitted nominal par",
-        "retrieved_at": "2026-10-19T18:46:24.562614+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027694+00:00"
       },
       "latest": {
-        "date": "2026-10-15",
-        "value": 5.3092
+        "date": "2026-10-22",
+        "value": 5.2784
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -1366,7 +1374,12 @@
         },
         {
           "date": "2026-09-01",
-          "value": 3.469524,
+          "value": 3.474091,
+          "status": "A"
+        },
+        {
+          "date": "2026-10-01",
+          "value": 3.4425,
           "status": "A"
         }
       ],
@@ -1404,19 +1417,23 @@
           "value": 3.45
         },
         {
-          "date": "2026-10-19",
-          "value": 3.46
+          "date": "2026-10-23",
+          "value": 3.36
+        },
+        {
+          "date": "2026-10-26",
+          "value": 3.4
         }
       ],
       "national": {
         "source": "DEU national official source",
         "url": "https://api.statistiken.bundesbank.de/rest/data/BBSIS/D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A",
         "yield_type": "10-year fitted par",
-        "retrieved_at": "2026-10-19T18:46:24.562649+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027724+00:00"
       },
       "latest": {
-        "date": "2026-10-19",
-        "value": 3.46
+        "date": "2026-10-26",
+        "value": 3.4
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -1430,77 +1447,77 @@
       "monthly": [
         {
           "date": "2021-10-01",
-          "value": 0.1973,
+          "value": 0.2,
           "status": "A"
         },
         {
           "date": "2021-11-01",
-          "value": 0.103,
+          "value": 0.1,
           "status": "A"
         },
         {
           "date": "2021-12-01",
-          "value": 0.0493,
+          "value": 0.05,
           "status": "A"
         },
         {
           "date": "2022-01-01",
-          "value": 0.3141,
+          "value": 0.31,
           "status": "A"
         },
         {
           "date": "2022-02-01",
-          "value": 0.6785,
+          "value": 0.68,
           "status": "A"
         },
         {
           "date": "2022-03-01",
-          "value": 0.7832,
+          "value": 0.78,
           "status": "A"
         },
         {
           "date": "2022-04-01",
-          "value": 1.2849,
+          "value": 1.28,
           "status": "A"
         },
         {
           "date": "2022-05-01",
-          "value": 1.5182,
+          "value": 1.52,
           "status": "A"
         },
         {
           "date": "2022-06-01",
-          "value": 2.056,
+          "value": 2.06,
           "status": "A"
         },
         {
           "date": "2022-07-01",
-          "value": 1.7067,
+          "value": 1.71,
           "status": "A"
         },
         {
           "date": "2022-08-01",
-          "value": 1.6857,
+          "value": 1.69,
           "status": "A"
         },
         {
           "date": "2022-09-01",
-          "value": 2.4096,
+          "value": 2.41,
           "status": "A"
         },
         {
           "date": "2022-10-01",
-          "value": 2.773,
+          "value": 2.77,
           "status": "A"
         },
         {
           "date": "2022-11-01",
-          "value": 2.5831,
+          "value": 2.58,
           "status": "A"
         },
         {
           "date": "2022-12-01",
-          "value": 2.6167,
+          "value": 2.62,
           "status": "A"
         },
         {
@@ -1510,222 +1527,222 @@
         },
         {
           "date": "2023-02-01",
-          "value": 2.8727,
+          "value": 2.87,
           "status": "A"
         },
         {
           "date": "2023-03-01",
-          "value": 2.9167,
+          "value": 2.92,
           "status": "A"
         },
         {
           "date": "2023-04-01",
-          "value": 2.9038,
+          "value": 2.9,
           "status": "A"
         },
         {
           "date": "2023-05-01",
-          "value": 2.9385,
+          "value": 2.94,
           "status": "A"
         },
         {
           "date": "2023-06-01",
-          "value": 2.9319,
+          "value": 2.93,
           "status": "A"
         },
         {
           "date": "2023-07-01",
-          "value": 3.0379,
+          "value": 3.04,
           "status": "A"
         },
         {
           "date": "2023-08-01",
-          "value": 3.1101,
+          "value": 3.11,
           "status": "A"
         },
         {
           "date": "2023-09-01",
-          "value": 3.242,
+          "value": 3.24,
           "status": "A"
         },
         {
           "date": "2023-10-01",
-          "value": 3.4496,
+          "value": 3.45,
           "status": "A"
         },
         {
           "date": "2023-11-01",
-          "value": 3.1914,
+          "value": 3.19,
           "status": "A"
         },
         {
           "date": "2023-12-01",
-          "value": 2.6549,
+          "value": 2.65,
           "status": "A"
         },
         {
           "date": "2024-01-01",
-          "value": 2.7365,
+          "value": 2.74,
           "status": "A"
         },
         {
           "date": "2024-02-01",
-          "value": 2.8547,
+          "value": 2.85,
           "status": "A"
         },
         {
           "date": "2024-03-01",
-          "value": 2.8236,
+          "value": 2.82,
           "status": "A"
         },
         {
           "date": "2024-04-01",
-          "value": 2.9749,
+          "value": 2.97,
           "status": "A"
         },
         {
           "date": "2024-05-01",
-          "value": 3.031,
+          "value": 3.03,
           "status": "A"
         },
         {
           "date": "2024-06-01",
-          "value": 3.1494,
+          "value": 3.15,
           "status": "A"
         },
         {
           "date": "2024-07-01",
-          "value": 3.1547,
+          "value": 3.14,
           "status": "A"
         },
         {
           "date": "2024-08-01",
-          "value": 2.9681,
+          "value": 2.94,
           "status": "A"
         },
         {
           "date": "2024-09-01",
-          "value": 2.9126,
+          "value": 2.9,
           "status": "A"
         },
         {
           "date": "2024-10-01",
-          "value": 2.9983,
+          "value": 2.99,
           "status": "A"
         },
         {
           "date": "2024-11-01",
-          "value": 3.086,
+          "value": 3.09,
           "status": "A"
         },
         {
           "date": "2024-12-01",
-          "value": 3.0164,
+          "value": 3.01,
           "status": "A"
         },
         {
           "date": "2025-01-01",
-          "value": 3.3141,
+          "value": 3.32,
           "status": "A"
         },
         {
           "date": "2025-02-01",
-          "value": 3.1526,
+          "value": 3.15,
           "status": "A"
         },
         {
           "date": "2025-03-01",
-          "value": 3.4784,
+          "value": 3.43,
           "status": "A"
         },
         {
           "date": "2025-04-01",
-          "value": 3.2953,
+          "value": 3.26,
           "status": "A"
         },
         {
           "date": "2025-05-01",
-          "value": 3.2606,
+          "value": 3.26,
           "status": "A"
         },
         {
           "date": "2025-06-01",
-          "value": 3.2362,
+          "value": 3.24,
           "status": "A"
         },
         {
           "date": "2025-07-01",
-          "value": 3.3472,
+          "value": 3.36,
           "status": "A"
         },
         {
           "date": "2025-08-01",
-          "value": 3.4056,
+          "value": 3.42,
           "status": "A"
         },
         {
           "date": "2025-09-01",
-          "value": 3.5172,
+          "value": 3.51,
           "status": "A"
         },
         {
           "date": "2025-10-01",
-          "value": 3.4377,
+          "value": 3.44,
           "status": "A"
         },
         {
           "date": "2025-11-01",
-          "value": 3.4386,
+          "value": 3.44,
           "status": "A"
         },
         {
           "date": "2025-12-01",
-          "value": 3.5542,
+          "value": 3.56,
           "status": "A"
         },
         {
           "date": "2026-01-01",
-          "value": 3.5028,
+          "value": 3.53,
           "status": "A"
         },
         {
           "date": "2026-02-01",
-          "value": 3.3535,
+          "value": 3.4,
           "status": "A"
         },
         {
           "date": "2026-03-01",
-          "value": 3.6011,
+          "value": 3.64,
           "status": "A"
         },
         {
           "date": "2026-04-01",
-          "value": 3.6749,
+          "value": 3.73,
           "status": "A"
         },
         {
           "date": "2026-05-01",
-          "value": 3.7416,
+          "value": 3.74,
           "status": "A"
         },
         {
           "date": "2026-06-01",
-          "value": 3.671,
+          "value": 3.68,
           "status": "A"
         },
         {
           "date": "2026-07-01",
-          "value": 3.8853,
+          "value": 3.85,
           "status": "A"
         },
         {
           "date": "2026-08-01",
-          "value": 4.0314,
+          "value": 4.0,
           "status": "A"
         },
         {
           "date": "2026-09-01",
-          "value": 4.4771,
+          "value": 4.44,
           "status": "A"
         }
       ],
@@ -1733,7 +1750,7 @@
       "national": {},
       "latest": {
         "date": "2026-09-01",
-        "value": 4.4771,
+        "value": 4.44,
         "status": "A"
       },
       "latest_frequency": "OECD monthly average",
@@ -1748,87 +1765,87 @@
       "monthly": [
         {
           "date": "2021-10-01",
-          "value": 0.955,
+          "value": 0.95487,
           "status": "A"
         },
         {
           "date": "2021-11-01",
-          "value": 1.01,
+          "value": 1.00969,
           "status": "A"
         },
         {
           "date": "2021-12-01",
-          "value": 1.047,
+          "value": 1.04735,
           "status": "A"
         },
         {
           "date": "2022-01-01",
-          "value": 1.346,
+          "value": 1.34641,
           "status": "A"
         },
         {
           "date": "2022-02-01",
-          "value": 1.794,
+          "value": 1.79367,
           "status": "A"
         },
         {
           "date": "2022-03-01",
-          "value": 1.854,
+          "value": 1.85382,
           "status": "A"
         },
         {
           "date": "2022-04-01",
-          "value": 2.436,
+          "value": 2.4356,
           "status": "A"
         },
         {
           "date": "2022-05-01",
-          "value": 2.99,
+          "value": 2.98982,
           "status": "A"
         },
         {
           "date": "2022-06-01",
-          "value": 3.635,
+          "value": 3.6347,
           "status": "A"
         },
         {
           "date": "2022-07-01",
-          "value": 3.359,
+          "value": 3.35879,
           "status": "A"
         },
         {
           "date": "2022-08-01",
-          "value": 3.297,
+          "value": 3.29713,
           "status": "A"
         },
         {
           "date": "2022-09-01",
-          "value": 4.138,
+          "value": 4.13844,
           "status": "A"
         },
         {
           "date": "2022-10-01",
-          "value": 4.532,
+          "value": 4.53227,
           "status": "A"
         },
         {
           "date": "2022-11-01",
-          "value": 4.243,
+          "value": 4.24251,
           "status": "A"
         },
         {
           "date": "2022-12-01",
-          "value": 4.257,
+          "value": 4.25657,
           "status": "A"
         },
         {
           "date": "2023-01-01",
-          "value": 4.243,
+          "value": 4.24279,
           "status": "A"
         },
         {
           "date": "2023-02-01",
-          "value": 4.27,
+          "value": 4.27004,
           "status": "A"
         },
         {
@@ -1838,172 +1855,172 @@
         },
         {
           "date": "2023-04-01",
-          "value": 4.234,
+          "value": 4.23356,
           "status": "A"
         },
         {
           "date": "2023-05-01",
-          "value": 4.313,
+          "value": 4.31267,
           "status": "A"
         },
         {
           "date": "2023-06-01",
-          "value": 4.074,
+          "value": 4.07441,
           "status": "A"
         },
         {
           "date": "2023-07-01",
-          "value": 4.157,
+          "value": 4.15721,
           "status": "A"
         },
         {
           "date": "2023-08-01",
-          "value": 4.221,
+          "value": 4.22104,
           "status": "A"
         },
         {
           "date": "2023-09-01",
-          "value": 4.513,
+          "value": 4.51295,
           "status": "A"
         },
         {
           "date": "2023-10-01",
-          "value": 4.885,
+          "value": 4.88505,
           "status": "A"
         },
         {
           "date": "2023-11-01",
-          "value": 4.428,
+          "value": 4.42761,
           "status": "A"
         },
         {
           "date": "2023-12-01",
-          "value": 3.821,
+          "value": 3.82082,
           "status": "A"
         },
         {
           "date": "2024-01-01",
-          "value": 3.811,
+          "value": 3.81113,
           "status": "A"
         },
         {
           "date": "2024-02-01",
-          "value": 3.872,
+          "value": 3.87207,
           "status": "A"
         },
         {
           "date": "2024-03-01",
-          "value": 3.696,
+          "value": 3.69579,
           "status": "A"
         },
         {
           "date": "2024-04-01",
-          "value": 3.856,
+          "value": 3.85564,
           "status": "A"
         },
         {
           "date": "2024-05-01",
-          "value": 3.844,
+          "value": 3.84382,
           "status": "A"
         },
         {
           "date": "2024-06-01",
-          "value": 3.942,
+          "value": 3.94189,
           "status": "A"
         },
         {
           "date": "2024-07-01",
-          "value": 3.83,
+          "value": 3.83015,
           "status": "A"
         },
         {
           "date": "2024-08-01",
-          "value": 3.682,
+          "value": 3.68199,
           "status": "A"
         },
         {
           "date": "2024-09-01",
-          "value": 3.565,
+          "value": 3.56547,
           "status": "A"
         },
         {
           "date": "2024-10-01",
-          "value": 3.501,
+          "value": 3.50106,
           "status": "A"
         },
         {
           "date": "2024-11-01",
-          "value": 3.569,
+          "value": 3.56886,
           "status": "A"
         },
         {
           "date": "2024-12-01",
-          "value": 3.321,
+          "value": 3.32087,
           "status": "A"
         },
         {
           "date": "2025-01-01",
-          "value": 3.676,
+          "value": 3.67594,
           "status": "A"
         },
         {
           "date": "2025-02-01",
-          "value": 3.575,
+          "value": 3.57541,
           "status": "A"
         },
         {
           "date": "2025-03-01",
-          "value": 3.887,
+          "value": 3.88713,
           "status": "A"
         },
         {
           "date": "2025-04-01",
-          "value": 3.712,
+          "value": 3.71151,
           "status": "A"
         },
         {
           "date": "2025-05-01",
-          "value": 3.629,
+          "value": 3.62922,
           "status": "A"
         },
         {
           "date": "2025-06-01",
-          "value": 3.501,
+          "value": 3.50068,
           "status": "A"
         },
         {
           "date": "2025-07-01",
-          "value": 3.537,
+          "value": 3.53735,
           "status": "A"
         },
         {
           "date": "2025-08-01",
-          "value": 3.538,
+          "value": 3.53833,
           "status": "A"
         },
         {
           "date": "2025-09-01",
-          "value": 3.559,
+          "value": 3.55866,
           "status": "A"
         },
         {
           "date": "2025-10-01",
-          "value": 3.442,
+          "value": 3.44212,
           "status": "A"
         },
         {
           "date": "2025-11-01",
-          "value": 3.459,
+          "value": 3.45927,
           "status": "A"
         },
         {
           "date": "2025-12-01",
-          "value": 3.552,
+          "value": 3.55156,
           "status": "A"
         },
         {
           "date": "2026-01-01",
-          "value": 3.492,
+          "value": 3.49242,
           "status": "A"
         },
         {
@@ -2013,40 +2030,45 @@
         },
         {
           "date": "2026-03-01",
-          "value": 3.733,
+          "value": 3.73337,
           "status": "A"
         },
         {
           "date": "2026-04-01",
-          "value": 3.818,
+          "value": 3.8182,
           "status": "A"
         },
         {
           "date": "2026-05-01",
-          "value": 3.839,
+          "value": 3.83912,
           "status": "A"
         },
         {
           "date": "2026-06-01",
-          "value": 3.734,
+          "value": 3.73443,
           "status": "A"
         },
         {
           "date": "2026-07-01",
-          "value": 3.881,
+          "value": 3.88074,
           "status": "A"
         },
         {
           "date": "2026-08-01",
-          "value": 3.986,
+          "value": 3.98598,
+          "status": "A"
+        },
+        {
+          "date": "2026-09-01",
+          "value": 4.3622,
           "status": "A"
         }
       ],
       "weekly": [],
       "national": {},
       "latest": {
-        "date": "2026-08-01",
-        "value": 3.986,
+        "date": "2026-09-01",
+        "value": 4.3622,
         "status": "A"
       },
       "latest_frequency": "OECD monthly average",
@@ -2390,19 +2412,23 @@
           "value": 4.14
         },
         {
-          "date": "2026-10-15",
-          "value": 4.02
+          "date": "2026-10-16",
+          "value": 4.01
+        },
+        {
+          "date": "2026-10-22",
+          "value": 4.07
         }
       ],
       "national": {
         "source": "ESP national official source",
         "url": "https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/uoi_sindi.csv",
         "yield_type": "10-year secondary-market government yield",
-        "retrieved_at": "2026-10-19T18:46:24.562756+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027811+00:00"
       },
       "latest": {
-        "date": "2026-10-15",
-        "value": 4.02
+        "date": "2026-10-22",
+        "value": 4.07
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -2747,17 +2773,21 @@
         {
           "date": "2026-10-16",
           "value": 3.162
+        },
+        {
+          "date": "2026-10-23",
+          "value": 3.112
         }
       ],
       "national": {
         "source": "SWE national official source",
-        "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-09-04",
+        "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-09-11",
         "yield_type": "10-year government benchmark",
-        "retrieved_at": "2026-10-19T18:46:24.562705+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027769+00:00"
       },
       "latest": {
-        "date": "2026-10-16",
-        "value": 3.162
+        "date": "2026-10-23",
+        "value": 3.112
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -3082,17 +3112,21 @@
         {
           "date": "2026-10-19",
           "value": 0.577
+        },
+        {
+          "date": "2026-10-26",
+          "value": 0.526
         }
       ],
       "national": {
         "source": "CHE national official source",
         "url": "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates",
         "yield_type": "10-year fitted spot",
-        "retrieved_at": "2026-10-19T18:46:24.562800+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027846+00:00"
       },
       "latest": {
-        "date": "2026-10-19",
-        "value": 0.577
+        "date": "2026-10-26",
+        "value": 0.526
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -3321,7 +3355,7 @@
         },
         {
           "date": "2025-05-01",
-          "value": 4.0091,
+          "value": 4.059077,
           "status": "A"
         },
         {
@@ -3401,7 +3435,12 @@
         },
         {
           "date": "2026-09-01",
-          "value": 4.405809,
+          "value": 4.409318,
+          "status": "A"
+        },
+        {
+          "date": "2026-10-01",
+          "value": 4.46875,
           "status": "A"
         }
       ],
@@ -3437,17 +3476,21 @@
         {
           "date": "2026-10-16",
           "value": 4.542
+        },
+        {
+          "date": "2026-10-23",
+          "value": 4.472
         }
       ],
       "national": {
         "source": "NOR national official source",
         "url": "https://data.norges-bank.no/api/data/GOVT_GENERIC_RATES/all",
         "yield_type": "10-year generic government bond mid-yield",
-        "retrieved_at": "2026-10-19T18:46:24.562787+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027837+00:00"
       },
       "latest": {
-        "date": "2026-10-16",
-        "value": 4.542
+        "date": "2026-10-23",
+        "value": 4.472
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -5131,7 +5174,7 @@
         "collection_mode": "Manually refreshed DBIE workbook",
         "workbook": "50 Macroeconomic Indicators.xlsx",
         "sha256": "4389f9fff51a6ac40315a804b6a39e6b0701a7d5ff87cbe5c565340ae1f1a914",
-        "retrieved_at": "2026-10-19T18:46:24.563046+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.028072+00:00"
       },
       "latest": {
         "date": "2026-09-25",
@@ -5480,17 +5523,21 @@
         {
           "date": "2026-10-16",
           "value": 2.958
+        },
+        {
+          "date": "2026-10-23",
+          "value": 2.837
         }
       ],
       "national": {
         "source": "JPN national official source",
         "url": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
         "yield_type": "10-year JGB",
-        "retrieved_at": "2026-10-19T18:46:24.562677+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027745+00:00"
       },
       "latest": {
-        "date": "2026-10-16",
-        "value": 2.958
+        "date": "2026-10-23",
+        "value": 2.837
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -5817,19 +5864,23 @@
           "value": 4.182
         },
         {
-          "date": "2026-10-19",
-          "value": 4.205
+          "date": "2026-10-23",
+          "value": 4.097
+        },
+        {
+          "date": "2026-10-26",
+          "value": 4.074
         }
       ],
       "national": {
         "source": "KOR national official source",
         "url": "https://ecos.bok.or.kr/api/",
         "yield_type": "10-year Treasury benchmark",
-        "retrieved_at": "2026-10-19T18:46:24.562721+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027782+00:00"
       },
       "latest": {
-        "date": "2026-10-19",
-        "value": 4.205
+        "date": "2026-10-26",
+        "value": 4.074
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -7076,19 +7127,23 @@
           "value": 5.331
         },
         {
-          "date": "2026-10-14",
-          "value": 5.314
+          "date": "2026-10-16",
+          "value": 5.229
+        },
+        {
+          "date": "2026-10-21",
+          "value": 5.277
         }
       ],
       "national": {
         "source": "AUS national official source",
         "url": "https://www.rba.gov.au/statistics/tables/csv/f2-data.csv",
         "yield_type": "10-year nominal government yield, interpolated maturity",
-        "retrieved_at": "2026-10-19T18:46:24.562821+00:00"
+        "retrieved_at": "2026-10-26T18:44:31.027862+00:00"
       },
       "latest": {
-        "date": "2026-10-14",
-        "value": 5.314
+        "date": "2026-10-21",
+        "value": 5.277
       },
       "latest_frequency": "National weekly observation",
       "stale": false,
@@ -7736,47 +7791,47 @@
   "sources": [
     {
       "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.STES,DSD_STES@DF_FINMARK,/USA+CAN+GBR+DEU+FRA+ITA+ESP+SWE+CHE+NOR+POL+IND+JPN+KOR+COL+CHL+MEX+AUS+NZL+ZAF.M.IRLT.PA.....?startPeriod=2021-10&format=csvfile",
-      "sha256": "3b25713c73b753ac7d2d0e9d69e74400b35d9b6b8354d5539528c6482e41d85c",
-      "retrieved_at": "2026-10-19T18:45:49.454928+00:00"
+      "sha256": "74f25848df5058d59cff75240474ebcaa87283dc3e02873b59ae810c28c4d0a4",
+      "retrieved_at": "2026-10-26T18:43:55.890449+00:00"
     },
     {
-      "url": "https://www.bankofcanada.ca/valet/observations/BD.CDN.10YR.DQ.YLD/json?start_date=2026-09-04",
-      "sha256": "0019c49f3e8a70ef14577a21d71dcac4b913508730e366ad2ca77f23dbc27130",
-      "retrieved_at": "2026-10-19T18:45:49.911392+00:00"
+      "url": "https://www.bankofcanada.ca/valet/observations/BD.CDN.10YR.DQ.YLD/json?start_date=2026-09-11",
+      "sha256": "ce289a76a6d163b7e82150999c9f37fd0ffc262b554984480ef8925f3e0ccefe",
+      "retrieved_at": "2026-10-26T18:43:56.543522+00:00"
     },
     {
-      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-09-04",
-      "sha256": "3a553e1f1ea0c7533cccf21eeeab89a0ac05d9d24da1583b82f749b7f23357d0",
-      "retrieved_at": "2026-10-19T18:45:50.028541+00:00"
-    },
-    {
-      "url": "https://data.norges-bank.no/api/data/GOVT_GENERIC_RATES/all?format=csv&startPeriod=2026-09-04",
-      "sha256": "a000ac09eefbc30c92ef85bc8416c130b86fbb0b373b609f00d29b8087cc75c7",
-      "retrieved_at": "2026-10-19T18:45:50.539959+00:00"
-    },
-    {
-      "url": "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates",
-      "sha256": "102c289a94f8cfff0e1d24a2483fc443b12badb6a737adaa9868793e2be51488",
-      "retrieved_at": "2026-10-19T18:45:51.060048+00:00"
-    },
-    {
-      "url": "https://www.rba.gov.au/statistics/tables/csv/f2-data.csv",
-      "sha256": "7377ae254cd9581f05300fc088fdc3a11a022485e350a3131fa0a573c9ae0136",
-      "retrieved_at": "2026-10-19T18:45:51.422773+00:00"
+      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-09-11",
+      "sha256": "4b42cfb36ccf0b7defeba75450dda49eea5c51223a805104e402a2c938aa3bd1",
+      "retrieved_at": "2026-10-26T18:43:56.851566+00:00"
     },
     {
       "url": "https://ecos.bok.or.kr/api/",
-      "sha256": "64dc403c827b7a35b1d931afbaba3bd67035cbed3b2e39a1fce30079ad95e0bc",
-      "retrieved_at": "2026-10-19T18:45:51.728180+00:00"
+      "sha256": "b1fc5fbc7c1fb63723f37b09af7e05511f062bd207e2a8d67632e8c0376baac4",
+      "retrieved_at": "2026-10-26T18:43:57.153625+00:00"
+    },
+    {
+      "url": "https://data.norges-bank.no/api/data/GOVT_GENERIC_RATES/all?format=csv&startPeriod=2026-09-11",
+      "sha256": "d5e3d0f625e1a5f7b37407baa5ee2ee052523eeb4bd05a2fcab2c2dcd7ccea4b",
+      "retrieved_at": "2026-10-26T18:43:57.553284+00:00"
+    },
+    {
+      "url": "https://www.rba.gov.au/statistics/tables/csv/f2-data.csv",
+      "sha256": "42a1425bae014c8a4d10e81a73e351d24f6e3ac13e5492d3ab5f7aefb5d0d942",
+      "retrieved_at": "2026-10-26T18:43:57.592273+00:00"
+    },
+    {
+      "url": "https://www.snb.ch/en/the-snb/mandates-goals/statistics/statistics-pub/current_interest_exchange_rates",
+      "sha256": "8611ebd73399aa2e291674d07943d4df70df5192b5aaf4300fb0f4e5eb7258bc",
+      "retrieved_at": "2026-10-26T18:43:57.715094+00:00"
     },
     {
       "url": "https://www.bde.es/webbe/es/estadisticas/compartido/datos/csv/uoi_sindi.csv",
-      "sha256": "d2ba64779759257f5e1c51a1fe082891df2e45153d394f732b43002279ace5bc",
-      "retrieved_at": "2026-10-19T18:45:52.359428+00:00"
+      "sha256": "1e616ed6e380ca4dabc43a615d39bc9dbfbdb8a05a1084a06d58f8457ea0388e",
+      "retrieved_at": "2026-10-26T18:44:00.142028+00:00"
     }
   ],
   "issues": [
     "USA: National refresh failed: ReadTimeout"
   ],
-  "monthly_retrieved_at": "2026-10-19T18:45:49.485109+00:00"
+  "monthly_retrieved_at": "2026-10-26T18:43:55.911503+00:00"
 }
