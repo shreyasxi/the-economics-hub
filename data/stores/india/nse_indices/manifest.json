@@ -3,12 +3,12 @@
   "source_url": "https://www.niftyindices.com/reports/historical-data",
   "index_variant": "price return; excludes dividends",
   "requested_start": "2016-10-04",
-  "requested_end": "2026-10-23",
+  "requested_end": "2026-10-25",
   "base_date": "2016-10-04",
   "last_date": "2026-10-23",
   "matched_dates": 2492,
   "unmatched_dates": [],
-  "imported_at": "2026-10-24T12:25:23.123122+00:00",
+  "imported_at": "2026-10-26T13:26:20.354752+00:00",
   "sources": [
     {
       "role": "smallcap",
@@ -822,14 +822,10 @@
     }
   ],
   "refresh": {
-    "started_at": "2026-10-24T12:25:15.057842+00:00",
-    "requested_start": "2026-10-02",
-    "requested_end": "2026-10-23",
+    "started_at": "2026-10-26T13:26:13.764246+00:00",
+    "requested_start": "2026-10-09",
+    "requested_end": "2026-10-25",
     "received_dates": [
-      "2026-10-05",
-      "2026-10-06",
-      "2026-10-07",
-      "2026-10-08",
       "2026-10-09",
       "2026-10-12",
       "2026-10-13",
@@ -842,14 +838,13 @@
       "2026-10-23"
     ],
     "unavailable_dates": [
-      "2026-10-02",
-      "2026-10-03",
-      "2026-10-04",
       "2026-10-10",
       "2026-10-11",
       "2026-10-17",
       "2026-10-18",
-      "2026-10-20"
+      "2026-10-20",
+      "2026-10-24",
+      "2026-10-25"
     ],
     "status": "validated_with_unavailable_reports",
     "unresolved_report_dates": [
@@ -864,7 +859,9 @@
       "2026-10-11",
       "2026-10-17",
       "2026-10-18",
-      "2026-10-20"
+      "2026-10-20",
+      "2026-10-24",
+      "2026-10-25"
     ]
   },
   "signal_path": "signals/196ae71b23c78df460b7b3bed4fad12aa1496a7f83e8e5e5895ce38d08c9c465.csv",
