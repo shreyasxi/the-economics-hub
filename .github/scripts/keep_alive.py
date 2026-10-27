@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-APP_URL = "https://weekly-macro-dashboard.streamlit.app/"
+APP_URL = "https://monetaria.streamlit.app/"
 PAGE_LOAD_TIMEOUT = 90   # seconds to wait for initial page response
 WAKE_BTN_TIMEOUT = 30    # seconds to check for the hibernation prompt
 RENDER_TIMEOUT = 60      # seconds to wait for Streamlit content after wake
