@@ -1,0 +1,158 @@
+{
+ "generated_at": "2026-10-28 11:13 UTC",
+ "reads": {
+  "count": 28,
+  "first": "2026-10-21 14:06 UTC"
+ },
+ "headlines": {
+  "from": "2026-10-21",
+  "to": "2026-10-28",
+  "world": {
+   "items": [
+    {
+     "title": "Australia’s inflation rate rises to 4.3%, fuelling fears of fifth interest rate hike this year",
+     "url": "https://www.theguardian.com/australia-news/2026/oct/28/inflation-rate-australia-2026-number-data-consumer-price-index-cpi-release",
+     "publisher": "The Guardian",
+     "date": "2026-10-28",
+     "theme": "Central banks",
+     "also": [
+      "BBC News",
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 7
+    },
+    {
+     "title": "White House lifts tariffs on some Canadian goods as midterm elections loom",
+     "url": "https://www.bbc.co.uk/news/articles/c60qk573yzz8o?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-10-24",
+     "theme": "Trade & tariffs",
+     "also": [
+      "CNBC",
+      "Financial Times"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Brent crude oil tops $116, a six-month high, as tensions swell in the Middle East",
+     "url": "https://www.cnbc.com/2026/10/23/oil-price-brent-wti-iran-war-saudi-arabia.html",
+     "publisher": "CNBC",
+     "date": "2026-10-23",
+     "theme": "Energy & commodities",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Meta’s deal to keep Zuckerberg in California adds fuel to wealth tax debate ahead of election",
+     "url": "https://www.cnbc.com/2026/10/22/meta-mark-zuckerberg-california-billionaire-tax.html",
+     "publisher": "CNBC",
+     "date": "2026-10-22",
+     "theme": "Public finances",
+     "also": [
+      "BBC News",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Barclays cutting 5,000 jobs as it increases reliance on AI",
+     "url": "https://www.bbc.co.uk/news/articles/cm4g1p347qgxo?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-10-22",
+     "theme": "Growth & jobs",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Indian shares on track for muted open as oil concerns persist, Fed in focus",
+     "url": "https://www.livemint.com/market/stock-market-news/indian-shares-on-track-for-muted-open-as-oil-concerns-persist-fed-in-focus-11792981672692.html",
+     "publisher": "Mint",
+     "date": "2026-10-26",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "India's Mideast oil imports return to pre-war levels in September",
+     "url": "https://www.livemint.com/economy/indias-mideast-oil-imports-return-to-pre-war-levels-in-september-11792650907813.html",
+     "publisher": "Mint",
+     "date": "2026-10-22",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 2
+    },
+    {
+     "title": "Utssav CZ Gold Jewels approves 1:1 bonus issue, to double equity capital",
+     "url": "https://www.business-standard.com/markets/news/utssav-cz-gold-jewels-approves-1-1-bonus-issue-to-double-equity-capital-126102400806_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-24",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Nifty 50 Prediction for the week: Supports can cushion the fall",
+     "url": "https://www.thehindubusinessline.com/portfolio/technical-analysis/index-outlook-supports-can-cushion-the-fall/article71619385.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-10-24",
+     "theme": "Markets",
+     "also": [
+      "Mint"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Gold gains as oil slide cools some inflation concerns",
+     "url": "https://www.thehindubusinessline.com/markets/gold/gold-gains-as-oil-slide-cools-some-inflation-concerns/article71626429.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-10-26",
+     "theme": "Inflation",
+     "also": [
+      "Mint"
+     ],
+     "days": 3
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
