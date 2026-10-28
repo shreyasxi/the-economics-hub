@@ -1,5 +1,5 @@
 """Explicit snapshot preparation. No NSE/AMFI automated downloads or UI I/O."""
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import json
 import hashlib
 import os
@@ -102,7 +102,7 @@ def prepare():
         fx_availability_note='Scheduled weekly releases with federal-holiday adjustment; actual vintage-by-vintage release receipts are not available. Revised-history reference research, not a point-in-time execution strategy.',
         fx_convention='INR per USD; noon New York fixing, weekly public release',frequency='weekly',
         publication='Public Portfolio Lab snapshot',
-        files={str(p.relative_to(bundle)):digest(p) for p in bundle.rglob('*') if p.is_file()})
+        files={p.relative_to(bundle).as_posix():digest(p) for p in bundle.rglob('*') if p.is_file()})
     (bundle/'manifest.json').write_text(json.dumps(manifest,indent=2))
     load(bundle)
     temp=root/'CURRENT.tmp';temp.write_text(stamp);os.replace(str(temp),str(root/'CURRENT'))
@@ -118,11 +118,19 @@ def current():
     return root/name
 
 
+def manifest_path(name):
+    """Read legacy Windows receipts on Linux; write new receipts with POSIX paths."""
+    relative = PurePosixPath(name.replace('\\', '/'))
+    if relative.is_absolute() or PureWindowsPath(name).drive or '..' in relative.parts or not relative.parts:
+        raise ValueError('Invalid INR bundle file path')
+    return relative
+
+
 def load(bundle):
     bundle=Path(bundle);m=json.loads((bundle/'manifest.json').read_text())
     if m.get('schema')!=1:raise ValueError('Invalid INR source schema')
     for name,sha in m['files'].items():
-        if Path(name).is_absolute() or '..' in Path(name).parts or digest(bundle/name)!=sha:raise ValueError('INR bundle checksum mismatch')
+        if digest(bundle.joinpath(*manifest_path(name).parts))!=sha:raise ValueError('INR bundle checksum mismatch')
     if set(m['assets'])!=set(INDEX_IDS+list(ETFS)+FOREIGN):raise ValueError('Unapproved INR universe')
     for key,meta in m['assets'].items():
         expected_currency='USD' if key in FOREIGN else 'INR'

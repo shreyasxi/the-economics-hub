@@ -1,10 +1,12 @@
 """Publication gates and fast readers: archive work must stay off the app path."""
 import copy
+import ast
+import importlib
 import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from config.emerging_opportunity import SECTORS, EQUITY_SECTORS
 from data.processors import emerging_publication as research
@@ -90,6 +92,31 @@ class ResearchPublicationTests(unittest.TestCase):
 
 
 class CPIDisplayTests(unittest.TestCase):
+    def test_renderer_recovers_previous_release_module_after_streamlit_rerun(self):
+        source = (Path(__file__).parents[1]/'app.py').read_text(encoding='utf-8')
+        function = next(node for node in ast.parse(source).body
+                        if isinstance(node, ast.FunctionDef) and node.name == '_render_cpi_items')
+        for missing in ('DISPLAY_NAME', 'load_display'):
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as d:
+                root, output, expected = self.prepare(d)
+                ui = MagicMock()
+                ui.columns.return_value = [MagicMock(), MagicMock()]
+                namespace = {'Path': Path, 'st': ui}
+                exec(compile(ast.Module(body=[function], type_ignores=[]), 'app.py', 'exec'), namespace)
+                try:
+                    # The dependency is already imported, as in a live Streamlit
+                    # process; only app.py has picked up the new release.
+                    delattr(items, missing)
+                    with patch('data.paths.CPI_ITEMS_DIR', root):
+                        namespace['_render_cpi_items'](output)
+                    self.assertEqual(ui.image.call_count, 2)
+                    self.assertTrue(any(expected['title'] in call.args[0]
+                                        for call in ui.markdown.call_args_list))
+                    ui.warning.assert_not_called()
+                    ui.caption.assert_called_once_with(expected['source_line'])
+                finally:
+                    importlib.reload(items)
+
     def prepare(self, directory):
         root, output = Path(directory)/'source', Path(directory)/'edition'
         (root/'runs/fixture').mkdir(parents=True)

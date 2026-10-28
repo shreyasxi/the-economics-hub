@@ -2702,7 +2702,8 @@ def _scoreboard_html(snapshot: dict) -> str:
             return datetime.strptime(period, "%Y-%m").strftime("%b")
         day = datetime.strptime(period, "%Y-%m-%d")
         # A rate announced but not yet in force is dated by the day it takes effect.
-        return f"from {day:%-d %b}" if day.date() > date.today() else day.strftime("%-d %b")
+        label = f"{day.day} {day:%b}"
+        return f"from {label}" if day.date() > date.today() else label
 
     def cell_html(country: str, column: str, cell: dict) -> str:
         title = f' title="{cell.get("source", "")}"'
@@ -4603,6 +4604,11 @@ def _render_india_equity_matrix(folder: Path) -> None:
 def _render_cpi_items(folder: Path) -> None:
     from html import escape
     from data.processors import cpi_items
+    # Streamlit can rerun app.py after a pull while retaining imported modules
+    # from the previous release. Refresh this dependency before using its new API.
+    if not hasattr(cpi_items, 'DISPLAY_NAME') or not hasattr(cpi_items, 'load_display'):
+        from importlib import reload
+        cpi_items = reload(cpi_items)
     NAME = cpi_items.DISPLAY_NAME
     path = folder / (NAME + '.json')
     if not path.exists():

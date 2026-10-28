@@ -34,3 +34,22 @@ jobs:
         run: pip check
       - name: Run repository tests
         run: python -m pytest tests -q
+
+  cloud-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+      - name: Install application and test dependencies
+        run: pip install -r requirements.txt pytest
+      - name: Verify the published release on the Streamlit Cloud runtime
+        run: python -m portfolio_lab.deployment --validate
+      - name: Render dashboard pages and test deployment regressions
+        run: python -m pytest tests/test_app_page_smoke.py tests/test_india_display.py tests/test_portfolio_deployment.py tests/test_portfolio_india_ui.py -q

@@ -10,6 +10,32 @@ import pytest
 from portfolio_lab.deployment import active_root, install, publish
 
 
+@pytest.mark.parametrize('name', ['raw/GILT5YBEES.NS.csv', r'raw\GILT5YBEES.NS.csv'])
+def test_india_receipts_resolve_windows_and_linux_paths_identically(name):
+    from data.fetchers.portfolio_india import manifest_path
+    assert manifest_path(name).parts == ('raw', 'GILT5YBEES.NS.csv')
+    assert manifest_path(name).as_posix() == 'raw/GILT5YBEES.NS.csv'
+
+
+@pytest.mark.parametrize('name', ['../escape', r'raw\..\escape', '/absolute',
+                                  r'C:\escape', 'C:escape', r'\\host\share\escape', ''])
+def test_india_receipts_reject_unsafe_paths_on_every_platform(name):
+    from data.fetchers.portfolio_india import manifest_path
+    with pytest.raises(ValueError, match='file path'):
+        manifest_path(name)
+
+
+def test_published_india_manifest_uses_portable_paths():
+    from data.paths import PUBLIC_PORTFOLIO_DIR
+    root = PUBLIC_PORTFOLIO_DIR / 'india'
+    bundle = root / (root / 'CURRENT').read_text().strip()
+    manifest = json.loads((bundle / 'manifest.json').read_text())
+    assert manifest['files']
+    assert all('\\' not in name for name in manifest['files'])
+    for name, digest in manifest['files'].items():
+        assert hashlib.sha256((bundle / name).read_bytes()).hexdigest() == digest
+
+
 def package(tmp_path, members=None):
     members = members or {'CURRENT': 'global', 'global/manifest.json': '{}',
                           'macro/CURRENT': 'macro', 'india/CURRENT': 'india'}
