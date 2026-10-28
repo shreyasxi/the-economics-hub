@@ -1,6 +1,6 @@
 {
-  "run_id": "20261026T132439825320Z-3e3d8daf",
-  "fetched_at": "2026-10-26T13:24:39.825494+00:00",
+  "run_id": "20261028T113338047762Z-07b1d954",
+  "fetched_at": "2026-10-28T11:33:38.047953+00:00",
   "status": "accepted",
   "sources": [
     {
@@ -14,16 +14,22 @@
         "Format": "JSON"
       },
       "role": "General IIP published growth",
-      "sha256": "932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
-      "raw": "raw/932f45d770f024a92aa812ed713f1921a7aaf11cb0b8321a446575745ed3a0af",
-      "retrieved_at": "2026-10-26T13:24:42.310315+00:00"
+      "sha256": "2db7f88b94c95b0a86d732d539da5c1f9bd1ddb8c861531a5fbc73312cb32705",
+      "raw": "raw/2db7f88b94c95b0a86d732d539da5c1f9bd1ddb8c861531a5fbc73312cb32705",
+      "retrieved_at": "2026-10-28T11:33:40.460188+00:00"
     }
   ],
   "base_year": "2022-23",
   "concept": "General",
   "measure": "published growth_rate (% YoY)",
   "earliest": "2023-04",
-  "latest": "2026-08",
-  "count": 41,
-  "revisions": []
+  "latest": "2026-09",
+  "count": 42,
+  "revisions": [
+    {
+      "month": "2026-08",
+      "before": 8.0,
+      "after": 7.8
+    }
+  ]
 }

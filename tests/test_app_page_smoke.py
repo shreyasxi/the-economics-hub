@@ -1,5 +1,6 @@
 """Render complete public dashboard pages against the checked-in artifacts."""
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from streamlit.testing.v1 import AppTest
@@ -19,7 +20,9 @@ def test_dashboard_page_renders_without_runtime_errors(page, tmp_path):
                             f'_substack_posts = lambda *_: ([], None)\npage_{page}()')
     script = tmp_path / 'app.py'
     script.write_text(source, encoding='utf-8')
-    app = AppTest.from_file(script, default_timeout=60).run()
+    # Deployment has no developer output/ directory. Read only committed assets.
+    with patch('charts.loader._get_base_dirs', return_value=[root / 'assets']):
+        app = AppTest.from_file(script, default_timeout=60).run()
     assert not app.exception, [item.message for item in app.exception]
     assert not app.error, [item.value for item in app.error]
     if page == 'india':
