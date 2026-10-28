@@ -44,3 +44,7 @@ tests/fixtures/emerging_opportunity/*.gz binary
 
 # Portfolio releases contain byte-level manifests; preserve producer bytes on every OS.
 data/published/portfolio_lab/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve checksum-verified NSDL responses on Windows and macOS.
+data/stores/india/nsdl_fpi/sources/** -text -whitespace
+tests/fixtures/nsdl_fpi/*.gz binary

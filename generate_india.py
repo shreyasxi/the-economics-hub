@@ -1706,8 +1706,8 @@ def fpi_series(df):
     """
     Canonical published FPI series.
 
-    Completed months come only from NSDL net investment, manually entered
-    in Rs crore. RBI DBIE portfolio investment remains in the database for
+    Completed months come from the official NSDL collector in Rs crore,
+    with the manual CLI retained for recovery. RBI DBIE remains available for
     reference but is never substituted into this chart.
     """
     return {
@@ -1724,7 +1724,7 @@ def fpi_series(df):
     }
 
 
-def chart_fpi_flows(df, output_dir):
+def chart_fpi_flows(df, output_dir, today=None):
     """
     NSDL monthly FPI flows.
 
@@ -1734,6 +1734,9 @@ def chart_fpi_flows(df, output_dir):
     """
     series = fpi_series(df)
     col = series["col"]
+    from zoneinfo import ZoneInfo
+    today = pd.Timestamp(today or datetime.now(ZoneInfo("Asia/Kolkata")).date())
+    current_period = today.to_period("M")
 
     has_completed = (
         col in df.columns
@@ -1758,7 +1761,7 @@ def chart_fpi_flows(df, output_dir):
     # Last 24 completed NSDL months.
     if has_completed:
         df_completed = (
-            df.dropna(subset=[col])
+            df.loc[df["date"].dt.to_period("M") < current_period].dropna(subset=[col])
             .tail(24)
             .copy()
         )
@@ -1776,8 +1779,9 @@ def chart_fpi_flows(df, output_dir):
 
         # Defensive check: stored MTD date must belong to the same month row.
         mtd_candidates = mtd_candidates[
-            mtd_candidates["date"].dt.to_period("M")
-            == mtd_candidates["india_fpi_mtd_asof"].dt.to_period("M")
+            (mtd_candidates["date"].dt.to_period("M") == current_period)
+            & (mtd_candidates["india_fpi_mtd_asof"].dt.to_period("M") == current_period)
+            & (mtd_candidates["india_fpi_mtd_asof"] <= today)
         ]
 
         if not mtd_candidates.empty:
@@ -1800,6 +1804,10 @@ def chart_fpi_flows(df, output_dir):
 
             if not completed_same_month:
                 mtd_row = candidate
+
+    if df_completed.empty and mtd_row is None:
+        print("   ⚠ Skipping FPI Flows — no eligible NSDL observations")
+        return None
 
     fig, ax = EconStyle.create_figure(size="wide")
 

@@ -3084,16 +3084,102 @@ def _search_index() -> list[dict]:
     return index
 
 
-# The scroll that puts a chart on screen, used both by the search box and by a
-# ?chart= link someone has kept. The page is still being built when it starts,
-# so it waits for the chart's anchor to appear; the page then keeps growing as
-# the charts above it load, so it holds the position until the layout settles.
-# A reader who scrolls takes over at once.
-#
-# Streamlit scrolls a container of its own rather than the window, so the offset
-# is worked out against that container and not against the document.
+# Section links appear before their destinations during a streamed page build.
+# Install one parent-document listener before rendering: remember the latest
+# click, wait for its target, and follow image layout changes until settled.
+# Manual input, page navigation, or chart search releases the pending jump.
+_SECTION_JUMP_JS = r"""
+(() => {
+  const outer = window.parent, doc = outer.document;
+  if (outer.__ehSectionJumpCleanup) outer.__ehSectionJumpCleanup();
+  let timer = null, pending = null;
+  const cancel = () => {
+    if (timer !== null) outer.clearInterval(timer);
+    timer = null;
+    if (pending) pending.link.removeAttribute("aria-busy");
+    pending = null;
+  };
+  const tick = () => {
+    if (!pending) return;
+    const now = outer.Date.now();
+    if (outer.location.pathname !== pending.path || now - pending.started > 120000) {
+      cancel(); return;
+    }
+    const target = doc.getElementById(pending.id);
+    const main = doc.querySelector('[data-testid="stMain"]');
+    if (!target || !main) return;
+    const position = target.getBoundingClientRect().top - main.getBoundingClientRect().top
+                     + main.scrollTop - 72;
+    // Reserve room for the fixed header; clamp near the bottom of a short page.
+    const top = Math.max(0, Math.min(position, main.scrollHeight - main.clientHeight));
+    if (pending.top === null || Math.abs(top - pending.top) > 1) {
+      pending.top = top;
+      pending.settled = now;
+    }
+    // Explicit instant scrolling also overrides the page's smooth-scroll CSS.
+    if (Math.abs(main.scrollTop - top) > 1) main.scrollTo({top, behavior: "instant"});
+    const loadingAbove = Array.from(main.querySelectorAll("img")).some((img) =>
+      !img.complete && Boolean(img.compareDocumentPosition(target) & 4));
+    if (!loadingAbove && now - pending.settled >= 1500) cancel();
+  };
+  const start = (link, updateURL) => {
+    const href = link.getAttribute("href");
+    if (!href || !/^#[a-z0-9-]+$/.test(href)) return;
+    cancel();
+    pending = {id: href.slice(1), link, path: outer.location.pathname,
+               started: outer.Date.now(), settled: outer.Date.now(), top: null};
+    link.setAttribute("aria-busy", "true");
+    if (updateURL && outer.location.hash !== href) {
+      const url = new URL(outer.location.href);
+      url.hash = href;
+      outer.history.pushState(null, "", url);
+    }
+    timer = outer.setInterval(tick, 100);
+    tick();
+  };
+  const onClick = (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey
+        || event.shiftKey || event.altKey) return;
+    const link = event.target.closest && event.target.closest('.tab-jump a[href^="#"]');
+    if (!link) return;
+    event.preventDefault();
+    start(link, true);
+  };
+  const onKey = (event) => {
+    if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Escape"].includes(event.key)) cancel();
+  };
+  const onPointer = (event) => {
+    if (!event.target.closest || !event.target.closest('.tab-jump a[href^="#"]')) cancel();
+  };
+  doc.addEventListener("click", onClick, true);
+  doc.addEventListener("wheel", cancel, {passive: true, capture: true});
+  doc.addEventListener("touchstart", cancel, {passive: true, capture: true});
+  doc.addEventListener("keydown", onKey, true);
+  doc.addEventListener("pointerdown", onPointer, true);
+  // Cancel immediately when another page is chosen, including before its URL updates.
+  const onPageClick = (event) => {
+    if (event.target.closest && event.target.closest('[class*="st-key-ehnav-"] a')) cancel();
+  };
+  doc.addEventListener("click", onPageClick, true);
+  outer.__ehSectionJumpCancel = cancel;
+  outer.__ehSectionJumpCleanup = () => {
+    cancel();
+    doc.removeEventListener("click", onClick, true);
+    doc.removeEventListener("click", onPageClick, true);
+    doc.removeEventListener("wheel", cancel, true);
+    doc.removeEventListener("touchstart", cancel, true);
+    doc.removeEventListener("keydown", onKey, true);
+    doc.removeEventListener("pointerdown", onPointer, true);
+  };
+})();
+"""
+
+
+# Chart-search scrolling also waits for its anchor and subsequent image layout.
+# Streamlit scrolls its own container, so offsets are relative to stMain.
 _SCROLL_JS = r"""
 function ehScrollToChart(outer, slug) {
+  if (outer.__ehSectionJumpCancel) outer.__ehSectionJumpCancel();
   const doc = outer.document, id = "chart-" + slug;
   const box = () => doc.querySelector('[data-testid="stMain"]');
   const place = () => {
@@ -4517,20 +4603,13 @@ def _render_india_equity_matrix(folder: Path) -> None:
 def _render_cpi_items(folder: Path) -> None:
     from html import escape
     from data.processors import cpi_items
-    from charts.india_charts.india_cpi_items import NAME
+    NAME = cpi_items.DISPLAY_NAME
     path = folder / (NAME + '.json')
     if not path.exists():
         st.caption('CPI item price pressures are unavailable: a validated official item snapshot is required.')
         return
     try:
-        data = json.loads(path.read_text())
-        rows, manifest = cpi_items.load_current()
-        expected = cpi_items.snapshot(rows)
-        if data['run_id'] != manifest['run_id'] or any(data[k] != v for k, v in expected.items()):
-            raise ValueError('CPI item edition differs from validated snapshot')
-        panels = [folder / f'{NAME}_{side}.png' for side in ('increases', 'declines')]
-        if not all(p.exists() for p in panels):
-            raise ValueError('Missing item panel')
+        data, panels = cpi_items.load_display(folder)
         st.markdown('<style>.cpi-items-heading{margin:24px 0 8px;font-family:Newsreader,Georgia,serif;'
                     'font-size:28px;line-height:1.2;font-weight:600;color:#28251f;'
                     'text-decoration:none;}'
@@ -5587,6 +5666,9 @@ for page in PAGES:
 if current.url_path not in (ABOUT_PAGE.url_path, RBI_ARCHIVE_PAGE.url_path, "rbi-sentinel", "portfolio-lab"):
     with st.container(key="ehsearch"):
         components.html(_search_box_html(), height=_SEARCH_BOX_HEIGHT)
+
+# Install delegated jump handling before the page emits its section links or targets.
+components.html("<script>" + _SECTION_JUMP_JS + "</script>", height=0)
 
 current.run()
 

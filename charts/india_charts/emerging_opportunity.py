@@ -7,8 +7,9 @@ import pandas as pd
 import altair as alt
 import streamlit as st
 
-from data.processors.emerging_opportunity import load, flow_metrics, company_panel
-from config.emerging_opportunity import SECTORS, EQUITY_SECTORS, AI_PAGE, sector_store
+from data.processors.emerging_opportunity import flow_metrics, company_panel
+from data.processors.emerging_publication import read_manifest, load_sector
+from config.emerging_opportunity import SECTORS, EQUITY_SECTORS, AI_PAGE
 
 INK, BLUE, ORANGE, RED = '#0A1F3D', '#1F5596', '#C8620A', '#9B1C31'
 
@@ -37,7 +38,12 @@ def _key(data, name):
 def render():
     st.markdown('Identify sectors attracting foreign money, then rank their stocks by quarterly changes in DII, FPI, mutual fund and insurer ownership. '
                 'Covers 22 equity sectors and AI Catalysts, with stock coverage drawn from verified index constituents.')
-    rows = _sector_rows()
+    try:
+        folder, publication = read_manifest()
+        rows = publication['ranking']
+    except (OSError, ValueError, KeyError, TypeError):
+        st.warning('Institutional research is unavailable: the published snapshot could not be verified.')
+        return
     order = st.radio('Rank sectors by', ['Six-month net buying', 'Latest fortnight', 'Buying relative to holdings'],
                      horizontal=True, key='eo-sector-ranking')
     column = {'Six-month net buying': 'Six-month net (₹ cr)', 'Latest fortnight': 'Latest fortnight (₹ cr)',
@@ -53,7 +59,7 @@ def render():
     sector = st.selectbox('Sector or theme', options, format_func=lambda name: labels.get(name, name + ' · theme' if name == 'AI Catalysts' else name),
                           key='eo-active-sector')
     try:
-        data = load(sector=sector)
+        data = load_sector(sector, folder, publication)
     except (OSError, ValueError, KeyError, TypeError):
         st.warning(f'{sector} research is unavailable: the source archive or snapshot failed validation.')
         return
@@ -86,31 +92,6 @@ def render():
             _companies(data)
         with tabs[2]:
             _sources(data)
-
-
-def _sector_rows():
-    rows = []
-    for name in EQUITY_SECTORS:
-        path = sector_store(name) / 'snapshot.json'
-        if not path.exists():
-            continue
-        try:
-            other = _validated_snapshot(name, path.stat().st_mtime_ns)
-            m = flow_metrics(other)
-            latest = other['flows'][-1] if other['flows'] else {}
-            opening = other['flows'][0].get('opening_equity_auc_cr') if other['flows'] else None
-            rows.append({'Sector': name, 'Six-month net (₹ cr)': m['net_cr'] if m['complete'] else None,
-                         'Net / opening FPI holdings (%)': 100 * m['net_cr'] / opening if m['complete'] and opening else None,
-                         'Latest fortnight (₹ cr)': latest.get('equity_flow_cr'),
-                         'Buying streak (fortnights)': m['current_streak'], 'Cutoff': other.get('flows_as_of') or other['as_of']})
-        except (OSError, ValueError, KeyError, TypeError):
-            continue
-    return rows
-
-
-@st.cache_data(show_spinner=False)
-def _validated_snapshot(sector, modified):
-    return load(sector=sector)
 
 
 def _flows(data, metrics):

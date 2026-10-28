@@ -381,8 +381,10 @@ class Collector:
 def validate_datasets(sectors):
     from data.processors.emerging_opportunity import load, flow_metrics
     flow_cutoffs = set()
+    datasets = {}
     for sector in sectors:
         data = load(sector=sector)
+        datasets[sector] = data
         if not data['companies'] or any(f['stage'] == 'universe' for f in data['failures']):
             raise ValueError('Incomplete constituent sources: ' + sector)
         if sector in EQUITY_SECTORS:
@@ -396,6 +398,7 @@ def validate_datasets(sectors):
               'filings:', sum(len(c['holdings']) for c in data['companies']), 'source gaps:', len(data['failures']), flush=True)
     if len(flow_cutoffs) > 1:
         raise ValueError('Sector FPI cutoffs differ; refusing to publish mismatched rankings')
+    return datasets
 
 
 def main():

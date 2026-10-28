@@ -9,6 +9,7 @@ from data.paths import CPI_ITEMS_DIR
 
 ROOT = CPI_ITEMS_DIR
 TITLE = 'Where Are India’s Biggest Price Pressures?'
+DISPLAY_NAME = '06b_india_cpi_items'
 
 
 def normalize(raw, retrieval_id):
@@ -140,3 +141,70 @@ def load_current(root=ROOT, ready=True):
         cpi.require(source_rows.get((r['source_retrieval'],r['month_key'],r['item_code'])) ==
                     {k:r[k] for k in cpi.FIELDS}, 'item differs from official source')
     return rows, manifest
+
+
+def _display_source(root):
+    """Small identity/readiness checks, never an archive replay."""
+    root = Path(root)
+    pointer = json.loads((root/'current.json').read_text())
+    run_id = pointer['run_id']
+    cpi.require(isinstance(run_id, str) and re.fullmatch(r'[a-zA-Z0-9_-]+', run_id), 'unsafe item run identity')
+    attempt = json.loads((root/'last_attempt.json').read_text())
+    cpi.require(attempt['status'] == 'success' and attempt['run_id'] == run_id, 'item refresh not ready')
+    blob = (root/'runs'/run_id/'manifest.json').read_bytes()
+    cpi.require(cpi.sha(blob) == pointer['manifest_sha256'], 'item manifest checksum mismatch')
+    manifest = json.loads(blob)
+    cpi.require(manifest['run_id'] == run_id, 'item manifest identity mismatch')
+    return pointer, manifest
+
+
+def seal_display(folder, manifest, root=ROOT):
+    """Called by chart generation only after load_current's full source audit."""
+    from data.fetchers.mospi_cpi import atomic_json
+    folder = Path(folder)
+    pointer, current = _display_source(root)
+    cpi.require(manifest == current, 'item source changed while generating panels')
+    names = [DISPLAY_NAME+'.json'] + [f'{DISPLAY_NAME}_{side}.png' for side in ('increases', 'declines')]
+    atomic_json(folder/(DISPLAY_NAME+'.display.json'), dict(
+        schema_version=1, run_id=manifest['run_id'], source_manifest_sha256=pointer['manifest_sha256'],
+        files={name: cpi.sha((folder/name).read_bytes()) for name in names}))
+
+
+def load_display(folder, root=ROOT):
+    """Verify published metadata and images without loading canonical observations."""
+    folder = Path(folder)
+    receipt = json.loads((folder/(DISPLAY_NAME+'.display.json')).read_text())
+    pointer, manifest = _display_source(root)
+    cpi.require(receipt['schema_version'] == 1 and receipt['run_id'] == pointer['run_id'] and
+                receipt['source_manifest_sha256'] == pointer['manifest_sha256'], 'item display source mismatch')
+    names = [DISPLAY_NAME+'.json'] + [f'{DISPLAY_NAME}_{side}.png' for side in ('increases', 'declines')]
+    cpi.require(set(receipt['files']) == set(names), 'incomplete item display publication')
+    blobs = {}
+    for name in names:
+        blobs[name] = (folder/name).read_bytes()
+        cpi.require(cpi.sha(blobs[name]) == receipt['files'][name], 'item display checksum mismatch')
+    data = json.loads(blobs[names[0]])
+    cpi.require(data['run_id'] == pointer['run_id'] and data['latest_month'] == manifest['latest_month'] and
+                data['coverage_start'] == manifest['coverage_start'] and data['base_year'] == '2024' and
+                data['series'] == 'Current', 'item display identity mismatch')
+    return data, [folder/name for name in names[1:]]
+
+
+def publish_existing_display(folder, root=ROOT):
+    """Bootstrap an existing edition, auditing sources and matching its metadata."""
+    folder = Path(folder)
+    rows, manifest = load_current(root)
+    expected = dict(snapshot(rows), run_id=manifest['run_id'], coverage_start=manifest['coverage_start'],
+                    base_year='2024', series='Current')
+    actual = json.loads((folder/(DISPLAY_NAME+'.json')).read_bytes())
+    cpi.require(actual == expected, 'existing item panels belong to a different snapshot')
+    seal_display(folder, manifest, root)
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Audit and publish existing CPI item display files')
+    parser.add_argument('--publish-display', required=True, type=Path)
+    args = parser.parse_args()
+    publish_existing_display(args.publish_display)
+    print('Published CPI item display:', args.publish_display)

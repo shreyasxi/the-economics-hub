@@ -9,7 +9,7 @@ from charts.style import EconStyle
 from data.processors import cpi_items as items, cpi_contributions as cpi
 from data.fetchers.mospi_cpi import atomic_json
 
-NAME = '06b_india_cpi_items'
+NAME = items.DISPLAY_NAME
 BACKGROUND = '#FFFFF0'  # Existing Streamlit page ivory, app.py.
 
 
@@ -59,7 +59,8 @@ def generate(output_dir, root=items.ROOT):
     output_dir = Path(output_dir); output_dir.mkdir(parents=True,exist_ok=True)
     paths = [output_dir/f'{NAME}_{side}.png' for side in ('increases','declines')]
     metadata = output_dir/(NAME+'.json')
-    for path in paths+[metadata]: path.unlink(missing_ok=True)
+    receipt = output_dir/(NAME+'.display.json')
+    for path in paths+[metadata, receipt]: path.unlink(missing_ok=True)
     try:
         if os.environ.get('CPI_ITEMS_UPDATE_FAILED') == 'true':
             raise ValueError('Saturday CPI item refresh failed')
@@ -72,8 +73,9 @@ def generate(output_dir, root=items.ROOT):
             plt.close(fig)
         atomic_json(metadata, dict(data,run_id=manifest['run_id'], coverage_start=manifest['coverage_start'],
                                    base_year='2024', series='Current'))
+        items.seal_display(output_dir, manifest, root)
         return paths
     except (ValueError, OSError, KeyError, TypeError) as exc:
-        for path in paths+[metadata]: path.unlink(missing_ok=True)
+        for path in paths+[metadata, receipt]: path.unlink(missing_ok=True)
         logging.warning('CPI ITEM MOVERS OMITTED: %s', exc)
         return []

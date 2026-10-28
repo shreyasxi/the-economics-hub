@@ -207,6 +207,7 @@ jobs:
           MPLBACKEND: Agg
         run: |
           python -m unittest discover -s tests -p 'test_cpi_items.py'
+          python -m unittest discover -s tests -p 'test_india_display.py'
           python -m unittest discover -s tests -p 'test_rbi_external.py'
           python -m unittest discover -s tests -p 'test_india_source_workflow.py'
 
@@ -240,6 +241,25 @@ jobs:
       - name: Warn about external vulnerability refresh failure
         if: ${{ steps.rbi-vulnerability.outcome == 'failure' }}
         run: echo "::warning title=External vulnerability refresh failed::Publishing validated stored observations with their original dates when available. See the failed refresh step for details."
+
+      - name: Test official NSDL FPI contracts
+        env:
+          MPLBACKEND: Agg
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_nsdl_fpi.py'
+
+      - name: Refresh official NSDL monthly and MTD FPI flows
+        id: nsdl-fpi
+        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nsdl_fpi
+
+      - name: Report NSDL FPI source failure
+        if: ${{ steps.nsdl-fpi.outcome == 'failure' }}
+        run: echo "::warning title=NSDL FPI refresh failed::Keeping validated FPI observations with their original dates. See the failed refresh step for details."
 
       - name: Generate India charts
         # CPI is optional, but failed refreshes must omit its chart.
@@ -313,9 +333,9 @@ jobs:
               rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
             fi
           done
-          rm -f "assets/india/$MONTH_FOLDER/06b_india_cpi_items.json" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png"
-          if [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" ]; then
-            cp "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" "assets/india/$MONTH_FOLDER/"
+          rm -f "assets/india/$MONTH_FOLDER/06b_india_cpi_items.json" "assets/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png"
+          if [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" ]; then
+            cp "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" "output/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" "assets/india/$MONTH_FOLDER/"
           fi
           # Publish the heatmap and leader metrics together; clear an omitted edition.
           rm -f "assets/india/$MONTH_FOLDER/india_equity_matrix.json"
@@ -381,7 +401,7 @@ jobs:
             git add "$EQUITY_TRI"
           fi
           # A skipped optional source may never create its directory.
-          SOURCE_DIRS=$(python -m data.paths --relative CPI_CONTRIBUTIONS_DIR CPI_MAIN_DIR CPI_ITEMS_DIR NSE_ROTATION_DIR GVA_DIR IIP_DIR)
+          SOURCE_DIRS=$(python -m data.paths --relative CPI_CONTRIBUTIONS_DIR CPI_MAIN_DIR CPI_ITEMS_DIR NSE_ROTATION_DIR GVA_DIR IIP_DIR NSDL_FPI_DIR)
           while IFS= read -r SOURCE_DIR; do
             if [ -d "$SOURCE_DIR" ]; then
               git add -A "$SOURCE_DIR"

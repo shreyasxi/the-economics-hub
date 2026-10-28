@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS india_monthly (
     india_trade_deficit_usd_bn REAL,            -- Trade deficit USD bn (derived)
     india_fpi_flows         REAL,               -- RBI net portfolio investment USD bn (DBIE; fallback)
 
-    -- MANUAL: NSDL
+    -- AUTO: official NSDL (manual CLI remains a recovery fallback)
     india_fpi_net_inr_cr    REAL,               -- Completed month, ₹ crore
     india_fpi_mtd_inr_cr    REAL,               -- Current-month MTD, ₹ crore
     india_fpi_mtd_asof      TEXT,               -- MTD observation date, YYYY-MM-DD
@@ -137,6 +137,77 @@ def init_db() -> None:
 
 
 # ── india_monthly ──────────────────────────────────────────────────────────────
+
+def apply_nsdl_fpi(observations: dict, run_id: str, receipt: dict, *, db=DB_PATH) -> None:
+    """Adopt an NSDL batch atomically, auditing replacements and preserving other data."""
+    from datetime import date
+    from decimal import Decimal
+    import math
+    import re
+
+    checked_on = date.fromisoformat(receipt["checked_on"])
+    current = checked_on.strftime("%Y-%m")
+    changes = {}
+    for month, value in observations["completed"].items():
+        if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", month) or month >= current:
+            raise ValueError("NSDL completed observation must be a past calendar month")
+        changes[month] = {"india_fpi_net_inr_cr": float(Decimal(value)),
+                          "india_fpi_mtd_inr_cr": None, "india_fpi_mtd_asof": None}
+    mtd = observations.get("mtd")
+    if mtd:
+        asof = date.fromisoformat(mtd["asof"])
+        if mtd["month"] != current or asof.strftime("%Y-%m") != current or asof > checked_on:
+            raise ValueError("NSDL MTD must belong to the current reporting month")
+        changes[current] = {"india_fpi_mtd_inr_cr": float(Decimal(mtd["value"])),
+                            "india_fpi_mtd_asof": mtd["asof"]}
+    if not changes or any(not math.isfinite(v) for fields in changes.values() for v in fields.values() if isinstance(v, float)):
+        raise ValueError("Empty or non-finite NSDL observations")
+    if not Path(db).is_file():
+        raise FileNotFoundError(f"India database does not exist: {db}")
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    try:
+        with conn:
+            conn.execute("BEGIN IMMEDIATE")
+            ensure_columns(conn)
+            conn.execute("""CREATE TABLE IF NOT EXISTS india_fpi_audit (
+                id INTEGER PRIMARY KEY, month TEXT NOT NULL, run_id TEXT NOT NULL,
+                previous_json TEXT NOT NULL, adopted_json TEXT NOT NULL,
+                receipt_json TEXT NOT NULL, recorded_at TEXT DEFAULT (datetime('now'))
+            )""")
+            for month, fields in sorted(changes.items()):
+                row = conn.execute("SELECT * FROM india_monthly WHERE month=?", (month,)).fetchone()
+                previous = dict(row) if row else {}
+                flags = json.loads(previous.get("source_flags") or "{}")
+                if not isinstance(flags, dict):
+                    raise ValueError("Invalid existing source flags")
+                if "india_fpi_net_inr_cr" not in fields:
+                    if previous.get("india_fpi_net_inr_cr") is not None:
+                        raise ValueError("Current month already has a final value; review before adopting MTD")
+                    if (previous.get("india_fpi_mtd_asof") or "") > fields["india_fpi_mtd_asof"]:
+                        raise ValueError("NSDL MTD reporting date would move backwards")
+                if row and all(previous.get(k) == v for k, v in fields.items()) and all(
+                    str(flags.get(k, "")).startswith("nsdl:auto:") for k, v in fields.items() if v is not None
+                ):
+                    continue
+                old = {k: previous.get(k) for k in fields}
+                old["source_flags"] = dict(flags)
+                for key, value in fields.items():
+                    if value is None:
+                        flags.pop(key, None)
+                    else:
+                        flags[key] = f"nsdl:auto:{run_id}"
+                adopted = {**fields, "source_flags": flags}
+                conn.execute("INSERT INTO india_fpi_audit(month,run_id,previous_json,adopted_json,receipt_json) VALUES(?,?,?,?,?)",
+                             (month, run_id, json.dumps(old), json.dumps(adopted), json.dumps(receipt)))
+                columns = ["month", *fields, "source_flags"]
+                updates = ",".join(f"{key}=excluded.{key}" for key in columns[1:])
+                conn.execute(f"INSERT INTO india_monthly ({','.join(columns)}) VALUES ({','.join('?' for _ in columns)}) "
+                             f"ON CONFLICT(month) DO UPDATE SET {updates}",
+                             [month, *fields.values(), json.dumps(flags)])
+    finally:
+        conn.close()
+
 
 def upsert_monthly(month: str, data: dict) -> None:
     """

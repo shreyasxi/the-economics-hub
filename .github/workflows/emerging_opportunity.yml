@@ -26,11 +26,13 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - name: Test release handling and ownership retention
-        run: python -m unittest discover -s tests -p 'test_emerging_opportunity.py'
+        run: |
+          python -m unittest discover -s tests -p 'test_emerging_opportunity.py'
+          python -m unittest discover -s tests -p 'test_india_display.py'
       - name: Check released FPI fortnights and refresh quarterly ownership
         run: python -m data.fetchers.emerging_opportunity --refresh --latest-flows --sector all
-      - name: Verify source archive and normalized snapshot
-        run: python -m data.fetchers.emerging_opportunity --validate-only --sector all
+      - name: Audit sources and prepare verified display release
+        run: python -m data.processors.emerging_publication
       - name: Publish research data
         env:
           TARGET_BRANCH: ${{ github.ref_name }}
@@ -38,6 +40,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add data/stores/india/emerging_opportunity/
+          git add data/published/india_research/
           if git diff --staged --quiet; then exit 0; fi
           git commit -m 'chore: refresh emerging-sector research'
           git pull --rebase origin "$TARGET_BRANCH"

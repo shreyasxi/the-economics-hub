@@ -123,13 +123,24 @@ class Ranking(unittest.TestCase):
 
     def test_generation_both_panels_and_failure_removes_assets(self):
         with tempfile.TemporaryDirectory() as d:
+            root = Path(d)/'source'
+            manifest = dict(run_id='x', coverage_start='2026-08', latest_month='2026-08')
+            (root/'runs/x').mkdir(parents=True)
+            blob = cpi.encoded(manifest)
+            (root/'runs/x/manifest.json').write_bytes(blob)
+            (root/'current.json').write_text(json.dumps(dict(run_id='x',manifest_sha256=cpi.sha(blob))))
+            (root/'last_attempt.json').write_text(json.dumps(dict(status='success',run_id='x')))
+            output = Path(d)/'edition'
             for values in ([1,-2], [1,2], [-2], [0,None]):
-                with patch.object(items,'load_current',return_value=(normalized(values),dict(run_id='x',coverage_start='2026-08'))):
-                    self.assertEqual(len(chart.generate(d)),2)
-                    self.assertEqual(len(list(Path(d).glob('*.png'))),2)
+                with patch.object(items,'load_current',return_value=(normalized(values),manifest)):
+                    self.assertEqual(len(chart.generate(output, root)),2)
+                    self.assertEqual(len(list(output.glob('*.png'))),2)
+                    data, panels = items.load_display(output, root)
+                    self.assertEqual(data['valid_count'], items.snapshot(normalized(values))['valid_count'])
+                    self.assertEqual(len(panels),2)
             with patch.object(items,'load_current',side_effect=ValueError('failed source')):
-                self.assertEqual(chart.generate(d),[])
-                self.assertEqual(list(Path(d).iterdir()),[])
+                self.assertEqual(chart.generate(output, root),[])
+                self.assertEqual(list(output.iterdir()),[])
 
     def test_failed_refresh_preserves_pointer_and_closes_gate(self):
         with tempfile.TemporaryDirectory() as d:

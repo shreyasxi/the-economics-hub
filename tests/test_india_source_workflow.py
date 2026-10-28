@@ -13,7 +13,7 @@ from tests.test_mospi_activity_workflow import copy_script
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / '.github/workflows/india.yml'
 CPI_FILES = ('06b_india_cpi_items.json', '06b_india_cpi_items_increases.png',
-             '06b_india_cpi_items_declines.png')
+             '06b_india_cpi_items_declines.png', '06b_india_cpi_items.display.json')
 EXTERNAL_FILES = ('30_india_reer.png', '31_india_external_vulnerability.png')
 
 

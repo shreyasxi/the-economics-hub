@@ -25,6 +25,7 @@ DBIE_WORKBOOK = DATA_DIR / "50 Macroeconomic Indicators.xlsx"
 INDIA_MANUAL_CSV = DATA_DIR / "india_manual.csv"
 
 INDIA_DB = INDIA_STORE_DIR / "india_macro.db"
+NSDL_FPI_DIR = INDIA_STORE_DIR / "nsdl_fpi"
 CAG_WORKBOOK = INPUTS_DIR / "cag/cag_monthly_accounts.xlsx"
 CAG_MANUAL_CSV = INPUTS_DIR / "cag/cag_manual_accounts.csv"
 INDIA_TRADE_RELEASES = INDIA_STORE_DIR / "india_trade_releases.json"
