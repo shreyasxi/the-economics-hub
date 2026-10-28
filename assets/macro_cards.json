@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-28T11:14:20.522690+00:00",
+  "generated_at": "2026-10-28T11:41:27.677488+00:00",
   "editions": {
     "weekly": "assets/weekly/2026-10-28",
     "macro": "assets/macro/2026-10",
@@ -329,7 +329,9 @@
       }
     }
   },
-  "refresh_errors": {},
+  "refresh_errors": {
+    "india_activity": "FileNotFoundError"
+  },
   "commodity_inputs": {
     "as_of": "2026-10-23",
     "rows": {
