@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Media, Entertainment & Publication",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-17T12:31:06.261110+00:00",
-  "window_start": "2026-03-31",
+  "collected_at": "2026-10-28T08:14:26.977274+00:00",
+  "window_start": "2026-04-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-09-30",
+  "flows_as_of": "2026-10-15",
   "flows_checked_through": "2026-10-15",
   "universe_scope": "Media, Entertainment & Publication members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-04-15",
-      "start": "2026-04-01",
-      "equity_flow_cr": -59.0,
-      "equity_flow_usd_m": -6.0,
-      "end_equity_auc_cr": 10355.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "opening_equity_auc_cr": 9458.0,
-      "flow_pct_opening_auc": -0.6238105307676042
-    },
     {
       "date": "2026-04-30",
       "start": "2026-04-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": 31.0,
       "equity_flow_usd_m": 3.0,
       "end_equity_auc_cr": 10616.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
       "opening_equity_auc_cr": 10037.0,
       "flow_pct_opening_auc": 0.3088572282554548
+    },
+    {
+      "date": "2026-10-15",
+      "start": "2026-10-01",
+      "equity_flow_cr": 252.0,
+      "equity_flow_usd_m": 27.0,
+      "end_equity_auc_cr": 11084.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "opening_equity_auc_cr": 10616.0,
+      "flow_pct_opening_auc": 2.373775433308214
     }
   ],
   "companies": [
@@ -210,6 +210,21 @@
           "insurance_pct": 0.054911526546700395,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1724573_16092026032612_WEB.xml",
           "filed_at": "18-SEP-2026 12:04:35"
+        },
+        {
+          "symbol": "NAZARA",
+          "quarter": "2026-09-30",
+          "fpi_shares": 58291023,
+          "total_shares": 384696024,
+          "fpi_pct": 15.152489072775028,
+          "dii_shares": 11764817,
+          "dii_pct": 3.0582112280942106,
+          "mf_shares": 7856784,
+          "mf_pct": 2.04233563900832,
+          "insurance_shares": 0,
+          "insurance_pct": 0.0,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743114_21102026050339_WEB.xml",
+          "filed_at": "21-OCT-2026 17:03:47"
         }
       ],
       "reference_price": 392.85
@@ -372,6 +387,21 @@
           "insurance_pct": 0.0013983428442175226,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695128_17072026032906_WEB.xml",
           "filed_at": "17-JUL-2026 15:29:11"
+        },
+        {
+          "symbol": "PFOCUS",
+          "quarter": "2026-09-30",
+          "fpi_shares": 23154106,
+          "total_shares": 778773880,
+          "fpi_pct": 2.973148765595477,
+          "dii_shares": 8343342,
+          "dii_pct": 1.0713433275394393,
+          "mf_shares": 624697,
+          "mf_pct": 0.08021545355373244,
+          "insurance_shares": 75493,
+          "insurance_pct": 0.009693827943998328,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741760_19102026053815_WEB.xml",
+          "filed_at": "19-OCT-2026 17:38:21"
         }
       ],
       "reference_price": 316.0
@@ -724,8 +754,8 @@
           "mf_pct": 4.3278861244282565,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1737322_13102026102815_WEB.xml",
-          "filed_at": "13-OCT-2026 22:28:20"
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1744600_23102026034510_WEB.xml",
+          "filed_at": "23-OCT-2026 15:50:20"
         }
       ],
       "reference_price": 657.85
@@ -820,13 +850,7 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-10-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554338_20102025024243_WEB.xml",
@@ -847,6 +871,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1724573_16092026032612_WEB.xml",
       "file": "sources/NAZARA-2026-06-30.xml.gz",
       "sha256": "c165c4ad55ccc8e6fbd3f29148442033216d4d77cf3fe6442bebd354016c156f"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743114_21102026050339_WEB.xml",
+      "file": "sources/NAZARA-2026-09-30.xml.gz",
+      "sha256": "391b6002395fe181064cbfabc5de3b3bdaafb13c3c4afb4502ff134ecaef7c46"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552518_17102025062825_WEB.xml",
@@ -892,6 +921,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695128_17072026032906_WEB.xml",
       "file": "sources/PFOCUS-2026-06-30.xml.gz",
       "sha256": "00ab43b6518b5512f1d66c5a17889e35d6b8a1fb4d4f0d01709a0f4d0ac43a67"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741760_19102026053815_WEB.xml",
+      "file": "sources/PFOCUS-2026-09-30.xml.gz",
+      "sha256": "4d5ae5e4f0c160143cb8ba3d779f94fdc9e1557fd4d8d832f1648117fbf7d1c6"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550645_16102025060057_WEB.xml",
@@ -989,9 +1023,9 @@
       "sha256": "0fdbe16bfc6478faaf0e6ef1667a1bc6486f816e4d2896a8e6b281776ad56d3f"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1737322_13102026102815_WEB.xml",
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1744600_23102026034510_WEB.xml",
       "file": "sources/TIPSMUSIC-2026-09-30.xml.gz",
-      "sha256": "96c12096a44d6940ffd32ee63358b4d4cfdd214acae696d2b951d279e19e3bce"
+      "sha256": "0137741680502b23fb1f9c9edc72fd23cf86eb7fb624ca19d761970b9984cefa"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1551850_17102025035419_WEB.xml",
@@ -1021,7 +1055,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NAZARA",
       "file": "sources/filings-NAZARA.json",
-      "sha256": "9244252932dce7bafe7b69725fd983f7a829f0225cfdfd0ecb10ecce2f222241"
+      "sha256": "5cd7faafc284bea3c03d6c0af13d0be001b1bb760610c6e7a838b8aed2ff0598"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NETWORK18",
@@ -1031,7 +1065,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PFOCUS",
       "file": "sources/filings-PFOCUS.json",
-      "sha256": "78c94dee3e59f38a7ea69b78a75b9ef18c13205f1d84c84e77cb12301bad5028"
+      "sha256": "af39677ed1c0caa1446d98bfb87cedd8c820e56be6d51b6019024741b5ce9e45"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PVRINOX",
@@ -1051,7 +1085,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TIPSMUSIC",
       "file": "sources/filings-TIPSMUSIC.json",
-      "sha256": "cb6f6486b126d054894ca8c64f0ba1c2f58524a9cb618d66a5836b5ab8316d38"
+      "sha256": "b1e26ce84c547e14ef180d1bc52ed2888f82b7b7993a121a478e252a69201af0"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ZEEL",
@@ -1061,12 +1095,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "974ff2493bbb8b7102efc5c282805a84bff3abf18ceb33e52961cdf5976116a5"
+      "sha256": "5f68c27931a5b24e28d5a85d37b0e6bdd36a3633403f85c81baeb1a97fbeac1f"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "692caee1b8e4fd11912c71e1c2519c4070e9675f9a0a9e6d40294cdf032890fc"
+      "sha256": "56cfae7b3ba1839fdf7f50395468b9f20bfbd68832a37043a3e4e27c92d5a07f"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -1101,7 +1135,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
       "file": "sources/nsdl-2026-10-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "03df04abcc0b2b2344fbd25c0d1146280c1dae9ea5cbeaaa0bcfbad4f9afa0d5"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -1109,5 +1143,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "a15802876991b52ba1e3f65ccc0b285a9ee89c62a8ad886208757549d102502d"
+  "digest": "68a042ad184a4ee8ae6981d053a5da4e06f1151ad245722131c2a1546abab5c1"
 }

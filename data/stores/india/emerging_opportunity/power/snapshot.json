@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Power",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-17T12:31:56.637661+00:00",
-  "window_start": "2026-03-31",
+  "collected_at": "2026-10-28T08:15:01.066594+00:00",
+  "window_start": "2026-04-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-09-30",
+  "flows_as_of": "2026-10-15",
   "flows_checked_through": "2026-10-15",
   "universe_scope": "Power members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-04-15",
-      "start": "2026-04-01",
-      "equity_flow_cr": 601.0,
-      "equity_flow_usd_m": 64.0,
-      "end_equity_auc_cr": 267860.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "opening_equity_auc_cr": 237583.0,
-      "flow_pct_opening_auc": 0.2529642272384809
-    },
     {
       "date": "2026-04-30",
       "start": "2026-04-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -570.0,
       "equity_flow_usd_m": -59.0,
       "end_equity_auc_cr": 242762.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
       "opening_equity_auc_cr": 245840.0,
       "flow_pct_opening_auc": -0.23185811910185486
+    },
+    {
+      "date": "2026-10-15",
+      "start": "2026-10-01",
+      "equity_flow_cr": -1732.0,
+      "equity_flow_usd_m": -182.0,
+      "end_equity_auc_cr": 235832.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "opening_equity_auc_cr": 242762.0,
+      "flow_pct_opening_auc": -0.7134559774594047
     }
   ],
   "companies": [
@@ -209,6 +209,21 @@
           "insurance_pct": 2.7238310997331214,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697407_20072026065935_WEB.xml",
           "filed_at": "20-JUL-2026 18:59:40"
+        },
+        {
+          "symbol": "ACMESOLAR",
+          "quarter": "2026-09-30",
+          "fpi_shares": 45531890,
+          "total_shares": 706874336,
+          "fpi_pct": 6.441299065637602,
+          "dii_shares": 123403161,
+          "dii_pct": 17.45758117323982,
+          "mf_shares": 105736883,
+          "mf_pct": 14.958370620488902,
+          "insurance_shares": 16768994,
+          "insurance_pct": 2.3722737049545395,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741955_19102026070634_WEB.xml",
+          "filed_at": "19-OCT-2026 19:06:41"
         }
       ],
       "reference_price": 439.0
@@ -604,6 +619,21 @@
           "insurance_pct": 4.826023710982865,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695700_17072026072335_WEB.xml",
           "filed_at": "17-JUL-2026 19:23:41"
+        },
+        {
+          "symbol": "CLEANMAX",
+          "quarter": "2026-09-30",
+          "fpi_shares": 16315486,
+          "total_shares": 117552200,
+          "fpi_pct": 13.879354023148865,
+          "dii_shares": 22851466,
+          "dii_pct": 19.4394201044302,
+          "mf_shares": 7279961,
+          "mf_pct": 6.192960233836542,
+          "insurance_shares": 7773549,
+          "insurance_pct": 6.61284858981797,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742065_19102026081910_WEB.xml",
+          "filed_at": "19-OCT-2026 20:19:17"
         }
       ],
       "reference_price": 1327.2
@@ -678,6 +708,21 @@
           "insurance_pct": 0.7534151003671007,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698307_21072026042751_WEB.xml",
           "filed_at": "21-JUL-2026 16:27:58"
+        },
+        {
+          "symbol": "GMRP&UI",
+          "quarter": "2026-09-30",
+          "fpi_shares": 28172338,
+          "total_shares": 781017529,
+          "fpi_pct": 3.6071326127687975,
+          "dii_shares": 43578931,
+          "dii_pct": 5.579763498496331,
+          "mf_shares": 792183,
+          "mf_pct": 0.10142960568558507,
+          "insurance_shares": 5884304,
+          "insurance_pct": 0.7534151003671007,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742948_21102026040615_WEB.xml",
+          "filed_at": "21-OCT-2026 16:06:22"
         }
       ],
       "reference_price": 105.38
@@ -751,6 +796,21 @@
           "insurance_pct": 1.1564534784648821,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1691416_13072026035716_WEB.xml",
           "filed_at": "13-JUL-2026 15:57:22"
+        },
+        {
+          "symbol": "JPPOWER",
+          "quarter": "2026-09-30",
+          "fpi_shares": 480266749,
+          "total_shares": 6853458827,
+          "fpi_pct": 7.007654983027448,
+          "dii_shares": 718979702,
+          "dii_pct": 10.490756859405002,
+          "mf_shares": 34233221,
+          "mf_pct": 0.4995028330094322,
+          "insurance_shares": 79520548,
+          "insurance_pct": 1.160298033552336,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742809_21102026030754_WEB.xml",
+          "filed_at": "21-OCT-2026 15:08:01"
         }
       ],
       "reference_price": 15.13
@@ -824,6 +884,21 @@
           "insurance_pct": 7.945078736754465,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1708681_05082026084803_WEB.xml",
           "filed_at": "07-AUG-2026 15:56:29"
+        },
+        {
+          "symbol": "JSWENERGY",
+          "quarter": "2026-09-30",
+          "fpi_shares": 200078816,
+          "total_shares": 1833482736,
+          "fpi_pct": 10.912500678162917,
+          "dii_shares": 306325972,
+          "dii_pct": 16.707327862180644,
+          "mf_shares": 138392764,
+          "mf_pct": 7.548081107211472,
+          "insurance_shares": 141755709,
+          "insurance_pct": 7.731499523647546,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743505_21102026074527_WEB.xml",
+          "filed_at": "21-OCT-2026 19:45:33"
         }
       ],
       "reference_price": 494.7
@@ -898,6 +973,21 @@
           "insurance_pct": 0.30302779198313035,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697473_20072026072833_WEB.xml",
           "filed_at": "20-JUL-2026 19:28:39"
+        },
+        {
+          "symbol": "KPIGREEN",
+          "quarter": "2026-09-30",
+          "fpi_shares": 14471160,
+          "total_shares": 197671968,
+          "fpi_pct": 7.3207952277785795,
+          "dii_shares": 1169470,
+          "dii_pct": 0.5916215697311215,
+          "mf_shares": 277002,
+          "mf_pct": 0.14013216077253807,
+          "insurance_shares": 454909,
+          "insurance_pct": 0.23013328829710442,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742008_19102026074038_WEB.xml",
+          "filed_at": "19-OCT-2026 19:40:44"
         }
       ],
       "reference_price": 358.95
@@ -1853,6 +1943,21 @@
           "insurance_pct": 7.461114804648334,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698230_21072026035332_WEB.xml",
           "filed_at": "21-JUL-2026 15:53:42"
+        },
+        {
+          "symbol": "TATAPOWER",
+          "quarter": "2026-09-30",
+          "fpi_shares": 323633751,
+          "total_shares": 3195339547,
+          "fpi_pct": 10.128305497418863,
+          "dii_shares": 590594638,
+          "dii_pct": 18.48300092409553,
+          "mf_shares": 279529668,
+          "mf_pct": 8.74804270057751,
+          "insurance_shares": 257270435,
+          "insurance_pct": 8.051427124279884,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742704_21102026020328_WEB.xml",
+          "filed_at": "21-OCT-2026 14:03:40"
         }
       ],
       "reference_price": 359.0
@@ -1926,6 +2031,21 @@
           "insurance_pct": 5.0350892253996316,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697887_21072026124035_WEB.xml",
           "filed_at": "21-JUL-2026 12:40:41"
+        },
+        {
+          "symbol": "TORNTPOWER",
+          "quarter": "2026-09-30",
+          "fpi_shares": 42134511,
+          "total_shares": 503903543,
+          "fpi_pct": 8.361622295638433,
+          "dii_shares": 114901414,
+          "dii_pct": 22.80226356733515,
+          "mf_shares": 80112718,
+          "mf_pct": 15.898423242481547,
+          "insurance_shares": 23273077,
+          "insurance_pct": 4.618557921113883,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743436_21102026070322_WEB.xml",
+          "filed_at": "21-OCT-2026 19:03:29"
         }
       ],
       "reference_price": 1245.9
@@ -1954,19 +2074,28 @@
           "insurance_pct": 5.120396162257407,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696163_18072026043611_WEB.xml",
           "filed_at": "18-JUL-2026 16:36:16"
+        },
+        {
+          "symbol": "VEDPOWER",
+          "quarter": "2026-09-30",
+          "fpi_shares": 265981655,
+          "total_shares": 3910388057,
+          "fpi_pct": 6.801924799352465,
+          "dii_shares": 418998193,
+          "dii_pct": 10.715002881873827,
+          "mf_shares": 126786419,
+          "mf_pct": 3.2422976224326168,
+          "insurance_shares": 184806026,
+          "insurance_pct": 4.726027783078409,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742537_21102026121042_WEB.xml",
+          "filed_at": "21-OCT-2026 12:10:49"
         }
       ],
       "reference_price": 32.84
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-10-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552940_17102025090755_WEB.xml",
@@ -1987,6 +2116,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697407_20072026065935_WEB.xml",
       "file": "sources/ACMESOLAR-2026-06-30.xml.gz",
       "sha256": "d815238c0d85b5e5d4a29abf44913c800d11ad4694d57a867b054cf75b33164a"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741955_19102026070634_WEB.xml",
+      "file": "sources/ACMESOLAR-2026-09-30.xml.gz",
+      "sha256": "b78b18996d97c775cf9ef3a775a9ed8da85f76c20a0b5f019f40a08027336a3f"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1544345_10102025034302_WEB.xml",
@@ -2099,6 +2233,11 @@
       "sha256": "7b25641cbc526ace6039e76bf85a42095d1bcd7a983dd8a7a8d6dd487559bdf4"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742065_19102026081910_WEB.xml",
+      "file": "sources/CLEANMAX-2026-09-30.xml.gz",
+      "sha256": "d25ba95d5fa6ff7309a68ad624c15a356677a932811035b03c1705769c0951cc"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1553801_18102025061855_WEB.xml",
       "file": "sources/GMRP&UI-2025-09-30.xml.gz",
       "sha256": "33d61352ba1ccd231d9c71a496ea548b5474e60180cb57a9d0b481d8a297f239"
@@ -2117,6 +2256,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698307_21072026042751_WEB.xml",
       "file": "sources/GMRP&UI-2026-06-30.xml.gz",
       "sha256": "e7db841a476740900b139a864aeb77ca9bcb1be22b5d6e21c5cfa267852f72b8"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742948_21102026040615_WEB.xml",
+      "file": "sources/GMRP&UI-2026-09-30.xml.gz",
+      "sha256": "a09f514b75388276a3276d81466e1623a88c821b91511685e68dc4a8735932d1"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1545063_11102025124355_WEB.xml",
@@ -2139,6 +2283,11 @@
       "sha256": "f9ba6f5587404ebf2429b2a41e88192001569f4fc6281b8c8f48f95cbf354243"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742809_21102026030754_WEB.xml",
+      "file": "sources/JPPOWER-2026-09-30.xml.gz",
+      "sha256": "73dbd4ea9c3827f7ebed7772da27314b34d107fe9acb2d0077985ba775cd3eaa"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554779_21102025025144_WEB.xml",
       "file": "sources/JSWENERGY-2025-09-30.xml.gz",
       "sha256": "93d0d9507389a71912092376ce94fd07bc1f295e8aaca1f02d1929313f76e963"
@@ -2159,6 +2308,11 @@
       "sha256": "0b7f605b4fbf5339369406e13d6d9cd2ed7ed3ba36f0f9ec9518fa7ed9ec2ce1"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743505_21102026074527_WEB.xml",
+      "file": "sources/JSWENERGY-2026-09-30.xml.gz",
+      "sha256": "9fc5f586efe08fe78b13c6c88a747966844316f3aa16cb40363d715cdfd1a066"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1550819_16102025065022_WEB.xml",
       "file": "sources/KPIGREEN-2025-09-30.xml.gz",
       "sha256": "5c7ff085269128c065c8d1c5ceca755219b327d2dbfd7c845eea8858cfc53602"
@@ -2177,6 +2331,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697473_20072026072833_WEB.xml",
       "file": "sources/KPIGREEN-2026-06-30.xml.gz",
       "sha256": "7785a50a9a01408ba06984dcbcf19a2120fa32efc9338c5014f96e9f288d9a67"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742008_19102026074038_WEB.xml",
+      "file": "sources/KPIGREEN-2026-09-30.xml.gz",
+      "sha256": "18d1ece05c80afc6295af985cf652ba1b1cd21d14d0ca56a4169319b962490d7"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548756_15102025031404_WEB.xml",
@@ -2449,6 +2608,11 @@
       "sha256": "8ee524d9af7ce41950bc7fbb73181a94f6366d2774a2ad77ad8019baa39bd84e"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742704_21102026020328_WEB.xml",
+      "file": "sources/TATAPOWER-2026-09-30.xml.gz",
+      "sha256": "da4f6e1ca4ecade7e253b1b20cf669b5b306d9f9b4d8ce837f33856d2a4613d2"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548083_14102025065535_WEB.xml",
       "file": "sources/TORNTPOWER-2025-09-30.xml.gz",
       "sha256": "39dff96ca9fb2c7207ee3944e2f2bd908b83fa50284ddc38765d55d50f458109"
@@ -2469,14 +2633,24 @@
       "sha256": "c4746abb7939785c6c97f9804a3f53453d5d2ff056c5c942c4002297e740b08b"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743436_21102026070322_WEB.xml",
+      "file": "sources/TORNTPOWER-2026-09-30.xml.gz",
+      "sha256": "e4a196d0515e9403bca912a8bec1dff8394113440f261e6b6642779ba48a00c5"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696163_18072026043611_WEB.xml",
       "file": "sources/VEDPOWER-2026-06-30.xml.gz",
       "sha256": "18415c577d5b15fa518e8b6bf852a4d9e52beec96a0e8a4f6a18842d550f600b"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742537_21102026121042_WEB.xml",
+      "file": "sources/VEDPOWER-2026-09-30.xml.gz",
+      "sha256": "fbef8aa5f6b7785a80c7afea569c3bfef33caa8a5fbd4e1df2eda7abbf209f5a"
+    },
+    {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ACMESOLAR",
       "file": "sources/filings-ACMESOLAR.json",
-      "sha256": "9476dbb027ab4a0fd348baa86a557bf9bff414b3dbccd25b1935f8b34ea360c5"
+      "sha256": "f8f931f4f4a926e585a3cd74c1552a021a8d1a6be9cee0865c80a552e64779d3"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ADANIENSOL",
@@ -2501,27 +2675,27 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CLEANMAX",
       "file": "sources/filings-CLEANMAX.json",
-      "sha256": "31e50bc4aa2e169c232205a6e93f8bb46c2077eaabb039a5ff2c2510de028ac2"
+      "sha256": "1360c997105f8ea57b3060ec5daa42c6edfc76ef1a183d2db5de8eaa4794f4ca"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GMRP%26UI",
       "file": "sources/filings-GMRP&UI.json",
-      "sha256": "f4f73aae128f331846025b7304b0273b043016a1cbb3dcb60c42c3451e259d71"
+      "sha256": "8d1a9dafe9238c32a23574e03460981c77430f2a81c74ed89551e1f0b1a68652"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JPPOWER",
       "file": "sources/filings-JPPOWER.json",
-      "sha256": "18362d512ad04335f78b87cef53d9579e577b2ba40e39c269d2adb8e4879205f"
+      "sha256": "a8ce1d691c56eb13ec6239f6ea9cfce523b5d437d60723fb5b83cef0481e9a9d"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JSWENERGY",
       "file": "sources/filings-JSWENERGY.json",
-      "sha256": "261e9791ec824c102eaca080f7283dbcc115b22cde62439d9c0cf2516dbe2bce"
+      "sha256": "40280ec20966b0f5c7f98dff0a519b6b48667f3232b51a0103f16b67513b0c29"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=KPIGREEN",
       "file": "sources/filings-KPIGREEN.json",
-      "sha256": "b3f3d3bf49d91ea3a54bd230419265a231227b8f486e185c2e99b86cb3bb6c6d"
+      "sha256": "231e5b36245252b51919363ce57e211dde48f8ae931e203cb781b708a96e49f8"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NAVA",
@@ -2576,27 +2750,27 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TATAPOWER",
       "file": "sources/filings-TATAPOWER.json",
-      "sha256": "6ef4cab4e5fd5500dc367305582d0e8eae7bd23f8f81003bb9c8a4fd1391e289"
+      "sha256": "2083750506fc94d2a0b6dee8a6f1a05a72c6a9c561116e47559ddd348cb306d5"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TORNTPOWER",
       "file": "sources/filings-TORNTPOWER.json",
-      "sha256": "1f08a5771ffc8f05eddb45f8014f8ba185b149d15dd0b252f085b3e8dcb0cc3b"
+      "sha256": "9ddc5a407157eab15b752768cc3fa7c584d2f2d95a0bb35d71a4a04e5f0f7bb4"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VEDPOWER",
       "file": "sources/filings-VEDPOWER.json",
-      "sha256": "7fb4ffe429063a9487a6099333c1a3f494518a4ce46f9802fd1cff696668b481"
+      "sha256": "ece2530c8dd0341542d9d05ae11a065e0d804df26b008b4d9ac9781110e0ac3b"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "974ff2493bbb8b7102efc5c282805a84bff3abf18ceb33e52961cdf5976116a5"
+      "sha256": "5f68c27931a5b24e28d5a85d37b0e6bdd36a3633403f85c81baeb1a97fbeac1f"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "692caee1b8e4fd11912c71e1c2519c4070e9675f9a0a9e6d40294cdf032890fc"
+      "sha256": "56cfae7b3ba1839fdf7f50395468b9f20bfbd68832a37043a3e4e27c92d5a07f"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -2631,7 +2805,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
       "file": "sources/nsdl-2026-10-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "03df04abcc0b2b2344fbd25c0d1146280c1dae9ea5cbeaaa0bcfbad4f9afa0d5"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -2639,5 +2813,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "171bb1613e823c2286262d2e727fad02625dccad6d7235525deb90912db21e80"
+  "digest": "88f796d8760adda9bfcb29a056f85c8d8285b5e671259981519e438c7918e209"
 }

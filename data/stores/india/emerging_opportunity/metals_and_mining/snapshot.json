@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Metals & Mining",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-17T12:31:14.221603+00:00",
-  "window_start": "2026-03-31",
+  "collected_at": "2026-10-28T08:14:33.227150+00:00",
+  "window_start": "2026-04-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-09-30",
+  "flows_as_of": "2026-10-15",
   "flows_checked_through": "2026-10-15",
   "universe_scope": "Metals & Mining members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-04-15",
-      "start": "2026-04-01",
-      "equity_flow_cr": -1198.0,
-      "equity_flow_usd_m": -128.0,
-      "end_equity_auc_cr": 290676.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "opening_equity_auc_cr": 257960.0,
-      "flow_pct_opening_auc": -0.46441308730035663
-    },
     {
       "date": "2026-04-30",
       "start": "2026-04-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -2322.0,
       "equity_flow_usd_m": -242.0,
       "end_equity_auc_cr": 283742.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
       "opening_equity_auc_cr": 286221.0,
       "flow_pct_opening_auc": -0.8112612282117664
+    },
+    {
+      "date": "2026-10-15",
+      "start": "2026-10-01",
+      "equity_flow_cr": -3693.0,
+      "equity_flow_usd_m": -388.0,
+      "end_equity_auc_cr": 263323.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "opening_equity_auc_cr": 283742.0,
+      "flow_pct_opening_auc": -1.3015344926024346
     }
   ],
   "companies": [
@@ -474,6 +474,21 @@
           "insurance_pct": 1.7056827273072022,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697360_20072026064031_WEB.xml",
           "filed_at": "20-JUL-2026 18:40:34"
+        },
+        {
+          "symbol": "GRAVITA",
+          "quarter": "2026-09-30",
+          "fpi_shares": 8691749,
+          "total_shares": 73808451,
+          "fpi_pct": 11.776089163556623,
+          "dii_shares": 3614185,
+          "dii_pct": 4.896708914809769,
+          "mf_shares": 2279988,
+          "mf_pct": 3.0890608990019315,
+          "insurance_shares": 964764,
+          "insurance_pct": 1.3071186116614206,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743625_21102026095332_WEB.xml",
+          "filed_at": "21-OCT-2026 21:53:36"
         }
       ],
       "reference_price": 1447.4
@@ -547,6 +562,21 @@
           "insurance_pct": 6.821146530228987,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1690624_10072026055831_WEB.xml",
           "filed_at": "10-JUL-2026 17:58:39"
+        },
+        {
+          "symbol": "HINDALCO",
+          "quarter": "2026-09-30",
+          "fpi_shares": 678162282,
+          "total_shares": 2247226523,
+          "fpi_pct": 30.17774465809827,
+          "dii_shares": 471231606,
+          "dii_pct": 20.969475091942034,
+          "mf_shares": 245832744,
+          "mf_pct": 10.93938423580986,
+          "insurance_shares": 150019192,
+          "insurance_pct": 6.675748548914755,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741799_19102026055449_WEB.xml",
+          "filed_at": "19-OCT-2026 17:54:59"
         }
       ],
       "reference_price": 941.8
@@ -959,6 +989,21 @@
           "insurance_pct": 0.006859453225741699,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698772_21072026071253_WEB.xml",
           "filed_at": "21-JUL-2026 19:12:58"
+        },
+        {
+          "symbol": "JAINREC",
+          "quarter": "2026-09-30",
+          "fpi_shares": 2696427,
+          "total_shares": 345085814,
+          "fpi_pct": 0.781378686288159,
+          "dii_shares": 33111171,
+          "dii_pct": 9.595054231930844,
+          "mf_shares": 21693917,
+          "mf_pct": 6.286528196722685,
+          "insurance_shares": 30058,
+          "insurance_pct": 0.008710297201611423,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742175_20102026103819_WEB.xml",
+          "filed_at": "20-OCT-2026 10:38:25"
         }
       ],
       "reference_price": 292.35
@@ -1032,6 +1077,21 @@
           "insurance_pct": 2.4115408338109448,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698293_21072026042048_WEB.xml",
           "filed_at": "21-JUL-2026 16:20:55"
+        },
+        {
+          "symbol": "JINDALSTEL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 89236653,
+          "total_shares": 1020088097,
+          "fpi_pct": 8.747935914793837,
+          "dii_shares": 200983182,
+          "dii_pct": 19.70253182946414,
+          "mf_shares": 158817297,
+          "mf_pct": 15.568978548722347,
+          "insurance_shares": 22829347,
+          "insurance_pct": 2.2379779812292036,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742806_21102026030632_WEB.xml",
+          "filed_at": "21-OCT-2026 15:06:39"
         }
       ],
       "reference_price": 1134.9
@@ -1193,6 +1253,21 @@
           "insurance_pct": 5.4631755026870135,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698632_21072026062045_WEB.xml",
           "filed_at": "21-JUL-2026 18:20:54"
+        },
+        {
+          "symbol": "JSWSTEEL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 274349662,
+          "total_shares": 2445453966,
+          "fpi_pct": 11.218762070943844,
+          "dii_shares": 277193524,
+          "dii_pct": 11.335053853146217,
+          "mf_shares": 143940237,
+          "mf_pct": 5.886033390987986,
+          "insurance_shares": 127925053,
+          "insurance_pct": 5.231137235809247,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743210_21102026055808_WEB.xml",
+          "filed_at": "21-OCT-2026 17:58:17"
         }
       ],
       "reference_price": 1253.4
@@ -1267,6 +1342,21 @@
           "insurance_pct": null,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696094_18072026034030_WEB.xml",
           "filed_at": "18-JUL-2026 15:40:36"
+        },
+        {
+          "symbol": "LLOYDSENT",
+          "quarter": "2026-09-30",
+          "fpi_shares": 10818282,
+          "total_shares": 1526691243,
+          "fpi_pct": 0.708609684479601,
+          "dii_shares": 2170300,
+          "dii_pct": 0.14215710019632305,
+          "mf_shares": 1552300,
+          "mf_pct": 0.10167740249493264,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741507_19102026035746_WEB.xml",
+          "filed_at": "19-OCT-2026 15:57:53"
         }
       ],
       "reference_price": 79.23
@@ -1781,6 +1871,21 @@
           "insurance_pct": 7.968296243530046,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1695371_17072026050422_WEB.xml",
           "filed_at": "17-JUL-2026 17:04:25"
+        },
+        {
+          "symbol": "SAIL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 301741274,
+          "total_shares": 4130457289,
+          "fpi_pct": 7.305275248907192,
+          "dii_shares": 681245160,
+          "dii_pct": 16.49321400355001,
+          "mf_shares": 410886950,
+          "mf_pct": 9.947735111418556,
+          "insurance_shares": 261799140,
+          "insurance_pct": 6.338260431773708,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742880_21102026034028_WEB.xml",
+          "filed_at": "21-OCT-2026 15:40:30"
         }
       ],
       "reference_price": 181.49
@@ -2120,6 +2225,21 @@
           "insurance_pct": 9.468663559809562,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697643_20072026103745_WEB.xml",
           "filed_at": "20-JUL-2026 22:37:54"
+        },
+        {
+          "symbol": "TATASTEEL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 2212504317,
+          "total_shares": 12483527171,
+          "fpi_pct": 17.723390886990526,
+          "dii_shares": 3435558228,
+          "dii_pct": 27.52073337078172,
+          "mf_shares": 2012086273,
+          "mf_pct": 16.117930817455182,
+          "insurance_shares": 1117645716,
+          "insurance_pct": 8.952964179838208,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741178_19102026114757_WEB.xml",
+          "filed_at": "19-OCT-2026 11:48:07"
         }
       ],
       "reference_price": 184.3
@@ -2279,6 +2399,21 @@
           "insurance_pct": 5.317774680386408,
           "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1692523_14072026061806_WEB.xml",
           "filed_at": "14-JUL-2026 18:18:12"
+        },
+        {
+          "symbol": "VISL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 160629973,
+          "total_shares": 3910388057,
+          "fpi_pct": 4.1077757669716615,
+          "dii_shares": 361507666,
+          "dii_pct": 9.24480283620097,
+          "mf_shares": 36924339,
+          "mf_pct": 0.9442627806184505,
+          "insurance_shares": 178119048,
+          "insurance_pct": 4.5550222996704495,
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1740959_17102026062957_WEB.xml",
+          "filed_at": "17-OCT-2026 18:30:03"
         }
       ],
       "reference_price": 32.3
@@ -2286,11 +2421,6 @@
   ],
   "price_date": "2026-09-30",
   "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-10-15",
-      "error": "NSDL report date mismatch"
-    },
     {
       "stage": "holding",
       "identity": "JAINREC:2025-09-30",
@@ -2394,6 +2524,11 @@
       "sha256": "acdcb9b9bd84d4c15bf034ddba1c10db6f6826999f9c8576073ff01934905739"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743625_21102026095332_WEB.xml",
+      "file": "sources/GRAVITA-2026-09-30.xml.gz",
+      "sha256": "29cab7d0c64a1e867094d6a6191e88fc63e6ab8b1ea24a79e959b8142303e859"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1555145_22102025093053_WEB.xml",
       "file": "sources/HINDALCO-2025-09-30.xml.gz",
       "sha256": "aa02d3507fcb210da43a2f8d5a435d4eb624d17776eb23b4fba36ced9791414d"
@@ -2412,6 +2547,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1690624_10072026055831_WEB.xml",
       "file": "sources/HINDALCO-2026-06-30.xml.gz",
       "sha256": "6616b2ba522d0f93a7c0262f1ba671c74326ef71f884b93ff5dafecb764e1056"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741799_19102026055449_WEB.xml",
+      "file": "sources/HINDALCO-2026-09-30.xml.gz",
+      "sha256": "a0662624a6d0b2a1d949cf063a22aa809c57d2f3bb2edcaa4effa909d1a4a63a"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1545175_11102025030638_WEB.xml",
@@ -2534,6 +2674,11 @@
       "sha256": "561ad6433f946702866fcfb92baaa8a787d884a344fc49115b690d444432b610"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742175_20102026103819_WEB.xml",
+      "file": "sources/JAINREC-2026-09-30.xml.gz",
+      "sha256": "f681d95c6e90b92f6889194d65b6b6ab0ad1a9c31c1bf92d4b28b4b589140e1d"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554939_21102025052302_WEB.xml",
       "file": "sources/JINDALSTEL-2025-09-30.xml.gz",
       "sha256": "48ce0d4c0344be91de47dfb5f5ab1255c14a1073bfee1c930585972ecfc18ec1"
@@ -2552,6 +2697,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1698293_21072026042048_WEB.xml",
       "file": "sources/JINDALSTEL-2026-06-30.xml.gz",
       "sha256": "56e829a372be7cf2edad6d95806c5613fa0c35c2116800e8b81ba0635edc4488"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742806_21102026030632_WEB.xml",
+      "file": "sources/JINDALSTEL-2026-09-30.xml.gz",
+      "sha256": "7f9c1517f480616747a0b3d43228378da03d38db5cdb20867b1c0c260a50daa4"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554706_21102025124004_WEB.xml",
@@ -2599,6 +2749,11 @@
       "sha256": "7c8861b3096c1c27b8459037d3104e8bcb62e10fc323a79023ed65faeb7db849"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743210_21102026055808_WEB.xml",
+      "file": "sources/JSWSTEEL-2026-09-30.xml.gz",
+      "sha256": "5073f878112630c75c3378b166b86a7649f2ec5d8cd10d23fb0ebe6c4190b246"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1553382_18102025023329_WEB.xml",
       "file": "sources/LLOYDSENT-2025-09-30.xml.gz",
       "sha256": "8b489896a7583b560b9f85f11e441ba597b740163a2c954e47a7fea8fd65e66d"
@@ -2617,6 +2772,11 @@
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696094_18072026034030_WEB.xml",
       "file": "sources/LLOYDSENT-2026-06-30.xml.gz",
       "sha256": "1d8f1a1e46e69d8080017f8b770ab4f5f1b446522304b103a2f5d1950570cf1a"
+    },
+    {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741507_19102026035746_WEB.xml",
+      "file": "sources/LLOYDSENT-2026-09-30.xml.gz",
+      "sha256": "2c1e05e32b9c24af1482d4fb2011cb18bff077a2c26c553c3c64f72317849ca2"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552517_17102025062819_WEB.xml",
@@ -2764,6 +2924,11 @@
       "sha256": "e379a86f78ab3f10b122f79b83b88376f13ed08df166edcc10b2d382f1c6e108"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1742880_21102026034028_WEB.xml",
+      "file": "sources/SAIL-2026-09-30.xml.gz",
+      "sha256": "a2db4c624f001730088fbd9e8931fc9bec20ccecbe87dd5ec476c5e5783cb99a"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552294_17102025054205_WEB.xml",
       "file": "sources/SANDUMA-2025-09-30.xml.gz",
       "sha256": "7c53bbf64822579675d0c4af70a252ff1ac32bf79dec7736848b823cce02164c"
@@ -2859,6 +3024,11 @@
       "sha256": "d3ddec6465a3f3da568fdab6923a50e4170698536df463c5898d81a04db09440"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741178_19102026114757_WEB.xml",
+      "file": "sources/TATASTEEL-2026-09-30.xml.gz",
+      "sha256": "23cde8f05a3f0e9f26852dce162f16adeaec9b315f737157241f2cc86409ce43"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1697225_20072026060149_WEB.xml",
       "file": "sources/VAML-2026-06-30.xml.gz",
       "sha256": "f30362a7fffa97a3c6487df53814a0cd88800f62360a36e0022d1a8d4d4b7b05"
@@ -2899,6 +3069,11 @@
       "sha256": "fac807c03763732df179651938360718d11582aa2e572581743fe071c05d44cc"
     },
     {
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1740959_17102026062957_WEB.xml",
+      "file": "sources/VISL-2026-09-30.xml.gz",
+      "sha256": "d5005c20c162afd1b41b1cbf79bc96ad95b07da61a6c5a0396c16264adcbc932"
+    },
+    {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ADANIENT",
       "file": "sources/filings-ADANIENT.json",
       "sha256": "5a22a61cb78302647ed27ce3db8e2df5ee1077dfa80e3031a4b72709a534b6db"
@@ -2916,12 +3091,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GRAVITA",
       "file": "sources/filings-GRAVITA.json",
-      "sha256": "26204d00af5a3f90d048ba8bb9e58290dfa8e8b25ae468c2deab83bedab7f352"
+      "sha256": "4bd8f393617af6d2b60786859df175c9023a080434939676d402b2d1d7b92c33"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HINDALCO",
       "file": "sources/filings-HINDALCO.json",
-      "sha256": "74999ad4ef16dba099f8710915cbfdf5c7243108d68b3245727314b37c729ba8"
+      "sha256": "2a8fbcffa5f11f6417425849baa27c5094cff396b06e67cb1821a680f4ce3b14"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HINDCOPPER",
@@ -2946,12 +3121,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JAINREC",
       "file": "sources/filings-JAINREC.json",
-      "sha256": "1c19d4e4629c28a4a9222d01d17ba15f4550995c8e18e91a1a92a9dd60eb17ef"
+      "sha256": "fc59316998a40b98b8be4ed5802bfa97c549d408ad129b536aaf88647f548378"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JINDALSTEL",
       "file": "sources/filings-JINDALSTEL.json",
-      "sha256": "687bb7ecca2c95165c8300ebcca2d3d2c5d58600feb2c07d976f270554e3aa2e"
+      "sha256": "33f6db8daa61095ac17d747d44630bae449f5eab3352e5fd226a5800bcb716e7"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JSL",
@@ -2961,12 +3136,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JSWSTEEL",
       "file": "sources/filings-JSWSTEEL.json",
-      "sha256": "ca0be6449e0e83d9663e8a908e10b169c054f884e304854c78cb1f215fc0b2e2"
+      "sha256": "4ced717563311e906b99cabb5ae3a63c0e97aebb4dd72eb21be7c7afee81b808"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=LLOYDSENT",
       "file": "sources/filings-LLOYDSENT.json",
-      "sha256": "dbadf83d524878c30df419675d9e5f3651b3929ed93a68ef0709f3485e244be2"
+      "sha256": "96195f3557764252284498b6292aef3270791d22ae17ba346203afef8dacc504"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=LLOYDSME",
@@ -2996,7 +3171,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SAIL",
       "file": "sources/filings-SAIL.json",
-      "sha256": "325f4533edd444b2503032ab9b3e1dae5aec47c8c5a5fedd9b3060d8e9deebf0"
+      "sha256": "9625d9d8c96cd96b1737d14f4d8791ef8b8cc4a386f94b1850ff1f8bfb2c1b15"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SANDUMA",
@@ -3016,7 +3191,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TATASTEEL",
       "file": "sources/filings-TATASTEEL.json",
-      "sha256": "aa0b63a7f4a5e6dc6256416c740141039f8822c1e62358956ab7a33b7a93eba9"
+      "sha256": "c145428c6657b37da7d1b5e76b676296f4f44a51d33bdcbad720929193ad1117"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VAML",
@@ -3031,17 +3206,17 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VISL",
       "file": "sources/filings-VISL.json",
-      "sha256": "399468cf2382b4d798915ecd816b1baed8bfee3b02a0b813c162fc5e77250145"
+      "sha256": "3ead266e2b94f965549fada1f33a092459c3e1051f99d0cfebb858f534ead06e"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "974ff2493bbb8b7102efc5c282805a84bff3abf18ceb33e52961cdf5976116a5"
+      "sha256": "5f68c27931a5b24e28d5a85d37b0e6bdd36a3633403f85c81baeb1a97fbeac1f"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "692caee1b8e4fd11912c71e1c2519c4070e9675f9a0a9e6d40294cdf032890fc"
+      "sha256": "56cfae7b3ba1839fdf7f50395468b9f20bfbd68832a37043a3e4e27c92d5a07f"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -3076,7 +3251,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
       "file": "sources/nsdl-2026-10-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "03df04abcc0b2b2344fbd25c0d1146280c1dae9ea5cbeaaa0bcfbad4f9afa0d5"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -3084,5 +3259,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "b58b2f61e90f0207bcc31e113cd055466b1a4ee32b76906fd590203975e7f2bb"
+  "digest": "86db5781e442cae0e40faa9a1468d5ba07e4ced81bd93ccbdc7aecffbea52de8"
 }
