@@ -5,6 +5,20 @@ from streamlit.testing.v1 import AppTest
 
 
 class IndiaUITests(unittest.TestCase):
+    def test_sip_dates_start_at_actual_common_history_after_refresh(self):
+        import pandas as pd
+        from data.fetchers.portfolio_india import current,load
+        prices,local,fx,manifest=load(current())
+        prices=prices.copy()
+        prices.loc[prices.index<pd.Timestamp('2021-10-20'),'nifty-50']=float('nan')
+        with patch('portfolio_lab.india.prepared',return_value=(prices,local,fx,manifest)):
+            app=AppTest.from_string('from portfolio_lab.page import render\nrender()',default_timeout=40).run()
+            app.button(key='pl_enter_india').click().run()
+            app.radio(key='in_investment').set_value('Monthly SIP').run()
+            self.assertFalse(app.exception,[e.message for e in app.exception])
+            self.assertTrue(any('SIP | Invested Capital' in m.value for m in app.markdown))
+            self.assertGreaterEqual(app.date_input(key='in_sip_period').value[0],pd.Timestamp('2021-10-20').date())
+
     def test_mode_templates_sip_research_and_global_state(self):
         from data.fetchers.portfolio_india import current
         try:current()

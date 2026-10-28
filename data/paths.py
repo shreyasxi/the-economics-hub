@@ -4,6 +4,7 @@ The DBIE workbook and India manual CSV intentionally remain directly in data/.
 CLI: python -m data.paths --relative INDIA_DB RBI_MONEY_MARKET_CSV
 """
 from pathlib import Path
+import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
@@ -12,7 +13,9 @@ STORES_DIR = DATA_DIR / "stores"
 INDIA_STORE_DIR = STORES_DIR / "india"
 WORLD_STORE_DIR = STORES_DIR / "world"
 SENTINEL_STORE_DIR = STORES_DIR / "rbi_sentinel"
-PORTFOLIO_STORE_DIR = STORES_DIR / "portfolio_lab"
+# Refresh subprocesses use an isolated candidate store; ordinary app loads keep
+# the existing local/public fallback. Never point a candidate at published data.
+PORTFOLIO_STORE_DIR = Path(os.environ.get("MONETARIA_PORTFOLIO_STORE", STORES_DIR / "portfolio_lab"))
 PUBLIC_PORTFOLIO_DIR = DATA_DIR / "published" / "portfolio_lab"
 PORTFOLIO_INDIA_STORE_DIR = PORTFOLIO_STORE_DIR / "india"
 INPUTS_DIR = DATA_DIR / "inputs"
@@ -25,7 +28,7 @@ INDIA_DB = INDIA_STORE_DIR / "india_macro.db"
 CAG_WORKBOOK = INPUTS_DIR / "cag/cag_monthly_accounts.xlsx"
 CAG_MANUAL_CSV = INPUTS_DIR / "cag/cag_manual_accounts.csv"
 INDIA_TRADE_RELEASES = INDIA_STORE_DIR / "india_trade_releases.json"
-INDIA_EQUITY_TRI = INDIA_STORE_DIR / "india_equity_tri.json"
+INDIA_EQUITY_TRI = Path(os.environ.get("MONETARIA_PORTFOLIO_TRI", INDIA_STORE_DIR / "india_equity_tri.json"))
 GMD_INVESTMENT_CSV = INDIA_STORE_DIR / "gmd_investment.csv"
 GMD_INVESTMENT_META = INDIA_STORE_DIR / "gmd_investment.json"
 

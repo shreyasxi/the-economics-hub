@@ -80,11 +80,14 @@ def _table(outcomes):
                 '</tr></thead><tbody>' + rows + '</tbody></table>', unsafe_allow_html=True)
 
 
-def _header(latest=None):
+def _header(latest=None, root=None, manifest=None, reference_date=None):
     meta = (
-        '<div class="rbi-head-meta"><span class="rbi-head-meta-label">Market data through</span>'
+        '<div class="rbi-head-meta"><span class="rbi-head-meta-label">Analysis through</span>'
         f'<span class="rbi-head-meta-value">{escape(str(latest))}</span></div>'
     ) if latest else ''
+    if latest and root is not None and manifest is not None:
+        from portfolio_lab.status import banner_html
+        meta = banner_html(latest, root, manifest, reference_date)
     st.markdown(
         '<div class="rbi-head"><div class="rbi-head-text">'
         '<p class="rbi-head-title">Portfolio Lab</p>'
@@ -125,6 +128,11 @@ def _render():
             st.session_state[key] = st.session_state[key]
     st.markdown('''<style>
     .st-key-portfolio-lab {font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;}
+    .pl-refresh-meta {max-width:290px;min-width:215px;white-space:normal!important;text-align:right;}
+    .pl-analysis-cutoff {font:600 13px/1.5 Inter,sans-serif;color:#0A1F3D;}
+    .pl-analysis-cutoff strong {font-weight:700;}
+    .pl-refresh-line {font:11px/1.5 Inter,sans-serif;color:#6B7280;}
+    @media(max-width:640px) {.pl-refresh-meta {max-width:100%;min-width:0;}}
     .st-key-portfolio-lab p,.st-key-portfolio-lab label,.st-key-portfolio-lab input,
     .st-key-portfolio-lab button,.st-key-portfolio-lab [role="combobox"] {font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;}
     .pl-chart-heading {max-width:900px;margin-left:auto!important;margin-right:auto!important;border-top:2px solid #1A1A1A;padding-top:16px;margin:24px 0 12px;}
@@ -184,9 +192,9 @@ def _render():
         return
     mode=st.radio('Investor mode',['Global Portfolio — USD','Indian Investor — INR'],horizontal=True,key='pl_mode')
 
-    def update_header(latest):
+    def update_header(latest, root=None, manifest=None, reference_date=None):
         with header.container():
-            _header(latest)
+            _header(latest, root, manifest, reference_date)
 
     if mode=='Indian Investor — INR':
         from portfolio_lab.india import render as render_india
@@ -200,7 +208,7 @@ def _render():
         st.info("The published portfolio dataset is unavailable. Please try again later.")
         return
     latest = min(m["latest_observation"] for m in manifest["assets"].values())
-    update_header(latest)
+    update_header(latest, bundle.parent, manifest)
     status = freshness(latest)
     if status.startswith(("Stale", "Invalid")):
         st.warning(status)
@@ -321,6 +329,8 @@ def _render():
                 st.dataframe(asset_frame((pd.DataFrame(contributions).fillna(0)*100).round(2)),use_container_width=True)
 
     with st.expander("Methodology and data"):
+        from portfolio_lab.status import data_timing_text
+        st.caption(data_timing_text(latest, manifest))
         st.markdown("""
 **Return definition.** Explicit Yahoo adjusted-close ratios are a split- and distribution-adjusted ETF historical-return proxy.
 Backward adjustment approximates distribution reinvestment; it is not a separately audited investor total-return index.

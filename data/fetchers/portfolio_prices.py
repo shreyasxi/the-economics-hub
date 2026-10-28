@@ -23,6 +23,42 @@ from data.processors.portfolio_analytics import validate_prices
 ADJUSTMENT = "Yahoo explicit Adj Close; split/distribution-adjusted ETF historical-return proxy"
 
 
+def source_epoch(value):
+    """Keep source metadata JSON-safe across yfinance's epoch/Timestamp versions."""
+    if value is None:
+        return None
+    if isinstance(value, (datetime, pd.Timestamp)):
+        timestamp = pd.Timestamp(value)
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.tz_localize('UTC')
+        return int(timestamp.timestamp())
+    return int(value)
+
+
+def closed_history(history, market_timezone, today=None):
+    """Keep the latest fully priced session, recording incomplete trailing labels.
+
+    A row without both Close and Adj Close is not a usable return observation.
+    Only the trailing run is omitted; interior gaps and invalid corporate actions
+    still fail validate_history. Publication independently enforces freshness.
+    """
+    today = today or pd.Timestamp.now(tz=market_timezone).date()
+    history = history.loc[history.index.date < today].copy()
+    excluded = []
+    if not {'Close', 'Adj Close'}.issubset(history.columns):
+        return history, excluded
+    while not history.empty:
+        row = history.iloc[-1]
+        if pd.notna(row['Close']) and pd.notna(row['Adj Close']):
+            break
+        actions = pd.to_numeric(row.reindex(['Dividends', 'Stock Splits']), errors='coerce')
+        if not np.isfinite(actions).all() or (actions < 0).any():
+            break  # Omitting an incomplete close must not hide corrupt action data.
+        excluded.append(str(history.index[-1].date()))
+        history = history.iloc[:-1].copy()
+    return history, sorted(excluded)
+
+
 def validate_history(ticker, history):
     required = {"Close", "Adj Close", "Dividends", "Stock Splits"}
     if history.empty or not required.issubset(history):
@@ -82,8 +118,9 @@ def prepare(root=PORTFOLIO_STORE_DIR, expand=False):
                 or identity.get("instrumentType") != "ETF"):
             raise ValueError(ticker + ": source ticker/currency/instrument identity mismatch")
         # Do not include an unfinished current session; normalize by exchange date.
-        local_today = pd.Timestamp.now(tz="America/New_York").date()
-        history = history.loc[history.index.date < local_today]
+        history, excluded = closed_history(history, 'America/New_York')
+        if excluded:
+            print(f'{ticker}: omitted incomplete trailing price rows: {", ".join(excluded)}', flush=True)
         history, error = validate_history(ticker, history)
         if inception is not None and pd.Timestamp(inception, unit="s").normalize() > history.index[0]:
             raise ValueError(ticker + ": observed history precedes reported fund inception")
@@ -97,7 +134,8 @@ def prepare(root=PORTFOLIO_STORE_DIR, expand=False):
                              latest_observation=str(history.index[-1].date()),
                              observations=len(history), quality="validated",
                              mean_daily_volume_60=float(volume.mean()),
-                             source_first_trade_epoch=identity.get("firstTradeDate"),
+                             excluded_unpriced_sessions=excluded,
+                             source_first_trade_epoch=source_epoch(identity.get("firstTradeDate")),
                              source_reported_fund_inception=str(pd.Timestamp(inception,unit="s").date()) if inception else None,
                              inception_source="Yahoo fundInceptionDate; distinct from first observed close; not issuer-certified",
                              liquidity_rule="60 observed sessions: mean shares traded >= 100,000; not an execution guarantee",

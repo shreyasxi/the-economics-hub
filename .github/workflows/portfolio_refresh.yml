@@ -1,0 +1,66 @@
+name: Portfolio Lab Refresh
+
+on:
+  schedule:
+    # 16:15 IST; after midnight New York in both DST and standard time.
+    # Collectors can include the previous completed US trading session.
+    - cron: '45 10 * * 3,6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repository-publication-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  refresh:
+    if: github.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONPATH: '.'
+      PYTHONUTF8: '1'
+      MPLBACKEND: Agg
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install application and test dependencies
+        run: pip install -r requirements.txt pytest
+      - name: Check dependency compatibility
+        run: pip check
+      - name: Prepare, verify and publish the complete candidate release
+        run: python -m portfolio_lab.refresh
+      - name: Commit the validated Portfolio Lab release only
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A -- data/published/portfolio_lab/
+          if git diff --cached --quiet; then
+            echo 'No changes to publish.'
+            exit 0
+          fi
+          git commit -m 'data: refresh Portfolio Lab snapshots'
+          for attempt in 1 2 3; do
+            git pull --rebase origin "$TARGET_BRANCH" && git push origin "HEAD:$TARGET_BRANCH" && exit 0
+            sleep $((attempt * 10))
+          done
+          echo '::error::Could not publish Portfolio Lab after 3 attempts'
+          exit 1
+      - name: Report an unsuccessful refresh
+        if: failure()
+        run: |
+          echo '::error::Portfolio Lab refresh failed. Check the failed step; the live site keeps its previous committed release.'
+          echo '## Portfolio Lab refresh failed' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No new release was pushed. The last committed dataset remains active. Inspect the failed collection, validation, test or publication step above.' >> "$GITHUB_STEP_SUMMARY"

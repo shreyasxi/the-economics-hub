@@ -115,8 +115,11 @@ def install(archive_path, expected_sha256, root=PORTFOLIO_STORE_DIR):
                 if len(names) != len(set(names)) or sum(e.file_size for e in entries) > MAX_BYTES:
                     raise ValueError("Duplicate members or oversized deployment archive")
                 for entry in entries:
-                    path = PurePosixPath(entry.filename)
-                    if (path.is_absolute() or ".." in path.parts or "\\" in entry.filename
+                    # Windows ZipInfo normalises backslashes in filename; the
+                    # original spelling must also pass the archive-path check.
+                    raw_name = entry.orig_filename
+                    path = PurePosixPath(raw_name)
+                    if (path.is_absolute() or ".." in path.parts or "\\" in raw_name
                             or not path.parts or stat.S_ISLNK(entry.external_attr >> 16)):
                         raise ValueError("Unsafe deployment archive member")
                     archive.extract(entry, unpacked)
@@ -139,7 +142,7 @@ def install(archive_path, expected_sha256, root=PORTFOLIO_STORE_DIR):
 
 
 
-def publish(destination=PUBLIC_PORTFOLIO_DIR, root=PORTFOLIO_STORE_DIR):
+def publish(destination=PUBLIC_PORTFOLIO_DIR, root=PORTFOLIO_STORE_DIR, refresh_metadata=None):
     """Publish only the validated active release; keep prior data on failure."""
     destination = Path(destination)
     source = active_root(root)
@@ -163,6 +166,8 @@ def publish(destination=PUBLIC_PORTFOLIO_DIR, root=PORTFOLIO_STORE_DIR):
         manifest = json.loads(path.read_text())
         manifest['credit_rights'] = "Public Portfolio Lab dataset; source permissions confirmed by the owner"
         path.write_text(json.dumps(manifest, indent=2) + "\n")
+        if refresh_metadata is not None:
+            (release / 'refresh.json').write_text(json.dumps(refresh_metadata, indent=2) + "\n")
         receipt = {'schema': 1, 'files': {
             p.relative_to(release).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(release.rglob('*')) if p.is_file()}}

@@ -11,7 +11,7 @@ from data.paths import PORTFOLIO_INDIA_STORE_DIR, INDIA_EQUITY_TRI
 from config.portfolio_india_settings import ETFS, FOREIGN, INDEX_IDS
 from config.india_equity_matrix import INDICES
 from data.processors.india_equity_matrix import validate_series
-from data.fetchers.portfolio_prices import validate_history, snapshot_path, load_bundle
+from data.fetchers.portfolio_prices import validate_history, snapshot_path, load_bundle, source_epoch, closed_history
 
 
 def digest(path):
@@ -26,13 +26,17 @@ def collect():
     for ticker in ETFS:
         asset=yf.Ticker(ticker)
         frame=asset.history(period='max',auto_adjust=False,actions=True,raise_errors=True)
+        frame,excluded=closed_history(frame,'Asia/Kolkata')
+        if excluded:
+            print(f'{ticker}: omitted incomplete trailing price rows: {", ".join(excluded)}',flush=True)
         frame,err=validate_history(ticker,frame)
         meta=asset.get_history_metadata()
         if meta.get('currency')!='INR' or meta.get('symbol')!=ticker or meta.get('instrumentType') not in ('ETF','EQUITY') or 'ETF' not in meta.get('longName','').upper():
             raise ValueError('Indian ETF source identity failed: '+str({k:meta.get(k) for k in ['symbol','currency','instrumentType','longName']}))
         frame.to_csv(root/(ticker+'.csv'),index_label='Date')
         (root/(ticker+'.json')).write_text(json.dumps(dict(currency=meta['currency'],symbol=meta['symbol'],
-            instrumentType=meta['instrumentType'],longName=meta.get('longName'),firstTradeDate=meta.get('firstTradeDate'),
+            instrumentType=meta['instrumentType'],longName=meta.get('longName'),firstTradeDate=source_epoch(meta.get('firstTradeDate')),
+            excluded_unpriced_sessions=excluded,
             retrieved_utc=datetime.now(timezone.utc).isoformat(),adjustment_error=err),indent=2))
         print(ticker,len(frame),str(frame.index[0].date()),str(frame.index[-1].date()),flush=True)
     from config.settings import FRED_API_KEY

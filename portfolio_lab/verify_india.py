@@ -63,7 +63,7 @@ def main():
     c={'NIFTYBEES.NS':.4,'GILT5YBEES.NS':.3,'GOLDBEES.NS':.1,'SPY':.2}
     foreign_window,foreign_replay,_,_=historical_replay(prices,c,c,'nifty-50','2022 inflation and rate shock','Monthly',5,EPISODES,100000,52,'₹')
     stress_fx=portfolio_fx_pnl(foreign_window,local,fx,foreign_replay['Portfolio A'],manifest['assets'])
-    contributions=sip(common,B,'2021-10-01',common.index[-1],10000,0,1,'Monthly',5)
+    contributions=sip(common,B,common.index[0],common.index[-1],10000,0,1,'Monthly',5)
     schedule=contributions['flows'].groupby('Investment date').Contribution.sum()
     independent=units_path(common,B,initial=0,schedule=schedule)
     np.testing.assert_allclose(independent,contributions['wealth'],rtol=1e-10)

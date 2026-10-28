@@ -18,7 +18,12 @@ def package(tmp_path, members=None):
     path = tmp_path / 'release.zip'
     with zipfile.ZipFile(path, 'w') as archive:
         for name, content in members.items():
-            archive.writestr(name, content)
+            # ZipInfo normalises Windows backslashes when built from a name.
+            # Preserve the raw member so the unsafe-path test is adversarial
+            # on Windows as well as Linux.
+            member = zipfile.ZipInfo()
+            member.filename = name
+            archive.writestr(member, content)
         archive.writestr('deployment.json', json.dumps(receipt))
     return path, hashlib.sha256(path.read_bytes()).hexdigest()
 

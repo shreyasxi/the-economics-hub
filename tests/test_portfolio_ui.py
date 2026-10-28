@@ -26,7 +26,10 @@ class PortfolioUITests(unittest.TestCase):
         from data.fetchers.portfolio_prices import snapshot_path
         try: snapshot_path()
         except ValueError: self.skipTest("Real local snapshot not prepared")
-        with patch("data.fetchers.yfinance_fetcher.YFinanceFetcher._download", side_effect=AssertionError("UI fetched data")):
+        # This interaction test checks stress-period coverage warnings, not
+        # whether the versioned snapshot happens to be recent on the test date.
+        with patch("data.fetchers.yfinance_fetcher.YFinanceFetcher._download", side_effect=AssertionError("UI fetched data")), \
+                patch("portfolio_lab.page.freshness", return_value="Historical end-of-day observations"):
             app = self.app()
             self.assertFalse(app.exception)
             app.checkbox(key="pl_compare").check().run()

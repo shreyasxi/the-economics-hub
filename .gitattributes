@@ -41,3 +41,6 @@ data/inputs/gst/sources/*.txt -whitespace
 # Emerging Opportunity source bytes are checksum-verified before display.
 data/stores/india/emerging_opportunity/**/sources/** -text -whitespace
 tests/fixtures/emerging_opportunity/*.gz binary
+
+# Portfolio releases contain byte-level manifests; preserve producer bytes on every OS.
+data/published/portfolio_lab/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

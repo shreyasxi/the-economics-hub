@@ -165,11 +165,15 @@ def stress(prices,a,b,benchmark,rebalance,cost,enabled,local,fx,metadata):
 
 
 def render(on_ready=None):
-    try:prices,local,fx,manifest=prepared(str(current()))
+    try:
+        bundle=current()
+        prices,local,fx,manifest=prepared(str(bundle))
     except (ValueError,OSError,AssertionError) as exc:
         st.warning('INR data unavailable: '+str(exc));return
+    latest=min(asset['last'] for asset in manifest['assets'].values())
+    analysis_latest=str(prices.dropna().index[-1].date())
     if on_ready:
-        on_ready(str(prices.index[-1].date()))
+        on_ready(latest,bundle.parent.parent,manifest,analysis_latest)
     if (pd.Timestamp.now(tz='Asia/Kolkata').tz_localize(None).normalize()-prices.index[-1]).days>14:
         st.warning('Prepared weekly reference data are more than two weeks old. Refresh explicitly before drawing current conclusions.')
     for key in list(st.session_state):
@@ -200,7 +204,16 @@ def render(on_ready=None):
     if any(manifest['assets'][k]['currency']=='USD' for k in common):sources.append('Federal Reserve H.10 USD/INR')
     source_note='Sources: '+ ' · '.join(sources)+' · prepared '+manifest['retrieved_utc'][:10]
     if investment=='Monthly SIP':
-        sip_period=st.date_input('SIP contribution period',value=period,min_value=period[0],max_value=period[1],key='in_sip_period')
+        # Refreshes can advance a benchmark's rolling-history start. SIP must
+        # use the actual common portfolio window, as the chart already does.
+        first,last=common.index[0].date(),common.index[-1].date()
+        saved=st.session_state.get('in_sip_period')
+        if saved and len(saved)==2:
+            start,end=max(first,saved[0]),min(last,saved[1])
+            clamped=(start,end) if start<=end else (first,last)
+            if tuple(saved)!=clamped:
+                st.session_state['in_sip_period']=clamped
+        sip_period=st.date_input('SIP contribution period',value=(first,last),min_value=first,max_value=last,key='in_sip_period')
         if len(sip_period)!=2 or sip_period[0]>sip_period[1]:st.info('Select a valid SIP contribution interval');return
         c1,c2,c3=st.columns(3)
         initial=c1.number_input('Initial SIP investment (₹)',min_value=0.,value=0.,step=1000.,key='in_sip_initial')
@@ -321,6 +334,8 @@ def render(on_ready=None):
             with st.expander('Exact shock contributions (pp)'):
                 st.dataframe(asset_frame(pd.DataFrame(contributions).fillna(0)*100).round(2),use_container_width=True)
     with st.expander('Methodology, sources and instrument identities'):
+        from portfolio_lab.status import data_timing_text
+        st.caption(data_timing_text(latest,manifest,analysis_latest))
         st.write(CONVENTION)
         st.write('Lump-sum reference paths charge rebalances; initial entry and terminal liquidation excluded. SIP additionally charges subscription purchases. Fund expenses already enter observed prices. Overseas holdings are hypothetical exposures; resident eligibility, remittance and tax rules are not assumed.')
         st.write('Sortino uses a zero minimum acceptable return and 52 evaluated weekly periods per year. It requires at least 26 returns and 182 calendar days; no downside variation gives an undefined ratio.')
