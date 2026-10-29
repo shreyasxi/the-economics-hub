@@ -1,5 +1,7 @@
 """Guard source fields, calendar weights, date matching and World integration."""
+from functools import partial
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import matplotlib.pyplot as plt
@@ -168,10 +170,18 @@ def test_generator_series_and_world_section_contract(tmp_path):
     assert [MACRO_INDICATORS[k]['series'] for k in keys] == ['EFFR', 'SOFR', 'IORB', 'WRESBAL']
     engine = Mock()
     engine.fetch_raw.side_effect = inputs()
+    fixture_pandas = SimpleNamespace(**vars(pd))
+    fixture_pandas.Timestamp = Mock(wraps=pd.Timestamp)
+    fixture_pandas.Timestamp.now.side_effect = AssertionError('Fixture must not read the wall clock')
+    # Keep the real preparation and freshness checks tied to the fixture date.
     with patch('charts.world_charts.banking_liquidity.draw') as render, patch(
-            'data.fetchers.fedwire.fetch_monthly', return_value=payments()):
+            'data.fetchers.fedwire.fetch_monthly', return_value=payments()), patch(
+            'charts.world_charts.banking_liquidity.prepare',
+            wraps=partial(prepare, today='2026-10-10')), patch(
+            'charts.world_charts.banking_liquidity.pd', fixture_pandas):
         chart_banking_liquidity(engine, tmp_path)
     assert [c.args[0] for c in engine.fetch_raw.call_args_list] == list(keys)
+    assert render.call_args.args[0][-1] == pd.Timestamp('2026-10-10')
     assert render.call_args.args[1].name == '07b_macro_banking_liquidity.png'
     root = Path(__file__).resolve().parents[1]
     assert '("United States", ("inflation", "labour", "balance_sheet", "banking_liquidity",' in (root / 'app.py').read_text()

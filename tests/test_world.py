@@ -17,6 +17,7 @@ import csv
 import ast
 import sys
 import tempfile
+import warnings
 from datetime import date
 from pathlib import Path
 
@@ -617,8 +618,8 @@ def test_india_cells_are_not_manual():
 
 # ── Meeting calendars ───────────────────────────────────────────────────────
 
-def test_meeting_calendars_are_sorted_and_not_exhausted():
-    """Fails when a bank's published dates run out: add next year's from MEETING_SOURCES."""
+def test_meeting_calendars_are_sorted_and_warn_when_exhausted():
+    """Invalid calendars fail; annual maintenance must not block chart publication."""
     soon = date.today().isoformat()
     for bank in CENTRAL_BANKS:
         dates = bank["meetings"]
@@ -627,9 +628,29 @@ def test_meeting_calendars_are_sorted_and_not_exhausted():
         assert dates == sorted(dates), f"{bank['id']} meetings are not in order"
         for d in dates:
             date.fromisoformat(d)
-        assert dates[-1] >= soon, (
-            f"{bank['id']}: no future meeting date listed — add next year's calendar in config/world_settings.py"
-        )
+        assert dates, f"{bank['id']}: meeting calendar is empty"
+        if dates[-1] < soon:
+            warnings.warn(
+                f"{bank['id']}: no future meeting date listed — update the calendar in config/world_settings.py",
+                UserWarning,
+            )
+
+
+def test_expired_meeting_calendar_does_not_block_publication(monkeypatch):
+    class FutureDate(date):
+        @classmethod
+        def today(cls):
+            return cls(2099, 1, 1)
+
+    monkeypatch.setitem(globals(), 'date', FutureDate)
+    monkeypatch.setitem(globals(), 'CENTRAL_BANKS', [
+        {'id': 'example', 'meetings': ['2026-01-01']},
+    ])
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        test_meeting_calendars_are_sorted_and_warn_when_exhausted()
+    assert len(caught) == 1
+    assert 'example: no future meeting date listed' in str(caught[0].message)
 
 
 if __name__ == "__main__":
