@@ -768,7 +768,7 @@
       "manual_conflict_approved": false,
       "month": "2026-08",
       "previous_source": "manual:mospi:2026-09-15",
-      "source_retrieval": "88fa2fa52bda490d99c3878a156c18fe",
+      "source_retrieval": "c072cbbb3a414a16b016b60637d054de",
       "value": 4.83
     },
     {
@@ -781,7 +781,7 @@
       "manual_conflict_approved": false,
       "month": "2026-08",
       "previous_source": "official:mospi_api:base2024:Food and beverages",
-      "source_retrieval": "88fa2fa52bda490d99c3878a156c18fe",
+      "source_retrieval": "c072cbbb3a414a16b016b60637d054de",
       "value": 5.68
     },
     {
@@ -794,7 +794,7 @@
       "manual_conflict_approved": false,
       "month": "2026-09",
       "previous_source": "official:mospi_api:base2024:CPI (General)",
-      "source_retrieval": "88fa2fa52bda490d99c3878a156c18fe",
+      "source_retrieval": "c072cbbb3a414a16b016b60637d054de",
       "value": 5.54
     },
     {
@@ -807,16 +807,16 @@
       "manual_conflict_approved": false,
       "month": "2026-09",
       "previous_source": "official:mospi_api:base2024:Food and beverages",
-      "source_retrieval": "88fa2fa52bda490d99c3878a156c18fe",
+      "source_retrieval": "c072cbbb3a414a16b016b60637d054de",
       "value": 7.36
     }
   ],
-  "checked_at_utc": "2026-10-30T11:46:09.479579+00:00",
+  "checked_at_utc": "2026-10-30T17:11:27.741641+00:00",
   "committed": true,
   "conflicts": [],
   "history_note": "2012 through Dec 2025; 2024 from Jan 2026; food is Food and beverages, not CFPI",
   "latest_month": "2026-09",
-  "source_run": "044f8293cf6d46d9a5181db18d91c415",
+  "source_run": "cf4d6ed558e447769257668b2753d4c9",
   "status": "ready",
   "warnings": [
     {
@@ -824,7 +824,7 @@
       "column": "india_cpi_yoy",
       "concept": "CPI (General)",
       "month": "2026-08",
-      "source_retrieval": "88fa2fa52bda490d99c3878a156c18fe",
+      "source_retrieval": "c072cbbb3a414a16b016b60637d054de",
       "stored": 4.82,
       "stored_source": "manual:mospi:2026-09-15",
       "value": 4.83
