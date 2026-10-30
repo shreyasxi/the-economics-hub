@@ -4751,10 +4751,11 @@ def page_india() -> None:
                 # Subsection of Equity Markets, after valuation and rotation.
                 # Preserve the old fragment for previously shared links.
                 st.markdown('<span id="india-emerging-opportunity"></span>'
-                            '<h3 id="india-institutional-flows-ownership" '
+                            '<span id="india-institutional-flows-ownership"></span>'
+                            '<h3 id="india-foreign-investment-sectors" '
                             'style="font-family:Newsreader,Georgia,serif;color:#28251f;margin-top:1.5rem;'
                             'border-bottom:1px solid #333638;padding-bottom:.65rem;margin-bottom:1rem">'
-                            'Institutional Flows &amp; Ownership</h3>', unsafe_allow_html=True)
+                            'Foreign Investment by Sector</h3>', unsafe_allow_html=True)
                 from charts.india_charts.emerging_opportunity import render as render_emerging_opportunity
                 render_emerging_opportunity()
         consumer = [c for c in charts if "consumer_confidence" in c.name or "discretionary_spending_sentiment" in c.name]

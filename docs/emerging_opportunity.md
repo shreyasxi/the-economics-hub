@@ -1,15 +1,39 @@
-# Institutional Flows & Ownership: all equity sectors and AI Catalysts
+# Foreign Investment by Sector
 
-The India page focuses on sector flows and a searchable, sortable company explorer,
-with a searchable selector for all 22 named NSDL equity sectors and the separate AI Catalysts theme.
-Sectors are ranked by six-month net buying, latest-fortnight buying or buying relative
-to opening FPI holdings; AI Catalysts is listed separately as a theme. The introduction
-uses two labelled sentences, and the cumulative buying chart is removed. The selector ranks sectors by six-month net buying, latest-fortnight buying or relative buying.
-Sovereign debt and the unclassified Others residual are excluded. Ownership selectors
-cover DII, FPI, mutual funds and insurers, with largest increases/decreases ranked by
-percentage-point ownership change. Company history is not displayed in this view.
-The app reads the committed audited snapshot; it never fetches financial data live.
-The breadth/concentration tab and FPI/DII scatter are retired from the dashboard.
+## Current dashboard — 30 October 2026
+
+The India Equity Markets subsection displays only the 22 named NSDL equity sectors. It has:
+
+- A ranked horizontal chart of foreign equity net investment, positive or negative.
+- Latest fortnight, latest complete calendar month, three-month and six-month comparisons.
+  Three/six months mean six/twelve consecutive fortnights, with exact dates displayed.
+- An optional ranking by selected-period net investment / opening FPI equity AUC × 100.
+  The denominator belongs to the first selected fortnight; missing/zero denominators remain
+  unavailable. This is neither investment return nor a change in portfolio weight.
+- A selected-sector history chart covering the full saved fortnightly window, independently
+  of the ranking period. Comparison and history CSV downloads are available.
+
+`data/processors/sector_flows.py` selects exact common periods. Missing periods never become zero,
+partial calendar months cannot become full months, and inconsistent sector cutoffs block display.
+The UI reads checksum-verified published files only. It does not fetch live sources or use company
+ownership data in calculations. Sovereign and Others are excluded; the sectors need not sum to the
+NSDL all-sector total. AI Catalysts has no separate sector-flow series and is absent from this view.
+
+Company explorer, quarterly ownership rankings and the AI basket have been removed from the UI.
+Historical stores and collectors are preserved for reproducibility; the existing all-sector weekly
+job still collects and audits its legacy datasets before publication. Decoupling or retiring that
+collector is separate maintenance, not a deletion of historical data in this change.
+
+Publish an audited existing source store with `python -m data.processors.emerging_publication`.
+The 30 October rebuild advances the displayed flow cutoff from 30 September to 15 October using
+already collected archives. Rendering never falls back to newer unverified raw files.
+
+Both old fragments (`india-emerging-opportunity`, `india-institutional-flows-ownership`) remain
+valid aliases; the new heading uses `india-foreign-investment-sectors`.
+
+## Historical ownership research documentation
+
+The following notes describe the retained legacy collector and research archive, not the current UI.
 
 ## Reproduce
 

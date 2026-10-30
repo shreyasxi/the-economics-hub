@@ -61,24 +61,19 @@ class OpportunityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unsupported'):
             parse_nsdl(raw, date(2026, 9, 30), 'AI Catalysts')
 
-    def test_ai_basket_and_searchable_selector(self):
+    def test_sector_only_selector_and_period_controls(self):
         from streamlit.testing.v1 import AppTest
         app = AppTest.from_string('from charts.india_charts.emerging_opportunity import render\nrender()').run(timeout=60)
-        self.assertEqual(len(app.selectbox(key='eo-active-sector').options), 23)
-        self.assertEqual(app.selectbox(key='eo-active-sector').value, max(EQUITY_SECTORS, key=lambda s: flow_metrics(load(sector=s))['net_cr']))
-        self.assertFalse(app.button)
-        app.selectbox(key='eo-active-sector').set_value('AI Catalysts').run(timeout=60)
         self.assertFalse(app.exception, [e.message for e in app.exception])
-        self.assertEqual([t.label for t in app.tabs], ['Company explorer', 'Sources & method'])
-        data = load(sector='AI Catalysts')
-        import pandas as pd
-        official = pd.read_csv(sector_store('AI Catalysts') / 'sources/ai_catalysts.csv')
-        self.assertEqual({c['symbol'] for c in data['companies']}, set(official.Symbol))
-        self.assertTrue(all(c['baskets'] == ['ai_catalysts'] for c in data['companies']))
-        self.assertFalse(app.metric)
-        app.selectbox(key='eo-active-sector').set_value('Information Technology').run(timeout=60)
+        self.assertEqual(len(app.selectbox(key='eo-active-sector').options), 22)
+        self.assertNotIn('AI Catalysts', app.selectbox(key='eo-active-sector').options)
+        self.assertFalse(app.tabs)
+        self.assertFalse(app.text_input)
+        for period in ['Latest fortnight', 'Latest complete month', 'Three months', 'Six months']:
+            app.radio(key='eo-flow-period').set_value(period).run(timeout=60)
+            self.assertFalse(app.exception, [e.message for e in app.exception])
+        app.checkbox(key='eo-flow-relative').check().run(timeout=60)
         self.assertFalse(app.exception, [e.message for e in app.exception])
-        self.assertEqual([t.label for t in app.tabs], ['Sector flows', 'Company explorer', 'Sources & method'])
 
     def test_completed_fortnight_boundaries(self):
         from datetime import date
@@ -283,26 +278,15 @@ class OpportunityTests(unittest.TestCase):
         self.assertEqual(p['increases'], 19)
         self.assertEqual(company_panel(data, '2026-06-30', 'mf')['increases'], 20)
 
-    def test_sector_selector_renders_the_matching_data_and_filters(self):
+    def test_sector_selector_renders_matching_flow_history(self):
         from streamlit.testing.v1 import AppTest
-        app = AppTest.from_string('from charts.india_charts.emerging_opportunity import render\nrender()').run(timeout=30)
+        app = AppTest.from_string('from charts.india_charts.emerging_opportunity import render\nrender()').run(timeout=60)
         for sector in ['Services', 'Textiles', 'Consumer Services']:
-            slug = SECTORS[sector]
-            app.selectbox(key='eo-active-sector').set_value(sector).run()
+            app.selectbox(key='eo-active-sector').set_value(sector).run(timeout=60)
             self.assertFalse(app.exception, [e.message for e in app.exception])
-            self.assertEqual([t.label for t in app.tabs], ['Sector flows', 'Company explorer', 'Sources & method'])
-            self.assertEqual(app.metric[0].value, f"₹{flow_metrics(load(sector=sector))['net_cr']:,.0f} cr")
-            suffix = '' if sector == 'Consumer Services' else '-' + slug
-            app.radio(key='eo-flow-frequency' + suffix).set_value('Monthly')
-            app.radio(key='eo-flow-unit' + suffix).set_value('US$ million')
-            app.selectbox(key='eo-company-quarter' + suffix).set_value(load(sector=sector)['quarters'][-1])
-            app.run()
-            self.assertFalse(app.exception, [e.message for e in app.exception])
-            for group in ['FPI', 'Mutual funds', 'Insurers', 'DII']:
-                app.radio(key='eo-company-investor' + suffix).set_value(group)
-                app.run()
-                self.assertFalse(app.exception, [e.message for e in app.exception])
-                self.assertTrue(any(group + ' ownership (%)' in frame.value.columns for frame in app.dataframe))
+            self.assertTrue(any('#### ' + sector in m.value for m in app.markdown))
+            self.assertFalse(app.tabs)
+
 
 
 if __name__ == '__main__':
