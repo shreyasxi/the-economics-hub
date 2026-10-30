@@ -1,0 +1,24 @@
+{
+  "reference_month": "2026-09",
+  "fiscal_year": "2026-27",
+  "basis": "April\u2013September cumulative; INR crore; unaudited provisional",
+  "retrieved_on": "2026-10-30",
+  "sources": [
+    {
+      "file": "published.html.gz",
+      "url": "https://cga.nic.in/MonthlyReport/Published/9/2026-2027.aspx",
+      "sha256_uncompressed": "e700a9117c02a66b2be70c128aefa9d1101ac05eb8001fbc772a9da250480254"
+    },
+    {
+      "file": "accounts.html.gz",
+      "url": "https://cga.nic.in/writereaddata/MonthAccount/92026/DATA2627.htm",
+      "sha256_uncompressed": "107637441b123eba2e14c79e41a606642559e84d9a5b59498ec14b1967eb80d0"
+    }
+  ],
+  "checks": {
+    "revenue_receipts": 1756820,
+    "total_receipts": 1835422,
+    "total_expenditure": 2549835,
+    "total_financing": "714412.96"
+  }
+}

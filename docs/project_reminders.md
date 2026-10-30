@@ -5,6 +5,52 @@ Read this first when coming back after a break. How everything is built:
 
 ---
 
+## Current handoff — 30 Oct 2026
+
+MacBook `main` is synced to reviewed GitHub commit `dcb949a` (36 incoming commits, no conflicts).
+**Python upgrade complete:** `.venv/bin/python` now runs Python 3.11.18 via `venv/python311`.
+The old 3.9.6 environment is preserved at `venv/python39-backup`; reactivate `.venv` in existing terminals
+and restart running apps. The NSDL `newline` compatibility error is resolved. Dependency checks and
+public Portfolio validation passed. Full Python suite: 813 passed, 1 skipped, 1 failed plus 101 passing
+subtests. The remaining sector-selector test fails identically under 3.9: published and raw-store flow
+values differ. Investigate that publication/test mismatch separately; no economic data were changed.
+See project context §0.3 for setup, rollback and verification details.
+
+## Manual-update audit — 30 Oct 2026
+
+This is an inventory of the local stores, not confirmation that newer official releases are available.
+Use the reference month the figure describes; October blanks are not automatically overdue. Check final
+releases before entering values. No economic observations were changed during this audit.
+
+| Manual task | Stored position / next action |
+|---|---|
+| World manufacturing PMI: US, euro area, UK, Japan, China | All five populated through Sep 2026. Enter October final releases when published; avoid flash/services/composite figures. |
+| China surveyed urban unemployment | September entered at 5.2% from owner-supplied figure on 30 Oct. |
+| China 10-year yield | September stored at 1.68%; October entered at 1.66% from owner-supplied month-end figure. |
+| India manufacturing/services PMI | Both through September; enter October final releases when available. Composite is calculated. |
+| India GST | Detailed gross/net/refunds CSV through September; summary gross level also present. Add October official monthly figures when released, including year-earlier revisions and source PDF; keep ₹ crore CSV versus ₹ lakh crore summary units straight. |
+| India core CPI | September entered at 4.3% from owner-supplied figure. Keep the same core definition. |
+| India legacy headline unemployment | Missing from August onward. This field still feeds the World scoreboard; decide whether to maintain the same series. It is separate from automated urban youth PLFS. |
+| RBI DBIE workbook | Owner-supplied `data/50 Macroeconomic Indicators.xlsx`; check for a newer release, dry-run then append. Updated workbook parsed/imported on 30 Oct: 109 combined months, with fortnightly-derived credit/deposit/M3 figures through October. |
+| CGA fiscal accounts | Manual YTD CSV through Sep 2026, plus FY2026–27 BE. September official source pages and full financing breakdown are archived in `data/inputs/cag/sources/2026-09/`. Replace the workbook if available, otherwise enter verified YTD rows including interest, net tax/non-tax revenue and financing components. |
+| Fiscal annuals and Budget assumptions | Annual interest/revenue file through FY2025–26 provisional. Update when actuals/revisions arrive; replace rounded FY2026–27 ₹393 lakh crore GDP with the exact official Budget figure after verification. |
+| RBI surveys | October-release workbooks present: IESH07102026, UCCSH07102026 and RCCSH07102026. Replace on new bi-monthly releases; workbook contents establish survey dates. |
+| India investment-rate snapshot | Explicit GMD refresh, not a monthly entry. Stored vintage 2026_09, annual history through 2025; refresh when new annual observations/revisions are available. |
+| Central-bank meeting calendars | Fed/ECB/BoE/BoJ lists extend through Dec 2027; some dates are tentative/provisional. Verify official calendars before annual rollover. Expiry now warns rather than failing publication. |
+| US CPI category weights | December weights through 2025 are configured, covering 2026. Add December 2026 weights when officially released with January 2027 CPI. |
+| Research editorial content | Maintain `WATCHING`, pinned essays, captions and saved chart images in `config/analysis.py` / `assets/analysis/` when the research changes. |
+| RBI Sentinel yield closes | Recovery only if automatic decision-day collection fails and an issue requests closes. Never rescore the history as routine maintenance. |
+
+**No routine manual entry:** NSDL FPI, headline/food CPI, IIP, urban youth PLFS, WSS reserves,
+REER, external vulnerability, State of the Economy, Portfolio Lab and normal market feeds. Their source
+failures need investigation; emergency manual flags do not turn them into monthly typing tasks.
+
+Next: collect October final PMI/GST releases as available. September China unemployment/core CPI,
+September fiscal accounts and the updated DBIE workbook were entered/imported on 30 Oct.
+The older `india_manual_entry status` grid includes automatic series, so its missing count is not a manual to-do count.
+
+---
+
 ## Coming back after months? Check these 4 things
 
 1. **GitHub → Actions tab.** Any red runs? Any workflow marked *disabled*? (GitHub switches off
@@ -25,7 +71,9 @@ Read this first when coming back after a break. How everything is built:
 | RBI Sentinel | weekdays 18:15 IST; extra checks on MPC decision day | supply yield closes only if requested (below) |
 | World policy rates | weekdays 12:00 IST and 02:30 IST the following day | nothing |
 | World bond yields retry | Mondays 17:47 IST | nothing |
-| India monetary charts | daily 20:40 IST, including weekends; local workflow, deployment pending | verify deployment before relying on it |
+| India monetary charts | daily 20:40 IST, including weekends | incoming update commits through 29 Oct; check Actions/live dates |
+| Portfolio Lab | Wednesday and Saturday 16:15 IST | nothing normally; check update status and analysis cutoff |
+| NSDL monthly/MTD FPI | Saturday India workflow, unless fetch is skipped | nothing normally; manual flags are recovery only |
 | Keep-alive | 3× a day | nothing |
 | Analysis: Signal or noise board | Saturdays, with Weekly Markets | nothing |
 | Analysis: newsletter shelf | read from Substack every 3 hours | nothing |
@@ -117,7 +165,7 @@ Sources: <https://www.pmi.spglobal.com/Public/Release/PressReleases> · <https:/
 
 **Once a year (by December):** add next year's decision dates for the Fed, ECB, BoE and BoJ in
 `config/world_settings.py` (`CENTRAL_BANKS`; URLs in `MEETING_SOURCES`). Listed through Dec 2027 now.
-`tests/test_world.py` fails when a bank's list runs out.
+`tests/test_world.py` warns when a bank's list runs out; update the calendar despite the warning being non-blocking.
 
 **Once a year (mid-February): US CPI weights.** The US Inflation Metrics chart splits CPI inflation
 by category using each category's BLS weight ("relative importance") for December. BLS publishes
@@ -163,8 +211,8 @@ Full command: `python -m data.processors.india_manual_entry set 2026-09 --gst 2.
 | When | Released | Command |
 |---|---|---|
 | ~1st of following month | Gross/net GST (GSTN) | Add the prior month's amounts to `data/inputs/gst/gst_monthly.csv` (₹ crore; details below); `--gst 2.04` still updates the summary's gross level (₹ lakh crore) |
-| month-end / 1st | FPI final monthly net investment (NSDL) | `set YYYY-MM --fpi -34574` (₹ crore, total of all segments) |
-| during current month, optional | FPI month-to-date (NSDL) | `set YYYY-MM --fpi-mtd -9508 --fpi-mtd-asof YYYY-MM-DD` |
+| month-end / 1st | FPI final monthly net investment (NSDL) | automatic Saturday collection; `--fpi` only for recovery (₹ crore, all segments) |
+| during current month | FPI month-to-date (NSDL) | automatic Saturday collection; `--fpi-mtd` / `--fpi-mtd-asof` only for recovery |
 | 1st business day | Manufacturing PMI | `set YYYY-MM --mfg-pmi 53.1` |
 | ~3rd business day | Services PMI | `set YYYY-MM --svc-pmi 54.6` |
 | ~5th | DBIE workbook (credit/deposits, trade; M3 retained without a chart) | replace file, run fetcher (below) |
@@ -194,13 +242,20 @@ PYTHONPATH=. .venv/bin/python data/fetchers/india_fetcher.py --append
 Published reserves use canonical RBI WSS, not this workbook. Trade uses DBIE first; verified releases in
 `data/stores/india/india_trade_releases.json` supplement missing months. Never type over official fetched observations.
 
-**FPI:** the published chart uses NSDL only and is manual by design — do not expect the
-fetcher to update it. Enter the final completed-month Total with `--fpi`. During the
-current month you may optionally enter an MTD figure with `--fpi-mtd` and
-`--fpi-mtd-asof YYYY-MM-DD`; it appears as a grey `*` bar and is excluded from the
-completed-month cumulative total. Once the final `--fpi` value exists for that month,
-the MTD bar disappears automatically. RBI DBIE's portfolio-investment series remains
-in the database for reference only and is never substituted into the published chart.
+**FPI:** the published chart uses official NSDL only, now collected automatically by the Saturday
+India workflow. It refreshes three recent completed months and current-month MTD (₹ crore, all segments),
+validates totals and dates, archives sources and audits database replacements. Failed collection keeps
+existing observations with their original dates. For an explicit refresh with the updated Python 3.11 environment: `PYTHONPATH=. .venv/bin/python -m data.fetchers.nsdl_fpi` (`--dry-run` validates without writes).
+Manual `--fpi`, `--fpi-mtd` and `--fpi-mtd-asof` remain recovery tools. MTD appears as a grey `*` bar only
+for the current month and never enters the completed-month cumulative total. No RBI DBIE substitution.
+
+**Portfolio Lab:** refreshes all three bundles together Wednesday/Saturday at 16:15 IST. The UI shows
+analysis cutoff and update status; a failed refresh keeps the previous validated release. Check Actions →
+Portfolio Lab Refresh for delays. Explicit refresh: `PYTHONPATH=. .venv/bin/python -m portfolio_lab.refresh`
+(requires `FRED_API_KEY`; performs collection, validation and tests). Published bundles can be checked
+without collecting: `PYTHONPATH=. .venv/bin/python -m portfolio_lab.deployment --validate`.
+Institutional research serves audited files under `data/published/india_research/`; CPI items require their
+same-edition display receipt, metadata and both panel PNGs. Missing/invalid releases need publication repair.
 
 **State of the Economy (nothing to do normally):** the Saturday India run reads RBI's monthly article itself —
 the briefing at the top of the India page and the rate-transmission chart both come from it. Published in the
@@ -254,8 +309,8 @@ A failed optional refresh omits its affected chart; check Actions/source status,
 Do not switch IIP back to DBIE. Emergency manual rendering requires `IIP_MANUAL_FALLBACK=true` or
 `CPI_MANUAL_FALLBACK=true`; resolve CPI conflicts through the audited bridge (§0.1 of project context).
 
-**CPI items, REER and external vulnerability:** now wired locally into Saturday India, pending publication
-and a successful Actions run. No routine manual entry after deployment; failed refreshes omit only the affected
+**CPI items, REER and external vulnerability:** wired into Saturday India; inspect Actions/source status
+for the affected edition. No routine manual entry after deployment; failed refreshes omit only the affected
 panels. WSS reserves already refresh on Saturdays. CPI items show price movers, not inflation contributions.
 
 **Investment rate:** still an explicit snapshot refresh when new annual data are available:
@@ -365,6 +420,7 @@ board as *Left out this week*; the list of 52 is `config/signals_settings.py`.
 | A series flatlines or goes blank | source stopped publishing or a column moved |
 | Rupee sign shows as a box | `DejaVu Sans` missing from the font list |
 | `status` shows `..` you thought you entered | the command never ran |
+| NSDL refresh fails with `write_text() got an unexpected keyword argument 'newline'` | An old Python 3.9 interpreter is still active; reactivate `.venv` and confirm `.venv/bin/python --version` |
 | A run fails with "FRED_API_KEY is not set" | the secret expired or was removed; there is no fallback by design |
 | Tabs lose bold styling | Streamlit version changed — keep `streamlit==1.50.0` in requirements.txt |
 | /analysis says "This page is being updated" | a slip in `config/analysis.py`; the line under it names where |

@@ -3,7 +3,7 @@
 > The single reference for how this project is built, run and changed. It is written so that an assistant
 > with **no access to the code** — a future Claude session, or any chatbot the owner uploads this file to —
 > can help change a chart, correct a figure or publish a change. Sections 1–12 describe the project as it is;
-> section 13 keeps the dated history of decisions. Operating sections refreshed against the working tree on 9 Oct 2026, including the completed local chart/data directory migration, shared path registry, processing modules, dataset/input/cache grouping, Weekly commentary/market matrix, official India activity and external sources, CPI items, monetary charts and the standalone daily workflow. Publication was authorized by the owner; live workflow verification remains pending and must be checked against GitHub history. Older dated history is background; current code and the operating sections below take precedence.
+> section 13 keeps the dated history of decisions. Latest update: 30 Oct 2026; §0.3 records the reviewed trip changes and local sync. The earlier operating sections were refreshed against the working tree on 9 Oct 2026, including the completed local chart/data directory migration, shared path registry, processing modules, dataset/input/cache grouping, Weekly commentary/market matrix, official India activity and external sources, CPI items, monetary charts and the standalone daily workflow. Publication was authorized by the owner; live workflow verification remains pending and must be checked against GitHub history. Older dated history is background; current code and the operating sections below take precedence.
 >
 > Companion file: `docs/project_reminders.md`, the owner's short monthly checklist (release dates, source
 > URLs, the Analysis page how-to). Upload it as well when the task is monthly data entry.
@@ -20,8 +20,10 @@ an edit. Do not write code against variable names you have not seen.
 **The owner's setup.** A Mac (zsh) and VS Code, with the project at `~/Documents/economics_hub` and a virtual
 environment in `.venv`. Commands in this file are run from that folder in VS Code's terminal, as
 `.venv/bin/python …` (scripts that import the project's packages also need `PYTHONPATH=.` in front). Local
-Python is **3.9**; GitHub Actions uses 3.11, so code must run on both — no `match` statements, no backslashes
-or reused quote characters inside f-string `{}` expressions. API keys live in `.env` (loaded automatically by
+Python is **3.11.18** locally after the 30 Oct upgrade; `.venv` points to `venv/python311`.
+The original 3.9.6 environment is preserved at `venv/python39-backup`. Primary GitHub Actions checks
+use 3.11 and the Cloud-runtime smoke job uses 3.14. Use `.venv/bin/python` (or activate `.venv`);
+plain system `python3` may still be 3.9. Keep changes compatible with Python 3.11, including f-string syntax. API keys live in `.env` (loaded automatically by
 `config/settings.py`). The owner also works with Claude Code inside VS Code, which *can* read the repository.
 
 **Rules that are not negotiable** (full list §12):
@@ -242,6 +244,58 @@ canonical Insights and the actual India page's section placement. Synthetic valu
 never enter production folders. Immutable official regression fixtures under `tests/fixtures/rbi_surveys/` verify
 the original exact values and source cells independently of future replacements
 in the production source folders.
+
+---
+
+## 0.3 Trip changes and MacBook sync — 30 Oct 2026
+
+Local `main` fast-forwarded from `7d189f6` (14 Oct) to `dcb949a` (latest reviewed commit, 29 Oct UTC).
+The 36 incoming commits comprise six owner-authored changes and 30 automated updates. There were no
+local-only commits or uncommitted files before the pull. This section supersedes older descriptions
+of manual-only FPI, pending monetary publication, and Portfolio Lab refresh behavior.
+
+- **Portfolio Lab:** `portfolio_lab/refresh.py` prepares fresh isolated Global, macro and India bundles,
+  checks freshness and non-regressing observation dates, runs Portfolio tests and independent verifiers,
+  and publishes the complete candidate only after validation. `.github/workflows/portfolio_refresh.yml`
+  schedules Wednesday/Saturday 10:45 UTC (16:15 IST), using `FRED_API_KEY`; commits only the public release.
+  The UI reads prepared data and reports analysis cutoff, successful update time and delayed status.
+  Source dates differ from retrieval dates; FX and usable weekly India checkpoints have separate cutoffs.
+- **NSDL FPI:** `python -m data.fetchers.nsdl_fpi` refreshes three recent completed months and current-month
+  daily MTD in INR crore, all segments. Saturday India invokes it unless `skip_fetch=true`. It validates
+  report identity, arithmetic, dates and categories, archives response bytes under `data/stores/india/nsdl_fpi/`,
+  and adopts database changes transactionally with `india_fpi_audit` records. Retrieval/validation failures
+  preserve existing observations. Manual flags remain recovery tools, not routine monthly work. The chart
+  excludes future/current-month final observations and displays MTD only for the current month.
+- **India publication:** `python -m data.processors.emerging_publication` audits all sector sources and
+  publishes immutable releases under `data/published/india_research/`, selected by `CURRENT`. The UI checks
+  the manifest and selected sector checksum instead of replaying archives. CPI item publication includes
+  `06b_india_cpi_items.display.json`, verified metadata and both PNGs; generation performs the full source audit.
+- **Deployment/navigation:** keep-alive now targets `https://monetaria.streamlit.app/`; section jumps wait
+  for targets and image layout, and stop on manual input/navigation. CPI rendering reloads an older retained
+  processor module when its new API is missing. INR manifests write POSIX paths and read legacy Windows paths.
+  SIP contribution dates are clamped to the actual common portfolio window after refreshes.
+- **CI maintenance:** primary checks run Python 3.11; an added 3.14 job validates public bundles and renders
+  dashboard smoke/regression tests. Expired meeting calendars warn rather than block World publication;
+  banking-liquidity fixtures use fixed dates. Calendar warnings still require annual maintenance.
+- **Publication evidence:** incoming history includes daily RBI monetary update commits through 29 Oct and
+  Portfolio snapshot publication on 28 Oct. This establishes committed updates; Actions logs and live UI
+  were not independently inspected in this review.
+- **Verification on 30 Oct:** tested a temporary copy of `dcb949a` with this Mac's existing `.venv`:
+  78 selected tests passed, six NSDL adoption tests failed at `Path.write_text(..., newline="\n")`.
+  That keyword requires Python 3.10+, while the environment used for that initial review was 3.9.6. Public Global/macro/India bundles
+  passed `python -m portfolio_lab.deployment --validate`. This was a focused check, not the full suite or
+  a live-source collection. The subsequent upgrade below resolves the local runtime mismatch.
+- **Python upgrade, 30 Oct:** installed Homebrew Python 3.11.18 and created `venv/python311` from
+  `requirements.txt` plus pytest. `pip check` passed; public Portfolio deployment validation passed.
+  Full Python suite: **813 passed, 1 skipped, 1 failed; 101 subtests passed**. The remaining failure is
+  `test_sector_selector_renders_the_matching_data_and_filters`: published versus raw-store flow values
+  differ (₹15,634 versus ₹16,487 for the first checked sector). The same failure was reproduced in 3.9.6,
+  so it is pre-existing, not an upgrade regression. All six previously failing NSDL tests now pass.
+  `.venv` is a symlink to `venv/python311`; the old environment remains in `venv/python39-backup`.
+  To roll back, remove only the `.venv` symlink and rename the backup directory to `.venv`; do not delete
+  either environment's contents. Existing terminals must deactivate/reactivate; restart any running app.
+  Installed package versions are recorded locally in `venv/python311/validated-dependencies.txt`.
+  No live collection, paid scoring, economic-data update or deployment was performed during the upgrade.
 
 ---
 
@@ -526,7 +580,7 @@ words in the file name (§5.3). Where the data is typed by hand, §5.4 says how 
 | `20_india_system_liquidity` | Banking System Liquidity | Monetary Conditions | `charts.india_charts.india_monetary.liquidity` | Surplus (+) / deficit (−), outstanding RBI operations; 20-weekday average | same canonical CSV; stored RBI sign reversed for display only |
 | `16_india_forex_reserves` | India Forex Reserves | External Sector | `chart_forex_reserves` / `charts.india_charts.india_external.load_forex` | Reserves, weekly | canonical `data/stores/india/rbi_wss_reserves.csv`, RBI WSS |
 | `17_india_trade` | India Trade | External Sector | `chart_trade_balance` | Exports, imports, deficit | `india_exports_usd_bn`, `india_imports_usd_bn` (DBIE; verified official release supplement for missing months) |
-| `03_india_fpi_monthly` | India FPI Monthly | Equity Markets | `chart_fpi_flows` | Net foreign portfolio investment per month | NSDL only: completed-month `india_fpi_net_inr_cr` (typed, ₹ crore), optional current-month MTD; no RBI fallback (`fpi_series()`) |
+| `03_india_fpi_monthly` | India FPI Monthly | Equity Markets | `chart_fpi_flows` | Net foreign portfolio investment per month | NSDL only: completed-month `india_fpi_net_inr_cr` (official collector, ₹ crore; manual recovery), optional current-month MTD; no RBI fallback (`fpi_series()`) |
 | `02_india_gst` | GST Revenue Growth | Fiscal Policy & Public Finances | `chart_gst` | Latest 12 months of gross/net YoY growth, excluding cess | `data/inputs/gst/gst_monthly.csv`, exact ₹ crore; official reports archived alongside |
 | `07_india_expenditure_quality` | India Expenditure Quality | Fiscal Policy & Public Finances | `chart_expenditure_quality` | Capital against revenue spending, year to date; capex Budget ÷ 12 line | `data/inputs/cag/cag_monthly_accounts.xlsx` + `data/inputs/cag/cag_manual_accounts.csv` |
 | `09_india_deficit_financing` | India Deficit Financing | Fiscal Policy & Public Finances | `chart_deficit_financing` | How the deficit is financed | `cag_manual_accounts.csv`, `fin_*` columns |
@@ -689,7 +743,7 @@ preview any `set`.
 | Weekly Markets | any | Nothing is stored: every number is fetched fresh each run (Yahoo, FRED, NSE, Coin Metrics). A wrong number means a wrong ticker or series (`config/settings.py`) or a wrong calculation (the chart's block). | — |
 | World | Manufacturing PMI (US, euro area, UK, Japan, China), China unemployment, China 10-year | `PYTHONPATH=. .venv/bin/python -m data.processors.world_manual_entry set 2026-08 --country US --pmi 52.4` (`--unemployment` and `--ten-year` China only; Japan CPI now uses OECD automatically). Running `set` again for the same month overwrites. `… status` lists what is missing. | `data/stores/world/world_manual.csv` |
 | World | everything else | Automatic, with freshness limits (`config/world_settings.py`); no overrides by design. A stale source fails the run with a message naming it. | — |
-| India | PMIs, GST, core CPI, unemployment, FPI (NSDL); headline/food CPI and IIP have guarded manual fallbacks | `PYTHONPATH=. .venv/bin/python -m data.processors.india_manual_entry set 2026-08 --gst 2.04 --core-cpi 3.8` — flags `--mfg-pmi --svc-pmi --gst --cpi --core-cpi --food-cpi --unemployment --iip --fpi`. Units: PMI index; GST ₹ **lakh crore** (2.04, never 204000); CPI/IIP % YoY; unemployment %; FPI ₹ **crore**. Range-checked; prints before → after; setting a month again corrects it. `… status` shows 12 months, `… show 2026-08` one. Composite PMI is calculated — never enter it. | `data/stores/india/india_macro.db`, table `india_monthly` |
+| India | PMIs, GST, core CPI, unemployment; FPI (NSDL) manual recovery only; headline/food CPI and IIP have guarded manual fallbacks | `PYTHONPATH=. .venv/bin/python -m data.processors.india_manual_entry set 2026-08 --gst 2.04 --core-cpi 3.8` — flags `--mfg-pmi --svc-pmi --gst --cpi --core-cpi --food-cpi --unemployment --iip --fpi`. Units: PMI index; GST ₹ **lakh crore** (2.04, never 204000); CPI/IIP % YoY; unemployment %; FPI ₹ **crore**. Range-checked; prints before → after; setting a month again corrects it. `… status` shows 12 months, `… show 2026-08` one. Composite PMI is calculated — never enter it. | `data/stores/india/india_macro.db`, table `india_monthly` |
 | India | DBIE bank credit, deposits, M3, exports/imports and legacy reserve/RBI portfolio rows (published reserves/FPI use separate sources) | Download RBI's DBIE workbook, save it over `data/50 Macroeconomic Indicators.xlsx` (same name), then `PYTHONPATH=. .venv/bin/python data/fetchers/india_fetcher.py --dry-run` and `… --append` (updates the months present; other columns untouched). A wrong figure is corrected by RBI's next workbook, not by hand. | `india_monthly`, `india_weekly` |
 | India | fiscal: revenue spending, capex, fiscal deficit, interest, subsidies, Budget (BE) rows, deficit financing | One row per month in `data/inputs/cag/cag_manual_accounts.csv`, **year-to-date ₹ crore**, rules in the file's header comment (the financing rows must add up, to within ₹1 crore). A row in `data/inputs/cag/cag_monthly_accounts.xlsx` for the same month wins, except the `fin_*` columns. Checked by `tests/test_cag_manual.py` and by `generate_india.py`, which stops on a bad figure. | the CSV / workbook |
 | India | official activity, CPI items and RBI external stores | Separate collector commands and contracts in §6; no manual replacement of official observations. | canonical CSVs / source archives |
@@ -1147,12 +1201,12 @@ sign; now by meaning (`good` per column in `SCOREBOARD_COLUMNS`, applied in `_sc
   exports/imports and legacy forex/RBI portfolio series. M3 has no current chart; legacy reserve/portfolio
   rows are not the sources for published reserves/FPI. Verified official merchandise releases in
   `data/stores/india/india_trade_releases.json` supplement only missing DBIE months; DBIE takes precedence on overlap.
-- **FPI chart and table:** NSDL only (`india_fpi_net_inr_cr`, ₹ crore, entered with `--fpi`), with optional
+- **FPI chart and table:** NSDL only (`india_fpi_net_inr_cr`, ₹ crore, official automated collector; `--fpi` for recovery), with optional
   current-month MTD (`--fpi-mtd`, `--fpi-mtd-asof`). No RBI fallback. `fpi_series()` selects completed months;
   a final monthly observation supersedes MTD, which never enters the completed-month cumulative total
 - **NIFTY IT standalone chart:** function retained, but not called by the current dashboard; sector rotation includes IT.
 - **Manual series** (`python -m data.processors.india_manual_entry set …`): manufacturing and services PMI,
-  GST, core CPI, the legacy monthly unemployment field and **FPI** (NSDL, ₹ crore).
+  GST, core CPI and the legacy monthly unemployment field; **FPI** flags are recovery-only (NSDL, ₹ crore).
   The new urban youth PLFS chart/snapshot use the separate official monthly store, not `--unemployment`. Headline/food CPI and IIP are official automated series; emergency manual rules are in §0.1
 - **Fiscal charts (4 since Oct 2026):** gross/net GST YoY growth (12 months, excluding cess), expenditure quality
   (with a "capex to date, % of Budget" badge), annual/current-year interest burden, and deficit financing.
@@ -1583,6 +1637,9 @@ Test pipeline changes on a copy: `RBI_SENTINEL_DB=/path/to/copy.db python …`
 ## 10. CI, secrets, setup
 
 ### Workflows
+
+Portfolio Lab also runs `portfolio_refresh.yml` on Wednesday/Saturday at 10:45 UTC; see §0.3.
+
 | Workflow | Schedule (UTC) | Command | Commits |
 |---|---|---|---|
 | `weekly.yml` ("Weekly Markets Generator") | Sat 06:00 | `generate_weekly.py --mode dashboard`, `generate_market_matrix.py` (required), restores the headline pool, then `generate_news.py` (optional: `continue-on-error`, 8 min limit), then `generate_signals.py` (optional, 10 min limit), keeps the last 4 weeks | `assets/weekly/` (charts + `market_matrix.json` + `news.json` + `signals.json`), showcase |
@@ -1653,7 +1710,7 @@ Sentinel database, macro database, transmission CSV, full India generation, prun
 ### Local setup
 ```bash
 cd ~/Documents/economics_hub
-source .venv/bin/activate        # Python 3.9 locally; CI uses 3.11
+source .venv/bin/activate        # Python 3.11.18; setup/rollback details in §0.3
 pip install -r requirements.txt
 streamlit run app.py
 for f in tests/test_*.py; do PYTHONPATH=. python "$f" > /dev/null || echo "FAILED: $f"; done
@@ -1751,6 +1808,15 @@ Six charts at fixed names in `assets/readme_showcase/`, refreshed by the workflo
 ---
 
 ## 13. History — what changed and why
+
+**Month-end data update (30 Oct 2026).** Owner supplied China September unemployment 5.2%, India
+September core CPI 4.3%, and China October month-end 10-year yield 1.66%. Imported the replaced DBIE
+workbook through the production monthly/fortnightly parsers (109 combined months; latest October).
+CGA September unaudited April–September figures entered in the existing manual CSV, with official
+HTML sources and SHA-256 manifest archived under `data/inputs/cag/sources/2026-09/`. Fiscal deficit
+₹714,413 crore reconciles to financing ₹714,412.96 crore; interest/revenue is 36.77%. Continue the
+web-page/manual-CSV route for CGA updates; a future official workbook still takes precedence on overlap.
+
 
 Dated notes kept for the reasons behind decisions, roughly newest first. Where they differ from §1–§12,
 §1–§12 describe the current state. Section numbers in older notes (e.g. "§4", "§7") refer to this file's

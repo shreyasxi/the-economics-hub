@@ -19,6 +19,8 @@ build/
 
 # ── Virtual Environment ──
 .venv/
+# Also ignore .venv when it is a local environment symlink.
+.venv
 venv/
 env/
 

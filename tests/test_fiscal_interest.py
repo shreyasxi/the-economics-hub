@@ -10,8 +10,8 @@ def test_official_ratios_and_statuses():
     assert annual.iloc[-3].interest_share == pytest.approx(1115575 / 3036619 * 100)
     assert annual.iloc[-2].interest_share == pytest.approx(1242575 / 3302225 * 100)
     assert annual.iloc[-1].interest_share == pytest.approx(1403972 / 3533150 * 100)
-    assert monthly.date.tolist() == pd.date_range('2026-04-01', '2026-08-01', freq='MS').tolist()
-    assert monthly.iloc[-1].interest_share == pytest.approx(514810 / (837921 + 454549) * 100)
+    assert monthly.date.tolist() == pd.date_range('2026-04-01', '2026-09-01', freq='MS').tolist()
+    assert monthly.iloc[-1].interest_share == pytest.approx(646010 / (1276088 + 480732) * 100)
     # May is cumulative. Using only May increments would produce a different ratio.
     assert monthly.iloc[1].interest_share == pytest.approx(181461 / 699005 * 100)
 

@@ -44,7 +44,7 @@ equities or the rupee. What it does track is the 10-year government security's m
 
 ### Prerequisites
 
-Python 3.9+ and a free FRED API key from [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html).
+Python 3.11+ (3.11 is used for the full CI suite) and a free FRED API key from [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html).
 
 ### Installation
 
