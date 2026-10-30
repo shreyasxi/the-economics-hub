@@ -28,53 +28,65 @@ class SaturdaySources(unittest.TestCase):
             load.assert_not_called()
             self.assertEqual(list(Path(directory).iterdir()), [])
 
-    def assert_independent_external_failure(self, failed_flag, failed_chart, good_chart, missing, retained):
+    def assert_external_refresh_fallback(self, failed_flag, fallback_chart, independent_chart,
+                                         fallback_name, independent_name):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
             for name in EXTERNAL_FILES:
-                (output / name).write_bytes(b'old')
+                (output / name).write_bytes(b'old chart')
 
-            def render(folder):
-                path = folder / retained
-                path.write_bytes(b'new')
+            def render(folder, name, content):
+                path = folder / name
+                path.write_bytes(content)
                 return path
 
             flags = dict(REER_UPDATE_FAILED='false', EXTERNAL_VULNERABILITY_UPDATE_FAILED='false')
             flags[failed_flag] = 'true'
-            with patch.dict(os.environ, flags), patch.object(external, failed_chart) as blocked, \
-                    patch.object(external, good_chart, side_effect=render):
-                self.assertEqual(external.generate(output), [output / retained])
-            blocked.assert_not_called()
-            self.assertFalse((output / missing).exists())
-            self.assertEqual((output / retained).read_bytes(), b'new')
+            with patch.dict(os.environ, flags), \
+                    patch.object(external, fallback_chart, side_effect=lambda folder: render(
+                        folder, fallback_name, b'validated stored data')) as fallback, \
+                    patch.object(external, independent_chart, side_effect=lambda folder: render(
+                        folder, independent_name, b'fresh independent data')) as independent:
+                self.assertEqual(set(external.generate(output)), {output / name for name in EXTERNAL_FILES})
+            fallback.assert_called_once_with(output)
+            independent.assert_called_once_with(output)
+            self.assertEqual((output / fallback_name).read_bytes(), b'validated stored data')
+            self.assertEqual((output / independent_name).read_bytes(), b'fresh independent data')
 
-    def test_failed_reer_does_not_read_old_store_or_block_vulnerability(self):
-        self.assert_independent_external_failure('REER_UPDATE_FAILED', 'chart_reer',
+    def test_failed_reer_renders_validated_store_and_does_not_block_vulnerability(self):
+        self.assert_external_refresh_fallback('REER_UPDATE_FAILED', 'chart_reer',
             'chart_vulnerability', EXTERNAL_FILES[0], EXTERNAL_FILES[1])
 
     def test_failed_vulnerability_renders_validated_store_and_does_not_block_reer(self):
-        with tempfile.TemporaryDirectory() as directory:
-            output=Path(directory)
-            def render(folder, name):
-                path=folder/name
-                path.write_bytes(b'validated stored data')
-                return path
-            with patch.dict(os.environ, dict(REER_UPDATE_FAILED='false', EXTERNAL_VULNERABILITY_UPDATE_FAILED='true')), \
-                    patch.object(external,'chart_vulnerability',side_effect=lambda folder:render(folder,EXTERNAL_FILES[1])) as fallback, \
-                    patch.object(external,'chart_reer',side_effect=lambda folder:render(folder,EXTERNAL_FILES[0])):
-                self.assertEqual(set(external.generate(output)),{output/name for name in EXTERNAL_FILES})
-            fallback.assert_called_once()
-        self.assertIn('::warning title=External vulnerability refresh failed',WORKFLOW.read_text())
+        self.assert_external_refresh_fallback('EXTERNAL_VULNERABILITY_UPDATE_FAILED',
+            'chart_vulnerability', 'chart_reer', EXTERNAL_FILES[1], EXTERNAL_FILES[0])
+        self.assertIn('::warning title=External vulnerability refresh failed', WORKFLOW.read_text())
 
-    def test_failed_vulnerability_with_invalid_store_is_still_omitted(self):
-        with tempfile.TemporaryDirectory() as directory:
-            output=Path(directory)
-            (output/EXTERNAL_FILES[1]).write_bytes(b'old chart')
-            with patch.dict(os.environ, dict(REER_UPDATE_FAILED='false', EXTERNAL_VULNERABILITY_UPDATE_FAILED='true')), \
-                    patch.object(external,'chart_vulnerability',side_effect=ValueError('invalid stored data')), \
-                    patch.object(external,'chart_reer',return_value=None):
-                self.assertEqual(external.generate(output),[])
-            self.assertFalse((output/EXTERNAL_FILES[1]).exists())
+    def test_failed_external_refresh_with_invalid_store_omits_only_affected_chart(self):
+        for flag, failed_chart, good_chart, missing, retained in (
+            ('REER_UPDATE_FAILED', 'chart_reer', 'chart_vulnerability', *EXTERNAL_FILES),
+            ('EXTERNAL_VULNERABILITY_UPDATE_FAILED', 'chart_vulnerability', 'chart_reer',
+             EXTERNAL_FILES[1], EXTERNAL_FILES[0]),
+        ):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory)
+                for name in EXTERNAL_FILES:
+                    (output / name).write_bytes(b'old chart')
+
+                def render(folder):
+                    path = folder / retained
+                    path.write_bytes(b'fresh independent data')
+                    return path
+
+                flags = dict(REER_UPDATE_FAILED='false', EXTERNAL_VULNERABILITY_UPDATE_FAILED='false')
+                flags[flag] = 'true'
+                with patch.dict(os.environ, flags), \
+                        patch.object(external, failed_chart, side_effect=ValueError('invalid stored data')), \
+                        patch.object(external, good_chart, side_effect=render) as independent:
+                    self.assertEqual(external.generate(output), [output / retained])
+                independent.assert_called_once_with(output)
+                self.assertFalse((output / missing).exists())
+                self.assertEqual((output / retained).read_bytes(), b'fresh independent data')
 
     def test_invalid_external_store_cannot_abort_independent_charts(self):
         with tempfile.TemporaryDirectory() as directory:
