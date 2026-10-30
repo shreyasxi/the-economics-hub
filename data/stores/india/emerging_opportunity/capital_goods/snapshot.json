@@ -2,7 +2,7 @@
   "schema_version": 1,
   "sector": "Capital Goods",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-28T08:08:40.319601+00:00",
+  "collected_at": "2026-10-30T13:05:50.682967+00:00",
   "window_start": "2026-04-15",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-15",
@@ -9596,35 +9596,6 @@
       "reference_price": 539.4
     },
     {
-      "symbol": "TRIVENIPT",
-      "name": "Triveni Power Transmission Ltd.",
-      "sector": "Capital Goods",
-      "industry": "Capital Goods",
-      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
-      "baskets": [
-        "niftymicrocap250",
-        "niftytotalmarket"
-      ],
-      "holdings": [
-        {
-          "symbol": "TRIVENIPT",
-          "quarter": "2026-09-30",
-          "fpi_shares": 5797996,
-          "total_shares": 104754338,
-          "fpi_pct": 5.534850499460939,
-          "dii_shares": 5355354,
-          "dii_pct": 5.112298070176339,
-          "mf_shares": 3740391,
-          "mf_pct": 3.5706311274670077,
-          "insurance_shares": null,
-          "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743169_21102026053552_WEB.xml",
-          "filed_at": "21-OCT-2026 17:36:00"
-        }
-      ],
-      "reference_price": null
-    },
-    {
       "symbol": "UNIMECH",
       "name": "Unimech Aerospace and Manufacturing Ltd.",
       "sector": "Capital Goods",
@@ -13300,11 +13271,6 @@
       "sha256": "51684db6c24294ee7e7a99d4eaecc22914f7a1ed9ad2d6674314cfa516f6952c"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1743169_21102026053552_WEB.xml",
-      "file": "sources/TRIVENIPT-2026-09-30.xml.gz",
-      "sha256": "184a14ad577025815db567dd7b953b931f571bd5609fa07fad2ecd13e2d7f959"
-    },
-    {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1577067_17112025053029_WEB.xml",
       "file": "sources/UNIMECH-2025-09-30.xml.gz",
       "sha256": "ab968802a4a3db3a54e9e6fc3ec3e807de14f11cd090d7a234a718b3b0a4718b"
@@ -14082,7 +14048,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TEGA",
       "file": "sources/filings-TEGA.json",
-      "sha256": "4ecc9abdae2861c6919f20f2a5527201efc70f0feadb0cb7a9ce983587b5b423"
+      "sha256": "49d230dbe3ad4ab1fc3caefdb2e2c10215f150ab197241e2d6aa3b5cbb487a05"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TEXRAIL",
@@ -14123,11 +14089,6 @@
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TRITURBINE",
       "file": "sources/filings-TRITURBINE.json",
       "sha256": "60bfb73000c6bbde0bff40b804bec1b9feb76eb39602f0c0bac8ef87ab32204c"
-    },
-    {
-      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TRIVENIPT",
-      "file": "sources/filings-TRIVENIPT.json",
-      "sha256": "5f428d4dd826cfe169d8775f6e6c66ec450c6f1579df48e8666c45ff6f83a70c"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=UNIMECH",
@@ -14187,12 +14148,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "5f68c27931a5b24e28d5a85d37b0e6bdd36a3633403f85c81baeb1a97fbeac1f"
+      "sha256": "56695884f6a6482d58930d07522036af1f7b6615327a70f628b13cd7058ca3ca"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "56cfae7b3ba1839fdf7f50395468b9f20bfbd68832a37043a3e4e27c92d5a07f"
+      "sha256": "d43b076112ebe7774db9378a5696ca9705420b9a3ffeede8b7411673caf134ed"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -14235,5 +14196,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "fdaa557117c2b358f3f3feb4947a43a538c095768aa42f82de10553df0f6efe1"
+  "digest": "f6b2d9936ecbca0e96e3100326b08a7ae414e45df375915fcb1d6467d8bc3045"
 }

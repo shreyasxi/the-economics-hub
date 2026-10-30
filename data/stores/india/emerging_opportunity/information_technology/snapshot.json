@@ -2,7 +2,7 @@
   "schema_version": 1,
   "sector": "Information Technology",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-28T08:14:01.738045+00:00",
+  "collected_at": "2026-10-30T13:13:52.589564+00:00",
   "window_start": "2026-04-15",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-15",
@@ -2899,8 +2899,8 @@
           "mf_pct": 1.682772307827501,
           "insurance_shares": 4841974,
           "insurance_pct": 7.7729567813737255,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554847_21102025040144_WEB.xml",
-          "filed_at": "21-OCT-2025 16:01:52"
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1747634_28102026032740_WEB.xml",
+          "filed_at": "28-OCT-2026 19:05:35"
         },
         {
           "symbol": "TATAELXSI",
@@ -4325,9 +4325,9 @@
       "sha256": "17436dc24f76cc60d5efe720937301a6c732150a52456a0bd90379e12e437aa5"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554847_21102025040144_WEB.xml",
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1747634_28102026032740_WEB.xml",
       "file": "sources/TATAELXSI-2025-09-30.xml.gz",
-      "sha256": "3659fea8797ce28e0156c72f089cc8c1c7e9bc894699b9ba06218e5e72961664"
+      "sha256": "a3737f601230095f7fb7fef86cada0f3e39bf74d52ce13061f0ed519cb84065a"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607009_21012026034644_WEB.xml",
@@ -4637,7 +4637,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PERSISTENT",
       "file": "sources/filings-PERSISTENT.json",
-      "sha256": "4c9c929ae39e3a09dc274c470598eac20315842fee3e41bb6170bc1b4a32ba3c"
+      "sha256": "735780ac1c637d9fe96ae977fa56002fc7e77f68e6943142a7e11953a2ab844d"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=RATEGAIN",
@@ -4662,7 +4662,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TATAELXSI",
       "file": "sources/filings-TATAELXSI.json",
-      "sha256": "2fc62ee6687502e6e5e910742549e2d80a18081d91b7d731d89154b69d170101"
+      "sha256": "112b17f9ddf13823b324140a816092b20dd404ce34038b825b3eec97e8fedb96"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TATATECH",
@@ -4697,12 +4697,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "5f68c27931a5b24e28d5a85d37b0e6bdd36a3633403f85c81baeb1a97fbeac1f"
+      "sha256": "56695884f6a6482d58930d07522036af1f7b6615327a70f628b13cd7058ca3ca"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "56cfae7b3ba1839fdf7f50395468b9f20bfbd68832a37043a3e4e27c92d5a07f"
+      "sha256": "d43b076112ebe7774db9378a5696ca9705420b9a3ffeede8b7411673caf134ed"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -4745,5 +4745,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "9d11da7c05ef149cfb6de8939ac9949e48833120fdb3deb062dcecc0f7b48bd6"
+  "digest": "e50b613cd2bb9d012e6aaf6d19871edcaf6946b9d44adf0fba44671b5b939bb5"
 }

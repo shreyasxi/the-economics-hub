@@ -2,7 +2,7 @@
   "schema_version": 1,
   "sector": "Utilities",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-28T08:15:57.573150+00:00",
+  "collected_at": "2026-10-30T13:16:44.047621+00:00",
   "window_start": "2026-04-15",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-15",
@@ -573,12 +573,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "5f68c27931a5b24e28d5a85d37b0e6bdd36a3633403f85c81baeb1a97fbeac1f"
+      "sha256": "56695884f6a6482d58930d07522036af1f7b6615327a70f628b13cd7058ca3ca"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "56cfae7b3ba1839fdf7f50395468b9f20bfbd68832a37043a3e4e27c92d5a07f"
+      "sha256": "d43b076112ebe7774db9378a5696ca9705420b9a3ffeede8b7411673caf134ed"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -621,5 +621,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "2325811f8c0976588075ef3bcd5396cfb4bbd9cf21037761d987340bb86f01c8"
+  "digest": "608e94b7cd145e20f6e0db4063c11416af6a3e9ab4874abaec3bef334ae9f30c"
 }
