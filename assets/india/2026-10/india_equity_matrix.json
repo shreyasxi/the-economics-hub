@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
   "title": "India Equity Market Performance Matrix",
-  "requested_as_of": "2026-10-28",
-  "as_of": "2026-10-27",
-  "generated_at": "2026-10-28T11:41:03.077903+00:00",
-  "source_fetched_at": "2026-10-28T11:38:43.996390+00:00",
+  "requested_as_of": "2026-10-30",
+  "as_of": "2026-10-29",
+  "generated_at": "2026-10-30T11:47:53.961421+00:00",
+  "source_fetched_at": "2026-10-30T11:45:53.311084+00:00",
   "source_url": "https://www.niftyindices.com/reports/historical-data",
   "return_method": "official NSE gross total-return index",
   "currency": "INR",
   "methodology_note": "Returns use official NSE gross total-return indices. Some newer indices include official NSE back-cast history prior to launch.",
   "relative_unit": "percentage points",
-  "relative_anchor": "2025-10-27",
+  "relative_anchor": "2025-10-29",
   "off_high_definition": "Latest gross TRI / highest observed gross TRI within the trailing five calendar years \u2212 1.",
   "groups": [
     {
@@ -27,42 +27,42 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 34579.35,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 34866.61,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.5991471717942343,
-            "1M": -1.656625006932233,
-            "YTD": -12.086882572257029,
-            "1Y": -11.488397415863115,
-            "3Y": 7.325156160655388,
-            "5Y": 5.777497532500919
+            "1W": 1.1159213753798358,
+            "1M": 1.0125413164659536,
+            "YTD": -11.356564561296912,
+            "1Y": -11.054112520982251,
+            "3Y": 7.6070647520943835,
+            "5Y": 6.591254260280355
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 34787.78
+              "date": "2026-10-22",
+              "level": 34481.82
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 35161.85
+              "date": "2026-09-29",
+              "level": 34517.11
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 39333.55
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 39067.59
+              "date": "2025-10-29",
+              "level": 39199.8
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 27969.92
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 26113.62
+              "date": "2021-10-29",
+              "level": 25340.83
             }
           },
           "vs_nifty50_1y": 0.0,
@@ -276,31 +276,31 @@
               "value": 88.76293907587997
             },
             {
-              "date": "2026-10-27",
-              "value": 89.3509402954993
+              "date": "2026-10-29",
+              "value": 90.09320268936399
             }
           ],
-          "off_5y_high": -12.75109447962417,
+          "off_5y_high": -12.026294256375802,
           "high_5y_date": "2026-01-02",
           "high_5y_level": 39632.99,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 26268.83
+              "date": "2021-10-18",
+              "level": 26467.21
             },
             {
-              "date": "2024-04-23",
-              "level": 32927.73
+              "date": "2024-04-24",
+              "level": 32978.37
             },
             {
-              "date": "2026-10-27",
-              "level": 34579.35
+              "date": "2026-10-29",
+              "level": 34866.61
             }
           ],
-          "source_sha256": "ce9dd567ef34d0f79560358d0ad24ede767d2f2ed9abe298959115b342ee198f"
+          "source_sha256": "8b70acdc9e9293e76c9e2ee9ab97c901b84290073a13541dcd2c3aa3fac5b8ce"
         },
         {
           "id": "nifty-next-50",
@@ -312,45 +312,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 97619.11,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 98746.4,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.9471138369030805,
-            "1M": -6.124178975759486,
-            "YTD": -2.0639002258610484,
-            "1Y": -2.371185695858169,
-            "3Y": 16.372332067677032,
-            "5Y": 10.486844945809093
+            "1W": 1.160918929091448,
+            "1M": -1.8705691704546057,
+            "YTD": -0.9329496782235158,
+            "1Y": -2.1242634024769336,
+            "3Y": 16.785393711311357,
+            "5Y": 11.08509649003655
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 99557.61
+              "date": "2026-10-22",
+              "level": 97613.19
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 103987.49
+              "date": "2026-09-29",
+              "level": 100628.73
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 99676.33
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 99990.06
+              "date": "2025-10-29",
+              "level": 100889.56
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 61935.63
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 59294.12
+              "date": "2021-10-29",
+              "level": 58381.27
             }
           },
-          "vs_nifty50_1y": 9.117211720004946,
+          "vs_nifty50_1y": 8.929849118505317,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -561,31 +561,31 @@
               "value": 95.14153046147594
             },
             {
-              "date": "2026-10-27",
-              "value": 97.33162158931165
+              "date": "2026-10-29",
+              "value": 98.45559171874035
             }
           ],
-          "off_5y_high": -11.790808395545838,
+          "off_5y_high": -10.77218264077523,
           "high_5y_date": "2024-09-27",
           "high_5y_level": 110667.73,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 61851.21
+              "date": "2021-10-18",
+              "level": 62004.77
             },
             {
-              "date": "2024-04-23",
-              "level": 88996.34
+              "date": "2024-04-24",
+              "level": 89674.94
             },
             {
-              "date": "2026-10-27",
-              "level": 97619.11
+              "date": "2026-10-29",
+              "level": 98746.4
             }
           ],
-          "source_sha256": "0c33c2c3412954e5b1ae7087aa5e1fcf6a93845f3839de6943b98f4942d7f9f1"
+          "source_sha256": "305883f9155579ac53234de7d8df010f027636dfb4bda1c1ef35f569d2714d6c"
         },
         {
           "id": "nifty-500",
@@ -597,45 +597,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 34975.2,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 35310.1,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.3786606354082243,
-            "1M": -3.8087395895386345,
-            "YTD": -8.204128704030811,
-            "1Y": -8.033379682316644,
-            "3Y": 10.069553753667716,
-            "5Y": 8.08742979571704
+            "1W": 1.1472488942869674,
+            "1M": -0.6796575018993556,
+            "YTD": -7.325150533869662,
+            "1Y": -7.584972641984001,
+            "3Y": 10.399743024090702,
+            "5Y": 8.857609234484332
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 35464.13
+              "date": "2026-10-22",
+              "level": 34909.6
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 36360.06
+              "date": "2026-09-29",
+              "level": 35551.73
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 38101.06
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 38030.32
+              "date": "2025-10-29",
+              "level": 38208.18
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 26225.88
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 23708.68
+              "date": "2021-10-29",
+              "level": 23100.97
             }
           },
-          "vs_nifty50_1y": 3.4550177335464713,
+          "vs_nifty50_1y": 3.4691398789982504,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -846,31 +846,31 @@
               "value": 91.16366073588571
             },
             {
-              "date": "2026-10-27",
-              "value": 92.47206354955853
+              "date": "2026-10-29",
+              "value": 93.35751650144293
             }
           ],
-          "off_5y_high": -9.527975419686918,
+          "off_5y_high": -8.661673553451788,
           "high_5y_date": "2024-09-26",
           "high_5y_level": 38658.58,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 24126.87
+              "date": "2021-10-18",
+              "level": 24305.72
             },
             {
-              "date": "2024-04-23",
-              "level": 32387.08
+              "date": "2024-04-24",
+              "level": 32509.43
             },
             {
-              "date": "2026-10-27",
-              "level": 34975.2
+              "date": "2026-10-29",
+              "level": 35310.1
             }
           ],
-          "source_sha256": "846ea5890992f256a813c88f9a72964a8c79018d5985e594c4285c472e2eb0fd"
+          "source_sha256": "1f642bb0c7c282f5d3e00273f4e6199afdd1e481d47f7786b68ffb2d9aa391e8"
         }
       ]
     },
@@ -888,45 +888,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 26857.65,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 27168.76,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.287388258253087,
-            "1M": -6.355222303772434,
-            "YTD": -5.205004173674254,
-            "1Y": -4.2128287577820505,
-            "3Y": 13.773483798784047,
-            "5Y": 13.374950459896295
+            "1W": 1.052301136955358,
+            "1M": -2.740153646784238,
+            "YTD": -4.106930769950257,
+            "1Y": -3.652882052198636,
+            "3Y": 14.18336321235647,
+            "5Y": 14.047903607227209
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 27486.37
+              "date": "2026-10-22",
+              "level": 26885.84
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 28680.35
+              "date": "2026-09-29",
+              "level": 27934.2
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 28332.35
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 28038.88
+              "date": "2025-10-29",
+              "level": 28198.83
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 18235.03
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 14339.03
+              "date": "2021-10-29",
+              "level": 14082.26
             }
           },
-          "vs_nifty50_1y": 7.275568658081065,
+          "vs_nifty50_1y": 7.401230468783615,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -1137,31 +1137,31 @@
               "value": 93.9869996319977
             },
             {
-              "date": "2026-10-27",
-              "value": 95.86495351070973
+              "date": "2026-10-29",
+              "value": 96.9754209450056
             }
           ],
-          "off_5y_high": -10.715478922388478,
+          "off_5y_high": -9.681237007982135,
           "high_5y_date": "2026-08-31",
           "high_5y_level": 30080.97,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 14952.67
+              "date": "2021-10-18",
+              "level": 15104.02
             },
             {
-              "date": "2024-04-23",
-              "level": 23199.02
+              "date": "2024-04-24",
+              "level": 23388.45
             },
             {
-              "date": "2026-10-27",
-              "level": 26857.65
+              "date": "2026-10-29",
+              "level": 27168.76
             }
           ],
-          "source_sha256": "1a8ca327ad99dbac314509701e5d074bb2221367531b6bd8e8ccb63eb838f2fd"
+          "source_sha256": "e4056e3234a2ded16e5da4aaf6042e0c23a2b5afed47b433af2a0b07ef29a7d4"
         },
         {
           "id": "niftysmallcap250",
@@ -1173,45 +1173,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 21637.47,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 21853.39,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.8691952059175962,
-            "1M": -6.7284095636111925,
-            "YTD": 2.00243250505594,
-            "1Y": -1.7303208307937856,
-            "3Y": 12.749935857842697,
-            "5Y": 12.90944780279557
+            "1W": 1.4624577498792757,
+            "1M": -3.612663287237794,
+            "YTD": 3.0203133028798623,
+            "1Y": -1.2818271548053928,
+            "3Y": 13.098247193737468,
+            "5Y": 13.565294153135277
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 22276.63
+              "date": "2026-10-22",
+              "level": 21538.4
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 23198.35
+              "date": "2026-09-29",
+              "level": 22672.47
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 21212.7
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 22018.46
+              "date": "2025-10-29",
+              "level": 22137.15
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 15094.61
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 11792.1
+              "date": "2021-10-29",
+              "level": 11569.87
             }
           },
-          "vs_nifty50_1y": 9.758076585069329,
+          "vs_nifty50_1y": 9.772285366176858,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -1422,31 +1422,31 @@
               "value": 95.17400326845666
             },
             {
-              "date": "2026-10-27",
-              "value": 98.36040757972829
+              "date": "2026-10-29",
+              "value": 99.34194466352851
             }
           ],
-          "off_5y_high": -8.553256628550942,
+          "off_5y_high": -7.640710899832969,
           "high_5y_date": "2026-09-08",
           "high_5y_level": 23661.28,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 12249.93
+              "date": "2021-10-18",
+              "level": 12351.72
             },
             {
-              "date": "2024-04-23",
-              "level": 19481.35
+              "date": "2024-04-24",
+              "level": 19636.34
             },
             {
-              "date": "2026-10-27",
-              "level": 21637.47
+              "date": "2026-10-29",
+              "level": 21853.39
             }
           ],
-          "source_sha256": "25945547a0f0f2edb91c92308be4e6398a11cef45c42f104e978fc0d9466aa15"
+          "source_sha256": "3861bdb586681cd9c0366279b8e232390b1708131528fbe2e9128b116fe07220"
         },
         {
           "id": "nifty-microcap-250",
@@ -1458,45 +1458,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 30492.32,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 30717.16,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -3.8456602184987587,
-            "1M": -8.082322310783518,
-            "YTD": 8.396518351175875,
-            "1Y": 2.93965035590642,
-            "3Y": 15.310231011123854,
-            "5Y": 19.386773943834612
+            "1W": 0.48566016873468065,
+            "1M": -6.865767579498872,
+            "YTD": 9.195797421646024,
+            "1Y": 2.981302740052083,
+            "3Y": 15.562386328377498,
+            "5Y": 20.20785776420062
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 31711.85
+              "date": "2026-10-22",
+              "level": 30568.7
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 33173.51
+              "date": "2026-09-29",
+              "level": 32981.6
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 28130.35
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 29621.55
+              "date": "2025-10-29",
+              "level": 29827.9
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 19885.87
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 12573.67
+              "date": "2021-10-29",
+              "level": 12239.72
             }
           },
-          "vs_nifty50_1y": 14.428047771769535,
+          "vs_nifty50_1y": 14.035415261034334,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -1707,31 +1707,31 @@
               "value": 100.65823406110121
             },
             {
-              "date": "2026-10-27",
-              "value": 102.79157854142127
+              "date": "2026-10-29",
+              "value": 103.54952869146736
             }
           ],
-          "off_5y_high": -9.183908696416188,
+          "off_5y_high": -8.514261717481887,
           "high_5y_date": "2026-09-23",
           "high_5y_level": 33575.9,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 13099.37
+              "date": "2021-10-18",
+              "level": 13188.29
             },
             {
-              "date": "2024-04-23",
-              "level": 25535.27
+              "date": "2024-04-24",
+              "level": 25708.55
             },
             {
-              "date": "2026-10-27",
-              "level": 30492.32
+              "date": "2026-10-29",
+              "level": 30717.16
             }
           ],
-          "source_sha256": "f04462e2f1d0219effd325f01aa155bcde093e309d6540657bc8985b844b9e1a"
+          "source_sha256": "8dcccbc9cace9114561d7c93f9dddf6c45cd2700eeca4c793eeb56561a9f65f9"
         }
       ]
     },
@@ -1749,45 +1749,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 75765.21,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 77077.34,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.727062638899047,
-            "1M": -2.8886586598043995,
-            "YTD": -8.815522151093214,
-            "1Y": -6.5127367020242914,
-            "3Y": 8.896150958261373,
-            "5Y": 6.563951613678576
+            "1W": -0.02920887275281725,
+            "1M": 1.1974216086796385,
+            "YTD": -7.236355553127138,
+            "1Y": -5.335187393179098,
+            "3Y": 9.502906558923474,
+            "5Y": 7.875454239698332
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 77889.3
+              "date": "2026-10-22",
+              "level": 77099.86
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 78018.91
+              "date": "2026-09-29",
+              "level": 76165.32
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 83090.03
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 81043.35
+              "date": "2025-10-29",
+              "level": 81421.32
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 58668.76
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 55136.24
+              "date": "2021-10-29",
+              "level": 52763.8
             }
           },
-          "vs_nifty50_1y": 4.975660713838824,
+          "vs_nifty50_1y": 5.718925127803153,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -1998,31 +1998,31 @@
               "value": 94.57834794467367
             },
             {
-              "date": "2026-10-27",
-              "value": 94.03402814770172
+              "date": "2026-10-29",
+              "value": 95.66254431433603
             }
           ],
-          "off_5y_high": -11.732419899708546,
+          "off_5y_high": -10.203769218518655,
           "high_5y_date": "2026-02-18",
           "high_5y_level": 85835.83,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 53067.74
+              "date": "2021-10-18",
+              "level": 53531.62
             },
             {
-              "date": "2024-04-23",
-              "level": 65783.87
+              "date": "2024-04-24",
+              "level": 66083.62
             },
             {
-              "date": "2026-10-27",
-              "level": 75765.21
+              "date": "2026-10-29",
+              "level": 77077.34
             }
           ],
-          "source_sha256": "26a7bfb9f2d93e188fd258e561a0844d9a33a116aef5a1a7e1f9420e6a30a09e"
+          "source_sha256": "cabd11d558155efd7bf9506760631c6a1a3ddb6e8fdd9a05d3c2f9c366faf310"
         },
         {
           "id": "nifty-financial-services-ex-bank",
@@ -2034,45 +2034,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 37915.73,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 38674.33,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -3.764153998755293,
-            "1M": -6.852332774105962,
-            "YTD": -10.980496381884086,
-            "1Y": -9.557715569441461,
-            "3Y": 12.843404851473995,
-            "5Y": 8.943763136764105
+            "1W": 0.024363175809782867,
+            "1M": -2.400891340720779,
+            "YTD": -9.199436240230408,
+            "1Y": -7.716072213454339,
+            "3Y": 13.56447886828025,
+            "5Y": 9.855992053605899
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 39398.76
+              "date": "2026-10-22",
+              "level": 38664.91
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 40704.97
+              "date": "2026-09-29",
+              "level": 39625.7
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 42592.61
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 41922.57
+              "date": "2025-10-29",
+              "level": 41907.98
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 26384.87
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 24707.74
+              "date": "2021-10-29",
+              "level": 24173.08
             }
           },
-          "vs_nifty50_1y": 1.9306818464216544,
+          "vs_nifty50_1y": 3.338040307527912,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -2283,31 +2283,31 @@
               "value": 91.08558158503642
             },
             {
-              "date": "2026-10-27",
-              "value": 91.28162324322673
+              "date": "2026-10-29",
+              "value": 93.10794280485226
             }
           ],
-          "off_5y_high": -14.796169800334958,
+          "off_5y_high": -13.091451848459423,
           "high_5y_date": "2026-08-03",
           "high_5y_level": 44500.03,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 24940.46
+              "date": "2021-10-18",
+              "level": 25065.06
             },
             {
-              "date": "2024-04-23",
-              "level": 30934.04
+              "date": "2024-04-24",
+              "level": 30985.39
             },
             {
-              "date": "2026-10-27",
-              "level": 37915.73
+              "date": "2026-10-29",
+              "level": 38674.33
             }
           ],
-          "source_sha256": "de4f1be9d9b2e93e90bedb67da6e4b17db79119ba8a9cbd4fb66009019d17aa9"
+          "source_sha256": "048e92a55fe3c27755726d1e0b550f76e0ef71bfcecd3fbd125c803eb624a01a"
         },
         {
           "id": "nifty-psu-bank",
@@ -2319,45 +2319,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 11156.5,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 11411.57,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.018300924531302,
-            "1M": -2.023377741088439,
-            "YTD": -4.057095337483563,
-            "1Y": 2.456607585636883,
-            "3Y": 19.037618505529164,
-            "5Y": 23.8445042562605
+            "1W": 0.6672588839204074,
+            "1M": 4.260478289669023,
+            "YTD": -1.8635618196000014,
+            "1Y": 3.5186040246051764,
+            "3Y": 19.898056037155285,
+            "5Y": 25.385857182379112
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 11386.31
+              "date": "2026-10-22",
+              "level": 11335.93
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 11386.9
+              "date": "2026-09-29",
+              "level": 10945.25
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 11628.27
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 10889.0
+              "date": "2025-10-29",
+              "level": 11023.69
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 6613.38
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 3830.08
+              "date": "2021-10-29",
+              "level": 3682.73
             }
           },
-          "vs_nifty50_1y": 13.945005001499998,
+          "vs_nifty50_1y": 14.572716545587427,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -2568,31 +2568,31 @@
               "value": 99.34206043217073
             },
             {
-              "date": "2026-10-27",
-              "value": 100.03138169102483
+              "date": "2026-10-29",
+              "value": 102.31838967094056
             }
           ],
-          "off_5y_high": -17.182397668502436,
+          "off_5y_high": -15.288946691341588,
           "high_5y_date": "2026-02-26",
           "high_5y_level": 13471.17,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 3541.18
+              "date": "2021-10-18",
+              "level": 3681.95
             },
             {
-              "date": "2024-04-23",
-              "level": 9609.77
+              "date": "2024-04-24",
+              "level": 9588.13
             },
             {
-              "date": "2026-10-27",
-              "level": 11156.5
+              "date": "2026-10-29",
+              "level": 11411.57
             }
           ],
-          "source_sha256": "5d91371d0e3d4cad96b055d79e87ac5facf2550507b822244392a0c51dbe056a"
+          "source_sha256": "457a80df23487fc6f7ebdfee962f7813b8f4a83c90920d0e80edbfa6ada392c1"
         },
         {
           "id": "nifty-it",
@@ -2604,45 +2604,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 46633.67,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 46165.66,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": 2.2492853199297835,
-            "1M": 14.664265209400096,
-            "YTD": -13.5999118095531,
-            "1Y": -9.363123431763364,
-            "3Y": 3.8078305033099724,
-            "5Y": 0.045731204442467366
+            "1W": -0.5594782166658763,
+            "1M": 15.527280089027172,
+            "YTD": -14.467012882104557,
+            "1Y": -10.175781721222599,
+            "3Y": 3.453064936529948,
+            "5Y": 0.47179716249403647
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 45607.82
+              "date": "2026-10-22",
+              "level": 46425.4
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 40669.75
+              "date": "2026-09-29",
+              "level": 39960.83
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 53974.1
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 51451.1
+              "date": "2025-10-29",
+              "level": 51395.56
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 41686.76
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 46527.2
+              "date": "2021-10-29",
+              "level": 45092.01
             }
           },
-          "vs_nifty50_1y": 2.125273984099751,
+          "vs_nifty50_1y": 0.8783307997596523,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -2853,31 +2853,31 @@
               "value": 91.13003159581577
             },
             {
-              "date": "2026-10-27",
-              "value": 91.6824619531998
+              "date": "2026-10-29",
+              "value": 90.76234760194424
             }
           ],
-          "off_5y_high": -27.091418883509288,
+          "off_5y_high": -27.823120785768506,
           "high_5y_date": "2024-12-13",
           "high_5y_level": 63961.84,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 46684.14
+              "date": "2021-10-18",
+              "level": 47417.52
             },
             {
-              "date": "2024-04-23",
-              "level": 46117.08
+              "date": "2024-04-24",
+              "level": 45745.04
             },
             {
-              "date": "2026-10-27",
-              "level": 46633.67
+              "date": "2026-10-29",
+              "level": 46165.66
             }
           ],
-          "source_sha256": "9d8ef8064ee39d2601ec99cba88dabbdbbc4ec57931f5eb69111604d74a5ddba"
+          "source_sha256": "35e6ec861c8e0dd58e2f4b0a9ce9344c471a323d5839ba68108af5c27bee9168"
         },
         {
           "id": "nifty-auto",
@@ -2889,45 +2889,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 33920.43,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 34328.37,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.9784963751933273,
-            "1M": -6.033477365491335,
-            "YTD": -9.172497502409227,
-            "1Y": -6.0656662454629195,
-            "3Y": 17.20778602186961,
-            "5Y": 18.4194690230322
+            "1W": 2.5351549794038863,
+            "1M": -2.0163665840821188,
+            "YTD": -8.080171391895075,
+            "1Y": -3.8255868584717745,
+            "3Y": 17.640787630013488,
+            "5Y": 18.907588128768936
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 34255.62
+              "date": "2026-10-22",
+              "level": 33479.61
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 36098.42
+              "date": "2026-09-29",
+              "level": 35034.8
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 37345.99
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 36110.79
+              "date": "2025-10-29",
+              "level": 35693.87
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 21064.19
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 14567.87
+              "date": "2021-10-29",
+              "level": 14442.98
             }
           },
-          "vs_nifty50_1y": 5.422731170400196,
+          "vs_nifty50_1y": 7.228525662510476,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -3138,31 +3138,31 @@
               "value": 93.7206207201859
             },
             {
-              "date": "2026-10-27",
-              "value": 95.52435220553696
+              "date": "2026-10-29",
+              "value": 96.67316441808046
             }
           ],
-          "off_5y_high": -14.527431130821512,
+          "off_5y_high": -13.499505490005848,
           "high_5y_date": "2026-08-07",
           "high_5y_level": 39685.75,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 15085.85
+              "date": "2021-10-18",
+              "level": 15104.37
             },
             {
-              "date": "2024-04-23",
-              "level": 28566.14
+              "date": "2024-04-24",
+              "level": 28543.43
             },
             {
-              "date": "2026-10-27",
-              "level": 33920.43
+              "date": "2026-10-29",
+              "level": 34328.37
             }
           ],
-          "source_sha256": "b9e195d2b2e82b8fdc1d788b58c4c472fbfaf9c74163a1ac2c57e69eb4b2faad"
+          "source_sha256": "de25ac752f298785063658ce95a676bebb4ae49cf38f9b12eb4954c50f5e2664"
         },
         {
           "id": "nifty-pharma",
@@ -3174,45 +3174,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 32918.33,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 33474.16,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": 2.5463756178950803,
-            "1M": -2.7247321913252076,
-            "YTD": 16.266477070642527,
-            "1Y": 18.441977217832406,
-            "3Y": 22.042162358529783,
-            "5Y": 14.088148233152364
+            "1W": 4.35268382509959,
+            "1M": -0.827441343033064,
+            "YTD": 18.229650656610463,
+            "1Y": 19.79572482258336,
+            "3Y": 22.679306959057264,
+            "5Y": 14.82320445661327
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 32100.92
+              "date": "2026-10-22",
+              "level": 32077.91
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 33840.39
+              "date": "2026-09-29",
+              "level": 33753.45
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 28312.83
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 27792.79
+              "date": "2025-10-29",
+              "level": 27942.7
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 18107.1
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 17032.34
+              "date": "2021-10-29",
+              "level": 16772.68
             }
           },
-          "vs_nifty50_1y": 29.93037463369552,
+          "vs_nifty50_1y": 30.84983734356561,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -3423,31 +3423,31 @@
               "value": 114.90389575225706
             },
             {
-              "date": "2026-10-27",
-              "value": 119.15822676903018
+              "date": "2026-10-29",
+              "value": 121.17022789986002
             }
           ],
-          "off_5y_high": -3.3810425867017213,
+          "off_5y_high": -1.7496197563505511,
           "high_5y_date": "2026-08-31",
           "high_5y_level": 34070.26,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 17799.01
+              "date": "2021-10-18",
+              "level": 17641.35
             },
             {
-              "date": "2024-04-23",
-              "level": 22740.2
+              "date": "2024-04-24",
+              "level": 22891.01
             },
             {
-              "date": "2026-10-27",
-              "level": 32918.33
+              "date": "2026-10-29",
+              "level": 33474.16
             }
           ],
-          "source_sha256": "42ed24c3f220e78c29f0f103999382d2f28a4467a11cd4e7b85b12c139e35e1c"
+          "source_sha256": "ea8b71bf0a8ba4ce0ebc80bb5b6520aeff62c5634ac0c9dc18b02c20d3a1810c"
         },
         {
           "id": "nifty-fmcg",
@@ -3459,45 +3459,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 71547.2,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 72816.14,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.9494795992804126,
-            "1M": -6.144958258779831,
-            "YTD": -21.72253485808413,
-            "1Y": -22.87771484032044,
-            "3Y": -4.153485756829955,
-            "5Y": 3.7222432863444066
+            "1W": 1.803721471392028,
+            "1M": -2.0257736196399034,
+            "YTD": -20.334228864038472,
+            "1Y": -21.76829359352359,
+            "3Y": -3.5838756560828466,
+            "5Y": 4.479063700497177
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 72969.73
+              "date": "2026-10-22",
+              "level": 71526.01
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 76231.6
+              "date": "2026-09-29",
+              "level": 74321.73
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 91402.04
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 92771.11
+              "date": "2025-10-29",
+              "level": 93077.53
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 81259.9
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 59599.69
+              "date": "2021-10-29",
+              "level": 58491.71
             }
           },
-          "vs_nifty50_1y": -11.389317424457325,
+          "vs_nifty50_1y": -10.71418107254134,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -3708,31 +3708,31 @@
               "value": 76.63912091374966
             },
             {
-              "date": "2026-10-27",
-              "value": 77.42476139687311
+              "date": "2026-10-29",
+              "value": 78.79794408923492
             }
           ],
-          "off_5y_high": -33.03622905182703,
+          "off_5y_high": -31.848579395278975,
           "high_5y_date": "2024-09-23",
           "high_5y_level": 106844.64,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 63183.38
+              "date": "2021-10-18",
+              "level": 63468.87
             },
             {
-              "date": "2024-04-23",
-              "level": 85971.51
+              "date": "2024-04-24",
+              "level": 86014.85
             },
             {
-              "date": "2026-10-27",
-              "level": 71547.2
+              "date": "2026-10-29",
+              "level": 72816.14
             }
           ],
-          "source_sha256": "4aeaa635c1ef56c75bb9c741940e0dbfb771d1d5db092bbe2e2a282be2ca023d"
+          "source_sha256": "fbc9837b52019563f6f085037c17cb255274f918a070f5a426bb19e1cab509d1"
         },
         {
           "id": "nifty-metal",
@@ -3744,45 +3744,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 18050.51,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 18114.31,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.152158039585794,
-            "1M": -9.617706217274913,
-            "YTD": 6.9355046057982594,
-            "1Y": 14.1463485583186,
-            "3Y": 23.351607792399378,
-            "5Y": 16.99233787336698
+            "1W": 0.4245545309748078,
+            "1M": -8.368966171356295,
+            "YTD": 7.313470945466793,
+            "1Y": 11.251064801991362,
+            "3Y": 23.449268574479266,
+            "5Y": 17.81691622956314
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 18447.53
+              "date": "2026-10-22",
+              "level": 18037.73
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 19971.29
+              "date": "2026-09-29",
+              "level": 19768.75
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 16879.81
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 15813.48
+              "date": "2025-10-29",
+              "level": 16282.37
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 9615.96
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 8236.62
+              "date": "2021-10-29",
+              "level": 7980.54
             }
           },
-          "vs_nifty50_1y": 25.634745974181715,
+          "vs_nifty50_1y": 22.305177322973613,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -3993,31 +3993,31 @@
               "value": 109.45409115092875
             },
             {
-              "date": "2026-10-27",
-              "value": 112.58678449377608
+              "date": "2026-10-29",
+              "value": 112.9847254301099
             }
           ],
-          "off_5y_high": -13.25948664522163,
+          "off_5y_high": -12.952900030658654,
           "high_5y_date": "2026-05-27",
           "high_5y_level": 20809.78,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 8634.39
+              "date": "2021-10-18",
+              "level": 8969.9
             },
             {
-              "date": "2024-04-23",
-              "level": 13276.69
+              "date": "2024-04-24",
+              "level": 13634.18
             },
             {
-              "date": "2026-10-27",
-              "level": 18050.51
+              "date": "2026-10-29",
+              "level": 18114.31
             }
           ],
-          "source_sha256": "c50cc487ed9ccfee43cec4aea2cca1873106d545fb416939fa4444e8b3d0aa39"
+          "source_sha256": "3476c487e6d0048d2820ea224e7ec4240318d439179f5345b99d32af570806cb"
         },
         {
           "id": "nifty-realty",
@@ -4029,45 +4029,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 897.43,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 913.88,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.3336118562821575,
-            "1M": -7.38405333443416,
-            "YTD": -7.870855148342071,
-            "1Y": -15.275247113469225,
-            "3Y": 11.756992292202062,
-            "5Y": 9.69419116876642
+            "1W": 2.049065916273052,
+            "1M": -1.6730684397964324,
+            "YTD": -6.182116825787909,
+            "1Y": -13.344269445577028,
+            "3Y": 12.411544404982,
+            "5Y": 10.84558197333434
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 909.56
+              "date": "2026-10-22",
+              "level": 895.53
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 968.98
+              "date": "2026-09-29",
+              "level": 929.43
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 974.1
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 1059.23
+              "date": "2025-10-29",
+              "level": 1054.61
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 642.9
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 565.08
+              "date": "2021-10-29",
+              "level": 546.17
             }
           },
-          "vs_nifty50_1y": -3.78684969760611,
+          "vs_nifty50_1y": -2.2901569245947773,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -4278,31 +4278,31 @@
               "value": 83.16624498259365
             },
             {
-              "date": "2026-10-27",
-              "value": 85.36058744078984
+              "date": "2026-10-29",
+              "value": 86.9252572906957
             }
           ],
-          "off_5y_high": -29.276634644937083,
+          "off_5y_high": -27.98026683899033,
           "high_5y_date": "2024-06-18",
           "high_5y_level": 1268.93,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 590.59
+              "date": "2021-10-18",
+              "level": 593.42
             },
             {
-              "date": "2024-04-23",
-              "level": 1055.84
+              "date": "2024-04-24",
+              "level": 1065.27
             },
             {
-              "date": "2026-10-27",
-              "level": 897.43
+              "date": "2026-10-29",
+              "level": 913.88
             }
           ],
-          "source_sha256": "efc1d0f99836d47300606a9bfb9bcb2fdf5531d013b33c9a9808d72e5f8b6b24"
+          "source_sha256": "46585474bbb3c7d5d445354542ebef0a893d752d5ff1bb5fefaf29ce49cd5774"
         },
         {
           "id": "nifty-energy",
@@ -4314,45 +4314,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 62442.42,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 62508.2,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.980824211367871,
-            "1M": -5.807943141819926,
-            "YTD": 0.8163808321969501,
-            "1Y": -0.29442662016474497,
-            "3Y": 11.458880563291585,
-            "5Y": 9.50184799975522
+            "1W": 0.5628205119954766,
+            "1M": -3.3053177264354305,
+            "YTD": 0.9225859013012983,
+            "1Y": -1.7490462262751194,
+            "3Y": 11.47589499108712,
+            "5Y": 10.405153436145698
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 63704.29
+              "date": "2026-10-22",
+              "level": 62158.36
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 66292.66
+              "date": "2026-09-29",
+              "level": 64644.92
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 61936.78
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 62626.81
+              "date": "2025-10-29",
+              "level": 63620.96
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 45092.41
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 39664.27
+              "date": "2021-10-29",
+              "level": 38108.31
             }
           },
-          "vs_nifty50_1y": 11.19397079569837,
+          "vs_nifty50_1y": 9.305066294707132,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -4563,31 +4563,31 @@
               "value": 96.27352982773115
             },
             {
-              "date": "2026-10-27",
-              "value": 98.34235609955691
+              "date": "2026-10-29",
+              "value": 98.44595490601297
             }
           ],
-          "off_5y_high": -19.032866662257998,
+          "off_5y_high": -18.94757179330582,
           "high_5y_date": "2024-08-01",
           "high_5y_level": 77120.7,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 40617.96
+              "date": "2021-10-18",
+              "level": 41245.08
             },
             {
-              "date": "2024-04-23",
-              "level": 67653.8
+              "date": "2024-04-24",
+              "level": 67851.45
             },
             {
-              "date": "2026-10-27",
-              "level": 62442.42
+              "date": "2026-10-29",
+              "level": 62508.2
             }
           ],
-          "source_sha256": "d278e8eb13d01be69682189a5a22aa24796e40262fe84bc61e4d5eb335e3842f"
+          "source_sha256": "f2f393a6c2718a0aa8142c62119300e7ee6a7ce7bdbbe6a845ad9bf089695377"
         },
         {
           "id": "nifty-consumer-durables-index",
@@ -4599,45 +4599,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 40040.89,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 41099.6,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -4.424539432713526,
-            "1M": -10.511852334428816,
-            "YTD": -6.449906603849631,
-            "1Y": -11.717441238503568,
-            "3Y": 7.322706646094446,
-            "5Y": 4.104072121157709
+            "1W": 0.9268167863311749,
+            "1M": -5.304213750054155,
+            "YTD": -3.9763746873653028,
+            "1Y": -9.370977746720065,
+            "3Y": 8.244522332029526,
+            "5Y": 4.939703167907372
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 41894.53
+              "date": "2026-10-22",
+              "level": 40722.18
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 44744.35
+              "date": "2026-09-29",
+              "level": 43401.72
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 42801.55
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 45355.38
+              "date": "2025-10-29",
+              "level": 45349.27
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 32389.77
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 32747.42
+              "date": "2021-10-29",
+              "level": 32296.3
             }
           },
-          "vs_nifty50_1y": -0.22904382264045253,
+          "vs_nifty50_1y": 1.6831347742621858,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -4848,31 +4848,31 @@
               "value": 88.18101050894612
             },
             {
-              "date": "2026-10-27",
-              "value": 89.04614440321618
+              "date": "2026-10-29",
+              "value": 91.40058866110178
             }
           ],
-          "off_5y_high": -22.061694855738512,
+          "off_5y_high": -20.0009498763117,
           "high_5y_date": "2024-09-23",
           "high_5y_level": 51375.11,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 34622.38
+              "date": "2021-10-18",
+              "level": 34833.25
             },
             {
-              "date": "2024-04-23",
-              "level": 39025.99
+              "date": "2024-04-24",
+              "level": 39377.7
             },
             {
-              "date": "2026-10-27",
-              "level": 40040.89
+              "date": "2026-10-29",
+              "level": 41099.6
             }
           ],
-          "source_sha256": "a147e09b8c1fefbe279cf6d58a859748cdb503543ce600b8d210854fe093fc65"
+          "source_sha256": "7e4e80430ef169eca3862fb1d055bb63e2d05c50e9c680df2faa9f73e5ea9b4f"
         },
         {
           "id": "nifty-capital-goods",
@@ -4884,45 +4884,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 19357.5,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 19451.33,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -3.837938050916845,
-            "1M": -8.17652307433966,
-            "YTD": 4.963699884340667,
-            "1Y": 2.3213994047043274,
-            "3Y": 18.17271188352869,
-            "5Y": 23.784883164794877
+            "1W": 0.7806990956263249,
+            "1M": -5.406258419239974,
+            "YTD": 5.472481698115561,
+            "1Y": 1.9234175178917345,
+            "3Y": 18.32695518286618,
+            "5Y": 23.891243332027877
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 20130.08
+              "date": "2026-10-22",
+              "level": 19300.65
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 21081.21
+              "date": "2026-09-29",
+              "level": 20563.02
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 18442.09
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 18918.33
+              "date": "2025-10-29",
+              "level": 19084.26
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 11728.65
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 6661.54
+              "date": "2021-10-29",
+              "level": 6665.15
             }
           },
-          "vs_nifty50_1y": 13.809796820567442,
+          "vs_nifty50_1y": 12.977530038873986,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -5133,31 +5133,31 @@
               "value": 98.11579688600266
             },
             {
-              "date": "2026-10-27",
-              "value": 100.97019012596824
+              "date": "2026-10-29",
+              "value": 101.4596145319876
             }
           ],
-          "off_5y_high": -13.001798614500547,
+          "off_5y_high": -12.580099467606498,
           "high_5y_date": "2026-06-22",
           "high_5y_level": 22250.46,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 6913.19
+              "date": "2021-10-18",
+              "level": 6996.95
             },
             {
-              "date": "2024-04-23",
-              "level": 16234.87
+              "date": "2024-04-24",
+              "level": 16471.17
             },
             {
-              "date": "2026-10-27",
-              "level": 19357.5
+              "date": "2026-10-29",
+              "level": 19451.33
             }
           ],
-          "source_sha256": "d5b3edfba0c86b463578a0e0b8cc5778ca4febb33283dc387eeec77259b770d0"
+          "source_sha256": "9be2146b13ebfc29397e545b7ff907e75580d20c5d343429ebd51ed32ab647f0"
         },
         {
           "id": "nifty-chemicals",
@@ -5169,45 +5169,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 38740.76,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 38846.56,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -3.893597365237844,
-            "1M": -7.955448840247148,
-            "YTD": -7.193044741465582,
-            "1Y": -7.64826168069237,
-            "3Y": 7.045974262695709,
-            "5Y": 4.2416671924021765
+            "1W": -0.1853351179086582,
+            "1M": -4.030009521263745,
+            "YTD": -6.939591379519339,
+            "1Y": -8.290537696398992,
+            "3Y": 7.129845367818377,
+            "5Y": 5.124216242481605
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 40310.28
+              "date": "2026-10-22",
+              "level": 38918.69
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 42089.14
+              "date": "2026-09-29",
+              "level": 40477.82
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 41743.38
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 41949.14
+              "date": "2025-10-29",
+              "level": 42358.29
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 31581.8
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 31475.58
+              "date": "2021-10-29",
+              "level": 30258.93
             }
           },
-          "vs_nifty50_1y": 3.8401357351707457,
+          "vs_nifty50_1y": 2.7635748245832588,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -5418,31 +5418,31 @@
               "value": 90.7094796932573
             },
             {
-              "date": "2026-10-27",
-              "value": 92.44076533916315
+              "date": "2026-10-29",
+              "value": 92.69321864603899
             }
           ],
-          "off_5y_high": -15.093937269370262,
+          "off_5y_high": -14.862061037801755,
           "high_5y_date": "2025-06-30",
           "high_5y_level": 45627.79,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 34431.16
+              "date": "2021-10-18",
+              "level": 34603.11
             },
             {
-              "date": "2024-04-23",
-              "level": 37160.54
+              "date": "2024-04-24",
+              "level": 37529.91
             },
             {
-              "date": "2026-10-27",
-              "level": 38740.76
+              "date": "2026-10-29",
+              "level": 38846.56
             }
           ],
-          "source_sha256": "267d2e9012869c00964b78c7799bca3678678e4f85e7b10f4c53b43297e85160"
+          "source_sha256": "4f725b6aadac2b5ea0051ea41a66b3044a710aa933d88991977e50bd530bea88"
         }
       ]
     },
@@ -5460,45 +5460,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 35695.07,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 36185.84,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.010758892859632,
-            "1M": -6.140026342271243,
-            "YTD": -8.367109979532493,
-            "1Y": -10.226240998120273,
-            "3Y": 9.06415162062606,
-            "5Y": 7.151700816392248
+            "1W": 2.6380937469508314,
+            "1M": -2.597492438257787,
+            "YTD": -7.107253270038871,
+            "1Y": -8.87572861840077,
+            "3Y": 9.54338171832514,
+            "5Y": 8.047517853058284
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 36427.54
+              "date": "2026-10-22",
+              "level": 35255.76
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 38030.13
+              "date": "2026-09-29",
+              "level": 37150.83
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 38954.43
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 39761.14
+              "date": "2025-10-29",
+              "level": 39710.43
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 27512.9
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 25271.64
+              "date": "2021-10-29",
+              "level": 24574.67
             }
           },
-          "vs_nifty50_1y": 1.2621564177428422,
+          "vs_nifty50_1y": 2.1783839025814817,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -5709,31 +5709,31 @@
               "value": 87.4418096021627
             },
             {
-              "date": "2026-10-27",
-              "value": 90.77783443345663
+              "date": "2026-10-29",
+              "value": 92.02593502003364
             }
           ],
-          "off_5y_high": -24.568400868026973,
+          "off_5y_high": -23.531295018227606,
           "high_5y_date": "2024-09-27",
           "high_5y_level": 47321.11,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 26238.0
+              "date": "2021-10-18",
+              "level": 26836.99
             },
             {
-              "date": "2024-04-23",
-              "level": 38510.23
+              "date": "2024-04-24",
+              "level": 38854.64
             },
             {
-              "date": "2026-10-27",
-              "level": 35695.07
+              "date": "2026-10-29",
+              "level": 36185.84
             }
           ],
-          "source_sha256": "07e616cde760186284478c0e07e4e6afd0d29656dd691686dea0c90368855f3a"
+          "source_sha256": "e77d886e75cdf7137d22c1db4eb302086d927da16e16a668a64564a127ef79be"
         },
         {
           "id": "nifty200-value30",
@@ -5745,45 +5745,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 24220.36,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 24437.89,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.5931754947083765,
-            "1M": -5.286069359912271,
-            "YTD": -5.497969914309541,
-            "1Y": 0.2104719627927576,
-            "3Y": 21.712367997837756,
-            "5Y": 21.521959036697336
+            "1W": 0.30903926510306157,
+            "1M": -1.8370193153545156,
+            "YTD": -4.649220077208027,
+            "1Y": -0.9296551981355039,
+            "3Y": 22.031231347669266,
+            "5Y": 22.54867993084513
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 24612.48
+              "date": "2026-10-22",
+              "level": 24362.6
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 25572.12
+              "date": "2026-09-29",
+              "level": 24895.22
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 25629.46
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 24169.49
+              "date": "2025-10-29",
+              "level": 24667.21
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 13431.3
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 9140.39
+              "date": "2021-10-29",
+              "level": 8842.62
             }
           },
-          "vs_nifty50_1y": 11.698869378655873,
+          "vs_nifty50_1y": 10.124457322846748,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -5994,31 +5994,31 @@
               "value": 97.40791268758528
             },
             {
-              "date": "2026-10-27",
-              "value": 98.51754049856783
+              "date": "2026-10-29",
+              "value": 99.40235478640885
             }
           ],
-          "off_5y_high": -14.803049175357119,
+          "off_5y_high": -14.037870923965134,
           "high_5y_date": "2026-02-26",
           "high_5y_level": 28428.67,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 9524.26
+              "date": "2021-10-18",
+              "level": 9726.91
             },
             {
-              "date": "2024-04-23",
-              "level": 20741.55
+              "date": "2024-04-24",
+              "level": 20987.88
             },
             {
-              "date": "2026-10-27",
-              "level": 24220.36
+              "date": "2026-10-29",
+              "level": 24437.89
             }
           ],
-          "source_sha256": "ce206c92c28a72dead3976755db9e7b12dcb1c80ce467288d19c6bad5fb1fa60"
+          "source_sha256": "f89c0cc1261c623cbf542e783150551105310ae8096d816a31ff5098d24cd5dd"
         },
         {
           "id": "nifty100-quality-30",
@@ -6030,45 +6030,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 6952.33,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 6994.23,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.037265842965318,
-            "1M": -1.3085367186646102,
-            "YTD": -7.284959859173723,
-            "1Y": -5.983910380630797,
-            "3Y": 8.604713228638694,
-            "5Y": 7.737578927480482
+            "1W": 0.77110266817082,
+            "1M": 1.8469899044615046,
+            "YTD": -6.726188888592544,
+            "1Y": -5.0691463154765914,
+            "3Y": 8.805647156325813,
+            "5Y": 8.31230452075511
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 7025.2
+              "date": "2026-10-22",
+              "level": 6940.71
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 7044.51
+              "date": "2026-09-29",
+              "level": 6867.39
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 7498.6
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 7394.83
+              "date": "2025-10-29",
+              "level": 7367.71
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 5427.0
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 4789.79
+              "date": "2021-10-29",
+              "level": 4692.18
             }
           },
-          "vs_nifty50_1y": 5.5044870352323185,
+          "vs_nifty50_1y": 5.98496620550566,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -6279,31 +6279,31 @@
               "value": 93.71531472538267
             },
             {
-              "date": "2026-10-27",
-              "value": 94.84502469236857
+              "date": "2026-10-29",
+              "value": 95.41663256118524
             }
           ],
-          "off_5y_high": -12.550298172725094,
+          "off_5y_high": -12.02326011403645,
           "high_5y_date": "2024-09-27",
           "high_5y_level": 7950.09,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 4989.49
+              "date": "2021-10-18",
+              "level": 4996.17
             },
             {
-              "date": "2024-04-23",
-              "level": 6411.35
+              "date": "2024-04-24",
+              "level": 6430.62
             },
             {
-              "date": "2026-10-27",
-              "level": 6952.33
+              "date": "2026-10-29",
+              "level": 6994.23
             }
           ],
-          "source_sha256": "690bf4a4a2aedf60610627f66e3e8f30ff1a949fe36fef148f80cb923b3231c9"
+          "source_sha256": "48b1eac7aa0f24ee98207f4b61bd566ca6c566ef3df4678a00cee99021aaaa29"
         },
         {
           "id": "nifty-100-low-volatility",
@@ -6315,45 +6315,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 26333.94,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 26641.0,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.3657501661898932,
-            "1M": -3.0106042570243297,
-            "YTD": -10.752434538418843,
-            "1Y": -9.80109544616774,
-            "3Y": 9.380559208392402,
-            "5Y": 8.256974276652308
+            "1W": 1.3436661444975684,
+            "1M": -0.029344638899586606,
+            "YTD": -9.71178671091436,
+            "1Y": -8.788719258860834,
+            "3Y": 9.785250740939077,
+            "5Y": 8.979982493261485
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 26430.61
+              "date": "2026-10-22",
+              "level": 26287.78
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 27151.36
+              "date": "2026-09-29",
+              "level": 26648.82
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 29506.62
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 29195.41
+              "date": "2025-10-29",
+              "level": 29208.01
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 20121.89
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 17711.69
+              "date": "2021-10-29",
+              "level": 17331.75
             }
           },
-          "vs_nifty50_1y": 1.6873019696953762,
+          "vs_nifty50_1y": 2.2653932621214175,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -6564,31 +6564,31 @@
               "value": 90.82441830085315
             },
             {
-              "date": "2026-10-27",
-              "value": 91.37012827723511
+              "date": "2026-10-29",
+              "value": 92.4355256917051
             }
           ],
-          "off_5y_high": -11.863570627950903,
+          "off_5y_high": -10.835878911368368,
           "high_5y_date": "2024-09-27",
           "high_5y_level": 29878.61,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 18263.9
+              "date": "2021-10-18",
+              "level": 18298.42
             },
             {
-              "date": "2024-04-23",
-              "level": 24289.06
+              "date": "2024-04-24",
+              "level": 24374.58
             },
             {
-              "date": "2026-10-27",
-              "level": 26333.94
+              "date": "2026-10-29",
+              "level": 26641.0
             }
           ],
-          "source_sha256": "b2c9b543ec59e967770d5a11843c17e7f4f333a82a119fb7d87599934fdd430c"
+          "source_sha256": "d1d3d21ffc8d5517f5f3bf8cb85e008ad4beabaf8e4bf8ff4943bb91b8316811"
         },
         {
           "id": "nifty-alpha-50",
@@ -6600,45 +6600,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 64082.59,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 65042.52,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.3709285538866975,
-            "1M": -4.671601883760578,
-            "YTD": 4.628770638774626,
-            "1Y": 2.8684332525144463,
-            "3Y": 14.740500786181698,
-            "5Y": 10.83735825783645
+            "1W": 3.6222903558054576,
+            "1M": -0.5224358028273257,
+            "YTD": 6.1960652159644525,
+            "1Y": 4.301165966167564,
+            "3Y": 15.280537039008312,
+            "5Y": 11.855721548258714
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 65638.84
+              "date": "2026-10-22",
+              "level": 62768.85
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 67222.98
+              "date": "2026-09-29",
+              "level": 65384.11
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 61247.58
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 62295.68
+              "date": "2025-10-29",
+              "level": 62360.3
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 42417.88
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 38312.44
+              "date": "2021-10-29",
+              "level": 37148.36
             }
           },
-          "vs_nifty50_1y": 14.356830668377562,
+          "vs_nifty50_1y": 15.355278487149814,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -6849,31 +6849,31 @@
               "value": 98.53784191119286
             },
             {
-              "date": "2026-10-27",
-              "value": 103.50607823276651
+              "date": "2026-10-29",
+              "value": 105.05655535421212
             }
           ],
-          "off_5y_high": -14.06361556555067,
+          "off_5y_high": -12.776325000201162,
           "high_5y_date": "2024-09-24",
           "high_5y_level": 74569.8,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 40131.66
+              "date": "2021-10-18",
+              "level": 40437.73
             },
             {
-              "date": "2024-04-23",
-              "level": 59437.17
+              "date": "2024-04-24",
+              "level": 59706.93
             },
             {
-              "date": "2026-10-27",
-              "level": 64082.59
+              "date": "2026-10-29",
+              "level": 65042.52
             }
           ],
-          "source_sha256": "ce3ef6d37d314c027a3fb289880892e2ce66135eba5ae8cc1062e1dd2618270a"
+          "source_sha256": "ec84d11e099f635d67005a6574070d18c26279bfb390cd4d6d9201227f0277b3"
         },
         {
           "id": "nifty-alpha-low-volatility-30",
@@ -6885,45 +6885,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 32662.7,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 32964.08,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.29542593472179357,
-            "1M": -5.0474476416008995,
-            "YTD": -8.100240675308923,
-            "1Y": -8.206647807399403,
-            "3Y": 9.194008098627293,
-            "5Y": 8.500661503769113
+            "1W": 1.6012545708741222,
+            "1M": -2.2010060538272813,
+            "YTD": -7.252278030907955,
+            "1Y": -7.555582477781442,
+            "3Y": 9.510592798724215,
+            "5Y": 8.937924014799513
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 32759.48
+              "date": "2026-10-22",
+              "level": 32444.56
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 34398.97
+              "date": "2026-09-29",
+              "level": 33705.95
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 35541.66
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 35582.86
+              "date": "2025-10-29",
+              "level": 35658.27
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 25085.89
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 21722.73
+              "date": "2021-10-29",
+              "level": 21486.76
             }
           },
-          "vs_nifty50_1y": 3.2817496084637128,
+          "vs_nifty50_1y": 3.498530043200809,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -7134,31 +7134,31 @@
               "value": 91.6367786202927
             },
             {
-              "date": "2026-10-27",
-              "value": 92.88527995231564
+              "date": "2026-10-29",
+              "value": 93.74233603377947
             }
           ],
-          "off_5y_high": -20.111931884053014,
+          "off_5y_high": -19.374801580410505,
           "high_5y_date": "2024-09-27",
           "high_5y_level": 40885.58,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 22793.7
+              "date": "2021-10-18",
+              "level": 22762.85
             },
             {
-              "date": "2024-04-23",
-              "level": 33583.39
+              "date": "2024-04-24",
+              "level": 33605.36
             },
             {
-              "date": "2026-10-27",
-              "level": 32662.7
+              "date": "2026-10-29",
+              "level": 32964.08
             }
           ],
-          "source_sha256": "e18f78bcd626437e23083d09c9b640af5fb2933b65ed2a8178281e5f895d2421"
+          "source_sha256": "e572d632dbdde08fb127804a2c54947100ba2075667e370923f087941321daa1"
         },
         {
           "id": "nifty50-equal-weight",
@@ -7170,45 +7170,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 53222.13,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 53802.08,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.6172241272003776,
-            "1M": -3.023798122650856,
-            "YTD": -7.033469755645106,
-            "1Y": -6.383931186324232,
-            "3Y": 11.308823414525548,
-            "5Y": 10.055470171937975
+            "1W": 1.5991043006673422,
+            "1M": -0.24994025424899258,
+            "YTD": -6.020433651768508,
+            "1Y": -5.763478979762693,
+            "3Y": 11.68904097236294,
+            "5Y": 10.835091207442883
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 53552.67
+              "date": "2026-10-22",
+              "level": 52955.27
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 54881.64
+              "date": "2026-09-29",
+              "level": 53936.89
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 57248.7
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 56851.49
+              "date": "2025-10-29",
+              "level": 57092.6
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 38589.72
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 32965.72
+              "date": "2021-10-29",
+              "level": 32169.42
             }
           },
-          "vs_nifty50_1y": 5.104466229538883,
+          "vs_nifty50_1y": 5.290633541219558,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -7419,31 +7419,31 @@
               "value": 93.29483939536034
             },
             {
-              "date": "2026-10-27",
-              "value": 94.35351724027893
+              "date": "2026-10-29",
+              "value": 95.38166704043725
             }
           ],
-          "off_5y_high": -9.460628432409768,
+          "off_5y_high": -8.47404054987624,
           "high_5y_date": "2026-08-03",
           "high_5y_level": 58783.41,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 33756.09
+              "date": "2021-10-18",
+              "level": 33946.65
             },
             {
-              "date": "2024-04-23",
-              "level": 47374.31
+              "date": "2024-04-24",
+              "level": 47519.99
             },
             {
-              "date": "2026-10-27",
-              "level": 53222.13
+              "date": "2026-10-29",
+              "level": 53802.08
             }
           ],
-          "source_sha256": "11c475fd2e42bbd20d0afa805beb243475e62929d28cf26c696ccf6476e3208c"
+          "source_sha256": "2dac4d03d956e5c335d18c3981b20b706f2a15ae69e21d2c7d9fe8a0a04418a5"
         },
         {
           "id": "nifty500-equal-weight",
@@ -7455,45 +7455,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 17912.7,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 18066.78,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -2.7101274842925793,
-            "1M": -6.852413750068253,
-            "YTD": -3.6525301248885866,
-            "1Y": -5.602398844844481,
-            "3Y": 11.864766913713254,
-            "5Y": 11.649092491625247
+            "1W": 0.7497631373056146,
+            "1M": -3.671531223824198,
+            "YTD": -2.823776326837102,
+            "1Y": -5.435175172387807,
+            "3Y": 12.161029761215758,
+            "5Y": 12.24715524658726
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 18411.68
+              "date": "2026-10-22",
+              "level": 17932.33
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 19230.45
+              "date": "2026-09-29",
+              "level": 18755.39
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 18591.77
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 18975.8
+              "date": "2025-10-29",
+              "level": 19105.18
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 12795.22
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 10325.66
+              "date": "2021-10-29",
+              "level": 10140.01
             }
           },
-          "vs_nifty50_1y": 5.885998571018635,
+          "vs_nifty50_1y": 5.618937348594444,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -7704,31 +7704,31 @@
               "value": 92.35516933106744
             },
             {
-              "date": "2026-10-27",
-              "value": 94.42088817107268
+              "date": "2026-10-29",
+              "value": 95.23307005595873
             }
           ],
-          "off_5y_high": -9.930580068243323,
+          "off_5y_high": -9.155828287490841,
           "high_5y_date": "2026-08-10",
           "high_5y_level": 19887.66,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 10707.81
+              "date": "2021-10-18",
+              "level": 10796.48
             },
             {
-              "date": "2024-04-23",
-              "level": 16437.19
+              "date": "2024-04-24",
+              "level": 16578.56
             },
             {
-              "date": "2026-10-27",
-              "level": 17912.7
+              "date": "2026-10-29",
+              "level": 18066.78
             }
           ],
-          "source_sha256": "5289ff6be715e755de9eb51966feb38ec4083461d05306eec4577dce6603e3ef"
+          "source_sha256": "a5fa3b930f6c7d62882241295ca10328c913830b98bd9eb3de6be90ea14ea043"
         },
         {
           "id": "nifty-dividend-opportunities-50",
@@ -7740,45 +7740,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 8823.42,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 8878.21,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.9731620077372494,
-            "1M": -0.9810522913664688,
-            "YTD": -11.844434764190337,
-            "1Y": -8.465809359011068,
-            "3Y": 9.388170637334635,
-            "5Y": 10.486020003127106
+            "1W": -0.03681818795966407,
+            "1M": 1.91870803471903,
+            "YTD": -11.297023055434563,
+            "1Y": -8.49724869546219,
+            "3Y": 9.595744807172712,
+            "5Y": 11.200229622255442
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 8910.13
+              "date": "2026-10-22",
+              "level": 8881.48
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 8910.84
+              "date": "2026-09-29",
+              "level": 8711.07
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 10008.92
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 9639.48
+              "date": "2025-10-29",
+              "level": 9702.67
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 6740.61
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 5359.57
+              "date": "2021-10-29",
+              "level": 5221.9
             }
           },
-          "vs_nifty50_1y": 3.0225880568520473,
+          "vs_nifty50_1y": 2.556863825520061,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -7989,31 +7989,31 @@
               "value": 91.03917584823587
             },
             {
-              "date": "2026-10-27",
-              "value": 91.55717615123285
+              "date": "2026-10-29",
+              "value": 92.1257105382762
             }
           ],
-          "off_5y_high": -17.10576380166081,
+          "off_5y_high": -16.591022896058803,
           "high_5y_date": "2024-09-27",
           "high_5y_level": 10644.19,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 5551.75
+              "date": "2021-10-18",
+              "level": 5636.35
             },
             {
-              "date": "2024-04-23",
-              "level": 8737.14
+              "date": "2024-04-24",
+              "level": 8764.56
             },
             {
-              "date": "2026-10-27",
-              "level": 8823.42
+              "date": "2026-10-29",
+              "level": 8878.21
             }
           ],
-          "source_sha256": "f4abf6078672805ef283a927bc2d53efd234953186ac341c81c206d1db321046"
+          "source_sha256": "f4f48d86d915ebab3edc8959caf558d93ec357c18f56daf593793886ab1b3086"
         }
       ]
     },
@@ -8031,45 +8031,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 11527.03,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 11614.06,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": 0.693945188463263,
-            "1M": -2.5768429806827586,
-            "YTD": -8.605868491743074,
-            "1Y": -7.684206648449687,
-            "3Y": 13.943112553086557,
-            "5Y": 12.23357169127044
+            "1W": 2.332470434404099,
+            "1M": 0.618051897646299,
+            "YTD": -7.9158354767198125,
+            "1Y": -8.245027331211308,
+            "3Y": 14.201411347147651,
+            "5Y": 12.847677598476848
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 11447.59
+              "date": "2026-10-22",
+              "level": 11349.34
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 11831.92
+              "date": "2026-09-29",
+              "level": 11542.72
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 12612.44
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 12486.52
+              "date": "2025-10-29",
+              "level": 12657.69
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 7791.38
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 6473.48
+              "date": "2021-10-29",
+              "level": 6346.83
             }
           },
-          "vs_nifty50_1y": 3.804190767413428,
+          "vs_nifty50_1y": 2.8090851897709435,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -8280,31 +8280,31 @@
               "value": 90.16143073383918
             },
             {
-              "date": "2026-10-27",
-              "value": 91.97849398873792
+              "date": "2026-10-29",
+              "value": 92.67293898730561
             }
           ],
-          "off_5y_high": -10.00413790949688,
+          "off_5y_high": -9.324661940601487,
           "high_5y_date": "2026-01-02",
           "high_5y_level": 12808.4,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 6629.6
+              "date": "2021-10-18",
+              "level": 6662.53
             },
             {
-              "date": "2024-04-23",
-              "level": 10927.86
+              "date": "2024-04-24",
+              "level": 10970.98
             },
             {
-              "date": "2026-10-27",
-              "level": 11527.03
+              "date": "2026-10-29",
+              "level": 11614.06
             }
           ],
-          "source_sha256": "8efbbf8328cd131a289d119888ddcb09990ae20034eb14760b8a889e5dcb0890"
+          "source_sha256": "bd10e417f3449ab68428397579737eb4491817a05016aae2a10a3f25cb4c3d7f"
         },
         {
           "id": "nifty-india-defence",
@@ -8316,45 +8316,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 9775.64,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 9845.51,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -3.3361910327567634,
-            "1M": -6.188108597788777,
-            "YTD": 14.397990003850047,
-            "1Y": 9.085715114663607,
-            "3Y": 41.04691104739937,
-            "5Y": 47.30750721335097
+            "1W": 1.0607492991807854,
+            "1M": -2.8091584666656066,
+            "YTD": 15.215633407409213,
+            "1Y": 10.71912535859556,
+            "3Y": 41.29292241462452,
+            "5Y": 47.92377149107665
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 10113.03
+              "date": "2026-10-22",
+              "level": 9742.17
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 10420.47
+              "date": "2026-09-29",
+              "level": 10130.08
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 8545.29
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 8961.43
+              "date": "2025-10-29",
+              "level": 8892.33
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 3482.99
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 1409.73
+              "date": "2021-10-29",
+              "level": 1390.48
             }
           },
-          "vs_nifty50_1y": 20.574112530526723,
+          "vs_nifty50_1y": 21.773237879577813,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -8565,31 +8565,31 @@
               "value": 105.78445231257693
             },
             {
-              "date": "2026-10-27",
-              "value": 108.98052191284803
+              "date": "2026-10-29",
+              "value": 109.75944473181956
             }
           ],
-          "off_5y_high": -11.764159007274133,
+          "off_5y_high": -11.133505852067739,
           "high_5y_date": "2026-09-08",
           "high_5y_level": 11078.99,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 1433.9
+              "date": "2021-10-18",
+              "level": 1475.63
             },
             {
-              "date": "2024-04-23",
-              "level": 5764.08
+              "date": "2024-04-24",
+              "level": 5910.58
             },
             {
-              "date": "2026-10-27",
-              "level": 9775.64
+              "date": "2026-10-29",
+              "level": 9845.51
             }
           ],
-          "source_sha256": "3a79c9b5af833028a9c556e7ea8d78ee24e6ba7fa5aeacb505ab8de763d38b57"
+          "source_sha256": "ab093067a3330fb17856526b699e8e7fc2683c782d125621be76b0bd186e2026"
         },
         {
           "id": "nifty-india-manufacturing",
@@ -8601,45 +8601,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 19547.01,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 19674.96,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.3256192322817162,
-            "1M": -6.298203286823611,
-            "YTD": -2.6902907391790465,
-            "1Y": -1.5039200381749773,
-            "3Y": 17.053939001107764,
-            "5Y": 14.029815843433969
+            "1W": 1.5450884334360815,
+            "1M": -3.4232182345188433,
+            "YTD": -2.0533249167887124,
+            "1Y": -1.521403559351553,
+            "3Y": 17.27462158190938,
+            "5Y": 14.478140389241956
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 19809.61
+              "date": "2026-10-22",
+              "level": 19375.59
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 20860.87
+              "date": "2026-09-29",
+              "level": 20372.35
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 20087.42
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 19845.47
+              "date": "2025-10-29",
+              "level": 19978.92
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 12186.4
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 10139.75
+              "date": "2021-10-29",
+              "level": 10007.86
             }
           },
-          "vs_nifty50_1y": 9.984477377688139,
+          "vs_nifty50_1y": 9.532708961630698,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -8850,31 +8850,31 @@
               "value": 95.93350593326952
             },
             {
-              "date": "2026-10-27",
-              "value": 98.32366461823706
+              "date": "2026-10-29",
+              "value": 98.96726754717113
             }
           ],
-          "off_5y_high": -10.654819801371984,
+          "off_5y_high": -10.069987859995033,
           "high_5y_date": "2026-08-07",
           "high_5y_level": 21878.08,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 10621.35
+              "date": "2021-10-18",
+              "level": 10718.63
             },
             {
-              "date": "2024-04-23",
-              "level": 16246.79
+              "date": "2024-04-24",
+              "level": 16388.54
             },
             {
-              "date": "2026-10-27",
-              "level": 19547.01
+              "date": "2026-10-29",
+              "level": 19674.96
             }
           ],
-          "source_sha256": "c96e470ab59a6224fe4a2ba53e3b26ae86ba8bf5cc17ffc7018931d774eb9ddc"
+          "source_sha256": "061d0def95fcc7e88aa1b5703d91eb8afe1303f9ae4632ce95e00f11424fd69d"
         },
         {
           "id": "nifty-india-consumption",
@@ -8886,45 +8886,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 13933.53,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 14089.62,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -0.017795624429084445,
-            "1M": -4.194041457724373,
-            "YTD": -10.361698308754985,
-            "1Y": -12.528155910292815,
-            "3Y": 10.469625221512068,
-            "5Y": 9.973064158122513
+            "1W": 2.8446172274124493,
+            "1M": -0.8657768033733193,
+            "YTD": -9.35752761324663,
+            "1Y": -11.371991032540995,
+            "3Y": 10.859653545014126,
+            "5Y": 10.52472777693163
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 13936.01
+              "date": "2026-10-22",
+              "level": 13699.91
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 14543.49
+              "date": "2026-09-29",
+              "level": 14212.67
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 15544.17
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 15929.16
+              "date": "2025-10-29",
+              "level": 15897.48
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 10334.82
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 8662.79
+              "date": "2021-10-29",
+              "level": 8543.42
             }
           },
-          "vs_nifty50_1y": -1.0397584944296998,
+          "vs_nifty50_1y": -0.31787851155874414,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -9135,31 +9135,31 @@
               "value": 87.07889796953474
             },
             {
-              "date": "2026-10-27",
-              "value": 88.7828677820866
+              "date": "2026-10-29",
+              "value": 89.7774555019326
             }
           ],
-          "off_5y_high": -14.59539937222375,
+          "off_5y_high": -13.638656600507638,
           "high_5y_date": "2024-09-26",
           "high_5y_level": 16314.73,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 9157.54
+              "date": "2021-10-18",
+              "level": 9114.42
             },
             {
-              "date": "2024-04-23",
-              "level": 12818.25
+              "date": "2024-04-24",
+              "level": 12821.8
             },
             {
-              "date": "2026-10-27",
-              "level": 13933.53
+              "date": "2026-10-29",
+              "level": 14089.62
             }
           ],
-          "source_sha256": "a79f76ce8794b4bc1aa93ce6c77c4908918fa073ebb91f6063bca4dcb3d6c267"
+          "source_sha256": "4ec990e4e4a7a62c321af47238438153bb5f83ed0a00dfe68346eae6aa0d8e13"
         },
         {
           "id": "nifty-housing",
@@ -9171,45 +9171,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 14414.65,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 14647.65,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.4242035272049147,
-            "1M": -5.046147441255966,
-            "YTD": -6.520991945629762,
-            "1Y": -7.541677811323999,
-            "3Y": 9.643311428942237,
-            "5Y": 7.516252491684949
+            "1W": 1.485529236678662,
+            "1M": -1.2554368782813352,
+            "YTD": -5.009986900299612,
+            "1Y": -7.127477050783115,
+            "3Y": 10.211228577671804,
+            "5Y": 8.21798218788372
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 14622.91
+              "date": "2026-10-22",
+              "level": 14433.24
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 15180.69
+              "date": "2026-09-29",
+              "level": 14833.88
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 15420.2
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 15590.43
+              "date": "2025-10-29",
+              "level": 15771.78
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 10935.29
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 10033.56
+              "date": "2021-10-29",
+              "level": 9869.48
             }
           },
-          "vs_nifty50_1y": 3.9467196045391164,
+          "vs_nifty50_1y": 3.9266354701991357,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -9420,31 +9420,31 @@
               "value": 91.15912499247605
             },
             {
-              "date": "2026-10-27",
-              "value": 92.3023184036658
+              "date": "2026-10-29",
+              "value": 93.79430330708378
             }
           ],
-          "off_5y_high": -10.43496793226818,
+          "off_5y_high": -8.987228828524307,
           "high_5y_date": "2024-09-26",
           "high_5y_level": 16094.06,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 10186.02
+              "date": "2021-10-18",
+              "level": 10270.34
             },
             {
-              "date": "2024-04-23",
-              "level": 13943.86
+              "date": "2024-04-24",
+              "level": 14060.75
             },
             {
-              "date": "2026-10-27",
-              "level": 14414.65
+              "date": "2026-10-29",
+              "level": 14647.65
             }
           ],
-          "source_sha256": "77453df59ede56c525541fd55772f21e4b9d227bf4cb8ed122300ae3a8e6de6e"
+          "source_sha256": "3d06ada3d1a7e77a36d17165efc4d6369ae48f0ff8f6c4e9bc20f335c538d02a"
         },
         {
           "id": "nifty-india-digital",
@@ -9456,45 +9456,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 11299.82,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 11273.06,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": 0.644043069211242,
-            "1M": 4.688837583335492,
-            "YTD": -7.759884542922546,
-            "1Y": -7.353236580148515,
-            "3Y": 12.552088112507409,
-            "5Y": 5.921681038736626
+            "1W": 0.910002327371684,
+            "1M": 6.82053998428922,
+            "YTD": -7.978325676465503,
+            "1Y": -7.358367451592063,
+            "3Y": 12.439131956789474,
+            "5Y": 6.413416757049517
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 11227.51
+              "date": "2026-10-22",
+              "level": 11171.4
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 10793.72
+              "date": "2026-09-29",
+              "level": 10553.27
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 12250.44
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 12196.67
+              "date": "2025-10-29",
+              "level": 12168.46
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 7924.57
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 8475.48
+              "date": "2021-10-29",
+              "level": 8261.87
             }
           },
-          "vs_nifty50_1y": 4.135160835714601,
+          "vs_nifty50_1y": 3.6957450693901883,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -9705,31 +9705,31 @@
               "value": 92.13597074329705
             },
             {
-              "date": "2026-10-27",
-              "value": 94.06882451222872
+              "date": "2026-10-29",
+              "value": 93.84605266772613
             }
           ],
-          "off_5y_high": -12.933039817973214,
+          "off_5y_high": -13.139229992194668,
           "high_5y_date": "2024-12-16",
           "high_5y_level": 12978.31,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 9044.06
+              "date": "2021-10-18",
+              "level": 9130.01
             },
             {
-              "date": "2024-04-23",
-              "level": 9790.49
+              "date": "2024-04-24",
+              "level": 9766.74
             },
             {
-              "date": "2026-10-27",
-              "level": 11299.82
+              "date": "2026-10-29",
+              "level": 11273.06
             }
           ],
-          "source_sha256": "0f1866e820f6180ef1d6578813c4791a54acb52557c492045132445f89d11810"
+          "source_sha256": "d8c119a538b8041f70b1d4cf09fd5624209c0fa8a742f803f47ac310bcb74faf"
         },
         {
           "id": "nifty-capital-markets",
@@ -9741,45 +9741,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 5631.29,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 5733.12,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.3914109355163462,
-            "1M": -2.6662979319165836,
-            "YTD": 10.550545166141202,
-            "1Y": 10.037928009082385,
-            "3Y": 40.916379963366964,
-            "5Y": 25.694418544989905
+            "1W": 3.0008497886307994,
+            "1M": 2.411706808190628,
+            "YTD": 12.549618560384479,
+            "1Y": 15.121735725544916,
+            "3Y": 41.67042894479414,
+            "5Y": 26.714977408150165
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 5710.75
+              "date": "2026-10-22",
+              "level": 5566.09
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 5785.55
+              "date": "2026-09-29",
+              "level": 5598.11
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 5093.86
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 5117.59
+              "date": "2025-10-29",
+              "level": 4980.05
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 2011.97
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 1795.13
+              "date": "2021-10-29",
+              "level": 1755.18
             }
           },
-          "vs_nifty50_1y": 21.5263254249455,
+          "vs_nifty50_1y": 26.175848246527167,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -9990,31 +9990,31 @@
               "value": 109.65775059781555
             },
             {
-              "date": "2026-10-27",
-              "value": 113.73218671233762
+              "date": "2026-10-29",
+              "value": 115.7887933820203
             }
           ],
-          "off_5y_high": -9.473523454329168,
+          "off_5y_high": -7.83654309873646,
           "high_5y_date": "2026-05-26",
           "high_5y_level": 6220.6,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 1935.47
+              "date": "2021-10-18",
+              "level": 1929.68
             },
             {
-              "date": "2024-04-23",
-              "level": 2978.34
+              "date": "2024-04-24",
+              "level": 2967.73
             },
             {
-              "date": "2026-10-27",
-              "level": 5631.29
+              "date": "2026-10-29",
+              "level": 5733.12
             }
           ],
-          "source_sha256": "83299ba549711021a8ce7d0274b454f185f0ed9ecc78655dd26e85d8112c8275"
+          "source_sha256": "fdf73efb460783619db1a22aee97116f87cd10d63be76384203aff899cbc71e7"
         }
       ]
     },
@@ -10032,45 +10032,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 16405.82,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 16493.77,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -1.5227938876953728,
-            "1M": -5.400794005460597,
-            "YTD": -6.752265002444036,
-            "1Y": -7.341014899814125,
-            "3Y": 18.148380667219556,
-            "5Y": 19.8937847659985
+            "1W": 0.7172555966515004,
+            "1M": -2.5610139372657548,
+            "YTD": -6.25237299503233,
+            "1Y": -7.729122401873423,
+            "3Y": 18.322750911189267,
+            "5Y": 20.816991776216764
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 16659.51
+              "date": "2026-10-22",
+              "level": 16376.31
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 17342.45
+              "date": "2026-09-29",
+              "level": 16927.28
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 17593.8
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 17705.59
+              "date": "2025-10-29",
+              "level": 17875.38
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 9946.38
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 6623.21
+              "date": "2021-10-29",
+              "level": 6408.2
             }
           },
-          "vs_nifty50_1y": 4.1473825160489906,
+          "vs_nifty50_1y": 3.3249901191088282,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -10281,31 +10281,31 @@
               "value": 90.01895298185387
             },
             {
-              "date": "2026-10-27",
-              "value": 91.66839880828658
+              "date": "2026-10-29",
+              "value": 92.15982414851271
             }
           ],
-          "off_5y_high": -19.189920055955913,
+          "off_5y_high": -18.756705103513504,
           "high_5y_date": "2024-08-01",
           "high_5y_level": 20301.7,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 7016.79
+              "date": "2021-10-18",
+              "level": 7139.12
             },
             {
-              "date": "2024-04-23",
-              "level": 16499.67
+              "date": "2024-04-24",
+              "level": 16763.02
             },
             {
-              "date": "2026-10-27",
-              "level": 16405.82
+              "date": "2026-10-29",
+              "level": 16493.77
             }
           ],
-          "source_sha256": "9cbc2f3c0ffaf2977e99bfe1e1783e687a3d9641c396c32935f85ef4fec163a0"
+          "source_sha256": "543299ceefce622ac2f730a15f88e0ea86c57fc14a2c4bf3d092e7aa58c05743"
         },
         {
           "id": "nifty-mnc",
@@ -10317,45 +10317,45 @@
           "currency": "INR",
           "return_method": "official NSE gross total-return index",
           "status": "available",
-          "latest_date": "2026-10-27",
-          "latest_level": 45121.98,
-          "history_start": "2021-10-14",
-          "history_observations": 1248,
+          "latest_date": "2026-10-29",
+          "latest_level": 45520.55,
+          "history_start": "2021-10-18",
+          "history_observations": 1249,
           "returns": {
-            "1W": -3.2631807780025945,
-            "1M": -9.691035607430221,
-            "YTD": -6.374298382724319,
-            "1Y": -5.367376373208643,
-            "3Y": 10.50164435019909,
-            "5Y": 9.618108872305742
+            "1W": 0.7623937685676152,
+            "1M": -6.26796577586618,
+            "YTD": -5.547286893122195,
+            "1Y": -4.582140013117697,
+            "3Y": 10.805228414050895,
+            "5Y": 9.727608958206101
           },
           "anchor_dates": {
             "1W": {
-              "date": "2026-10-19",
-              "level": 46644.06
+              "date": "2026-10-22",
+              "level": 45176.13
             },
             "1M": {
-              "date": "2026-09-25",
-              "level": 49964.01
+              "date": "2026-09-29",
+              "level": 48564.56
             },
             "YTD": {
               "date": "2025-12-31",
               "level": 48194.01
             },
             "1Y": {
-              "date": "2025-10-27",
-              "level": 47681.21
+              "date": "2025-10-29",
+              "level": 47706.53
             },
             "3Y": {
               "date": "2023-10-27",
               "level": 33438.92
             },
             "5Y": {
-              "date": "2021-10-27",
-              "level": 28510.44
+              "date": "2021-10-29",
+              "level": 28619.07
             }
           },
-          "vs_nifty50_1y": 6.121021042654473,
+          "vs_nifty50_1y": 6.471972507864554,
           "sparkline": [
             {
               "date": "2025-10-31",
@@ -10566,31 +10566,31 @@
               "value": 93.16431371484953
             },
             {
-              "date": "2026-10-27",
-              "value": 94.90890344010748
+              "date": "2026-10-29",
+              "value": 95.74724966614019
             }
           ],
-          "off_5y_high": -16.417746223403785,
+          "off_5y_high": -15.679450189237333,
           "high_5y_date": "2026-08-10",
           "high_5y_level": 53985.12,
-          "high_5y_start": "2021-10-27",
+          "high_5y_start": "2021-10-29",
           "missing_5y_dates": [],
           "off_5y_high_reason": null,
           "source_checks": [
             {
-              "date": "2021-10-14",
-              "level": 29615.9
+              "date": "2021-10-18",
+              "level": 29935.27
             },
             {
-              "date": "2024-04-23",
-              "level": 40966.23
+              "date": "2024-04-24",
+              "level": 41291.19
             },
             {
-              "date": "2026-10-27",
-              "level": 45121.98
+              "date": "2026-10-29",
+              "level": 45520.55
             }
           ],
-          "source_sha256": "f4e7d20ebf49e26e4a9f609d5634d9b8354a0bdfc77798f68de1d4f01924fba4"
+          "source_sha256": "78c2f090f3a5cc1045d18bae769493ee8a310951d61898768d5a4b832515741e"
         }
       ]
     }
