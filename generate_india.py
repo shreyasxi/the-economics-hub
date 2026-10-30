@@ -2796,88 +2796,111 @@ def load_transmission(path=TRANSMISSION_CSV):
     return df
 
 
-def chart_rate_transmission(output_dir, path=TRANSMISSION_CSV):
-    """
-    How much of the policy rate move has reached bank lending and deposit rates.
-
-    Drawn as the path through the cycle rather than one set of bars: the gap
-    between the repo line and the others is the part of the move that has not
-    reached borrowers and savers, and the way that gap widens or narrows month
-    by month is the point of the chart.
-    """
-    df = load_transmission(path)
-    if df is None or len(df) < 2:
-        print("   ⚠ Skipping Monetary Transmission — no RBI transmission history "
-              "(run: python generate_soe.py --history)")
+def transmission_monthly_detail(path, latest):
+    """Use only the same edition's explicit memo row; never difference vintages."""
+    import json
+    detail_path = path.with_suffix(".json")
+    if not detail_path.exists():
+        return None
+    try:
+        detail = json.loads(detail_path.read_text(encoding="utf-8"))
+        if detail["month"] != latest["month"] or detail["url"] != latest["url"] or detail["published"] != latest["published"]:
+            return None
+        matching = [r for r in detail["cycles"] if r["cycle_start"] == latest["cycle_start"]
+                    and r["cycle_end"] == latest["cycle_end"]]
+        if len(matching) != 1:
+            return None
+        fields = [c for c, _, _, _ in TRANSMISSION_SERIES] + ["overall_bps", "wadtdr_outstanding_bps"]
+        if any(matching[0].get(c) != latest[c] for c in fields):
+            return None
+        monthly = [r for r in detail["monthly"] if r["month"] == latest["cycle_end"]]
+        if len(monthly) != 1:
+            return None
+        row = monthly[0]
+        if any(type(row.get(c)) is not int or abs(row[c]) > 1000 for c in fields):
+            return None
+        return row
+    except (ValueError, KeyError, TypeError, OSError):
         return None
 
-    fig, ax = EconStyle.create_figure(size="wide")
-    dates = df["date"].tolist()
 
-    ax.yaxis.grid(True, linestyle="-", alpha=0.15, color="#9CA3AF", zorder=0)
-    ax.set_axisbelow(True)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
+def chart_rate_transmission(output_dir, path=TRANSMISSION_CSV):
+    """An optional transmission chart must never block the later SOE briefing."""
+    try:
+        return _render_rate_transmission(output_dir, path)
+    except Exception as exc:
+        (output_dir / "18_india_rate_transmission.png").unlink(missing_ok=True)
+        print(f"   Skipping Monetary Transmission: {exc}")
+        return None
 
-    ends: list[tuple[float, str, str]] = []
+
+def _render_rate_transmission(output_dir, path):
+    """One compact figure: cumulative history and the latest published monthly changes."""
+    df = load_transmission(path)
+    if df is None or len(df) < 2:
+        (output_dir / "18_india_rate_transmission.png").unlink(missing_ok=True)
+        print("   Skipping Monetary Transmission — insufficient validated history")
+        return None
+    latest = df.iloc[-1]
+    # Optional columns were not printed in early editions. Gaps remain gaps.
+    for field in ("overall_bps", "wadtdr_outstanding_bps"):
+        df[field] = pd.to_numeric(df.get(field), errors="coerce")
+    latest = df.iloc[-1]
+    monthly = transmission_monthly_detail(path, latest)
+    fig, (ax, memo) = EconStyle.create_figure(size="wide", ncols=2,
+        gridspec_kw={"width_ratios": [1.65, 1], "wspace": .65})
+    fig.subplots_adjust(left=.07, right=.96, bottom=.23, top=.76)
+    start = pd.to_datetime(latest["cycle_start"])
+    end = latest["date"]
+    published = pd.to_datetime(latest["published"])
+    EconStyle.add_editorial_header(fig, "Monetary Transmission",
+        f"{latest['cycle_type'].capitalize()} cycle from {start:%b %Y} | Bank rates through {end:%b %Y} | Bulletin {published:%d %b %Y}")
     for column, label, color, style in TRANSMISSION_SERIES:
-        values = df[column].values
-        # The repo rate holds between MPC decisions, so it is drawn as steps;
-        # bank rates are monthly averages and are drawn as lines.
-        ax.plot(dates, values, color=color, linewidth=2.5, linestyle=style, zorder=4,
-                solid_capstyle="round", label=label,
+        ax.plot(df["date"], df[column], color=color, lw=1.8, ls=style, label=label,
                 drawstyle="steps-post" if column == "repo_bps" else "default")
-        ends.append((float(values[-1]), label, color))
-
-    ax.axhline(y=0, color="#000000", linewidth=1.0, zorder=2)
-    ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%d"))
-    ax.set_ylabel("Cumulative change (basis points)", fontsize=EconStyle.FONT_SIZE_AXIS)
-
-    # Ticks every second month: sixteen monthly labels ran into each other.
-    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+    ax.set_title("Cumulative change since cycle start", loc="left", fontsize=10, weight="bold", pad=12)
+    ax.set_ylabel("Basis points", fontsize=9)
+    ax.axhline(0, color="#777777", lw=.7)
+    ax.grid(axis="y", alpha=.18)
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=max(2, len(df)//6)))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
-    plt.setp(ax.get_xticklabels(), rotation=0, ha="center", fontsize=8)
-
-    span = df[[c for c, _, _, _ in TRANSMISSION_SERIES]].values
-    low, high = span.min() - 20, max(span.max(), 0) + 20
-    ax.set_ylim(low, high)
-    # The axis stops with the data: empty months to the right would read as a
-    # gap in reporting rather than as room for the labels.
-    ax.set_xlim(dates[0], dates[-1] + pd.Timedelta(days=42))
-
-    # End labels, nudged apart when two series finish within a hair of each
-    # other (fresh and existing loans ended one basis point apart in Jun 2026).
-    gap = (high - low) * 0.075
-    placed: list[float] = []
-    for value, label, color in sorted(ends, reverse=True):
-        y = value
-        for taken in placed:
-            if abs(y - taken) < gap:
-                y = taken - gap
-        placed.append(y)
-        ax.annotate(
-            f"{label}  {value:,.0f}",
-            xy=(dates[-1], y), xytext=(10, 0), textcoords="offset points",
-            va="center", fontsize=9, fontweight="bold", color=color,
-            fontfamily=EconStyle.FONT_FAMILY, annotation_clip=False, zorder=10,
-        )
-
-    cycle = df["cycle_type"].iloc[0]
-    start = pd.to_datetime(df["cycle_start"].iloc[0], format="%Y-%m")
-    EconStyle.set_title(
-        ax,
-        "Monetary Transmission: How Far the Repo Cut Has Travelled"
-        if cycle == "easing" else "Monetary Transmission: How Far the Repo Rise Has Travelled",
-        f"Cumulative change since the start of the {cycle} cycle ({start:%b %Y}), "
-        f"basis points — bank rates through {df['date'].iloc[-1]:%b %Y}",
-    )
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[0.02, 0.04, 0.98, 0.96])
-    EconStyle.add_source(fig, "RBI Bulletin, State of the Economy (Table IV.3)")
-
+    ax.tick_params(labelsize=8)
+    fig.legend(*ax.get_legend_handles_labels(), loc="upper left",
+               bbox_to_anchor=(.07, .18), ncol=3, fontsize=7.5, frameon=False, borderaxespad=0)
+    memo.set_title(f"{end:%b %Y}: monthly change", loc="left", fontsize=10, weight="bold", pad=12)
+    if monthly:
+        rows = [("repo_bps", "Repo", "#000000"),
+                ("walr_fresh_bps", "Fresh loans", "#1E3A8A"),
+                ("overall_bps", "Fresh loans: fixed mix", "#8B5CF6"),
+                ("walr_outstanding_bps", "Existing loans", "#0B8F82"),
+                ("wadtdr_fresh_bps", "Fresh deposits", "#D97706"),
+                ("wadtdr_outstanding_bps", "Existing deposits", "#A16207")]
+        values = [monthly[c] for c, _, _ in rows]
+        memo.grid(False)
+        memo.barh(range(len(rows)), values, color=[color for _, _, color in rows], height=.55)
+        memo.set_yticks(range(len(rows)), [label for _, label, _ in rows], fontsize=8)
+        memo.invert_yaxis()
+        extent = max(5, max(abs(v) for v in values))
+        memo.set_xlim(min(0, min(values))-extent*.25, max(0, max(values))+extent*.3)
+        for i, value in enumerate(values):
+            memo.annotate(f"{value:+d}" if value else "0", (value, i),
+                          xytext=(4 if value >= 0 else -4, 0), textcoords="offset points",
+                          va="center", ha="left" if value >= 0 else "right", fontsize=8, weight="bold")
+        memo.axvline(0, color="#777777", lw=.7)
+        memo.set_xlabel("Basis points; + rise / - fall", fontsize=8)
+        memo.tick_params(axis="x", labelsize=8)
+    else:
+        memo.text(.5, .5, "Matching monthly detail unavailable", transform=memo.transAxes,
+                  ha="center", va="center", fontsize=9, wrap=True)
+        memo.set_axis_off()
+    for panel in (ax, memo):
+        panel.spines[["top", "right"]].set_visible(False)
+    fig.text(.07, .075, "Fixed mix: RBI's reference weights. Historical observations may use different publication vintages.",
+             fontsize=7, color="#555555")
+    EconStyle.add_source(fig, "RBI Bulletin, SOE transmission table", date_text=f"Published {published:%d %b %Y}")
     fp = output_dir / "18_india_rate_transmission.png"
     EconStyle.save_chart(fig, fp)
-    print(f"   ✓ Monetary Transmission ({len(df)} editions)")
+    print(f"   Monetary Transmission ({len(df)} data months)")
     return fp
 
 

@@ -21,7 +21,7 @@ def _text(value: str) -> str:
     return re.sub(r"\s+", " ", value.replace("\u00ad", "")).strip()
 
 
-def pdf_to_article(payload: bytes, month: str, source_url: str) -> str:
+def pdf_to_article(payload: bytes, month: str, source_url: str, *, include_transmission: bool = True) -> str:
     if not payload.startswith(b"%PDF-"):
         raise SoeError("not a PDF: RBI may have returned a CAPTCHA page")
     # RBI article filenames carry their publication date, not the data month.
@@ -35,7 +35,7 @@ def pdf_to_article(payload: bytes, month: str, source_url: str) -> str:
     if published.strftime("%Y-%m") != month:
         raise SoeError("PDF publication date does not match the requested edition")
     try:
-        return _extract(payload, month, source_url, published)
+        return _extract(payload, month, source_url, published, include_transmission=include_transmission)
     except SoeError:
         raise
     except Exception as exc:
@@ -50,7 +50,8 @@ def _html_table(rows):
 
 def _numbered_table(page):
     """Use RBI's printed column numbers and grid boundaries, not PDF text order."""
-    words = page.extract_words()
+    # Default line tolerance interleaves letters on October's closely spaced headers.
+    words = page.extract_words(y_tolerance=2)
     starts = [w for w in words if w["text"] == "(1)"]
     for first in starts:
         numbered = sorted([w for w in words if abs(w["top"]-first["top"]) < 2
@@ -62,7 +63,8 @@ def _numbered_table(page):
         period = [w for w in words if w["text"].lower() == "period" and top-100 < w["top"] < top]
         if not period:
             continue
-        header_top = min(w["top"] for w in period) - 2
+        header_top = min(w["top"] for w in period + [w for w in words
+                         if top-100 < w["top"] < top and re.search(r"WADTDR|WALR", w["text"])]) - 2
         centers = [(w["x0"] + w["x1"])/2 for w in numbered]
         boundaries = [0.0]
         for left, right in zip(centers, centers[1:]):
@@ -72,8 +74,20 @@ def _numbered_table(page):
                 raise SoeError("PDF transmission column boundary is missing")
             boundaries.append(sorted(edges)[len(edges)//2])
         boundaries.append(float(page.width))
-        headers = [_text(page.crop((l, header_top, r, top-1)).extract_text() or "")
+        headers = [_text(page.crop((l, header_top, r, top-1)).extract_text(y_tolerance=2) or "")
                    for l, r in zip(boundaries, boundaries[1:])]
+        # A shared fresh-loan heading spans Overall and Interest Rate Effect.
+        # Read its actual merged cell and carry it to both numbered columns.
+        for table in page.find_tables():
+            for cell in table.cells:
+                l, t, r, b = cell
+                covered = [i for i, center in enumerate(centers) if l < center < r]
+                if len(covered) < 2 or not header_top-5 <= t < b < top:
+                    continue
+                parent = _text(page.crop(cell).extract_text(y_tolerance=2) or "")
+                if re.search(r"WALR|WADTDR", parent, re.I):
+                    for i in covered:
+                        headers[i] = parent + " " + headers[i]
         if not any(re.search(r"repo\s*rate", h, re.I) for h in headers):
             continue
         # Stop at the first notes/source line below the numbered header.
@@ -168,6 +182,19 @@ def _prose(doc):
                 lines.append((line["bbox"], text, spans))
         # Left/right columns are determined by the line's left edge.
         lines.sort(key=lambda item: (item[0][0] >= page.rect.width/2, item[0][1]))
+        # Fully justified text can be exported as separate word-sized lines.
+        # Rejoin a baseline before using indentation to detect paragraphs.
+        joined = []
+        for bbox, text, spans in lines:
+            if joined:
+                prev, old_text, old_spans = joined[-1]
+                if ((prev[0] >= page.rect.width/2) == (bbox[0] >= page.rect.width/2)
+                        and abs(prev[1] - bbox[1]) < 1 and bbox[0] >= prev[2]-1):
+                    joined[-1] = ((prev[0], min(prev[1], bbox[1]), bbox[2], max(prev[3], bbox[3])),
+                                  old_text + " " + text, old_spans + spans)
+                    continue
+            joined.append((bbox, text, spans))
+        lines = joined
         bases = {}
         for bbox, _, _ in lines:
             col = bbox[0] >= page.rect.width/2
@@ -189,7 +216,7 @@ def _prose(doc):
     return paragraphs
 
 
-def _extract(payload, month, source_url, published):
+def _extract(payload, month, source_url, published, *, include_transmission=True):
     tables_html, raw_text = [], []
     with fitz.open(stream=payload, filetype="pdf") as doc, pdfplumber.open(BytesIO(payload)) as pdf:
         if not doc.page_count:
@@ -203,12 +230,12 @@ def _extract(payload, month, source_url, published):
         for page, pp in zip(doc, pdf.pages):
             text = page.get_text()
             raw_text.append(text)
-            if re.search(r"repo\s*rate", text, re.I) and re.search(r"WADTDR", text, re.I):
+            if include_transmission and re.search(r"repo\s*rate", text, re.I) and re.search(r"WADTDR", text, re.I):
                 tables_html.extend(_transmission_tables(pp))
     if not any(re.search(r">(?:I\.\s*)?Introduction<", p, re.I) for p in paragraphs):
         raise SoeError("PDF introduction heading not recognised; cannot safely identify its summary")
     raw = _text(" ".join(raw_text))
-    if re.search(r"repo\s*rate", raw, re.I) and re.search(r"WAD TDR|WADTDR", raw, re.I) and not tables_html:
+    if include_transmission and re.search(r"repo\s*rate", raw, re.I) and re.search(r"WAD TDR|WADTDR", raw, re.I) and not tables_html:
         raise SoeError("PDF mentions transmission rates but its table could not be extracted; review required")
     return (f'<meta name="soe-source" content="{escape(source_url, quote=True)}">'
             f'<table><tr><td><b>{ARTICLE_TITLE}</b>'

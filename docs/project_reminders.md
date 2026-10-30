@@ -260,17 +260,18 @@ same-edition display receipt, metadata and both panel PNGs. Missing/invalid rele
 **State of the Economy (nothing to do normally):** the Saturday India run reads RBI's monthly article itself —
 the briefing at the top of the India page and the rate-transmission chart both come from it. Published in the
 Bulletin's fourth week at <https://rbi.org.in/scripts/BS_ViewBulletin.aspx> (Article → State of the Economy).
-Both steps are optional in the workflow, so a bad week costs the briefing, never the charts.
+Both steps are optional and independent. A transmission failure does not block the monthly briefing or comparison.
 Worth knowing:
 - The briefing is RBI's own words, quoted. Question summaries elsewhere on the page are generated from stored data.
 - If the page shows no briefing, RBI's page could not be read that Saturday; the next run picks it up.
 - To catch up by hand, or after a run that reported problems:
   ```bash
   PYTHONPATH=. .venv/bin/python generate_soe.py --history      # transmission table, any missing editions
-  PYTHONPATH=. .venv/bin/python generate_soe.py                # briefing into the newest edition folder
+  PYTHONPATH=. .venv/bin/python generate_soe.py --briefing-only # briefing/comparison, independent of tables
   ```
-- A run that says the table's **columns have changed** means RBI reshaped Table IV.3. That is deliberate: the
-  figures are never guessed at. Send the edition to Claude and the column map in `config/soe_settings.py` is updated.
+- A run that says the table's **columns have changed** means the table could not be mapped safely; a PDF extraction problem can cause this even without a
+  schema change. The transmission update stops, while the briefing continues. Inspect the original table before
+  changing the parser or the column map in `config/soe_settings.py`; figures are never guessed.
 - HTML is tried first. If the article is PDF-only, or HTML cannot be parsed, the
   PDF linked in the same Bulletin row is downloaded and parsed. A CAPTCHA response
   is rejected with an explicit error; it cannot update the briefing or rate history.
@@ -278,7 +279,7 @@ Worth knowing:
   `PYTHONPATH=. .venv/bin/python generate_soe.py --month YYYY-MM --pdf-file /path/to/report.pdf`
   The contents page still supplies the official source URL. The PDF's printed
   month and the date in its official filename must match the requested edition.
-  Unrecognised PDF layouts stop the run for review rather than guessing figures.
+  Unrecognised table layouts stop the transmission update for review; prose is processed independently.
 
 **CAG workbook:** <https://cga.nic.in/MonthDashboardReport/Published/list.aspx> → replace
 `data/inputs/cag/cag_monthly_accounts.xlsx` (same filename, values in ₹ crore — don't convert).

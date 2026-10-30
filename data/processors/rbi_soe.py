@@ -147,11 +147,13 @@ def find_month(session: requests.Session, month: str) -> Edition | None:
 
 
 def fetch_article(session: requests.Session, edition: Edition, *, use_cache: bool = True,
-                  pdf_file: Path | None = None) -> str:
+                  pdf_file: Path | None = None, include_transmission: bool = True) -> str:
     """Prefer validated HTML; fall back to the edition's PDF, never a CAPTCHA page.
 
     A supplied PDF is for a manual download when RBI blocks automated access.
-    Both formats are validated before being cached or returned.
+    Briefing text is always validated before caching or returning. With
+    include_transmission=False, table extraction and validation are skipped, so
+    a broken table cannot block the briefing or the previous-month comparison.
     """
     cached = CACHE_DIR / f"{edition.month}.html"
     error = "no HTML article linked"
@@ -160,7 +162,8 @@ def fetch_article(session: requests.Session, edition: Edition, *, use_cache: boo
             page = (cached.read_text(encoding="utf-8") if use_cache and cached.exists()
                     else _request(session, "GET", edition.url))
             parse_briefing(page, edition)
-            parse_transmission(page)
+            if include_transmission:
+                parse_transmission(page)
             CACHE_DIR.mkdir(parents=True, exist_ok=True)
             cached.write_text(page, encoding="utf-8")
             return page
@@ -178,9 +181,10 @@ def fetch_article(session: requests.Session, edition: Edition, *, use_cache: boo
     else:
         payload = _request_pdf(session, pdf_url)
     from data.processors.rbi_soe_pdf import pdf_to_article
-    page = pdf_to_article(payload, edition.month, pdf_url)
+    page = pdf_to_article(payload, edition.month, pdf_url, include_transmission=include_transmission)
     parse_briefing(page, edition)
-    parse_transmission(page)
+    if include_transmission:
+        parse_transmission(page)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     pdf_cache.write_bytes(payload)
     return page

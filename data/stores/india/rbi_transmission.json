@@ -1,0 +1,69 @@
+{
+  "month": "2026-10",
+  "published": "2026-10-23",
+  "url": "https://rbidocs.rbi.org.in/rdocs/Bulletin/PDFs/01ARTICLE23102026026657A9D5FE49CA9595B3F593D46E4C.PDF",
+  "cycles": [
+    {
+      "cycle_type": "tightening",
+      "cycle_start": "2022-05",
+      "cycle_end": "2025-01",
+      "repo_bps": 250,
+      "wadtdr_fresh_bps": 259,
+      "wadtdr_outstanding_bps": 206,
+      "eblr_bps": 250,
+      "mclr_bps": 175,
+      "walr_fresh_bps": 182,
+      "overall_bps": 191,
+      "walr_outstanding_bps": 115
+    },
+    {
+      "cycle_type": "easing",
+      "cycle_start": "2025-02",
+      "cycle_end": "2026-08",
+      "repo_bps": -125,
+      "wadtdr_fresh_bps": -95,
+      "wadtdr_outstanding_bps": -53,
+      "eblr_bps": -125,
+      "mclr_bps": -30,
+      "walr_fresh_bps": -72,
+      "overall_bps": -76,
+      "walr_outstanding_bps": -91
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2026-06",
+      "repo_bps": 0,
+      "wadtdr_fresh_bps": 15,
+      "wadtdr_outstanding_bps": 1,
+      "eblr_bps": 0,
+      "mclr_bps": -15,
+      "walr_fresh_bps": 2,
+      "overall_bps": 6,
+      "walr_outstanding_bps": -1
+    },
+    {
+      "month": "2026-07",
+      "repo_bps": 0,
+      "wadtdr_fresh_bps": -10,
+      "wadtdr_outstanding_bps": 0,
+      "eblr_bps": 0,
+      "mclr_bps": 10,
+      "walr_fresh_bps": -1,
+      "overall_bps": 4,
+      "walr_outstanding_bps": 1
+    },
+    {
+      "month": "2026-08",
+      "repo_bps": 0,
+      "wadtdr_fresh_bps": -18,
+      "wadtdr_outstanding_bps": -2,
+      "eblr_bps": 0,
+      "mclr_bps": 10,
+      "walr_fresh_bps": 9,
+      "overall_bps": -1,
+      "walr_outstanding_bps": -1
+    }
+  ],
+  "table": "Transmission to Banks' Deposit and Lending Rates"
+}

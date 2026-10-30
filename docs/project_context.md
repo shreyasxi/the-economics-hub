@@ -1241,10 +1241,21 @@ sign; now by meaning (`good` per column in `SCOREBOARD_COLUMNS`, applied in `_sc
     either month is left out, and a previous edition that cannot be read simply means no comparison. `generate_soe.py`
     fetches the previous edition too, trying two months back before giving up.
   - `data/stores/india/rbi_transmission.csv` — Table IV.3 (pass-through of policy rate changes to bank deposit and lending rates)
-    from every edition, which draws `18_india_rate_transmission.png`. Backfilled to Feb 2025 (16 points in the
-    current cycle); `python generate_soe.py --history` reads any editions missing from the file. The chart follows
+    from every edition, which draws `18_india_rate_transmission.png`. Backfilled to Feb 2025; `python generate_soe.py --history` reads any editions missing from the file. The chart follows
     whichever cycle is current, easing or tightening, and the title says which; a new cycle with only one month behind
     it leaves the finished cycle up until it has two, because one point is not a path.
+  - **Independent briefing (30 Oct 2026):** workflow uses `generate_soe.py --briefing-only`, which skips
+    table extraction/validation for both the current and comparison editions. A normal combined run saves
+    `soe.json` before attempting transmission; a table failure cannot discard the briefing. The optional
+    chart also catches rendering/data failures and removes its omitted artifact before publication.
+  - **Compact transmission:** one figure combines cycle-to-date policy, loan and deposit history
+    with the latest month's memo changes. Fixed-weight fresh lending appears only in the monthly panel. `data/stores/india/rbi_transmission.json` stores the validated source
+    edition, cycles and memo rows. Monthly detail must match the CSV's edition, URL, publication date, cycle
+    and cumulative values; it is never inferred by differencing publication vintages. Historical vintages and
+    coverage dates remain explicit. Insights explain composition effects without prescribing policy cuts.
+  - **October PDF regression:** tightly spaced header lines need reduced line tolerance; merged fresh-WALR
+    headers are propagated using cell geometry. Justified word fragments are rejoined before paragraph
+    detection so the summary, conclusion and comparison remain faithful to the report.
   - **Access:** HTML first, then the official PDF linked in the same Bulletin row when needed. Challenge/
     CAPTCHA responses are rejected; there is no bypass. A manually downloaded PDF can be supplied with
     `generate_soe.py --month YYYY-MM --pdf-file /path/to/report.pdf`; official source identity and printed

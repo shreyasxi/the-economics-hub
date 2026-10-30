@@ -112,6 +112,7 @@ jobs:
         run: |
           python tests/test_soe.py
           python tests/test_soe_pdf.py
+          python tests/test_soe_independence.py
 
       - name: Verify RBI bi-monthly survey charts
         env:
@@ -285,7 +286,7 @@ jobs:
       # Part 2 of 2: the briefing shown at the top of the tab, written into the
       # edition folder the charts just went to, so text and charts always match
       # and are pruned together. The article page is already in this job's cache
-      # from the step above.
+      # from the step above. Prose is processed independently of transmission tables.
       - name: Read RBI briefing (State of the Economy)
         continue-on-error: true
         timeout-minutes: 8
@@ -293,7 +294,7 @@ jobs:
           PYTHONPATH: "."
         run: |
           MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
-          python generate_soe.py --out "output/india/$MONTH_FOLDER"
+          python generate_soe.py --briefing-only --out "output/india/$MONTH_FOLDER"
 
       - name: Copy charts to assets/
         run: |
@@ -305,7 +306,7 @@ jobs:
           echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
           mkdir -p "assets/india/$MONTH_FOLDER"
           # Remove omitted optional artifacts before copying this run's output.
-          for NAME in 08_india_interest_revenue 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
+          for NAME in 18_india_rate_transmission 08_india_interest_revenue 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
             if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
               rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
             fi
@@ -388,7 +389,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/india/ assets/readme_showcase/ assets/macro_cards.json "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
+          git add -A assets/india/ assets/readme_showcase/ assets/macro_cards.json "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" data/stores/india/rbi_transmission.json "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
           # Include canonical monthly histories and the raw evidence their loaders verify.
           SOURCE_PATHS=$(python -m data.paths --relative MOSPI_IIP_CSV MOSPI_PLFS_CSV MOSPI_SOURCES_DIR RBI_WSS_CSV RBI_REER_CSV INDIA_EXTERNAL_CSV)
           while IFS= read -r SOURCE_PATH; do

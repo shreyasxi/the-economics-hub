@@ -17,11 +17,12 @@ Usage:
   python generate_soe.py --out output/india/2026-09
   python generate_soe.py --month 2026-07         # one past edition
   python generate_soe.py --history               # rebuild the transmission history, no soe.json
+  python generate_soe.py --briefing-only          # prose and comparison, independent of tables
   python generate_soe.py --no-cache              # ignore the local page cache
 
 The briefing never blocks the India charts: a fetch that fails leaves the
 edition without soe.json, and the tab simply shows no briefing. The transmission
-history is different — a table that is present but unreadable stops the run,
+history is different — an unreadable table stops its update after the briefing is saved,
 because a misread column would put wrong basis points on a chart.
 """
 
@@ -106,7 +107,7 @@ def read_changes(session, edition: Edition, page: str, *, use_cache: bool) -> tu
             if past is None:
                 continue
             changes = compare_editions(page, edition.month,
-                                       fetch_article(session, past, use_cache=use_cache), month)
+                                       fetch_article(session, past, use_cache=use_cache, include_transmission=False), month)
             if changes:
                 return changes, month
         except SoeError as exc:
@@ -221,7 +222,11 @@ def main() -> int:
                              "the current cycle covers)")
     parser.add_argument("--no-cache", action="store_true", help="re-read pages instead of using the local cache")
     parser.add_argument("--pdf-file", type=Path, help="Manually downloaded PDF fallback; requires --month")
+    parser.add_argument("--briefing-only", action="store_true",
+                        help="write the briefing and comparison without reading transmission tables")
     args = parser.parse_args()
+    if args.briefing_only and args.history:
+        parser.error("--briefing-only and --history are mutually exclusive")
     if args.pdf_file and not args.month:
         parser.error("--pdf-file requires --month")
 
@@ -235,10 +240,11 @@ def main() -> int:
         if edition is None:
             print(f"No State of the Economy in the {args.month} Bulletin.")
             return 1
-        page = fetch_article(session, edition, use_cache=use_cache, pdf_file=args.pdf_file)
+        page = fetch_article(session, edition, use_cache=use_cache, pdf_file=args.pdf_file,
+                             include_transmission=False)
         briefing = parse_briefing(page, edition)
-        transmission = parse_transmission(page)
-        changes, compared_with = read_changes(session, edition, page, use_cache=use_cache)
+        changes, compared_with = ([], None) if args.history else read_changes(
+            session, edition, page, use_cache=use_cache)
         briefing["changes"] = changes
         briefing["compared_with"] = compared_with
     except SoeError as exc:
@@ -258,6 +264,29 @@ def main() -> int:
         print("   No month-on-month comparison (last month's edition could not be read)")
     if age > MAX_EDITION_AGE_DAYS:
         problems.append(f"the newest edition is {age} days old; an edition has been missed")
+
+    # ── The briefing, into the edition folder ─────────────────────────────────
+    if not args.history:
+        out_dir = args.out or latest_edition_folder()
+        if out_dir is None:
+            problems.append("no India edition folder with charts; soe.json was not written "
+                            "(run generate_india.py first)")
+        else:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            path = out_dir / BRIEFING_FILENAME
+            with path.open("w", encoding="utf-8") as fh:
+                json.dump(briefing, fh, indent=1, ensure_ascii=False)
+            print(f"{_rel(path)} written")
+
+    # The briefing is already saved before any transmission extraction or validation.
+    if args.briefing_only:
+        return 1 if problems else 0
+    try:
+        page = fetch_article(session, edition, use_cache=True, pdf_file=args.pdf_file)
+        transmission = parse_transmission(page)
+    except SoeError as exc:
+        print(f"Could not update transmission (briefing retained): {exc}")
+        return 1
 
     # ── The transmission history ───────────────────────────────────────────────
     history = {(row["month"], row["cycle_type"], row["cycle_start"]): row for row in read_history()}
@@ -303,22 +332,16 @@ def main() -> int:
 
     rows = list(history.values())
     if rows:
-        problems.extend(check_repo_column(rows))
-        write_history(rows)
+        repo_problems = check_repo_column(rows)
+        problems.extend(repo_problems)
+        if not repo_problems:
+            write_history(rows)
+            if transmission is not None:
+                detail = {"month": edition.month, "published": briefing["published"],
+                          "url": briefing["url"], **transmission}
+                TRANSMISSION_CSV.with_suffix(".json").write_text(
+                    json.dumps(detail, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"\n{_rel(TRANSMISSION_CSV)}: {len(rows)} rows")
-
-    # ── The briefing, into the edition folder ─────────────────────────────────
-    if not args.history:
-        out_dir = args.out or latest_edition_folder()
-        if out_dir is None:
-            problems.append("no India edition folder with charts; soe.json was not written "
-                            "(run generate_india.py first)")
-        else:
-            out_dir.mkdir(parents=True, exist_ok=True)
-            path = out_dir / BRIEFING_FILENAME
-            with path.open("w", encoding="utf-8") as fh:
-                json.dump(briefing, fh, indent=1, ensure_ascii=False)
-            print(f"{_rel(path)} written")
 
     if problems:
         print("\nFINISHED WITH PROBLEMS")
