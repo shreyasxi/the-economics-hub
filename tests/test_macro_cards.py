@@ -40,7 +40,7 @@ def test_market_returns_use_calendar_anchors_and_reject_missing_annual_vix_histo
     assert not prepare({'sp500':pd.Series([100,120],index=dates[[1,2]])},'2026-10-09')['rows']
 
 
-def test_major_economy_inflation_requires_matched_headline_comparisons():
+def test_major_economy_inflation_requires_80_percent_matched_comparisons():
     countries = [dict(code=code, series={'headline':[
         dict(month='2026-05', value=4), dict(month='2026-08', value=3)], 'core':[]})
         for code in ('USA','EA','CHN','JPN','GBR','IND')]
@@ -49,7 +49,25 @@ def test_major_economy_inflation_requires_matched_headline_comparisons():
     result=global_inflation(snapshot)
     assert result['state']=='Easing' and 'headline eased in US / euro area / China' in result['evidence']
     countries[0]['series']['headline'].pop(0)
+    result=global_inflation(snapshot)
+    assert result['state']=='Easing' and len(result['metrics'])==5
+    assert 'US' not in result['evidence'] and 'unavailable' not in result['evidence']
+    countries[1]['series']['headline'].pop(0)
     assert global_inflation(snapshot)['state']=='Awaiting data'
+
+
+def test_global_inflation_requires_80_percent_broad_country_coverage():
+    countries = [dict(code=code, aggregate=code=='EA', series={'headline':[
+        dict(month='2026-05', value=4), dict(month='2026-08', value=3)], 'core':[]})
+        for code in ('USA','EA','CHN','JPN','GBR','IND')]
+    snapshot={'inflation_breadth':{'breadth':{'month':'2026-08','comparison_month':'2026-05'},
+                                 'countries':countries}}
+    countries.append(dict(code='CAN', series={'headline':[dict(month='2026-08', value=3)]}))
+    assert global_inflation(snapshot)['state']=='Easing'
+    countries.append(dict(code='AUS', series={'headline':[dict(month='2026-08', value=3)]}))
+    result=global_inflation(snapshot)
+    assert len(result['metrics'])==6
+    assert result['state']=='Awaiting data'
 
 
 def test_expansion_and_momentum_are_distinct_and_no_gdp():

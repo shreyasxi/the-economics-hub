@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-30T15:37:50.908584+00:00",
+  "generated_at": "2026-10-30T16:04:33.010241+00:00",
   "editions": {
     "weekly": "assets/weekly/2026-10-30",
     "macro": "assets/macro/2026-10",
@@ -30,66 +30,57 @@
     },
     "global_inflation": {
       "state": "Mixed",
-      "evidence": "Aug 2026 vs May 2026: headline inflation eased in 23/46 countries and rose in 20. Core rose in 21/38 and eased in 13. Major-economy headline rose in Japan / UK / India; eased in US / China; was little changed in euro area.",
+      "evidence": "Sep 2026 vs Jun 2026: headline inflation eased in 12/45 countries and rose in 32. Core rose in 25/37 and eased in 10. Major-economy headline rose in US / euro area / Japan / UK; eased in China.",
       "metrics": [
         {
           "country": "USA",
           "label": "US",
           "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 3.396548,
-          "change": -0.8521260000000002
+          "period": "2026-09",
+          "comparison_month": "2026-06",
+          "value": 3.737685,
+          "change": 0.2062599999999999
         },
         {
           "country": "EA",
           "label": "euro area",
           "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 3.2,
-          "change": 0.0
+          "period": "2026-09",
+          "comparison_month": "2026-06",
+          "value": 3.8,
+          "change": 1.0
         },
         {
           "country": "CHN",
           "label": "China",
           "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 0.8,
-          "change": -0.3999999999999999
+          "period": "2026-09",
+          "comparison_month": "2026-06",
+          "value": 0.9,
+          "change": -0.09999999999999998
         },
         {
           "country": "JPN",
           "label": "Japan",
           "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 1.9,
-          "change": 0.3999999999999999
+          "period": "2026-09",
+          "comparison_month": "2026-06",
+          "value": 2.1,
+          "change": 0.5
         },
         {
           "country": "GBR",
           "label": "UK",
           "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 3.3,
-          "change": 0.2999999999999998
-        },
-        {
-          "country": "IND",
-          "label": "India",
-          "measure": "headline",
-          "period": "2026-08",
-          "comparison_month": "2026-05",
-          "value": 4.96261,
-          "change": 0.24038799999999938
+          "period": "2026-09",
+          "comparison_month": "2026-06",
+          "value": 3.6,
+          "change": 0.8000000000000003
         }
       ],
       "context": "",
       "conclusion": "Broad country inflation and major-economy trends are uneven.",
-      "observation_date": "2026-08-01"
+      "observation_date": "2026-09-01"
     },
     "india_activity": {
       "state": "Expanding",
@@ -330,7 +321,6 @@
     }
   },
   "refresh_errors": {
-    "global_inflation": "Insufficient comparable observations",
     "india_activity": "FileNotFoundError"
   },
   "commodity_inputs": {

@@ -141,14 +141,11 @@ def global_inflation(snapshot):
     if not complete:
         evidence += 'Insufficient matched country headline coverage. '
     major_state = verdict(head)
-    if len(head) != len(labels):
+    if len(head) / len(labels) < .8:
         state = 'Awaiting data'
     elif state in ('Building', 'Easing') and major_state != state:
         state = 'Mixed'
     evidence += 'Major-economy headline ' + description(head) + '. ' if head else 'Major-economy headline comparisons unavailable. '
-    if len(head) != len(labels):
-        missing_head = [label for code, label in labels.items() if code not in {m['country'] for m in head}]
-        evidence += 'Headline comparisons unavailable for ' + ' / '.join(missing_head) + '.'
     conclusion = {'Building': 'Headline inflation is rising across the countries reviewed.',
                   'Easing': 'Headline inflation is easing across the countries reviewed.',
                   'Mixed': 'Broad country inflation and major-economy trends are uneven.',

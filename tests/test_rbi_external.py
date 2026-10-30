@@ -7,6 +7,7 @@ import copy
 import re
 import logging
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -410,6 +411,41 @@ class AtomicRefreshTests(unittest.TestCase):
     def test_only_official_provenance_accepted(self):
         with self.assertRaises(ext.ExternalDataError):ext.validate_rows([dict(reer()[0],source_url='https://example.com/series')],'reer')
         with self.assertRaises(ext.ExternalDataError):ext.soup_for('<html>Please enable JavaScript to view the page content. captcha</html>')
+
+
+class ReerFallbackTests(unittest.TestCase):
+    def test_failed_refresh_renders_validated_history_with_original_dates(self):
+        from charts.india_charts import india_external as charts
+        import matplotlib.pyplot as plt
+        rows = ext.read_rows(ext.REER_PATH, 'reer')
+        before = ext.REER_PATH.read_bytes()
+        captured = []
+        def save(fig, destination):
+            captured.extend(t.get_text() for t in fig.texts)
+            Path(destination).touch()
+            plt.close(fig)
+        with tempfile.TemporaryDirectory() as folder:
+            with patch.dict(os.environ, {'REER_UPDATE_FAILED':'true'}), \
+                 patch.object(charts, 'chart_vulnerability', return_value=None), \
+                 patch.object(charts.EconStyle, 'save_chart', side_effect=save):
+                result = charts.generate(folder)
+            self.assertEqual(result, [Path(folder)/'30_india_reer.png'])
+            self.assertTrue(result[0].exists())
+        latest = pd.Timestamp(rows[-1]['date']).strftime('%b %Y')
+        self.assertTrue(any(latest in text for text in captured))
+        self.assertEqual(ext.REER_PATH.read_bytes(), before)
+
+    def test_failed_refresh_omits_missing_or_invalid_history(self):
+        from charts.india_charts import india_external as charts
+        for failure in (None, ValueError('invalid stored REER'), OSError('missing store')):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as folder:
+                destination = Path(folder)/'30_india_reer.png'
+                destination.touch()
+                with patch.dict(os.environ, {'REER_UPDATE_FAILED':'true'}), \
+                     patch.object(charts, 'chart_reer', return_value=None, side_effect=failure), \
+                     patch.object(charts, 'chart_vulnerability', return_value=None):
+                    self.assertEqual(charts.generate(folder), [])
+                self.assertFalse(destination.exists())
 
 
 class DashboardIntegrationTests(unittest.TestCase):
