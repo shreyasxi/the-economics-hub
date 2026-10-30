@@ -69,11 +69,16 @@ class OpportunityTests(unittest.TestCase):
         self.assertNotIn('AI Catalysts', app.selectbox(key='eo-active-sector').options)
         self.assertFalse(app.tabs)
         self.assertFalse(app.text_input)
-        for period in ['Latest fortnight', 'Latest complete month', 'Three months', 'Six months']:
-            app.radio(key='eo-flow-period').set_value(period).run(timeout=60)
-            self.assertFalse(app.exception, [e.message for e in app.exception])
-        app.checkbox(key='eo-flow-relative').check().run(timeout=60)
-        self.assertFalse(app.exception, [e.message for e in app.exception])
+        app.selectbox(key='eo-active-sector').set_value('Textiles').run(timeout=60)
+        history_options = app.selectbox(key='eo-active-sector').options
+        for relative in [False, True]:
+            app.checkbox(key='eo-flow-relative').set_value(relative).run(timeout=60)
+            for period in ['Latest fortnight', 'Latest complete month', 'Three months', 'Six months']:
+                app.radio(key='eo-flow-period').set_value(period).run(timeout=60)
+                self.assertFalse(app.exception, [e.message for e in app.exception])
+                self.assertEqual(app.selectbox(key='eo-active-sector').value, 'Textiles')
+                self.assertEqual(app.selectbox(key='eo-active-sector').options, history_options)
+                self.assertTrue(any('#### Textiles' in m.value for m in app.markdown))
 
     def test_completed_fortnight_boundaries(self):
         from datetime import date
