@@ -1,0 +1,157 @@
+{
+ "generated_at": "2026-10-31 11:39 UTC",
+ "reads": {
+  "count": 25,
+  "first": "2026-10-24 12:54 UTC"
+ },
+ "headlines": {
+  "from": "2026-10-24",
+  "to": "2026-10-31",
+  "world": {
+   "items": [
+    {
+     "title": "Fed holds rates steady despite concerns over inflation",
+     "url": "https://www.cnbc.com/2026/10/28/fed-interest-rate-decision-october-2026.html",
+     "publisher": "CNBC",
+     "date": "2026-10-28",
+     "theme": "Central banks",
+     "also": [
+      "BBC News",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 7
+    },
+    {
+     "title": "Healey unveils £100 for energy bills and bank tax in first Budget",
+     "url": "https://www.bbc.co.uk/news/articles/cqpvgxz3y49go?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-10-28",
+     "theme": "Public finances",
+     "also": [
+      "The Guardian",
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 4
+    },
+    {
+     "title": "US tech stocks fall after earnings fuel AI spending concerns",
+     "url": "https://www.ft.com/content/1639620b-99e7-47ed-8484-49646816489e?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-10-29",
+     "theme": "Markets",
+     "also": [
+      "BBC News",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Oil prices rise as Houthi attacks on Saudi Arabian refinery raise supply worries",
+     "url": "https://www.cnbc.com/2026/10/28/oil-price-today-wti-brent-hormuz.html",
+     "publisher": "CNBC",
+     "date": "2026-10-28",
+     "theme": "Energy & commodities",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 2
+    },
+    {
+     "title": "UK shop price inflation ‘highest since 2024’ as retailers struggle to limit price rises",
+     "url": "https://www.theguardian.com/business/2026/oct/27/uk-shop-price-inflation-highest-since-2024-as-retailers-struggle-to-limit-price-rises",
+     "publisher": "The Guardian",
+     "date": "2026-10-27",
+     "theme": "Inflation",
+     "also": [
+      "Bloomberg"
+     ],
+     "days": 3
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Indian shares steady after US Fed holds key rates unchanged, elevated oil weighs",
+     "url": "https://www.livemint.com/market/stock-market-news/indian-shares-set-for-positive-start-after-fed-holds-rates-steady-elevated-oil-weighs-11793240729336.html",
+     "publisher": "Mint",
+     "date": "2026-10-29",
+     "theme": "Central banks",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Utssav CZ Gold Jewels approves 1:1 bonus issue, to double equity capital",
+     "url": "https://www.business-standard.com/markets/news/utssav-cz-gold-jewels-approves-1-1-bonus-issue-to-double-equity-capital-126102400806_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-24",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Indian economy may sustain expansion through FY27, says Finance Ministry’s monthly economic review",
+     "url": "https://www.thehindubusinessline.com/economy/indian-economy-may-sustain-expansion-through-fy27-says-finance-ministrys-monthly-economic-review/article71639965.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-10-29",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Stock market outlook today, 27 Oct: Sensex, Nifty prediction - DJIA, S&P, NASDAQ, GIFT Nifty, Kospi, Nikkei, Taiwan cues",
+     "url": "https://www.livemint.com/market/stock-market-news/stock-market-outlook-today-27-oct-sensex-nifty-prediction-djia-s-p-nasdaq-gift-nifty-kospi-nikkei-cues-11793062963069.html",
+     "publisher": "Mint",
+     "date": "2026-10-27",
+     "theme": "Markets",
+     "also": [
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Govt likely to extend duty-free cotton imports through Dec to curb prices",
+     "url": "https://www.business-standard.com/economy/news/govt-likely-to-extend-duty-free-cotton-imports-through-dec-to-curb-prices-126102600749_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-10-26",
+     "theme": "Trade & tariffs",
+     "also": [
+      "BusinessLine"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
