@@ -2,11 +2,11 @@
   "metadata": {
     "methodology": "round((last / oneYearAgoVal - 1) * 100, 2)",
     "observation_date": "2026-10-30",
-    "previous_close_date": "2026-10-29",
+    "previous_close_date": "2026-10-30",
     "return_type": "price; dividends excluded",
     "source_url": "https://www.nseindia.com/api/allIndices",
     "timestamp": "30-Oct-2026 15:30",
-    "year_ago_date": "2025-10-29"
+    "year_ago_date": "2025-10-30"
   },
   "rows": [
     {
@@ -14,100 +14,100 @@
       "label": "NIFTY 50",
       "last": 23053.1,
       "observation_date": "2026-10-30",
-      "return_pct": -11.52,
-      "year_ago": 26053.9,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -10.92,
+      "year_ago": 25877.85,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY PHARMA",
       "label": "Pharma",
       "last": 27124.85,
       "observation_date": "2026-10-30",
-      "return_pct": 20.93,
-      "year_ago": 22430.7,
-      "year_ago_date": "2025-10-29"
+      "return_pct": 21.65,
+      "year_ago": 22298.2,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY METAL",
       "label": "Metal",
       "last": 11784.9,
       "observation_date": "2026-10-30",
-      "return_pct": 9.35,
-      "year_ago": 10777.5,
-      "year_ago_date": "2025-10-29"
+      "return_pct": 9.84,
+      "year_ago": 10729.2,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY PSU BANK",
       "label": "PSU Bank",
       "last": 8234.85,
       "observation_date": "2026-10-30",
-      "return_pct": 1.8,
-      "year_ago": 8089.45,
-      "year_ago_date": "2025-10-29"
+      "return_pct": 2.19,
+      "year_ago": 8058.75,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY ENERGY",
       "label": "Energy",
       "last": 34957.9,
       "observation_date": "2026-10-30",
-      "return_pct": -3.82,
-      "year_ago": 36347.95,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -3.94,
+      "year_ago": 36392.6,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY AUTO",
       "label": "Auto",
       "last": 25422.7,
       "observation_date": "2026-10-30",
-      "return_pct": -5.66,
-      "year_ago": 26948.9,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -5.24,
+      "year_ago": 26829.55,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY BANK",
       "label": "Bank Nifty",
       "last": 54686.95,
       "observation_date": "2026-10-30",
-      "return_pct": -6.33,
-      "year_ago": 58385.25,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -5.76,
+      "year_ago": 58031.1,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY INFRASTRUCTURE",
       "label": "Infra",
       "last": 8799.0,
       "observation_date": "2026-10-30",
-      "return_pct": -8.93,
-      "year_ago": 9661.85,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -8.43,
+      "year_ago": 9608.65,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY IT",
       "label": "IT",
       "last": 32606.9,
       "observation_date": "2026-10-30",
-      "return_pct": -9.65,
-      "year_ago": 36090.1,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -9.19,
+      "year_ago": 35906.4,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY REALTY",
       "label": "Realty",
       "last": 813.9,
       "observation_date": "2026-10-30",
-      "return_pct": -14.37,
-      "year_ago": 950.5,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -14.41,
+      "year_ago": 950.9,
+      "year_ago_date": "2025-10-30"
     },
     {
       "index": "NIFTY FMCG",
       "label": "FMCG",
       "last": 43609.2,
       "observation_date": "2026-10-30",
-      "return_pct": -22.97,
-      "year_ago": 56615.35,
-      "year_ago_date": "2025-10-29"
+      "return_pct": -22.6,
+      "year_ago": 56343.5,
+      "year_ago_date": "2025-10-30"
     }
   ],
-  "sha256": "f716ca19c93136fcbff73784a31e254cca1dbed759c44dbd8c0f767f6bf166b0"
+  "sha256": "458621c865058e8c08ec95308adcfa1ccde531d17e099355403ec714ef31c500"
 }
