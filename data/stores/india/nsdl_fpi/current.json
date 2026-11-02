@@ -1,28 +1,24 @@
 {
-  "run_id": "12392cabc96a4f9eeb9965c540b0dea48dd9f7dd58387e278e30479ebcb17720",
+  "run_id": "133238018206c70c18e6c67fd03e69132150fd694332a2ba4fb4625add4928fd",
   "schema_version": 1,
-  "checked_on": "2026-10-31",
-  "retrieved_at": "2026-10-31T19:41:17.912962+05:30",
+  "checked_on": "2026-11-02",
+  "retrieved_at": "2026-11-02T14:02:08.706683+05:30",
   "units": "INR crore",
   "scope": "all segments",
   "completed": {
-    "2026-07": "40031",
     "2026-08": "25492",
-    "2026-09": "-58443"
+    "2026-09": "-58443",
+    "2026-10": "-24475"
   },
-  "mtd": {
-    "month": "2026-10",
-    "asof": "2026-10-30",
-    "value": "-24474.72"
-  },
+  "mtd": null,
   "sources": [
     {
       "url": "https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx?RptType=6",
-      "sha256": "08384c43d965658f6620370bc83481362ac4cf6cea2e75e3a4dab306d98133a5"
+      "sha256": "e153fecb6e38a4ffb0a9a8042b1c87222ade9e7b9a1f88c3f32c36d3f330e3e3"
     },
     {
       "url": "https://www.fpi.nsdl.co.in/web/Reports/Monthly.aspx",
-      "sha256": "9c2da097f7561b7c44fc795f378ce762fbdeee31981ad6b3380e73e4e934e518"
+      "sha256": "761b071ffe7b54b452701a7c55c5c56951ea63ea86ecc530f574980d56ad5999"
     }
   ]
 }
