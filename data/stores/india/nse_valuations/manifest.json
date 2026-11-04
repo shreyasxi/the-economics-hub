@@ -1,10 +1,10 @@
 {
   "audit_only": true,
-  "cutoff": "2026-10-30",
-  "generated_at": "2026-10-30T17:11:12.882868+00:00",
+  "cutoff": "2026-11-05",
+  "generated_at": "2026-11-04T18:32:49.321272+00:00",
   "start_month": "2016-10",
-  "expected_months": 121,
-  "validated_months": 121,
+  "expected_months": 122,
+  "validated_months": 122,
   "partial_month_note": "Current month is latest available as of cutoff, not a completed month-end.",
   "full_10_year_definition": "120 complete monthly observations October 2016\u2013September 2026; evaluated separately for each metric",
   "provisional_metric_choices": {
@@ -4006,21 +4006,69 @@
       },
       "attempts": [
         {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_30102026.csv",
-          "requested_date": "2026-10-30",
-          "retrieved_at": "2026-10-30T17:11:12.256922+00:00",
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_31102026.csv",
+          "requested_date": "2026-10-31",
+          "retrieved_at": "2026-11-04T18:32:48.884894+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "b829ede66a4ea87fe16c6113e28aabd0a48c04675c6465774c64da552193a860",
+          "outcome": "archive_not_found"
+        }
+      ]
+    },
+    {
+      "month": "2026-11",
+      "status": "validated",
+      "source": {
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_04112026.csv",
+        "observation_date": "2026-11-04",
+        "retrieved_at": "2026-11-04T18:32:48.519495+00:00",
+        "sha256": "131f28a1758583ac784ccb64d5fc2ea8e5134f66b0b516efb2f43fa776ba1b37",
+        "bytes": 17603,
+        "content_type": "text/csv",
+        "exact_target_names": [
+          "Nifty 50",
+          "Nifty Auto",
+          "Nifty Bank",
+          "Nifty Financial Services",
+          "Nifty FMCG",
+          "Nifty IT",
+          "Nifty Metal",
+          "Nifty Pharma",
+          "Nifty PSU Bank",
+          "Nifty Realty",
+          "Nifty Private Bank",
+          "Nifty Oil & Gas",
+          "Nifty Healthcare Index",
+          "Nifty Consumer Durables"
+        ]
+      },
+      "attempts": [
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv",
+          "requested_date": "2026-11-05",
+          "retrieved_at": "2026-11-04T18:32:48.067156+00:00",
+          "http_status": 404,
+          "content_type": "text/html;charset=UTF-8",
+          "sha256": "b829ede66a4ea87fe16c6113e28aabd0a48c04675c6465774c64da552193a860",
+          "outcome": "archive_not_found"
+        },
+        {
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_04112026.csv",
+          "requested_date": "2026-11-04",
+          "retrieved_at": "2026-11-04T18:32:48.519495+00:00",
           "http_status": 200,
           "content_type": "text/csv",
-          "sha256": "443b839af73ba1b276915d4e47ecfa30e462cf6481266110f28e4fc32f8b2a2f",
+          "sha256": "131f28a1758583ac784ccb64d5fc2ea8e5134f66b0b516efb2f43fa776ba1b37",
           "outcome": "validated_csv"
         }
       ]
     }
   ],
   "outputs": {
-    "monthly.csv": "9fd368ef8e841cd3d0d983f1ef9343e510fb9f61b96eae2d9fafbe7a1898a20f",
-    "extracted.csv": "e0c5779afc235c4f2e310aa5a4ecbce8df5862f22694e329c9f4703fb01414b0",
-    "coverage.csv": "9649b739f20c2aa4afc2fdab23a971c1bc07c90e218efa0b309aae7c7967d2c9",
-    "metric_details.json": "c373c60f2919c98f4fe9c2e66902dcece1cc825d3ff7a7183917cfe833920af3"
+    "monthly.csv": "43ec72cb9a84dbff20f4886b9242bdb13cf8969ca0a58e9b03a931ad7e8f154d",
+    "extracted.csv": "b57959f7565a3bacc747273cbf7bb6315fa665bc415fe4c2f30929861c2434f2",
+    "coverage.csv": "762275d4828c19a2f4bf3e7c8e1fbea920c9d89550ac93fc532d02e8d169d144",
+    "metric_details.json": "e0f3483ffedb5a4b4485b2e4a157a05cf2f1408194f9ced4fc712ea09e54d7e4"
   }
 }

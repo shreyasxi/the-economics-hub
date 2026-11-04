@@ -3,12 +3,12 @@
   "source_url": "https://www.niftyindices.com/reports/historical-data",
   "index_variant": "price return; excludes dividends",
   "requested_start": "2016-10-04",
-  "requested_end": "2026-11-01",
+  "requested_end": "2026-11-03",
   "base_date": "2016-10-04",
-  "last_date": "2026-10-30",
-  "matched_dates": 2497,
+  "last_date": "2026-11-03",
+  "matched_dates": 2499,
   "unmatched_dates": [],
-  "imported_at": "2026-11-02T08:26:31.566229+00:00",
+  "imported_at": "2026-11-04T18:27:52.299069+00:00",
   "sources": [
     {
       "role": "smallcap",
@@ -929,14 +929,57 @@
       "date": "2026-10-30",
       "rows": 1,
       "retrieved_at": "2026-11-02T08:26:30.698706+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/030b797a2022f2dfcf49ab4ae4e9a50435a8f70fe0176f8015a5238cebd1253b.csv",
+      "sha256": "030b797a2022f2dfcf49ab4ae4e9a50435a8f70fe0176f8015a5238cebd1253b",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_02112026.csv",
+      "format": "daily",
+      "date": "2026-11-02",
+      "rows": 1,
+      "retrieved_at": "2026-11-04T18:27:51.758571+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/030b797a2022f2dfcf49ab4ae4e9a50435a8f70fe0176f8015a5238cebd1253b.csv",
+      "sha256": "030b797a2022f2dfcf49ab4ae4e9a50435a8f70fe0176f8015a5238cebd1253b",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_02112026.csv",
+      "format": "daily",
+      "date": "2026-11-02",
+      "rows": 1,
+      "retrieved_at": "2026-11-04T18:27:51.758585+00:00"
+    },
+    {
+      "role": "smallcap",
+      "index": "NIFTY SMALLCAP 250",
+      "path": "raw/510b52ed9562b6d1d071ae81719c0af07d8a698ea8bd4bd61254ed0ec688425c.csv",
+      "sha256": "510b52ed9562b6d1d071ae81719c0af07d8a698ea8bd4bd61254ed0ec688425c",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_03112026.csv",
+      "format": "daily",
+      "date": "2026-11-03",
+      "rows": 1,
+      "retrieved_at": "2026-11-04T18:27:52.090072+00:00"
+    },
+    {
+      "role": "largecap",
+      "index": "NIFTY 50",
+      "path": "raw/510b52ed9562b6d1d071ae81719c0af07d8a698ea8bd4bd61254ed0ec688425c.csv",
+      "sha256": "510b52ed9562b6d1d071ae81719c0af07d8a698ea8bd4bd61254ed0ec688425c",
+      "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_03112026.csv",
+      "format": "daily",
+      "date": "2026-11-03",
+      "rows": 1,
+      "retrieved_at": "2026-11-04T18:27:52.090083+00:00"
     }
   ],
   "refresh": {
-    "started_at": "2026-11-02T08:26:25.212000+00:00",
-    "requested_start": "2026-10-15",
-    "requested_end": "2026-11-01",
+    "started_at": "2026-11-04T18:27:46.043321+00:00",
+    "requested_start": "2026-10-16",
+    "requested_end": "2026-11-03",
     "received_dates": [
-      "2026-10-15",
       "2026-10-16",
       "2026-10-19",
       "2026-10-21",
@@ -946,7 +989,9 @@
       "2026-10-27",
       "2026-10-28",
       "2026-10-29",
-      "2026-10-30"
+      "2026-10-30",
+      "2026-11-02",
+      "2026-11-03"
     ],
     "unavailable_dates": [
       "2026-10-17",
@@ -977,7 +1022,7 @@
       "2026-11-01"
     ]
   },
-  "signal_path": "signals/6d4e23d08ef0cf6b4437e96d8c2f168bcee11ed52eb43bc2969bbb7480fcabef.csv",
-  "signal_sha256": "6d4e23d08ef0cf6b4437e96d8c2f168bcee11ed52eb43bc2969bbb7480fcabef",
+  "signal_path": "signals/643dc9aa4cdc35367789f0550e9c0bb5fd32d9b5a46e45dea6f9450b3c1dcfd5.csv",
+  "signal_sha256": "643dc9aa4cdc35367789f0550e9c0bb5fd32d9b5a46e45dea6f9450b3c1dcfd5",
   "calendar_note": "Matched source dates; missing dates in both exports cannot be detected without a separate exchange calendar."
 }
