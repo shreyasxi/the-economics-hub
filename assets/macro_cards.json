@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T15:18:47.262498+00:00",
+  "generated_at": "2026-11-05T15:50:51.478396+00:00",
   "editions": {
     "weekly": "assets/weekly/2026-11-05",
     "macro": "assets/macro/2026-10",
@@ -84,11 +84,11 @@
     },
     "india_activity": {
       "state": "Expanding",
-      "evidence": "Sep 2026: manufacturing PMI 55.1, services 55.8 (+2.3 and +1.7 points; both gaining momentum). Aug 2026 IIP grew 8.0% YoY, versus 7.4% previously. Aug 2026: 18/23 manufacturing industries expanded YoY, and growth accelerated in 14/23.",
+      "evidence": "Oct 2026: manufacturing PMI 54.7, services 55.8 (-0.4 and +0.6 points; momentum diverging). Sep 2026 IIP grew 6.7% YoY, versus 7.8% previously. Sep 2026: 17/23 manufacturing industries expanded YoY, and growth accelerated in 10/23.",
       "metrics": [],
       "context": "",
       "conclusion": "Both PMI surveys indicate expansion in activity.",
-      "observation_date": "2026-09-01"
+      "observation_date": "2026-10-01"
     },
     "india_inflation": {
       "state": "Broadening",
@@ -326,9 +326,7 @@
       }
     }
   },
-  "refresh_errors": {
-    "india_activity": "FileNotFoundError"
-  },
+  "refresh_errors": {},
   "commodity_inputs": {
     "as_of": "2026-10-30",
     "rows": {
