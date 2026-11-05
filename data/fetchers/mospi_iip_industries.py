@@ -4,7 +4,9 @@ python -m data.fetchers.mospi_iip_industries [--dry-run] [--csv PATH]
 
 Full current-base overlap (not merely four months) is reconciled on each run.
 The annexure includes the published growth table; YoY is never recomputed from
-rounded indices. Release text supplies statuses only where explicitly stated.
+rounded indices. The listing identifies the latest quick estimate; searchable
+release text supplies revision stages when available. Unreadable stages remain
+"Not specified" rather than being inferred.
 2022-23 releases before 29 June 2026 used a superseded WPI deflator and are
 rejected. Latest annexures contain the revised Output-PPI history throughout.
 """
@@ -75,7 +77,7 @@ def _normalize_release_text(text):
 
 
 def release_statuses(text, latest, release_title=''):
-    """Do not assume the old-base two-stage revision timetable still applies."""
+    """Use searchable release text when present; image-only PDFs have no text layer."""
     text = _normalize_release_text(text)
     release_title = _normalize_release_text(release_title)
     base_in_pdf = re.search(
@@ -87,16 +89,16 @@ def release_statuses(text, latest, release_title=''):
     # the attached workbook are independent base-year checks.
     base_in_title = re.search(r'\bBase\s+Year\s*:?\s*2022\s*-\s*23\b', release_title, re.I)
     require(base_in_pdf or base_in_title, 'release base mismatch')
-    # The PDF's NIC version label is inconsistently extracted. The structured
-    # workbook below is the authoritative universe check: it requires the exact
-    # NIC 2025 header and all 23 manufacturing rows in both tables.
-    require('Quick Estimate' in text, 'quick-estimate release unidentified')
+    # Some MoSPI PDFs are image-only. The official listing title still identifies
+    # the selected quick-estimate release; use PDF text for optional details only.
+    quick_in_pdf = re.search(r'\bQuick Estimates?\b', text, re.I)
+    quick_in_title = re.search(r'\bQuick Estimates?\b', release_title, re.I)
+    require(quick_in_pdf or quick_in_title, 'quick-estimate release unidentified')
     result = {latest: 'Quick estimate'}
     pattern = (r'indices for\s+(' + '|'.join(calendar.month_name[1:]) +
                r')\s+(20\d{2})\s+have\s+undergone\s+(first|final)\s+revision')
     for name, year, stage in re.findall(pattern, text, flags=re.I):
         result[month(year, name.capitalize())] = 'First revision' if stage.lower() == 'first' else 'Final estimate'
-    require(len(result) >= 2, 'official revision status missing')
     return result
 
 
@@ -169,8 +171,8 @@ def fetch(path=CSV, dry_run=False, session=None):
         reference = publication_month(release['title'])
         url = attachment(release, '.xlsx')
         note_url = attachment(release, '.pdf')
-        # The PDF is used only for vintage/status and breadth verification;
-        # every economic observation comes from the structured Excel annexure.
+        # Some release PDFs are image-only. The listing title and workbook remain
+        # authoritative; searchable PDF text adds revision/breadth details when present.
         note = download(client, note_url)
         with fitz.open(stream=note, filetype='pdf') as document:
             text = '\n'.join(p.get_text() for p in document)
@@ -180,9 +182,11 @@ def fetch(path=CSV, dry_run=False, session=None):
         incoming = parse_annexure(content, url, release['published_year'], statuses, note_url, fetched)
         require(max(r['month'] for r in incoming) == reference, 'Excel is stale relative to release')
         latest = [r for r in incoming if r['month'] == reference]
-        match = re.search(r'(\d+)\s+out of\s+23 industry groups', text)
-        require(match and sum(r['yoy_growth'] > 0 for r in latest if r['yoy_growth'] is not None)
-                == int(match[1]), 'breadth differs from official release')
+        match = re.search(r'\b(\d+)\s+out\s+of\s+23\s+industry groups\b',
+                          _normalize_release_text(text), re.I)
+        if match:
+            require(sum(r['yoy_growth'] > 0 for r in latest if r['yoy_growth'] is not None)
+                    == int(match[1]), 'breadth differs from official release')
         combined = reconcile(read_csv(path), incoming, ('month', 'nic_code'), validate)
         if not dry_run:
             archive = mospi_sources_for(path, 'iip')
