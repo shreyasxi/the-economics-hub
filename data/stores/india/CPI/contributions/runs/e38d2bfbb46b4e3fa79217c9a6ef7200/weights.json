@@ -1,0 +1,87 @@
+{
+  "base_year": "2024",
+  "buckets": {
+    "Food": [
+      "01"
+    ],
+    "Health & Education": [
+      "06",
+      "10"
+    ],
+    "Household & Apparel": [
+      "03",
+      "05"
+    ],
+    "Housing & Utilities": [
+      "04"
+    ],
+    "Other Consumption": [
+      "02",
+      "08",
+      "09",
+      "11",
+      "13"
+    ],
+    "Transport": [
+      "07"
+    ]
+  },
+  "formula": "W_i * (I_i,t - I_i,t-12) / G_t-12",
+  "rounding_source": "https://www.mospi.gov.in/uploads/release_calendar/1773312227790_Press_Release_of_CPI_February_2026.pdf",
+  "sector_code": 3,
+  "series": "Current",
+  "state_code": 1,
+  "version": 1,
+  "weights_percent": {
+    "01": {
+      "division": "Food and beverages",
+      "weight": "36.7531063101009000"
+    },
+    "02": {
+      "division": "Paan, tobacco and intoxicants",
+      "weight": "2.9894513474480300"
+    },
+    "03": {
+      "division": "Clothing and footwear",
+      "weight": "6.3832571477623400"
+    },
+    "04": {
+      "division": "Housing, water, electricity, gas and other fuels",
+      "weight": "17.6645726883430000"
+    },
+    "05": {
+      "division": "Furnishings, household equipment and routine household maintenance",
+      "weight": "4.4693932060393600"
+    },
+    "06": {
+      "division": "Health",
+      "weight": "6.1002633527256500"
+    },
+    "07": {
+      "division": "Transport",
+      "weight": "8.7961133915624400"
+    },
+    "08": {
+      "division": "Information and communication",
+      "weight": "3.6094384689580600"
+    },
+    "09": {
+      "division": "Recreation, sport and culture",
+      "weight": "1.5158147751142900"
+    },
+    "10": {
+      "division": "Education services",
+      "weight": "3.3333088103870400"
+    },
+    "11": {
+      "division": "Restaurants and accommodation services",
+      "weight": "3.3475203529668700"
+    },
+    "13": {
+      "division": "Personal care, social protection and miscellaneous goods and services",
+      "weight": "5.0377601485917900"
+    }
+  },
+  "weights_source": "https://www.mospi.gov.in/uploads/documents/documents/1770882257889-Expert_Group_Report_CPI.pdf",
+  "weights_table": "Annexure 5.3a, printed page 108"
+}
