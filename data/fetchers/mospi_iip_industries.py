@@ -87,8 +87,9 @@ def release_statuses(text, latest, release_title=''):
     # the attached workbook are independent base-year checks.
     base_in_title = re.search(r'\bBase\s+Year\s*:?\s*2022\s*-\s*23\b', release_title, re.I)
     require(base_in_pdf or base_in_title, 'release base mismatch')
-    require(re.search(r'NIC\s*-\s*2025', text, re.I) and
-            re.search(r'23\s+industry groups', text, re.I), 'release universe mismatch')
+    # The PDF's NIC version label is inconsistently extracted. The structured
+    # workbook below is the authoritative universe check: it requires the exact
+    # NIC 2025 header and all 23 manufacturing rows in both tables.
     require('Quick Estimate' in text, 'quick-estimate release unidentified')
     result = {latest: 'Quick estimate'}
     pattern = (r'indices for\s+(' + '|'.join(calendar.month_name[1:]) +
