@@ -1,7 +1,7 @@
 # GST monthly amounts
 
-`gst_monthly.csv` contains 24 months, October 2024 through September 2026,
-supporting 12 monthly year-on-year readings, October 2025 through September 2026.
+`gst_monthly.csv` contains 24 months, November 2024 through October 2026,
+supporting 12 monthly year-on-year readings, November 2025 through October 2026.
 Amounts are exact published integer rupees crore, rather than the older rounded
 lakh-crore manual series. These figures cover the GST system, not net tax receipts
 of the Union government.
@@ -15,10 +15,8 @@ extracted text and manifest in `sources/` provide provenance.
 
 All amounts **exclude compensation cess**. Reports from November 2025 onward
 report cess separately (where applicable), and restate the comparison month on
-the same basis. October 2025 includes cess within its published totals: subtract
-the aggregate CESS rows from gross, refunds and net for both October 2024 and
-October 2025. October normalized values are gross 174796 / 188124, net
-155999 / 161893, and refunds 18796 / 26231 respectively.
+the same basis. The October 2026 report restates October 2025 to gross 188125,
+net 161900 and refunds 26225; the CSV points to that newer vintage.
 
 Growth is unadjusted: May 2025 contains an approximately Rs 10000 crore one-off
 spectrum payment, flagged by GSTN's May 2026 report. Do not silently replace it

@@ -16,6 +16,7 @@ import hashlib
 import io
 from pathlib import Path
 import re
+import unicodedata
 
 import openpyxl
 import requests
@@ -67,10 +68,27 @@ def validate(rows):
     return rows
 
 
-def release_statuses(text, latest):
+def _normalize_release_text(text):
+    text = unicodedata.normalize('NFKC', text).replace('\u00ad', '')
+    text = re.sub(r'[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]', '-', text)
+    return re.sub(r'\s+', ' ', text)
+
+
+def release_statuses(text, latest, release_title=''):
     """Do not assume the old-base two-stage revision timetable still applies."""
-    require(re.search(r'Base\s*:?\s*2022[–-]23\s*=\s*100', text, re.I), 'release base mismatch')
-    require('NIC-2025' in text and '23 industry groups' in text, 'release universe mismatch')
+    text = _normalize_release_text(text)
+    release_title = _normalize_release_text(release_title)
+    base_in_pdf = re.search(
+        r'\bBase(?:\s+Year)?\s*:?\s*\(?\s*2022\s*-\s*23\s*\)?(?:\s*=\s*100)?\b',
+        text,
+        re.I,
+    )
+    # PDF text extraction can alter the label; the official listing title and
+    # the attached workbook are independent base-year checks.
+    base_in_title = re.search(r'\bBase\s+Year\s*:?\s*2022\s*-\s*23\b', release_title, re.I)
+    require(base_in_pdf or base_in_title, 'release base mismatch')
+    require(re.search(r'NIC\s*-\s*2025', text, re.I) and
+            re.search(r'23\s+industry groups', text, re.I), 'release universe mismatch')
     require('Quick Estimate' in text, 'quick-estimate release unidentified')
     result = {latest: 'Quick estimate'}
     pattern = (r'indices for\s+(' + '|'.join(calendar.month_name[1:]) +
@@ -155,7 +173,7 @@ def fetch(path=CSV, dry_run=False, session=None):
         note = download(client, note_url)
         with fitz.open(stream=note, filetype='pdf') as document:
             text = '\n'.join(p.get_text() for p in document)
-        statuses = release_statuses(text, reference)
+        statuses = release_statuses(text, reference, release.get('title', ''))
         content = download(client, url)
         fetched = datetime.now(timezone.utc).isoformat()
         incoming = parse_annexure(content, url, release['published_year'], statuses, note_url, fetched)
