@@ -244,7 +244,7 @@ class DashboardPlacementTests(unittest.TestCase):
                    '_section':lambda title,**kwargs:sections.append(title),
                    '_render_grid':lambda paths,**kwargs:rendered.append((sections[-1],[p.stem for p in paths]))}
         exec(code,namespace);namespace['page_india']()
-        self.assertEqual(sections,[section_names[i] for i in (0,1,2,5,3,4,6)])
+        self.assertEqual(sections,[section_names[i] for i in (0,1,5,2,3,4,6)])
         placed={}
         for section, items in rendered:
             placed.setdefault(section, []).extend(items)
