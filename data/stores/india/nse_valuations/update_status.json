@@ -1,7 +1,10 @@
 {
-  "status": "failed_chart_must_be_omitted",
-  "requested_cutoff": "2026-11-05",
-  "started_at": "2026-11-05T15:48:35.595806+00:00",
-  "error": "Unresolved latest archive on 2026-11-05: [{'source_url': 'https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv', 'requested_date': '2026-11-05', 'retrieved_at': '2026-11-05T15:48:35.693437+00:00', 'http_status': 200, 'content_type': 'text/csv', 'sha256': 'd4586feda7aafff8d24e70560f937639e644183a323013a78eeb8a8a450b268b', 'outcome': 'unresolved_error', 'error': 'Official archive changed; immutable source retained for review'}, {'source_url': 'https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv', 'requested_date': '2026-11-05', 'retrieved_at': '2026-11-05T15:48:35.693437+00:00', 'http_status': 200, 'content_type': 'text/csv', 'sha256': 'd4586feda7aafff8d24e70560f937639e644183a323013a78eeb8a8a450b268b', 'outcome': 'unresolved_error', 'error': 'Official archive changed; immutable source retained for review'}, {'source_url': 'https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv', 'requested_date': '2026-11-05', 'retrieved_at': '2026-11-05T15:48:37.219579+00:00', 'http_status': 200, 'content_type': 'text/csv', 'sha256': 'd4586feda7aafff8d24e70560f937639e644183a323013a78eeb8a8a450b268b', 'outcome': 'unresolved_error', 'error': 'Official archive changed; immutable source retained for review'}, {'source_url': 'https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv', 'requested_date': '2026-11-05', 'retrieved_at': '2026-11-05T15:48:37.219579+00:00', 'http_status': 200, 'content_type': 'text/csv', 'sha256': 'd4586feda7aafff8d24e70560f937639e644183a323013a78eeb8a8a450b268b', 'outcome': 'unresolved_error', 'error': 'Official archive changed; immutable source retained for review'}, {'source_url': 'https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv', 'requested_date': '2026-11-05', 'retrieved_at': '2026-11-05T15:48:40.746805+00:00', 'http_status': 200, 'content_type': 'text/csv', 'sha256': 'd4586feda7aafff8d24e70560f937639e644183a323013a78eeb8a8a450b268b', 'outcome': 'unresolved_error', 'error': 'Official archive changed; immutable source retained for review'}, {'source_url': 'https://archives.nseindia.com/content/indices/ind_close_all_05112026.csv', 'requested_date': '2026-11-05', 'retrieved_at': '2026-11-05T15:48:40.746805+00:00', 'http_status': 200, 'content_type': 'text/csv', 'sha256': 'd4586feda7aafff8d24e70560f937639e644183a323013a78eeb8a8a450b268b', 'outcome': 'unresolved_error', 'error': 'Official archive changed; immutable source retained for review'}]",
-  "finished_at": "2026-11-05T15:48:41.276599+00:00"
+  "status": "ready",
+  "requested_cutoff": "2026-11-06",
+  "started_at": "2026-11-06T15:54:04.287136+00:00",
+  "observation_date": "2026-11-06",
+  "finalized_months": [],
+  "current_sha256": "f3b0576dd5bddef4a97a7f852b33cea2baee11369788fea388946696f01d0e3c",
+  "monthly_sha256": "a7c173b0cc9b8fe35e2dbb606fb49f6f009827fbe0ba0db87a747635b5972d4e",
+  "finished_at": "2026-11-06T15:54:05.250077+00:00"
 }

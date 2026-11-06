@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T15:50:51.478396+00:00",
+  "generated_at": "2026-11-06T15:56:22.414766+00:00",
   "editions": {
     "weekly": "assets/weekly/2026-11-05",
     "macro": "assets/macro/2026-10",
@@ -326,7 +326,9 @@
       }
     }
   },
-  "refresh_errors": {},
+  "refresh_errors": {
+    "india_inflation": "FileNotFoundError"
+  },
   "commodity_inputs": {
     "as_of": "2026-10-30",
     "rows": {

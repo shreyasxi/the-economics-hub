@@ -1,7 +1,7 @@
 {
   "version": "nse_fpi_dii_cash_weekly_v1",
   "history_months": 6,
-  "source_note": "NSE/BSE cash market daily figures; archive backfill cross-checked against NSE daily API at latest date. NSE daily figures are provisional.",
+  "source_note": "Six-month daily cash-market flow history; historical rows from the public archive, new rows from the provisional NSE daily endpoint.",
   "sources": {
     "historical_archive": {
       "url": "https://indmarket.in/fii-dii-activity",
@@ -19,6 +19,14 @@
       "path": "raw/861c19014ce4aa4847c366df3f1a1116de58e2f883489faff2be5b011b0409f2.json",
       "sha256": "861c19014ce4aa4847c366df3f1a1116de58e2f883489faff2be5b011b0409f2",
       "bytes": 220
+    },
+    {
+      "date": "2026-11-06",
+      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
+      "retrieved_at": "2026-11-06T15:50:58.276587+00:00",
+      "path": "raw/b5851617af7a361ae5f8bc8de545b2148e26b1dd67d1697d4b19fe4d888c6417.json",
+      "sha256": "b5851617af7a361ae5f8bc8de545b2148e26b1dd67d1697d4b19fe4d888c6417",
+      "bytes": 218
     }
   ],
   "row_sources": {
@@ -144,11 +152,12 @@
     "2026-11-02": "third_party_historical_archive",
     "2026-11-03": "third_party_historical_archive",
     "2026-11-04": "third_party_historical_archive",
-    "2026-11-05": "archive_cross_checked_against_nse"
+    "2026-11-05": "archive_cross_checked_against_nse",
+    "2026-11-06": "nse_official_daily_provisional"
   },
-  "refreshed_at": "2026-11-06T06:15:09.720053+00:00",
+  "refreshed_at": "2026-11-06T15:50:58.277073+00:00",
   "first_date": "2026-05-12",
-  "last_date": "2026-11-05",
+  "last_date": "2026-11-06",
   "observations": [
     {
       "date": "2026-05-12",
@@ -1256,8 +1265,17 @@
       "dii_buy_cr": 22168.28,
       "dii_sell_cr": 32612.82,
       "dii_net_cr": -10444.54
+    },
+    {
+      "date": "2026-11-06",
+      "fpi_buy_cr": 30455.63,
+      "fpi_sell_cr": 16705.81,
+      "fpi_net_cr": 13749.82,
+      "dii_buy_cr": 18084.32,
+      "dii_sell_cr": 24053.02,
+      "dii_net_cr": -5968.7
     }
   ],
-  "observations_path": "derived/b799e54364dda627aa424a87666a621eb719c5a4cd87db0fc82188a4fb45ee87.csv",
-  "observations_sha256": "b799e54364dda627aa424a87666a621eb719c5a4cd87db0fc82188a4fb45ee87"
+  "observations_path": "derived/2c422437b8404e6297d7042b785c217d574a35d819a2f69510d94fc2549b67ce.csv",
+  "observations_sha256": "2c422437b8404e6297d7042b785c217d574a35d819a2f69510d94fc2549b67ce"
 }
