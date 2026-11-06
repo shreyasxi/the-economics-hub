@@ -3,6 +3,9 @@ name: India Dashboard Generator
 on:
   # Weekly auto-run: Saturday 08:00 UTC (after weekly macro pipeline at 06:00)
   schedule:
+    # Capture the official cash-market flow snapshot after each trading day;
+    # the chart itself is regenerated in the Saturday India dashboard run.
+    - cron: "30 13 * * 1-5"
     - cron: "0 8 * * 6"
 
   # Manual trigger — use after updating manual data / cag_monthly_accounts.xlsx,
@@ -33,10 +36,46 @@ permissions:
   contents: write
 
 jobs:
+  # The daily FII/FPI and DII endpoint has no historical backfill. Collect it
+  # on each trading day so the Saturday chart can aggregate complete weeks.
+  collect-institutional-flows:
+    if: github.ref_type == 'branch' && github.event_name == 'schedule' && github.event.schedule == '30 13 * * 1-5'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Refresh official NSE daily institutional flows
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_institutional_flows
+
+      - name: Commit daily institutional flow observation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A data/stores/india/nse_institutional_flows/
+          git diff --staged --quiet && echo "No new institutional flow observation." && exit 0
+          git commit -m "data: refresh daily NSE FPI and DII flows"
+          git push origin "${{ github.ref_name }}"
+
   # All source updates and generation share one checkout. Optional source
   # failures are gated per chart; independent charts still render.
   generate-charts:
-    if: github.ref_type == 'branch'
+    if: github.ref_type == 'branch' && (github.event_name != 'schedule' || github.event.schedule == '0 8 * * 6')
     runs-on: ubuntu-latest
     env:
       TARGET_BRANCH: ${{ github.ref_name }}
@@ -143,6 +182,30 @@ jobs:
         env:
           PYTHONPATH: "."
         run: python -m data.fetchers.nse_risk_appetite
+
+      - name: Refresh official NSE daily India VIX and NIFTY 50 history
+        id: nse-options-risk
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_options_risk_premium
+
+      - name: Refresh official NSE NIFTY 50 option skew history
+        id: nse-downside-skew
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_nifty_downside_skew
+
+      - name: Refresh latest NSE institutional flow observation
+        id: nse-institutional-flows
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          PYTHONPATH: "."
+        run: python -m data.fetchers.nse_institutional_flows
 
       - name: Verify India equity matrix
         env:
@@ -272,6 +335,9 @@ jobs:
           IIP_INDUSTRIES_UPDATE_FAILED: ${{ steps.mospi-iip-industries.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           PLFS_UPDATE_FAILED: ${{ steps.mospi-plfs.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           NSE_RISK_UPDATE_FAILED: ${{ steps.nse-risk.outcome != 'success' }}
+          NSE_OPTIONS_RISK_UPDATE_FAILED: ${{ steps.nse-options-risk.outcome != 'success' }}
+          NSE_DOWNSIDE_SKEW_UPDATE_FAILED: ${{ steps.nse-downside-skew.outcome != 'success' }}
+          NSE_INSTITUTIONAL_FLOWS_UPDATE_FAILED: ${{ steps.nse-institutional-flows.outcome != 'success' }}
           NSE_ROTATION_UPDATE_FAILED: ${{ steps.nse-rotation.outcome != 'success' }}
           NSE_EQUITY_UPDATE_FAILED: ${{ steps.nse-equity.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
           CPI_MAIN_UPDATE_FAILED: ${{ steps.cpi-main.outcome != 'success' }}
@@ -389,7 +455,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A assets/india/ assets/readme_showcase/ assets/macro_cards.json "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" data/stores/india/rbi_transmission.json "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
+          git add -A assets/india/ assets/readme_showcase/ assets/macro_cards.json "$(python -m data.paths --relative RBI_TRANSMISSION_CSV)" data/stores/india/rbi_transmission.json "$(python -m data.paths --relative NSE_INDICES_DIR)" "$(python -m data.paths --relative NSE_OPTIONS_RISK_PREMIUM_DIR)" "$(python -m data.paths --relative NSE_INSTITUTIONAL_FLOWS_DIR)" "$(python -m data.paths --relative NSE_NIFTY_DOWNSIDE_SKEW_DIR)" "$(python -m data.paths --relative NSE_VALUATIONS_DIR)" "$(python -m data.paths --relative INDIA_DB)"
           # Include canonical monthly histories and the raw evidence their loaders verify.
           SOURCE_PATHS=$(python -m data.paths --relative MOSPI_IIP_CSV MOSPI_PLFS_CSV MOSPI_SOURCES_DIR RBI_WSS_CSV RBI_REER_CSV INDIA_EXTERNAL_CSV)
           while IFS= read -r SOURCE_PATH; do

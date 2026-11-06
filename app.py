@@ -4663,9 +4663,9 @@ def page_india() -> None:
                 "Edition",
                 datetime.strptime(date_label, "%Y-%m").strftime("%B %Y"),
                 nav=[(label, _anchor("india", anchor)) for label, anchor in zip(
-                    ("Growth & Activity", "Inflation", "Monetary Conditions", "Equity Markets",
+                    ("Growth & Activity", "Inflation", "Equity Markets", "Monetary Conditions",
                      "External Sector", "Public Finances", "Consumer Confidence"),
-                    [_EH_ANCHORS[i] for i in (0, 1, 2, 5, 3, 4, 6)])],
+                    [_EH_ANCHORS[i] for i in (0, 1, 5, 2, 3, 4, 6)])],
             ),
             unsafe_allow_html=True,
         )
@@ -4735,14 +4735,15 @@ def page_india() -> None:
             else:
                 _render_grid(section_charts)
 
-            if index == 2:
-                equity_keys = ("fpi_monthly", "risk_appetite", "sector_valuations", "sector_rotation")
+            if index == 1:
+                equity_keys = ("fpi_monthly", "institutional_flows_weekly", "nifty_downside_skew", "risk_appetite", "sector_valuations", "sector_rotation")
                 equity = [c for c in charts if any(k in c.name for k in equity_keys)]
                 charts = [c for c in charts if c not in equity]
                 st.markdown(_eh_question_header(5, answers[5]), unsafe_allow_html=True)
                 if equity:
-                    first = [c for c in equity if any(k in c.name for k in ('fpi_monthly', 'risk_appetite'))]
-                    first.sort(key=lambda c: 0 if 'fpi_monthly' in c.name else 1)
+                    first = [c for c in equity if any(k in c.name for k in ('fpi_monthly', 'institutional_flows_weekly', 'nifty_downside_skew', 'risk_appetite'))]
+                    first.sort(key=lambda c: next((i for i, key in enumerate(
+                        ('fpi_monthly', 'institutional_flows_weekly', 'nifty_downside_skew', 'risk_appetite')) if key in c.name), 4))
                     last = [c for c in equity if c not in first]
                     last.sort(key=lambda c: 0 if 'sector_valuations' in c.name else 1)
                     _render_grid(first)
@@ -4758,6 +4759,7 @@ def page_india() -> None:
                             'Foreign Investment by Sector</h3>', unsafe_allow_html=True)
                 from charts.india_charts.emerging_opportunity import render as render_emerging_opportunity
                 render_emerging_opportunity()
+
         consumer = [c for c in charts if "consumer_confidence" in c.name or "discretionary_spending_sentiment" in c.name]
         charts = [c for c in charts if c not in consumer]
         if consumer:

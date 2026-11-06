@@ -174,7 +174,7 @@ python generate_macro.py
 ```
 
 ### 3. India
-Generates India charts covering FPI, risk appetite, sector valuations and rotation, investment, GVA growth contributions, GST, fiscal accounts, credit and trade — runs every Saturday via GitHub Actions. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
+Generates India charts covering FPI, institutional cash flows, NIFTY downside skew, options risk premium, sector valuations and rotation, investment, GVA growth contributions, GST, fiscal accounts, credit and trade — runs every Saturday via GitHub Actions. The options risk-premium chart compares daily India VIX with annualized NIFTY 50 realized volatility over the trailing 30 calendar days, with the index's trailing 252-session drawdown below. The weekly NIFTY downside-skew chart shows 30-day constant-maturity 25-delta put implied volatility minus call implied volatility, with NIFTY 50's trailing 252-session drawdown below; its rolling 36-month history is collected from NSE legacy and UDiFF F&O bhavcopies. Monthly figures without an API (PMI, GST, CPI, IIP) are entered with the manual-entry CLI.
 
 The RBI State of the Economy reader prefers HTML and falls back to the PDF
 linked alongside the article in the Bulletin contents. PDF dates and transmission
@@ -213,6 +213,9 @@ Run these commands from the repository root after installing `requirements.txt`:
 
 ```bash
 python -m data.fetchers.nse_risk_appetite
+python -m data.fetchers.nse_options_risk_premium
+python -m data.fetchers.nse_nifty_downside_skew
+python -m data.fetchers.nse_institutional_flows --bootstrap
 python -m data.fetchers.nse_valuations.collector --update
 python -m data.fetchers.nse_valuations.collector --verify
 python -m unittest discover -s tests -p "test_nse*.py" -v
@@ -224,8 +227,11 @@ updates do not need the original annual export folders. For a new risk-appetite
 store, place official annual price-index exports in `data/inputs/nse/NIFTY 50/` and
 `data/inputs/nse/NIFTY Small Cap 250/` (local, gitignored), then run
 `python -m data.fetchers.nse_risk_appetite --bootstrap --seed-only`.
-Risk appetite rebases the Smallcap 250 / NIFTY 50 price-index ratio to 100 on
-4 October 2016, using matching dates without filling gaps.
+The options risk-premium collector retains a rolling two-year audit of official NSE daily index-close reports, enough for the one-year chart, 30-calendar-day realized-volatility window and trailing 252-session drawdown. Missing report dates are left unfilled. The historical Smallcap 250 / NIFTY 50 ratio store remains available for its source history.
+
+The NIFTY downside-skew collector retains one official NSE F&O snapshot for each week's final trading session, filtering the archive to NIFTY index options 7–60 calendar days from expiry. It handles the legacy bhavcopy format before 8 July 2024 and the UDiFF format from that date onward. It solves Black–Scholes implied volatility from traded option closes, interpolates 25-delta put and call total variance to a constant 30-day tenor, and keeps a rolling 36-month history. The chart's drawdown panel uses official daily NIFTY 50 closes and the same trailing 252-session high definition as the options risk-premium chart.
+
+The India dashboard includes a six-month weekly FPI/DII cash-flow chart. Its initial daily history is retained with an archive checksum and checked against NSE's current daily endpoint; new daily observations are captured after market close on weekdays in the India workflow. The chart aggregates sessions into Friday-ending weeks and compares them with NIFTY 50 weekly returns. NSE's FII/FPI and DII figures are provisional.
 
 NSE valuation code lives in `data/fetchers/nse_valuations/`; its default store
 remains `data/stores/india/nse_valuations/`. Keep raw `sources/`, source manifests, normalized

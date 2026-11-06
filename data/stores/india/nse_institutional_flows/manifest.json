@@ -1,0 +1,1263 @@
+{
+  "version": "nse_fpi_dii_cash_weekly_v1",
+  "history_months": 6,
+  "source_note": "NSE/BSE cash market daily figures; archive backfill cross-checked against NSE daily API at latest date. NSE daily figures are provisional.",
+  "sources": {
+    "historical_archive": {
+      "url": "https://indmarket.in/fii-dii-activity",
+      "retrieved_at": "2026-11-06T06:15:09.719895+00:00",
+      "path": "raw/12d576418ca075b7776eac22660b77762450b7c4fc612c9f3d5ab29996c590b5.html",
+      "sha256": "12d576418ca075b7776eac22660b77762450b7c4fc612c9f3d5ab29996c590b5",
+      "bytes": 634097
+    }
+  },
+  "nse_daily_snapshots": [
+    {
+      "date": "2026-11-05",
+      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
+      "retrieved_at": "2026-11-06T06:15:09.719907+00:00",
+      "path": "raw/861c19014ce4aa4847c366df3f1a1116de58e2f883489faff2be5b011b0409f2.json",
+      "sha256": "861c19014ce4aa4847c366df3f1a1116de58e2f883489faff2be5b011b0409f2",
+      "bytes": 220
+    }
+  ],
+  "row_sources": {
+    "2026-05-12": "third_party_historical_archive",
+    "2026-05-13": "third_party_historical_archive",
+    "2026-05-14": "third_party_historical_archive",
+    "2026-05-15": "third_party_historical_archive",
+    "2026-05-18": "third_party_historical_archive",
+    "2026-05-19": "third_party_historical_archive",
+    "2026-05-20": "third_party_historical_archive",
+    "2026-05-21": "third_party_historical_archive",
+    "2026-05-22": "third_party_historical_archive",
+    "2026-05-25": "third_party_historical_archive",
+    "2026-05-26": "third_party_historical_archive",
+    "2026-05-27": "third_party_historical_archive",
+    "2026-05-29": "third_party_historical_archive",
+    "2026-06-01": "third_party_historical_archive",
+    "2026-06-02": "third_party_historical_archive",
+    "2026-06-03": "third_party_historical_archive",
+    "2026-06-04": "third_party_historical_archive",
+    "2026-06-05": "third_party_historical_archive",
+    "2026-06-08": "third_party_historical_archive",
+    "2026-06-09": "third_party_historical_archive",
+    "2026-06-10": "third_party_historical_archive",
+    "2026-06-11": "third_party_historical_archive",
+    "2026-06-12": "third_party_historical_archive",
+    "2026-06-15": "third_party_historical_archive",
+    "2026-06-16": "third_party_historical_archive",
+    "2026-06-17": "third_party_historical_archive",
+    "2026-06-18": "third_party_historical_archive",
+    "2026-06-19": "third_party_historical_archive",
+    "2026-06-22": "third_party_historical_archive",
+    "2026-06-23": "third_party_historical_archive",
+    "2026-06-24": "third_party_historical_archive",
+    "2026-06-25": "third_party_historical_archive",
+    "2026-06-29": "third_party_historical_archive",
+    "2026-06-30": "third_party_historical_archive",
+    "2026-07-01": "third_party_historical_archive",
+    "2026-07-02": "third_party_historical_archive",
+    "2026-07-03": "third_party_historical_archive",
+    "2026-07-06": "third_party_historical_archive",
+    "2026-07-07": "third_party_historical_archive",
+    "2026-07-08": "third_party_historical_archive",
+    "2026-07-09": "third_party_historical_archive",
+    "2026-07-10": "third_party_historical_archive",
+    "2026-07-13": "third_party_historical_archive",
+    "2026-07-14": "third_party_historical_archive",
+    "2026-07-15": "third_party_historical_archive",
+    "2026-07-16": "third_party_historical_archive",
+    "2026-07-17": "third_party_historical_archive",
+    "2026-07-20": "third_party_historical_archive",
+    "2026-07-21": "third_party_historical_archive",
+    "2026-07-22": "third_party_historical_archive",
+    "2026-07-23": "third_party_historical_archive",
+    "2026-07-24": "third_party_historical_archive",
+    "2026-07-27": "third_party_historical_archive",
+    "2026-07-28": "third_party_historical_archive",
+    "2026-07-29": "third_party_historical_archive",
+    "2026-07-30": "third_party_historical_archive",
+    "2026-07-31": "third_party_historical_archive",
+    "2026-08-03": "third_party_historical_archive",
+    "2026-08-04": "third_party_historical_archive",
+    "2026-08-05": "third_party_historical_archive",
+    "2026-08-06": "third_party_historical_archive",
+    "2026-08-07": "third_party_historical_archive",
+    "2026-08-10": "third_party_historical_archive",
+    "2026-08-11": "third_party_historical_archive",
+    "2026-08-12": "third_party_historical_archive",
+    "2026-08-13": "third_party_historical_archive",
+    "2026-08-14": "third_party_historical_archive",
+    "2026-08-17": "third_party_historical_archive",
+    "2026-08-18": "third_party_historical_archive",
+    "2026-08-19": "third_party_historical_archive",
+    "2026-08-20": "third_party_historical_archive",
+    "2026-08-21": "third_party_historical_archive",
+    "2026-08-24": "third_party_historical_archive",
+    "2026-08-25": "third_party_historical_archive",
+    "2026-08-26": "third_party_historical_archive",
+    "2026-08-27": "third_party_historical_archive",
+    "2026-08-28": "third_party_historical_archive",
+    "2026-08-31": "third_party_historical_archive",
+    "2026-09-01": "third_party_historical_archive",
+    "2026-09-02": "third_party_historical_archive",
+    "2026-09-03": "third_party_historical_archive",
+    "2026-09-04": "third_party_historical_archive",
+    "2026-09-07": "third_party_historical_archive",
+    "2026-09-08": "third_party_historical_archive",
+    "2026-09-09": "third_party_historical_archive",
+    "2026-09-10": "third_party_historical_archive",
+    "2026-09-11": "third_party_historical_archive",
+    "2026-09-15": "third_party_historical_archive",
+    "2026-09-16": "third_party_historical_archive",
+    "2026-09-17": "third_party_historical_archive",
+    "2026-09-18": "third_party_historical_archive",
+    "2026-09-21": "third_party_historical_archive",
+    "2026-09-22": "third_party_historical_archive",
+    "2026-09-23": "third_party_historical_archive",
+    "2026-09-24": "third_party_historical_archive",
+    "2026-09-25": "third_party_historical_archive",
+    "2026-09-28": "third_party_historical_archive",
+    "2026-09-29": "third_party_historical_archive",
+    "2026-09-30": "third_party_historical_archive",
+    "2026-10-01": "third_party_historical_archive",
+    "2026-10-05": "third_party_historical_archive",
+    "2026-10-06": "third_party_historical_archive",
+    "2026-10-07": "third_party_historical_archive",
+    "2026-10-08": "third_party_historical_archive",
+    "2026-10-09": "third_party_historical_archive",
+    "2026-10-12": "third_party_historical_archive",
+    "2026-10-13": "third_party_historical_archive",
+    "2026-10-14": "third_party_historical_archive",
+    "2026-10-15": "third_party_historical_archive",
+    "2026-10-16": "third_party_historical_archive",
+    "2026-10-19": "third_party_historical_archive",
+    "2026-10-21": "third_party_historical_archive",
+    "2026-10-22": "third_party_historical_archive",
+    "2026-10-23": "third_party_historical_archive",
+    "2026-10-26": "third_party_historical_archive",
+    "2026-10-27": "third_party_historical_archive",
+    "2026-10-28": "third_party_historical_archive",
+    "2026-10-29": "third_party_historical_archive",
+    "2026-10-30": "third_party_historical_archive",
+    "2026-11-02": "third_party_historical_archive",
+    "2026-11-03": "third_party_historical_archive",
+    "2026-11-04": "third_party_historical_archive",
+    "2026-11-05": "archive_cross_checked_against_nse"
+  },
+  "refreshed_at": "2026-11-06T06:15:09.720053+00:00",
+  "first_date": "2026-05-12",
+  "last_date": "2026-11-05",
+  "observations": [
+    {
+      "date": "2026-05-12",
+      "fpi_buy_cr": 16555.27,
+      "fpi_sell_cr": 18514.66,
+      "fpi_net_cr": -1959.39,
+      "dii_buy_cr": 20684.82,
+      "dii_sell_cr": 12694.5,
+      "dii_net_cr": 7990.32
+    },
+    {
+      "date": "2026-05-13",
+      "fpi_buy_cr": 14373.99,
+      "fpi_sell_cr": 19077.14,
+      "fpi_net_cr": -4703.15,
+      "dii_buy_cr": 18872.65,
+      "dii_sell_cr": 13003.6,
+      "dii_net_cr": 5869.05
+    },
+    {
+      "date": "2026-05-14",
+      "fpi_buy_cr": 17350.56,
+      "fpi_sell_cr": 17163.1,
+      "fpi_net_cr": 187.46,
+      "dii_buy_cr": 18255.96,
+      "dii_sell_cr": 17571.63,
+      "dii_net_cr": 684.33
+    },
+    {
+      "date": "2026-05-15",
+      "fpi_buy_cr": 16299.6,
+      "fpi_sell_cr": 14970.43,
+      "fpi_net_cr": 1329.17,
+      "dii_buy_cr": 14961.88,
+      "dii_sell_cr": 16920.7,
+      "dii_net_cr": -1958.82
+    },
+    {
+      "date": "2026-05-18",
+      "fpi_buy_cr": 17222.18,
+      "fpi_sell_cr": 14408.49,
+      "fpi_net_cr": 2813.69,
+      "dii_buy_cr": 16844.94,
+      "dii_sell_cr": 14162.82,
+      "dii_net_cr": 2682.12
+    },
+    {
+      "date": "2026-05-19",
+      "fpi_buy_cr": 17907.55,
+      "fpi_sell_cr": 20365.04,
+      "fpi_net_cr": -2457.49,
+      "dii_buy_cr": 16951.95,
+      "dii_sell_cr": 13150.27,
+      "dii_net_cr": 3801.68
+    },
+    {
+      "date": "2026-05-20",
+      "fpi_buy_cr": 14139.56,
+      "fpi_sell_cr": 15736.91,
+      "fpi_net_cr": -1597.35,
+      "dii_buy_cr": 16000.79,
+      "dii_sell_cr": 14032.44,
+      "dii_net_cr": 1968.35
+    },
+    {
+      "date": "2026-05-21",
+      "fpi_buy_cr": 12322.16,
+      "fpi_sell_cr": 14213.37,
+      "fpi_net_cr": -1891.21,
+      "dii_buy_cr": 15857.03,
+      "dii_sell_cr": 13364.61,
+      "dii_net_cr": 2492.42
+    },
+    {
+      "date": "2026-05-22",
+      "fpi_buy_cr": 10972.76,
+      "fpi_sell_cr": 15413.23,
+      "fpi_net_cr": -4440.47,
+      "dii_buy_cr": 18436.72,
+      "dii_sell_cr": 12433.19,
+      "dii_net_cr": 6003.53
+    },
+    {
+      "date": "2026-05-25",
+      "fpi_buy_cr": 12083.12,
+      "fpi_sell_cr": 11261.37,
+      "fpi_net_cr": 821.75,
+      "dii_buy_cr": 16434.96,
+      "dii_sell_cr": 12578.08,
+      "dii_net_cr": 3856.88
+    },
+    {
+      "date": "2026-05-26",
+      "fpi_buy_cr": 13127.02,
+      "fpi_sell_cr": 15534.89,
+      "fpi_net_cr": -2407.87,
+      "dii_buy_cr": 15536.74,
+      "dii_sell_cr": 14175.31,
+      "dii_net_cr": 1361.43
+    },
+    {
+      "date": "2026-05-27",
+      "fpi_buy_cr": 11418.65,
+      "fpi_sell_cr": 12461.35,
+      "fpi_net_cr": -1042.7,
+      "dii_buy_cr": 16893.1,
+      "dii_sell_cr": 13072.1,
+      "dii_net_cr": 3821.0
+    },
+    {
+      "date": "2026-05-29",
+      "fpi_buy_cr": 89733.64,
+      "fpi_sell_cr": 110839.5,
+      "fpi_net_cr": -21105.86,
+      "dii_buy_cr": 36999.7,
+      "dii_sell_cr": 20235.56,
+      "dii_net_cr": 16764.14
+    },
+    {
+      "date": "2026-06-01",
+      "fpi_buy_cr": 17725.89,
+      "fpi_sell_cr": 21637.57,
+      "fpi_net_cr": -3911.68,
+      "dii_buy_cr": 15226.29,
+      "dii_sell_cr": 10117.16,
+      "dii_net_cr": 5109.13
+    },
+    {
+      "date": "2026-06-02",
+      "fpi_buy_cr": 16955.9,
+      "fpi_sell_cr": 25318.82,
+      "fpi_net_cr": -8362.92,
+      "dii_buy_cr": 22508.77,
+      "dii_sell_cr": 12919.45,
+      "dii_net_cr": 9589.32
+    },
+    {
+      "date": "2026-06-03",
+      "fpi_buy_cr": 17053.63,
+      "fpi_sell_cr": 22670.19,
+      "fpi_net_cr": -5616.56,
+      "dii_buy_cr": 17530.0,
+      "dii_sell_cr": 11789.11,
+      "dii_net_cr": 5740.89
+    },
+    {
+      "date": "2026-06-04",
+      "fpi_buy_cr": 14012.52,
+      "fpi_sell_cr": 18459.58,
+      "fpi_net_cr": -4447.06,
+      "dii_buy_cr": 16824.35,
+      "dii_sell_cr": 12464.21,
+      "dii_net_cr": 4360.14
+    },
+    {
+      "date": "2026-06-05",
+      "fpi_buy_cr": 11044.57,
+      "fpi_sell_cr": 19820.82,
+      "fpi_net_cr": -8776.25,
+      "dii_buy_cr": 22779.32,
+      "dii_sell_cr": 13645.75,
+      "dii_net_cr": 9133.57
+    },
+    {
+      "date": "2026-06-08",
+      "fpi_buy_cr": 8842.08,
+      "fpi_sell_cr": 14397.75,
+      "fpi_net_cr": -5555.67,
+      "dii_buy_cr": 16683.18,
+      "dii_sell_cr": 11517.94,
+      "dii_net_cr": 5165.24
+    },
+    {
+      "date": "2026-06-09",
+      "fpi_buy_cr": 14735.47,
+      "fpi_sell_cr": 19301.5,
+      "fpi_net_cr": -4566.03,
+      "dii_buy_cr": 17664.98,
+      "dii_sell_cr": 11505.5,
+      "dii_net_cr": 6159.48
+    },
+    {
+      "date": "2026-06-10",
+      "fpi_buy_cr": 14047.79,
+      "fpi_sell_cr": 16172.77,
+      "fpi_net_cr": -2124.98,
+      "dii_buy_cr": 17396.4,
+      "dii_sell_cr": 14272.45,
+      "dii_net_cr": 3123.95
+    },
+    {
+      "date": "2026-06-11",
+      "fpi_buy_cr": 14000.58,
+      "fpi_sell_cr": 15987.67,
+      "fpi_net_cr": -1987.09,
+      "dii_buy_cr": 16822.57,
+      "dii_sell_cr": 12598.06,
+      "dii_net_cr": 4224.51
+    },
+    {
+      "date": "2026-06-12",
+      "fpi_buy_cr": 12064.61,
+      "fpi_sell_cr": 13146.79,
+      "fpi_net_cr": -1082.18,
+      "dii_buy_cr": 18877.03,
+      "dii_sell_cr": 13535.74,
+      "dii_net_cr": 5341.29
+    },
+    {
+      "date": "2026-06-15",
+      "fpi_buy_cr": 15650.2,
+      "fpi_sell_cr": 15450.15,
+      "fpi_net_cr": 200.05,
+      "dii_buy_cr": 21080.9,
+      "dii_sell_cr": 17891.64,
+      "dii_net_cr": 3189.26
+    },
+    {
+      "date": "2026-06-16",
+      "fpi_buy_cr": 13887.15,
+      "fpi_sell_cr": 14636.33,
+      "fpi_net_cr": -749.18,
+      "dii_buy_cr": 13553.36,
+      "dii_sell_cr": 13553.3,
+      "dii_net_cr": 0.06
+    },
+    {
+      "date": "2026-06-17",
+      "fpi_buy_cr": 14806.3,
+      "fpi_sell_cr": 14704.71,
+      "fpi_net_cr": 101.59,
+      "dii_buy_cr": 16611.87,
+      "dii_sell_cr": 15050.47,
+      "dii_net_cr": 1561.4
+    },
+    {
+      "date": "2026-06-18",
+      "fpi_buy_cr": 14611.83,
+      "fpi_sell_cr": 15637.03,
+      "fpi_net_cr": -1025.2,
+      "dii_buy_cr": 16163.18,
+      "dii_sell_cr": 12646.37,
+      "dii_net_cr": 3516.81
+    },
+    {
+      "date": "2026-06-19",
+      "fpi_buy_cr": 31442.87,
+      "fpi_sell_cr": 26583.8,
+      "fpi_net_cr": 4859.07,
+      "dii_buy_cr": 18020.49,
+      "dii_sell_cr": 19180.13,
+      "dii_net_cr": -1159.64
+    },
+    {
+      "date": "2026-06-22",
+      "fpi_buy_cr": 10082.08,
+      "fpi_sell_cr": 10717.99,
+      "fpi_net_cr": -635.91,
+      "dii_buy_cr": 17391.78,
+      "dii_sell_cr": 16356.06,
+      "dii_net_cr": 1035.72
+    },
+    {
+      "date": "2026-06-23",
+      "fpi_buy_cr": 15396.07,
+      "fpi_sell_cr": 15378.21,
+      "fpi_net_cr": 17.86,
+      "dii_buy_cr": 16863.04,
+      "dii_sell_cr": 16182.83,
+      "dii_net_cr": 680.21
+    },
+    {
+      "date": "2026-06-24",
+      "fpi_buy_cr": 16744.73,
+      "fpi_sell_cr": 18588.13,
+      "fpi_net_cr": -1843.4,
+      "dii_buy_cr": 17274.01,
+      "dii_sell_cr": 13636.75,
+      "dii_net_cr": 3637.26
+    },
+    {
+      "date": "2026-06-25",
+      "fpi_buy_cr": 18988.03,
+      "fpi_sell_cr": 18604.27,
+      "fpi_net_cr": 383.76,
+      "dii_buy_cr": 24844.03,
+      "dii_sell_cr": 19096.28,
+      "dii_net_cr": 5747.75
+    },
+    {
+      "date": "2026-06-29",
+      "fpi_buy_cr": 24754.26,
+      "fpi_sell_cr": 26104.36,
+      "fpi_net_cr": -1350.1,
+      "dii_buy_cr": 55273.85,
+      "dii_sell_cr": 52472.4,
+      "dii_net_cr": 2801.45
+    },
+    {
+      "date": "2026-06-30",
+      "fpi_buy_cr": 23273.71,
+      "fpi_sell_cr": 25830.46,
+      "fpi_net_cr": -2556.75,
+      "dii_buy_cr": 23432.58,
+      "dii_sell_cr": 16590.24,
+      "dii_net_cr": 6842.34
+    },
+    {
+      "date": "2026-07-01",
+      "fpi_buy_cr": 11623.31,
+      "fpi_sell_cr": 12763.81,
+      "fpi_net_cr": -1140.5,
+      "dii_buy_cr": 17136.57,
+      "dii_sell_cr": 13977.33,
+      "dii_net_cr": 3159.24
+    },
+    {
+      "date": "2026-07-02",
+      "fpi_buy_cr": 14018.4,
+      "fpi_sell_cr": 14330.22,
+      "fpi_net_cr": -311.82,
+      "dii_buy_cr": 17391.61,
+      "dii_sell_cr": 15607.21,
+      "dii_net_cr": 1784.4
+    },
+    {
+      "date": "2026-07-03",
+      "fpi_buy_cr": 13337.33,
+      "fpi_sell_cr": 11982.0,
+      "fpi_net_cr": 1355.33,
+      "dii_buy_cr": 18676.35,
+      "dii_sell_cr": 20630.24,
+      "dii_net_cr": -1953.89
+    },
+    {
+      "date": "2026-07-06",
+      "fpi_buy_cr": 11686.1,
+      "fpi_sell_cr": 11443.07,
+      "fpi_net_cr": 243.03,
+      "dii_buy_cr": 19727.56,
+      "dii_sell_cr": 15936.14,
+      "dii_net_cr": 3791.42
+    },
+    {
+      "date": "2026-07-07",
+      "fpi_buy_cr": 18414.01,
+      "fpi_sell_cr": 18020.82,
+      "fpi_net_cr": 393.19,
+      "dii_buy_cr": 18897.44,
+      "dii_sell_cr": 19280.87,
+      "dii_net_cr": -383.43
+    },
+    {
+      "date": "2026-07-08",
+      "fpi_buy_cr": 17463.95,
+      "fpi_sell_cr": 15501.15,
+      "fpi_net_cr": 1962.8,
+      "dii_buy_cr": 19165.13,
+      "dii_sell_cr": 18374.97,
+      "dii_net_cr": 790.16
+    },
+    {
+      "date": "2026-07-09",
+      "fpi_buy_cr": 14388.41,
+      "fpi_sell_cr": 14921.27,
+      "fpi_net_cr": -532.86,
+      "dii_buy_cr": 18302.87,
+      "dii_sell_cr": 16245.08,
+      "dii_net_cr": 2057.79
+    },
+    {
+      "date": "2026-07-10",
+      "fpi_buy_cr": 15318.07,
+      "fpi_sell_cr": 12714.35,
+      "fpi_net_cr": 2603.72,
+      "dii_buy_cr": 17171.75,
+      "dii_sell_cr": 15152.07,
+      "dii_net_cr": 2019.68
+    },
+    {
+      "date": "2026-07-13",
+      "fpi_buy_cr": 10386.48,
+      "fpi_sell_cr": 13448.75,
+      "fpi_net_cr": -3062.27,
+      "dii_buy_cr": 17393.46,
+      "dii_sell_cr": 15221.76,
+      "dii_net_cr": 2171.7
+    },
+    {
+      "date": "2026-07-14",
+      "fpi_buy_cr": 12763.43,
+      "fpi_sell_cr": 13503.12,
+      "fpi_net_cr": -739.69,
+      "dii_buy_cr": 20420.87,
+      "dii_sell_cr": 17493.16,
+      "dii_net_cr": 2927.71
+    },
+    {
+      "date": "2026-07-15",
+      "fpi_buy_cr": 13207.46,
+      "fpi_sell_cr": 13943.29,
+      "fpi_net_cr": -735.83,
+      "dii_buy_cr": 16226.42,
+      "dii_sell_cr": 15521.49,
+      "dii_net_cr": 704.93
+    },
+    {
+      "date": "2026-07-16",
+      "fpi_buy_cr": 13576.08,
+      "fpi_sell_cr": 17781.64,
+      "fpi_net_cr": -4205.56,
+      "dii_buy_cr": 19236.8,
+      "dii_sell_cr": 16250.39,
+      "dii_net_cr": 2986.41
+    },
+    {
+      "date": "2026-07-17",
+      "fpi_buy_cr": 14393.77,
+      "fpi_sell_cr": 14770.18,
+      "fpi_net_cr": -376.41,
+      "dii_buy_cr": 17180.08,
+      "dii_sell_cr": 16162.19,
+      "dii_net_cr": 1017.89
+    },
+    {
+      "date": "2026-07-20",
+      "fpi_buy_cr": 13312.67,
+      "fpi_sell_cr": 14433.71,
+      "fpi_net_cr": -1121.04,
+      "dii_buy_cr": 16187.84,
+      "dii_sell_cr": 14875.81,
+      "dii_net_cr": 1312.03
+    },
+    {
+      "date": "2026-07-21",
+      "fpi_buy_cr": 16327.88,
+      "fpi_sell_cr": 14677.72,
+      "fpi_net_cr": 1650.16,
+      "dii_buy_cr": 14638.54,
+      "dii_sell_cr": 15295.42,
+      "dii_net_cr": -656.88
+    },
+    {
+      "date": "2026-07-22",
+      "fpi_buy_cr": 12889.82,
+      "fpi_sell_cr": 13709.02,
+      "fpi_net_cr": -819.2,
+      "dii_buy_cr": 13665.69,
+      "dii_sell_cr": 14083.95,
+      "dii_net_cr": -418.26
+    },
+    {
+      "date": "2026-07-23",
+      "fpi_buy_cr": 11472.08,
+      "fpi_sell_cr": 14471.31,
+      "fpi_net_cr": -2999.23,
+      "dii_buy_cr": 16575.3,
+      "dii_sell_cr": 13628.16,
+      "dii_net_cr": 2947.14
+    },
+    {
+      "date": "2026-07-24",
+      "fpi_buy_cr": 11123.86,
+      "fpi_sell_cr": 15016.63,
+      "fpi_net_cr": -3892.77,
+      "dii_buy_cr": 18959.43,
+      "dii_sell_cr": 13505.88,
+      "dii_net_cr": 5453.55
+    },
+    {
+      "date": "2026-07-27",
+      "fpi_buy_cr": 11695.95,
+      "fpi_sell_cr": 13384.18,
+      "fpi_net_cr": -1688.23,
+      "dii_buy_cr": 15937.1,
+      "dii_sell_cr": 13607.96,
+      "dii_net_cr": 2329.14
+    },
+    {
+      "date": "2026-07-28",
+      "fpi_buy_cr": 17530.97,
+      "fpi_sell_cr": 16775.64,
+      "fpi_net_cr": 755.33,
+      "dii_buy_cr": 18256.88,
+      "dii_sell_cr": 16592.72,
+      "dii_net_cr": 1664.16
+    },
+    {
+      "date": "2026-07-29",
+      "fpi_buy_cr": 17358.31,
+      "fpi_sell_cr": 14376.44,
+      "fpi_net_cr": 2981.87,
+      "dii_buy_cr": 18176.22,
+      "dii_sell_cr": 17178.2,
+      "dii_net_cr": 998.02
+    },
+    {
+      "date": "2026-07-30",
+      "fpi_buy_cr": 17431.96,
+      "fpi_sell_cr": 13808.45,
+      "fpi_net_cr": 3623.51,
+      "dii_buy_cr": 17979.63,
+      "dii_sell_cr": 19843.66,
+      "dii_net_cr": -1864.03
+    },
+    {
+      "date": "2026-07-31",
+      "fpi_buy_cr": 19045.51,
+      "fpi_sell_cr": 18768.03,
+      "fpi_net_cr": 277.48,
+      "dii_buy_cr": 19885.8,
+      "dii_sell_cr": 17625.43,
+      "dii_net_cr": 2260.37
+    },
+    {
+      "date": "2026-08-03",
+      "fpi_buy_cr": 12621.89,
+      "fpi_sell_cr": 11699.63,
+      "fpi_net_cr": 922.26,
+      "dii_buy_cr": 18325.97,
+      "dii_sell_cr": 16754.79,
+      "dii_net_cr": 1571.18
+    },
+    {
+      "date": "2026-08-04",
+      "fpi_buy_cr": 15630.45,
+      "fpi_sell_cr": 13183.98,
+      "fpi_net_cr": 2446.47,
+      "dii_buy_cr": 15241.39,
+      "dii_sell_cr": 16177.53,
+      "dii_net_cr": -936.14
+    },
+    {
+      "date": "2026-08-05",
+      "fpi_buy_cr": 15940.5,
+      "fpi_sell_cr": 16883.92,
+      "fpi_net_cr": -943.42,
+      "dii_buy_cr": 19353.43,
+      "dii_sell_cr": 16470.26,
+      "dii_net_cr": 2883.17
+    },
+    {
+      "date": "2026-08-06",
+      "fpi_buy_cr": 16161.35,
+      "fpi_sell_cr": 16179.21,
+      "fpi_net_cr": -17.86,
+      "dii_buy_cr": 19723.68,
+      "dii_sell_cr": 15710.08,
+      "dii_net_cr": 4013.6
+    },
+    {
+      "date": "2026-08-07",
+      "fpi_buy_cr": 12941.31,
+      "fpi_sell_cr": 12461.07,
+      "fpi_net_cr": 480.24,
+      "dii_buy_cr": 15679.58,
+      "dii_sell_cr": 15444.02,
+      "dii_net_cr": 235.56
+    },
+    {
+      "date": "2026-08-10",
+      "fpi_buy_cr": 13161.56,
+      "fpi_sell_cr": 11186.8,
+      "fpi_net_cr": 1974.76,
+      "dii_buy_cr": 15868.51,
+      "dii_sell_cr": 17158.8,
+      "dii_net_cr": -1290.29
+    },
+    {
+      "date": "2026-08-11",
+      "fpi_buy_cr": 14628.47,
+      "fpi_sell_cr": 14369.92,
+      "fpi_net_cr": 258.55,
+      "dii_buy_cr": 15006.72,
+      "dii_sell_cr": 14981.95,
+      "dii_net_cr": 24.77
+    },
+    {
+      "date": "2026-08-12",
+      "fpi_buy_cr": 16584.64,
+      "fpi_sell_cr": 17587.14,
+      "fpi_net_cr": -1002.5,
+      "dii_buy_cr": 21518.55,
+      "dii_sell_cr": 15676.89,
+      "dii_net_cr": 5841.66
+    },
+    {
+      "date": "2026-08-13",
+      "fpi_buy_cr": 14492.46,
+      "fpi_sell_cr": 15003.15,
+      "fpi_net_cr": -510.69,
+      "dii_buy_cr": 16565.14,
+      "dii_sell_cr": 12212.05,
+      "dii_net_cr": 4353.09
+    },
+    {
+      "date": "2026-08-14",
+      "fpi_buy_cr": 12854.44,
+      "fpi_sell_cr": 12346.32,
+      "fpi_net_cr": 508.12,
+      "dii_buy_cr": 14295.49,
+      "dii_sell_cr": 13939.09,
+      "dii_net_cr": 356.4
+    },
+    {
+      "date": "2026-08-17",
+      "fpi_buy_cr": 11546.16,
+      "fpi_sell_cr": 14081.26,
+      "fpi_net_cr": -2535.1,
+      "dii_buy_cr": 16654.08,
+      "dii_sell_cr": 11552.62,
+      "dii_net_cr": 5101.46
+    },
+    {
+      "date": "2026-08-18",
+      "fpi_buy_cr": 13543.3,
+      "fpi_sell_cr": 11891.77,
+      "fpi_net_cr": 1651.53,
+      "dii_buy_cr": 15566.07,
+      "dii_sell_cr": 12986.76,
+      "dii_net_cr": 2579.31
+    },
+    {
+      "date": "2026-08-19",
+      "fpi_buy_cr": 12875.76,
+      "fpi_sell_cr": 12467.77,
+      "fpi_net_cr": 407.99,
+      "dii_buy_cr": 17288.58,
+      "dii_sell_cr": 13314.86,
+      "dii_net_cr": 3973.72
+    },
+    {
+      "date": "2026-08-20",
+      "fpi_buy_cr": 11411.73,
+      "fpi_sell_cr": 11995.09,
+      "fpi_net_cr": -583.36,
+      "dii_buy_cr": 16932.72,
+      "dii_sell_cr": 13395.01,
+      "dii_net_cr": 3537.71
+    },
+    {
+      "date": "2026-08-21",
+      "fpi_buy_cr": 12560.91,
+      "fpi_sell_cr": 13103.62,
+      "fpi_net_cr": -542.71,
+      "dii_buy_cr": 15258.71,
+      "dii_sell_cr": 13134.57,
+      "dii_net_cr": 2124.14
+    },
+    {
+      "date": "2026-08-24",
+      "fpi_buy_cr": 12332.64,
+      "fpi_sell_cr": 11150.98,
+      "fpi_net_cr": 1181.66,
+      "dii_buy_cr": 15337.18,
+      "dii_sell_cr": 12843.77,
+      "dii_net_cr": 2493.41
+    },
+    {
+      "date": "2026-08-25",
+      "fpi_buy_cr": 13259.03,
+      "fpi_sell_cr": 11665.5,
+      "fpi_net_cr": 1593.53,
+      "dii_buy_cr": 14280.18,
+      "dii_sell_cr": 14049.92,
+      "dii_net_cr": 230.26
+    },
+    {
+      "date": "2026-08-26",
+      "fpi_buy_cr": 17520.49,
+      "fpi_sell_cr": 17017.86,
+      "fpi_net_cr": 502.63,
+      "dii_buy_cr": 17710.07,
+      "dii_sell_cr": 11284.91,
+      "dii_net_cr": 6425.16
+    },
+    {
+      "date": "2026-08-27",
+      "fpi_buy_cr": 15276.94,
+      "fpi_sell_cr": 15575.2,
+      "fpi_net_cr": -298.26,
+      "dii_buy_cr": 19605.6,
+      "dii_sell_cr": 14628.43,
+      "dii_net_cr": 4977.17
+    },
+    {
+      "date": "2026-08-28",
+      "fpi_buy_cr": 13263.62,
+      "fpi_sell_cr": 18303.42,
+      "fpi_net_cr": -5039.8,
+      "dii_buy_cr": 16539.38,
+      "dii_sell_cr": 11355.45,
+      "dii_net_cr": 5183.93
+    },
+    {
+      "date": "2026-08-31",
+      "fpi_buy_cr": 60025.88,
+      "fpi_sell_cr": 68011.76,
+      "fpi_net_cr": -7985.88,
+      "dii_buy_cr": 19730.38,
+      "dii_sell_cr": 15141.5,
+      "dii_net_cr": 4588.88
+    },
+    {
+      "date": "2026-09-01",
+      "fpi_buy_cr": 17807.53,
+      "fpi_sell_cr": 16664.15,
+      "fpi_net_cr": 1143.38,
+      "dii_buy_cr": 15635.49,
+      "dii_sell_cr": 13788.55,
+      "dii_net_cr": 1846.94
+    },
+    {
+      "date": "2026-09-02",
+      "fpi_buy_cr": 26715.88,
+      "fpi_sell_cr": 20027.51,
+      "fpi_net_cr": 6688.37,
+      "dii_buy_cr": 17639.89,
+      "dii_sell_cr": 14826.91,
+      "dii_net_cr": 2812.98
+    },
+    {
+      "date": "2026-09-03",
+      "fpi_buy_cr": 13596.04,
+      "fpi_sell_cr": 15941.91,
+      "fpi_net_cr": -2345.87,
+      "dii_buy_cr": 17063.65,
+      "dii_sell_cr": 12086.19,
+      "dii_net_cr": 4977.46
+    },
+    {
+      "date": "2026-09-04",
+      "fpi_buy_cr": 13857.58,
+      "fpi_sell_cr": 16969.52,
+      "fpi_net_cr": -3111.94,
+      "dii_buy_cr": 19254.19,
+      "dii_sell_cr": 10324.07,
+      "dii_net_cr": 8930.12
+    },
+    {
+      "date": "2026-09-07",
+      "fpi_buy_cr": 9581.19,
+      "fpi_sell_cr": 9301.06,
+      "fpi_net_cr": 280.13,
+      "dii_buy_cr": 13154.13,
+      "dii_sell_cr": 12587.37,
+      "dii_net_cr": 566.76
+    },
+    {
+      "date": "2026-09-08",
+      "fpi_buy_cr": 11704.84,
+      "fpi_sell_cr": 11828.03,
+      "fpi_net_cr": -123.19,
+      "dii_buy_cr": 14678.53,
+      "dii_sell_cr": 13328.89,
+      "dii_net_cr": 1349.64
+    },
+    {
+      "date": "2026-09-09",
+      "fpi_buy_cr": 16392.9,
+      "fpi_sell_cr": 16975.89,
+      "fpi_net_cr": -582.99,
+      "dii_buy_cr": 18130.76,
+      "dii_sell_cr": 16621.72,
+      "dii_net_cr": 1509.04
+    },
+    {
+      "date": "2026-09-10",
+      "fpi_buy_cr": 11882.95,
+      "fpi_sell_cr": 12321.19,
+      "fpi_net_cr": -438.24,
+      "dii_buy_cr": 13326.33,
+      "dii_sell_cr": 12300.48,
+      "dii_net_cr": 1025.85
+    },
+    {
+      "date": "2026-09-11",
+      "fpi_buy_cr": 12616.89,
+      "fpi_sell_cr": 13547.79,
+      "fpi_net_cr": -930.9,
+      "dii_buy_cr": 15109.58,
+      "dii_sell_cr": 13141.41,
+      "dii_net_cr": 1968.17
+    },
+    {
+      "date": "2026-09-15",
+      "fpi_buy_cr": 13194.76,
+      "fpi_sell_cr": 16172.62,
+      "fpi_net_cr": -2977.86,
+      "dii_buy_cr": 15221.98,
+      "dii_sell_cr": 12535.93,
+      "dii_net_cr": 2686.05
+    },
+    {
+      "date": "2026-09-16",
+      "fpi_buy_cr": 12959.04,
+      "fpi_sell_cr": 14991.65,
+      "fpi_net_cr": -2032.61,
+      "dii_buy_cr": 15279.59,
+      "dii_sell_cr": 11371.36,
+      "dii_net_cr": 3908.23
+    },
+    {
+      "date": "2026-09-17",
+      "fpi_buy_cr": 8761.71,
+      "fpi_sell_cr": 11970.47,
+      "fpi_net_cr": -3208.76,
+      "dii_buy_cr": 14105.01,
+      "dii_sell_cr": 10487.26,
+      "dii_net_cr": 3617.75
+    },
+    {
+      "date": "2026-09-18",
+      "fpi_buy_cr": 38461.63,
+      "fpi_sell_cr": 37862.09,
+      "fpi_net_cr": 599.54,
+      "dii_buy_cr": 17310.04,
+      "dii_sell_cr": 16290.35,
+      "dii_net_cr": 1019.69
+    },
+    {
+      "date": "2026-09-21",
+      "fpi_buy_cr": 10637.17,
+      "fpi_sell_cr": 11213.37,
+      "fpi_net_cr": -576.2,
+      "dii_buy_cr": 14098.64,
+      "dii_sell_cr": 11301.37,
+      "dii_net_cr": 2797.27
+    },
+    {
+      "date": "2026-09-22",
+      "fpi_buy_cr": 9845.81,
+      "fpi_sell_cr": 13655.8,
+      "fpi_net_cr": -3809.99,
+      "dii_buy_cr": 14599.72,
+      "dii_sell_cr": 10479.65,
+      "dii_net_cr": 4120.07
+    },
+    {
+      "date": "2026-09-23",
+      "fpi_buy_cr": 13580.4,
+      "fpi_sell_cr": 11962.95,
+      "fpi_net_cr": 1617.45,
+      "dii_buy_cr": 14404.9,
+      "dii_sell_cr": 12063.44,
+      "dii_net_cr": 2341.46
+    },
+    {
+      "date": "2026-09-24",
+      "fpi_buy_cr": 13111.22,
+      "fpi_sell_cr": 18138.58,
+      "fpi_net_cr": -5027.36,
+      "dii_buy_cr": 18196.9,
+      "dii_sell_cr": 13895.72,
+      "dii_net_cr": 4301.18
+    },
+    {
+      "date": "2026-09-25",
+      "fpi_buy_cr": 12327.36,
+      "fpi_sell_cr": 16021.29,
+      "fpi_net_cr": -3693.93,
+      "dii_buy_cr": 14035.77,
+      "dii_sell_cr": 11197.6,
+      "dii_net_cr": 2838.17
+    },
+    {
+      "date": "2026-09-28",
+      "fpi_buy_cr": 9047.56,
+      "fpi_sell_cr": 14400.78,
+      "fpi_net_cr": -5353.22,
+      "dii_buy_cr": 15918.32,
+      "dii_sell_cr": 10729.3,
+      "dii_net_cr": 5189.02
+    },
+    {
+      "date": "2026-09-29",
+      "fpi_buy_cr": 22472.7,
+      "fpi_sell_cr": 32452.92,
+      "fpi_net_cr": -9980.22,
+      "dii_buy_cr": 46261.11,
+      "dii_sell_cr": 39308.4,
+      "dii_net_cr": 6952.71
+    },
+    {
+      "date": "2026-09-30",
+      "fpi_buy_cr": 14967.82,
+      "fpi_sell_cr": 25116.23,
+      "fpi_net_cr": -10148.41,
+      "dii_buy_cr": 24413.76,
+      "dii_sell_cr": 13142.03,
+      "dii_net_cr": 11271.73
+    },
+    {
+      "date": "2026-10-01",
+      "fpi_buy_cr": 12260.26,
+      "fpi_sell_cr": 21744.48,
+      "fpi_net_cr": -9484.22,
+      "dii_buy_cr": 25420.04,
+      "dii_sell_cr": 15378.2,
+      "dii_net_cr": 10041.84
+    },
+    {
+      "date": "2026-10-05",
+      "fpi_buy_cr": 15674.61,
+      "fpi_sell_cr": 20373.75,
+      "fpi_net_cr": -4699.14,
+      "dii_buy_cr": 20492.93,
+      "dii_sell_cr": 15311.31,
+      "dii_net_cr": 5181.62
+    },
+    {
+      "date": "2026-10-06",
+      "fpi_buy_cr": 11258.72,
+      "fpi_sell_cr": 14220.02,
+      "fpi_net_cr": -2961.3,
+      "dii_buy_cr": 20146.4,
+      "dii_sell_cr": 15057.48,
+      "dii_net_cr": 5088.92
+    },
+    {
+      "date": "2026-10-07",
+      "fpi_buy_cr": 12577.96,
+      "fpi_sell_cr": 18699.33,
+      "fpi_net_cr": -6121.37,
+      "dii_buy_cr": 18707.03,
+      "dii_sell_cr": 14110.46,
+      "dii_net_cr": 4596.57
+    },
+    {
+      "date": "2026-10-08",
+      "fpi_buy_cr": 15725.45,
+      "fpi_sell_cr": 28669.03,
+      "fpi_net_cr": -12943.58,
+      "dii_buy_cr": 22987.97,
+      "dii_sell_cr": 12284.86,
+      "dii_net_cr": 10703.11
+    },
+    {
+      "date": "2026-10-09",
+      "fpi_buy_cr": 10373.99,
+      "fpi_sell_cr": 13942.89,
+      "fpi_net_cr": -3568.9,
+      "dii_buy_cr": 15626.53,
+      "dii_sell_cr": 10883.27,
+      "dii_net_cr": 4743.26
+    },
+    {
+      "date": "2026-10-12",
+      "fpi_buy_cr": 12583.21,
+      "fpi_sell_cr": 14291.69,
+      "fpi_net_cr": -1708.48,
+      "dii_buy_cr": 15506.73,
+      "dii_sell_cr": 12461.71,
+      "dii_net_cr": 3045.02
+    },
+    {
+      "date": "2026-10-13",
+      "fpi_buy_cr": 13465.39,
+      "fpi_sell_cr": 14770.52,
+      "fpi_net_cr": -1305.13,
+      "dii_buy_cr": 16232.97,
+      "dii_sell_cr": 13793.73,
+      "dii_net_cr": 2439.24
+    },
+    {
+      "date": "2026-10-14",
+      "fpi_buy_cr": 16381.85,
+      "fpi_sell_cr": 18239.29,
+      "fpi_net_cr": -1857.44,
+      "dii_buy_cr": 17428.61,
+      "dii_sell_cr": 14758.17,
+      "dii_net_cr": 2670.44
+    },
+    {
+      "date": "2026-10-15",
+      "fpi_buy_cr": 12735.59,
+      "fpi_sell_cr": 18020.96,
+      "fpi_net_cr": -5285.37,
+      "dii_buy_cr": 19438.65,
+      "dii_sell_cr": 16119.26,
+      "dii_net_cr": 3319.39
+    },
+    {
+      "date": "2026-10-16",
+      "fpi_buy_cr": 19951.59,
+      "fpi_sell_cr": 18785.67,
+      "fpi_net_cr": 1165.92,
+      "dii_buy_cr": 17201.8,
+      "dii_sell_cr": 20863.08,
+      "dii_net_cr": -3661.28
+    },
+    {
+      "date": "2026-10-19",
+      "fpi_buy_cr": 11240.64,
+      "fpi_sell_cr": 12389.28,
+      "fpi_net_cr": -1148.64,
+      "dii_buy_cr": 14781.31,
+      "dii_sell_cr": 11580.12,
+      "dii_net_cr": 3201.19
+    },
+    {
+      "date": "2026-10-21",
+      "fpi_buy_cr": 17003.9,
+      "fpi_sell_cr": 15981.58,
+      "fpi_net_cr": 1022.32,
+      "dii_buy_cr": 14931.57,
+      "dii_sell_cr": 13317.25,
+      "dii_net_cr": 1614.32
+    },
+    {
+      "date": "2026-10-22",
+      "fpi_buy_cr": 13627.54,
+      "fpi_sell_cr": 17086.24,
+      "fpi_net_cr": -3458.7,
+      "dii_buy_cr": 16242.83,
+      "dii_sell_cr": 13351.51,
+      "dii_net_cr": 2891.32
+    },
+    {
+      "date": "2026-10-23",
+      "fpi_buy_cr": 14445.54,
+      "fpi_sell_cr": 13557.89,
+      "fpi_net_cr": 887.65,
+      "dii_buy_cr": 19232.31,
+      "dii_sell_cr": 15996.95,
+      "dii_net_cr": 3235.36
+    },
+    {
+      "date": "2026-10-26",
+      "fpi_buy_cr": 9324.9,
+      "fpi_sell_cr": 10787.39,
+      "fpi_net_cr": -1462.49,
+      "dii_buy_cr": 17389.57,
+      "dii_sell_cr": 14780.0,
+      "dii_net_cr": 2609.57
+    },
+    {
+      "date": "2026-10-27",
+      "fpi_buy_cr": 24517.65,
+      "fpi_sell_cr": 20277.26,
+      "fpi_net_cr": 4240.39,
+      "dii_buy_cr": 15702.74,
+      "dii_sell_cr": 16952.77,
+      "dii_net_cr": -1250.03
+    },
+    {
+      "date": "2026-10-28",
+      "fpi_buy_cr": 16834.53,
+      "fpi_sell_cr": 15962.7,
+      "fpi_net_cr": 871.83,
+      "dii_buy_cr": 17240.9,
+      "dii_sell_cr": 16597.55,
+      "dii_net_cr": 643.35
+    },
+    {
+      "date": "2026-10-29",
+      "fpi_buy_cr": 13400.29,
+      "fpi_sell_cr": 14343.89,
+      "fpi_net_cr": -943.6,
+      "dii_buy_cr": 18458.64,
+      "dii_sell_cr": 16534.23,
+      "dii_net_cr": 1924.41
+    },
+    {
+      "date": "2026-10-30",
+      "fpi_buy_cr": 20564.02,
+      "fpi_sell_cr": 16965.48,
+      "fpi_net_cr": 3598.54,
+      "dii_buy_cr": 16643.55,
+      "dii_sell_cr": 17461.06,
+      "dii_net_cr": -817.51
+    },
+    {
+      "date": "2026-11-02",
+      "fpi_buy_cr": 16499.46,
+      "fpi_sell_cr": 13384.78,
+      "fpi_net_cr": 3114.68,
+      "dii_buy_cr": 14988.48,
+      "dii_sell_cr": 15380.68,
+      "dii_net_cr": -392.2
+    },
+    {
+      "date": "2026-11-03",
+      "fpi_buy_cr": 20970.51,
+      "fpi_sell_cr": 14133.7,
+      "fpi_net_cr": 6836.81,
+      "dii_buy_cr": 16723.91,
+      "dii_sell_cr": 20402.76,
+      "dii_net_cr": -3678.85
+    },
+    {
+      "date": "2026-11-04",
+      "fpi_buy_cr": 21607.38,
+      "fpi_sell_cr": 14323.35,
+      "fpi_net_cr": 7284.03,
+      "dii_buy_cr": 16392.82,
+      "dii_sell_cr": 20105.05,
+      "dii_net_cr": -3712.23
+    },
+    {
+      "date": "2026-11-05",
+      "fpi_buy_cr": 31797.86,
+      "fpi_sell_cr": 16823.18,
+      "fpi_net_cr": 14974.68,
+      "dii_buy_cr": 22168.28,
+      "dii_sell_cr": 32612.82,
+      "dii_net_cr": -10444.54
+    }
+  ],
+  "observations_path": "derived/b799e54364dda627aa424a87666a621eb719c5a4cd87db0fc82188a4fb45ee87.csv",
+  "observations_sha256": "b799e54364dda627aa424a87666a621eb719c5a4cd87db0fc82188a4fb45ee87"
+}

@@ -1286,55 +1286,103 @@ def chart_investment_rate(output_dir):
     return fp
 
 
-def chart_risk_appetite(output_dir):
-    """Smallcap/large-cap price-index ratio; no network calls or imputed dates."""
-    from data.processors.nse_indices import ROOT, load_risk_appetite
+def chart_options_risk_premium(output_dir):
+    """India VIX versus realized volatility, with NIFTY drawdown below."""
     import os
-    fp = output_dir / '21_india_risk_appetite.png'
+    import matplotlib.ticker as mticker
+    from data.processors.nse_options_risk_premium import (
+        CHART_DAYS, load_risk_premium,
+    )
+
+    fp = output_dir / "21_india_risk_appetite.png"
     try:
-        if os.environ.get('NSE_RISK_UPDATE_FAILED') == 'true':
-            raise ValueError('Saturday NSE refresh failed')
-        panel, meta = load_risk_appetite()
-        if (pd.Timestamp.now().normalize()-pd.Timestamp(meta['last_date'])).days > 10:
-            raise ValueError('Last matched NSE close is more than ten days old')
+        if os.environ.get("NSE_OPTIONS_RISK_UPDATE_FAILED") == "true":
+            raise ValueError("NSE daily VIX refresh failed")
+        panel, meta = load_risk_premium()
+        if (pd.Timestamp.now().normalize() - pd.Timestamp(meta["last_date"])).days > 10:
+            raise ValueError("Latest NSE India VIX close is more than ten days old")
+        last = panel.index[-1]
+        panel = panel.loc[panel.index >= last - pd.Timedelta(days=CHART_DAYS)]
+        panel = panel.dropna(subset=["realized_vol_pct", "implied_minus_realized_pp", "drawdown_pct"])
+        if len(panel) < 100:
+            raise ValueError("Fewer than 100 matched daily observations in the chart window")
     except (ValueError, OSError, KeyError) as exc:
         fp.unlink(missing_ok=True)
-        print(f'   WARNING: Risk Appetite omitted — {exc}')
+        print(f"   WARNING: Options Risk Premium omitted — {exc}")
         return None
-    values = panel["relative_100"]
-    first, last = values.index[0], values.index[-1]
-    fig, ax = EconStyle.create_figure(size="wide")
-    color = "#B91C1C"
-    # Use the union only for rendering gaps: no value exists on an unmatched date.
-    dates = values.index.union(pd.DatetimeIndex(meta["unmatched_dates"]))
-    ax.plot(dates, values.reindex(dates), color=color, linewidth=2.35,
-            solid_capstyle="round", solid_joinstyle="round", zorder=4)
-    ax.axhline(100, color=EconStyle.INK_MUTED, linewidth=0.8,
-               linestyle=(0, (4, 4)), alpha=0.65, zorder=2)
-    ax.scatter([last], [values.iloc[-1]], s=46, color=color,
-               edgecolors="white", linewidths=1.1, zorder=6)
-    ax.annotate(f"{values.iloc[-1]:.1f}", (last, values.iloc[-1]), xytext=(9, 0),
-                textcoords="offset points", fontsize=11, fontweight="bold",
-                color=color, va="center", annotation_clip=False)
-    ax.text(0.015, 0.96, "Rising = small caps outperform", transform=ax.transAxes,
-            va="top", fontsize=9, color=EconStyle.INK_MUTED)
-    ax.set_xlim(first - pd.Timedelta(days=45), last + pd.Timedelta(days=220))
-    ax.set_ylim(np.floor(values.min() / 10) * 10 - 5, np.ceil(values.max() / 10) * 10 + 10)
-    ax.xaxis.set_major_locator(mdates.YearLocator(2))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-    ax.set_ylabel("Relative performance", fontsize=EconStyle.FONT_SIZE_AXIS,
+
+    first, last = panel.index[0], panel.index[-1]
+    fig, axes = EconStyle.create_figure(
+        size="wide", nrows=2, ncols=1, sharex=True,
+        gridspec_kw={"height_ratios": [1.7, 1.0], "hspace": 0.12},
+    )
+    implied_color = EconStyle.LINE_MAROON
+    realized_color = EconStyle.LINE_BLUE
+    drawdown_color = EconStyle.LINE_RUPEE
+    normal_color = C_FPI_POS
+    unusual_color = C_FPI_NEG
+    x_right = last + pd.Timedelta(days=7)
+
+    ax = axes[0]
+    implied = panel["india_vix_close"].to_numpy()
+    realized = panel["realized_vol_pct"].to_numpy()
+    gap = panel["implied_minus_realized_pp"].to_numpy()
+    ax.fill_between(panel.index, realized, implied, where=(gap >= 0),
+                    color=normal_color, alpha=0.13, interpolate=True, zorder=1)
+    ax.fill_between(panel.index, realized, implied, where=(gap < 0),
+                    color=unusual_color, alpha=0.13, interpolate=True, zorder=1)
+    ax.plot(panel.index, panel["india_vix_close"], color=implied_color,
+            linewidth=2.2, label="India VIX · implied", zorder=3)
+    ax.plot(panel.index, panel["realized_vol_pct"], color=realized_color,
+            linewidth=2.0, label="NIFTY 50 · realized", zorder=3)
+    ax.scatter([last], [panel["india_vix_close"].iloc[-1]], s=32,
+               color=implied_color, edgecolors="white", linewidths=0.9, zorder=6)
+    ax.scatter([last], [panel["realized_vol_pct"].iloc[-1]], s=32,
+               color=realized_color, edgecolors="white", linewidths=0.9, zorder=6)
+    ax.set_ylabel("Annualized volatility (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
                   fontweight="bold", color=EconStyle.INK)
-    for sp in ("top", "right", "left"):
-        ax.spines[sp].set_visible(False)
-    EconStyle.set_title(ax, "Indian Risk Appetite",
-                        f"NIFTY Smallcap 250 / NIFTY 50 · price indices · {first:%d %b %Y} = 100")
-    EconStyle.add_top_rule(ax)
-    fig.tight_layout(rect=[.02, .04, .98, .96])
-    EconStyle.add_source(fig, "NSE Indices · daily closing values",
-                         date_text=f"Through {last:%d %b %Y}")
-    fp = output_dir / "21_india_risk_appetite.png"
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda value, _: f"{value:.0f}%"))
+    ax.legend(loc="upper left", frameon=False, ncol=2, fontsize=8.5,
+              handlelength=2.1, columnspacing=1.4)
+    ax.set_ylim(0, max(20, np.ceil(panel[["india_vix_close", "realized_vol_pct"]].max().max() / 5) * 5 + 3))
+
+    ax = axes[1]
+    drawdown = panel["drawdown_pct"]
+    ax.axhline(0, color=EconStyle.INK_MUTED, linewidth=0.8,
+               linestyle=(0, (4, 3)), alpha=0.7, zorder=2)
+    ax.fill_between(panel.index, drawdown.to_numpy(), 0,
+                    where=(drawdown.to_numpy() < 0), color=drawdown_color,
+                    alpha=0.11, interpolate=True, zorder=1)
+    ax.plot(panel.index, drawdown, color=drawdown_color,
+            linewidth=1.8, zorder=3)
+    ax.scatter([last], [drawdown.iloc[-1]], s=30, color=drawdown_color,
+               edgecolors="white", linewidths=0.9, zorder=5)
+    ax.set_ylabel("NIFTY 50\ndrawdown (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                  fontweight="bold", color=EconStyle.INK)
+    ax.set_ylim(min(-1, np.floor(drawdown.min() / 5) * 5 - 2), 1)
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    ax.set_xlim(first - pd.Timedelta(days=5), x_right)
+
+    for axis in axes:
+        axis.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=0.7, alpha=0.65)
+        axis.tick_params(axis="both", labelsize=EconStyle.FONT_SIZE_TICK,
+                         colors=EconStyle.INK_MUTED, length=0, pad=5)
+        for spine in ("top", "right", "left"):
+            axis.spines[spine].set_visible(False)
+    axes[0].tick_params(labelbottom=False)
+    EconStyle.set_title(
+        axes[0], "India VIX and Realized Volatility Dynamics",
+        "Comparing options market expectations against realized volatility alongside the market drawdowns",
+    )
+    EconStyle.add_top_rule(axes[0])
+    fig.tight_layout(rect=[.02, .04, .98, .96], h_pad=.15)
+    EconStyle.add_source(
+        fig, "NSE daily index closes · India VIX and NIFTY 50",
+        date_text=f"Through {last:%d %b %Y}",
+    )
     EconStyle.save_chart(fig, fp)
-    print("   ✓ Indian Risk Appetite")
+    print(f"   ✓ Options Risk Premium ({first:%d %b %Y} to {last:%d %b %Y})")
     return fp
 
 
@@ -1831,16 +1879,11 @@ def chart_fpi_flows(df, output_dir, today=None):
         completed_dates = df_completed["date"].tolist()
         completed_vals = df_completed[col].values
 
-        try:
-            completed_colors = [
-                C_FPI_POS if v >= 0 else C_FPI_NEG
-                for v in completed_vals
-            ]
-        except NameError:
-            completed_colors = [
-                "#10B981" if v >= 0 else "#EF4444"
-                for v in completed_vals
-            ]
+        completed_colors = [
+            EconStyle.CATEGORICAL_COLORS[2] if v >= 0
+            else EconStyle.CATEGORICAL_COLORS[7]
+            for v in completed_vals
+        ]
 
         ax.bar(
             completed_dates,
@@ -1848,7 +1891,8 @@ def chart_fpi_flows(df, output_dir, today=None):
             width=20,
             color=completed_colors,
             alpha=0.9,
-            edgecolor="none",
+            edgecolor="#333333",
+            linewidth=1.0,
             zorder=3,
         )
 
@@ -1866,7 +1910,8 @@ def chart_fpi_flows(df, output_dir, today=None):
             width=20,
             color="#9CA3AF",
             alpha=0.9,
-            edgecolor="none",
+            edgecolor="#333333",
+            linewidth=1.0,
             zorder=3,
         )
 
@@ -1958,6 +2003,244 @@ def chart_fpi_flows(df, output_dir, today=None):
     EconStyle.save_chart(fig, fp)
 
     print("   ✓ FPI Flows (Monthly, NSDL)")
+    return fp
+
+
+def chart_nifty_downside_skew(output_dir):
+    """Three-year weekly NIFTY option skew with the matching index drawdown."""
+    import json
+    import os
+    import matplotlib.ticker as mticker
+    from data.processors.nse_nifty_downside_skew import (
+        HISTORY_MONTHS, load_nifty_close_history, load_skew,
+    )
+
+    fp = output_dir / "05_india_nifty_downside_skew.png"
+    try:
+        if os.environ.get("NSE_DOWNSIDE_SKEW_UPDATE_FAILED") == "true":
+            raise ValueError("NSE NIFTY options refresh failed")
+        daily, metadata = load_skew()
+        last = daily.index[-1]
+        if (pd.Timestamp.now().normalize() - last).days > 10:
+            raise ValueError("Latest NIFTY downside-skew observation is more than ten days old")
+        daily = daily.loc[daily.index >= last - pd.DateOffset(months=HISTORY_MONTHS)]
+        weekly = daily.groupby(daily.index.to_period("W-FRI"), sort=True).tail(1).copy()
+        if len(weekly) < 140:
+            raise ValueError(f"Only {len(weekly)} complete weeks are available; at least 140 are required")
+        if not np.isfinite(weekly["downside_skew_pp"].to_numpy(dtype=float)).all():
+            raise ValueError("NIFTY downside-skew series contains non-finite values")
+        nifty = load_nifty_close_history()
+        nifty_drawdown = (
+            nifty / nifty.rolling(252, min_periods=252).max() - 1
+        ) * 100
+        weekly["drawdown_pct"] = nifty_drawdown.reindex(weekly.index)
+        if weekly["drawdown_pct"].isna().any():
+            raise ValueError("NIFTY 50 drawdown history does not cover every skew observation")
+    except (ValueError, OSError, KeyError, json.JSONDecodeError) as exc:
+        fp.unlink(missing_ok=True)
+        print(f"   WARNING: NIFTY downside skew omitted — {exc}")
+        return None
+
+    first, last = weekly.index[0], weekly.index[-1]
+    latest_value = float(weekly["downside_skew_pp"].iloc[-1])
+    latest_drawdown = float(weekly["drawdown_pct"].iloc[-1])
+    median = float(weekly["downside_skew_pp"].median())
+    q25, q75 = weekly["downside_skew_pp"].quantile([.25, .75])
+    fig, axes = EconStyle.create_figure(
+        size="wide", nrows=2, ncols=1, sharex=True,
+        gridspec_kw={"height_ratios": [1.7, 1.0], "hspace": 0.12},
+    )
+    color = EconStyle.LINE_MAROON
+    ax = axes[0]
+    ax.axhspan(float(q25), float(q75), color=color, alpha=.08, zorder=0)
+    ax.axhline(median, color=EconStyle.INK_MUTED, linewidth=.85,
+               linestyle=(0, (2, 2)), alpha=.9, zorder=2)
+    ax.plot(weekly.index, weekly["downside_skew_pp"], color=color,
+            linewidth=2.0, marker="o", markersize=3.3, zorder=4)
+    ax.scatter([last], [latest_value], s=34, color=color,
+               edgecolors="white", linewidths=.9, zorder=5)
+    # A dark, solid zero line makes the put-rich / call-rich sign change easy to spot.
+    ax.axhline(0, color=EconStyle.INK, linewidth=1.5, zorder=4)
+    ax.annotate(f"{latest_value:+.1f} pp", xy=(last, latest_value),
+                xytext=(8, 1), textcoords="offset points", va="center",
+                fontsize=8.5, fontweight="bold", color=color,
+                annotation_clip=False)
+    ax.text(.012, .965,
+            f"36-month median {median:+.1f} pp  ·  shaded band: 25th–75th percentile",
+            transform=ax.transAxes, va="top", ha="left",
+            fontsize=8.2, color=EconStyle.INK_MUTED)
+    ax.set_ylabel("25Δ put IV − call IV (volatility pp)",
+                  fontsize=EconStyle.FONT_SIZE_AXIS, fontweight="bold",
+                  color=EconStyle.INK)
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda value, _: f"{value:+.0f}" if value else "0"))
+    ax.set_xlim(first - pd.Timedelta(days=7), last + pd.Timedelta(days=14))
+    low = min(float(weekly["downside_skew_pp"].min()), float(q25), 0)
+    high = max(float(weekly["downside_skew_pp"].max()), float(q75), 0)
+    span = max(high - low, 2.0)
+    ax.set_ylim(low - .11 * span, high + .22 * span)
+
+    ax = axes[1]
+    drawdown = weekly["drawdown_pct"]
+    drawdown_color = EconStyle.LINE_RUPEE
+    ax.axhline(0, color=EconStyle.INK_MUTED, linewidth=.8,
+               linestyle=(0, (4, 3)), alpha=.7, zorder=2)
+    ax.fill_between(weekly.index, drawdown.to_numpy(), 0,
+                    where=(drawdown.to_numpy() < 0), color=drawdown_color,
+                    alpha=.11, interpolate=True, zorder=1)
+    ax.plot(weekly.index, drawdown, color=drawdown_color,
+            linewidth=1.8, zorder=3)
+    ax.scatter([last], [latest_drawdown], s=30, color=drawdown_color,
+               edgecolors="white", linewidths=.9, zorder=5)
+    ax.set_ylabel("NIFTY 50\ndrawdown (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                  fontweight="bold", color=EconStyle.INK)
+    ax.set_ylim(min(-1, np.floor(drawdown.min() / 5) * 5 - 2), 1)
+    ax.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    for axis in axes:
+        axis.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=.7, alpha=.65)
+        axis.tick_params(axis="both", labelsize=EconStyle.FONT_SIZE_TICK,
+                         colors=EconStyle.INK_MUTED, length=0, pad=5)
+        for spine in ("top", "right", "left"):
+            axis.spines[spine].set_visible(False)
+    axes[0].tick_params(labelbottom=False)
+    EconStyle.set_title(
+        axes[0], "NIFTY 50 Downside Volatility Skew",
+        "Tracking the premium of put options over call options alongside index drawdowns",
+    )
+    EconStyle.add_top_rule(axes[0])
+    fig.tight_layout(rect=[.02, .04, .98, .96], h_pad=.15)
+    EconStyle.add_source(
+        fig, "NSE F&O bhavcopy archive · NSE NIFTY 50 closes · Black–Scholes implied volatility",
+        date_text=f"Through {last:%d %b %Y}",
+    )
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ NIFTY downside skew ({len(weekly)} weeks; {first:%d %b %Y} to {last:%d %b %Y})")
+    return fp
+
+
+def chart_institutional_flows_weekly(output_dir):
+    """Weekly NSE FPI/DII cash flows alongside NIFTY 50 weekly returns."""
+    import os
+    import json
+    import matplotlib.ticker as mticker
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    from data.processors.nse_institutional_flows import load, weekly
+    from data.processors.nse_options_risk_premium import load_history as load_nse_daily_indices
+
+    fp = output_dir / "04_india_institutional_flows_weekly.png"
+    try:
+        if os.environ.get("NSE_INSTITUTIONAL_FLOWS_UPDATE_FAILED") == "true":
+            raise ValueError("NSE institutional-flow refresh failed")
+        daily, metadata = load()
+        last = daily.index[-1]
+        if (pd.Timestamp.now().normalize() - last).days > 7:
+            raise ValueError("Latest daily institutional-flow observation is more than seven days old")
+        nifty_reports, _ = load_nse_daily_indices()
+        nifty = nifty_reports["nifty50_close"]
+        start = last - pd.DateOffset(months=6)
+        daily = daily.loc[daily.index >= start]
+        expected_sessions = nifty.index[(nifty.index >= daily.index[0]) & (nifty.index <= last)]
+        missing_sessions = expected_sessions.difference(daily.index)
+        unmatched_flows = daily.index.difference(nifty.index)
+        if len(missing_sessions) or len(unmatched_flows):
+            missing_text = ", ".join(str(day.date()) for day in missing_sessions[:4])
+            extra_text = ", ".join(str(day.date()) for day in unmatched_flows[:4])
+            raise ValueError(
+                f"Institutional flow dates do not match NSE sessions; missing [{missing_text}], "
+                f"unmatched [{extra_text}]"
+            )
+        flows = weekly(daily)
+        returns = {}
+        flow_weeks = daily.index.to_period("W-FRI")
+        for week_end in flows.index:
+            dates = daily.index[flow_weeks == week_end.to_period("W-FRI")]
+            first_session, last_session = dates[0], dates[-1]
+            prior_closes = nifty.loc[nifty.index < first_session]
+            week_closes = nifty.loc[nifty.index <= last_session]
+            if prior_closes.empty or week_closes.empty or week_closes.index[-1] != last_session:
+                continue
+            returns[week_end] = (week_closes.iloc[-1] / prior_closes.iloc[-1] - 1) * 100
+        returns = pd.Series(returns, name="nifty_return_pct")
+        panel = flows.join(returns, how="inner")
+        panel = panel.dropna(subset=["fpi_net_cr", "dii_net_cr", "nifty_return_pct"])
+        if len(panel) < 20:
+            raise ValueError(f"Only {len(panel)} complete weeks are available; at least 20 are required")
+    except (ValueError, OSError, KeyError, json.JSONDecodeError) as exc:
+        fp.unlink(missing_ok=True)
+        print(f"   WARNING: Weekly FPI/DII flows omitted — {exc}")
+        return None
+
+    fig, ax = EconStyle.create_figure(size="wide")
+    x = mdates.date2num(panel.index.to_pydatetime())
+    width = 2.4
+    fpi = panel["fpi_net_cr"].to_numpy() / 1000
+    dii = panel["dii_net_cr"].to_numpy() / 1000
+    # Use fixed series colors regardless of sign, so the bars identify investor
+    # groups without implying that buying is good or selling is bad.
+    fpi_color = "#D97706"  # Food Inflation bar in India's Inflation Dynamics
+    dii_color = "#A070E0"  # IIP monthly series color
+    ax.bar(x - width / 2, fpi, width=width, color=fpi_color,
+           alpha=0.86, edgecolor="#333333", linewidth=1.0, zorder=2)
+    ax.bar(x + width / 2, dii, width=width, color=dii_color,
+           alpha=0.86, edgecolor="#333333", linewidth=1.0, zorder=2)
+    ax.axhline(0, color=EconStyle.INK, linewidth=0.95, zorder=2)
+    ax.set_ylabel("Net cash flows (₹ thousand crore)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                  fontweight="bold", color=EconStyle.INK)
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda value, _: f"{value:+.0f}" if value else "0"))
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=0.7, alpha=0.65, zorder=0)
+
+    ax_ret = ax.twinx()
+    ax_ret.plot(panel.index, panel["nifty_return_pct"], color=EconStyle.LINE_BLUE,
+                linewidth=1.65, marker="o", markersize=3.2, label="NIFTY 50 weekly return", zorder=5)
+    ax_ret.axhline(0, color=EconStyle.LINE_BLUE, linewidth=0.65, alpha=0.28, zorder=1)
+    ax_ret.set_ylabel("NIFTY 50 weekly return (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
+                      fontweight="bold", color=EconStyle.LINE_BLUE)
+    ax_ret.yaxis.set_major_formatter(mticker.FuncFormatter(lambda value, _: f"{value:+.0f}%" if value else "0%"))
+    ax_ret.tick_params(axis="y", labelsize=EconStyle.FONT_SIZE_TICK,
+                       colors=EconStyle.LINE_BLUE, length=0, pad=5)
+    ax_ret.spines["right"].set_visible(False)
+
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=15, interval=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
+    ax.set_xlim(panel.index[0] - pd.Timedelta(days=8), panel.index[-1] + pd.Timedelta(days=8))
+    for axis in (ax, ax_ret):
+        axis.tick_params(axis="x", labelsize=EconStyle.FONT_SIZE_TICK,
+                         colors=EconStyle.INK_MUTED, length=0, pad=5)
+        for spine in ("top", "left"):
+            axis.spines[spine].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax_ret.spines["left"].set_visible(False)
+    # Reserve a dedicated subcaption band between the subtitle and plot. The
+    # series key lives in that band, outside the data area and within the chart.
+    fig.text(.075, .965, "Foreign and Domestic Institutional Flows",
+             fontproperties=EconStyle._get_font("bold"),
+             fontsize=EconStyle.FONT_SIZE_TITLE, color=EconStyle.TEXT_TITLE,
+             va="top", ha="left")
+    fig.text(.075, .908, "Weekly net cash-market activity",
+             fontproperties=EconStyle._get_font("regular"),
+             fontsize=EconStyle.FONT_SIZE_SUBTITLE, color=EconStyle.TEXT_SECONDARY,
+             va="top", ha="left")
+    legend_handles = [
+        Patch(facecolor=dii_color, edgecolor="#333333", linewidth=1.0, label="DII"),
+        Patch(facecolor=fpi_color, edgecolor="#333333", linewidth=1.0, label="FPI / FII"),
+        Line2D([], [], color=EconStyle.LINE_BLUE, linewidth=1.65, marker="o",
+               markersize=3.2, label="NIFTY 50 weekly return"),
+    ]
+    fig.legend(handles=legend_handles, loc="center right", bbox_to_anchor=(.965, .89),
+               bbox_transform=fig.transFigure, frameon=False, ncol=3,
+               fontsize=8.5, handlelength=1.7, handletextpad=.55,
+               columnspacing=1.8, borderaxespad=0)
+    fig.add_artist(Line2D([.075, .965], [.855, .855], transform=fig.transFigure,
+                          color=EconStyle.RULE_HEAVY, linewidth=1.5))
+    fig.subplots_adjust(left=.075, right=.965, bottom=.11, top=.83)
+    EconStyle.add_source(
+        fig, "NSE FII/FPI & DII cash activity · historical archive backfill · NIFTY 50",
+        date_text=f"Through {last:%d %b %Y}",
+    )
+    EconStyle.save_chart(fig, fp)
+    print(f"   ✓ Weekly FPI/DII Flows ({len(panel)} weeks through {last:%d %b %Y})")
     return fp
 
 
@@ -3458,13 +3741,15 @@ def main():
     chart_pmi(df, output_dir)
     chart_investment_rate(output_dir)
     chart_gva_contributions(output_dir)
-    chart_risk_appetite(output_dir)
+    chart_options_risk_premium(output_dir)
+    chart_nifty_downside_skew(output_dir)
     chart_sector_valuations(output_dir)
     chart_sector_rotation_12m(output_dir)
     from data.processors.india_equity_matrix import generate as generate_equity_matrix
     generate_equity_matrix(output_dir)
     chart_gst(df, output_dir)
     chart_fpi_flows(df, output_dir)
+    chart_institutional_flows_weekly(output_dir)
     chart_inflation_bar(df, output_dir)
     from charts.india_charts.india_cpi_contributions import generate as chart_cpi_contributions
     chart_cpi_contributions(output_dir)

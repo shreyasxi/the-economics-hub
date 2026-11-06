@@ -597,11 +597,25 @@ The percentile is the share of valid historical multiples at or below the curren
 """,
 
     "india_risk_appetite": """\
-**How to read this chart:** The official NIFTY Smallcap 250 closing price index divided by the NIFTY 50 closing price index, rebased to 100 on the first matching date shown. A rising line means small caps outperform large caps over that interval. Above 100 means cumulative relative outperformance since the base date; it does not mean momentum is currently rising.
+**How to read this chart:** The upper panel compares India VIX with NIFTY 50 realized volatility. India VIX is NSE's annualized, option-implied expectation for volatility over the next 30 calendar days. Realized volatility is the annualized sample standard deviation of daily NIFTY 50 log returns over the trailing 30 calendar days. Both series are percentages on the same annualized scale. Green shading marks periods when implied volatility is above recent realized volatility; red marks periods when realized volatility is higher than the options market implied. This is a comparison of forward-looking implied volatility with past realized volatility, not a formal variance risk premium or a forecast of future volatility.
 
-**Method:** Only matching trading dates enter the calculation. No forward-filling, smoothing or constituent reconstruction. These are price indices, excluding dividend reinvestment. Raw official NSE Indices CSV exports, their checksums and source dates are retained separately from the calculated signal. This is a relative-leadership proxy for risk appetite, not market-wide breadth or a pure measure of investor sentiment.
+**Drawdown:** The lower panel shows the NIFTY 50 price index relative to its highest close over the trailing 252 trading sessions. It is a price-index drawdown, so dividends are excluded. Dates are matched observed NSE closes; missing dates are not forward-filled.
 
-**Source:** NSE Indices, Historical Data — https://www.niftyindices.com/reports/historical-data
+**Sources:** [India VIX methodology](https://www.nseindia.com/static/products-services/indices-indiavix-index) · [Historical VIX data](https://www.nseindia.com/reports-indices-historical-vix) · [NSE Indices historical data](https://www.niftyindices.com/reports/historical-data)
+""",
+    "india_institutional_flows_weekly": """\
+**How to read this chart:** Bars show the weekly sum of daily net cash-equity purchases by foreign portfolio investors (FPI/FII) and domestic institutional investors (DII), in ₹ thousand crore. Positive values are net buying; negative values are net selling. The blue line shows the NIFTY 50's close-to-close return for the same Friday-ending week.
+
+**Data note:** Daily exchange flow figures are provisional and can be revised. The six-month initial history is parsed from a public historical ledger and its latest observation is checked against NSE's daily endpoint; new observations are taken from NSE's daily endpoint. The historical rows and ongoing NSE figures should be read as a high-frequency market activity series, not final depository-confirmed FPI investment totals. Weekly flows and index returns can move together or diverge; the chart does not imply that flows caused the return.
+
+**Sources:** [NSE FII/FPI & DII activity](https://www.nseindia.com/reports/fii-dii) · [Historical archive](https://indmarket.in/fii-dii-activity)
+""",
+    "india_nifty_downside_skew": """\
+**How to read this chart:** The upper panel shows NIFTY 50's 30-calendar-day constant-maturity 25-delta put implied volatility minus call implied volatility, in volatility percentage points. Positive values mean comparable downside puts are priced at higher volatility than calls. Below zero, 25-delta calls are richer than puts; that can reflect upside-call demand or relatively less priced demand for downside hedging, but this measure alone does not establish that investors are greedy or unafraid. The solid dark zero line marks equal put and call volatility. The dashed reference and shaded band show the 36-month median and interquartile range. The lower panel shows NIFTY 50's drawdown from its trailing 252-session high.
+
+**Method:** Weekly observations use the final available NSE session in each Friday-ending week, over a rolling 36-month window. Implied volatility is solved from traded NSE daily close prices with Black–Scholes spot deltas (6% continuously compounded rate and 1.2% dividend-yield assumptions); 25-delta put and call volatilities are interpolated in total variance across expiries bracketing 30 calendar days. Legacy bhavcopies use the matching official NIFTY 50 spot close; UDiFF bhavcopies provide the underlying close. The archive refreshes in the India weekly workflow. Non-traded option rows are excluded.
+
+**Sources:** [NSE derivatives bhavcopy archive](https://www.nseindia.com/all-reports-derivatives) · [NIFTY 50 historical index closes](https://www.niftyindices.com/reports/historical-data)
 """,
     "india_gross_fixed_capital_formation": """\
 **How to read this chart:** The orange line shows India's annual gross fixed capital formation (GFCF) as a share of GDP — investment in fixed assets such as machinery, buildings and infrastructure. A higher ratio means a larger share of current economic output is being devoted to expanding or replacing the economy's productive capital stock. The dashed line is the long-run average, while the shaded band highlights the mid-2000s investment boom. The series is annual and unsmoothed.

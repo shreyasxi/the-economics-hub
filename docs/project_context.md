@@ -73,7 +73,7 @@ only after commit/push and a successful GitHub Actions run. Source code and work
   command/path instructions required it. Ignore rules and NSE byte-preservation attributes were checked locally.
   These checks establish local readiness, not successful deployment. Rollout and tracking discussion: §5.7.1–5.7.2.
 - **Saturday India job:** 08:00 UTC / 13:30 IST. GVA/IIP contract tests → `india_fetcher.py --append` (including GVA)
-  → official IIP industries/monthly PLFS/General IIP → RBI transmission → NSE checks/risk appetite/rotation/valuations → CPI checks/collector → main
+  → official IIP industries/monthly PLFS/General IIP → RBI transmission → NSE daily VIX/NIFTY checks, options risk premium, rotation and valuations → CPI checks/collector → main
   inflation bridge → CPI items/REER/external vulnerability → dashboard → RBI briefing → copy/prune/persist. Check `india.yml` for exact conditions:
   `skip_fetch` skips the initial India/IIP updates, but does not skip every independent source updater.
 - **Daily India monetary job:** standalone `rbi_monetary_conditions.yml`, daily 15:10 UTC / 20:40 IST,
@@ -105,8 +105,9 @@ only after commit/push and a successful GitHub Actions run. Source code and work
   `CPI_MANUAL_FALLBACK=true`. The separate six-bucket contribution chart uses verified base-2024 indices,
   weights, immutable responses and run manifests; its validity is independent of a main-CPI manual conflict.
 - **NSE:** valuation P/E starts Apr 2021, P/B uses up to ten years, and every sector needs at least 60 valid
-  observations. Risk appetite uses matched price-index closes, Smallcap 250 / NIFTY 50, rebased to 4 Oct 2016 = 100;
-  retained raw seed exports make the original ignored export folders unnecessary for routine updates. Valuations
+  observations. The retained Smallcap 250 / NIFTY 50 price-ratio history is legacy data; the India chart now compares
+  India VIX with trailing 30-calendar-day annualized NIFTY 50 realized volatility, its implied-minus-realized gap,
+  and the trailing 252-session drawdown. Retained raw seed exports make the original ignored export folders unnecessary for routine updates. Valuations
   use approved per-sector metrics and verified historical CSVs; generated coverage/extracted/metric-detail files
   are checksum dependencies of the production updater. Rotation uses the official snapshot timestamp as its
   observation date; `previousDay` is a previous-close reference. Require all sectors and NIFTY 50, consistent
@@ -581,6 +582,7 @@ words in the file name (§5.3). Where the data is typed by hand, §5.4 says how 
 | `16_india_forex_reserves` | India Forex Reserves | External Sector | `chart_forex_reserves` / `charts.india_charts.india_external.load_forex` | Reserves, weekly | canonical `data/stores/india/rbi_wss_reserves.csv`, RBI WSS |
 | `17_india_trade` | India Trade | External Sector | `chart_trade_balance` | Exports, imports, deficit | `india_exports_usd_bn`, `india_imports_usd_bn` (DBIE; verified official release supplement for missing months) |
 | `03_india_fpi_monthly` | India FPI Monthly | Equity Markets | `chart_fpi_flows` | Net foreign portfolio investment per month | NSDL only: completed-month `india_fpi_net_inr_cr` (official collector, ₹ crore; manual recovery), optional current-month MTD; no RBI fallback (`fpi_series()`) |
+| `04_india_institutional_flows_weekly` | Foreign and Domestic Institutional Flows | Equity Markets | `chart_institutional_flows_weekly` | Six months of Friday-ending weekly FPI/FII and DII net cash-market flows with NIFTY 50 weekly return | `data/stores/india/nse_institutional_flows/`; initial public historical ledger validated against latest NSE daily API observation; weekday NSE provisional daily collection |
 | `02_india_gst` | GST Revenue Growth | Fiscal Policy & Public Finances | `chart_gst` | Latest 12 months of gross/net YoY growth, excluding cess | `data/inputs/gst/gst_monthly.csv`, exact ₹ crore; official reports archived alongside |
 | `07_india_expenditure_quality` | India Expenditure Quality | Fiscal Policy & Public Finances | `chart_expenditure_quality` | Capital against revenue spending, year to date; capex Budget ÷ 12 line | `data/inputs/cag/cag_monthly_accounts.xlsx` + `data/inputs/cag/cag_manual_accounts.csv` |
 | `09_india_deficit_financing` | India Deficit Financing | Fiscal Policy & Public Finances | `chart_deficit_financing` | How the deficit is financed | `cag_manual_accounts.csv`, `fin_*` columns |
@@ -588,7 +590,7 @@ words in the file name (§5.3). Where the data is typed by hand, §5.4 says how 
 
 | `20_india_gross_fixed_capital_formation` | India Investment Rate | Growth & Activity | `chart_investment_rate` | Gross fixed capital formation as % of GDP | saved GMD CSV + JSON provenance |
 | `22_india_gva_contributions` | Real GVA contributions | Growth & Activity | `chart_gva_contributions` | Primary, secondary and tertiary contributions to real growth | official MoSPI constant-price GVA, base 2022–23 |
-| `21_india_risk_appetite` | Indian Risk Appetite | Equity Markets | `chart_risk_appetite` | Smallcap 250 / NIFTY 50 price ratio, rebased | verified `data/stores/india/nse_indices/` |
+| `21_india_risk_appetite` | India VIX and Realized Volatility Dynamics | Equity Markets | `chart_options_risk_premium` | India VIX vs trailing 30-calendar-day annualized NIFTY 50 realized volatility, shaded green when implied exceeds realized and red when realized exceeds implied; trailing 252-session drawdown below | verified `data/stores/india/nse_options_risk_premium/` and `data/stores/india/nse_indices/` |
 | `22_india_sector_valuations` | NIFTY Sector Valuations | Equity Markets | `chart_sector_valuations` | Current sector multiples against validated history | `data/stores/india/nse_valuations/` |
 | `23_india_sector_rotation_12m_benchmark` | NIFTY Sector Rotation | Equity Markets | `chart_sector_rotation_12m` | Trailing-year price returns with NIFTY 50 benchmark | official NSE snapshot; PNG + JSON sidecar |
 | `24_india_cpi_contributions` | What’s Driving Indian Inflation | Inflation | `charts.india_charts.india_cpi_contributions.generate` | Six buckets contributing to headline inflation | independent verified CPI 2024 store; PNG + JSON sidecar |
