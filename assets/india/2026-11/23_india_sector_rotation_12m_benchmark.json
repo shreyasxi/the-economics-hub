@@ -2,109 +2,109 @@
   "source_url": "https://www.nseindia.com/api/allIndices",
   "timestamp": "06-Nov-2026 15:30",
   "observation_date": "2026-11-06",
-  "previous_close_date": "2026-11-05",
-  "year_ago_date": "2025-11-04",
+  "previous_close_date": "2026-11-06",
+  "year_ago_date": "2025-11-06",
   "methodology": "round((last / oneYearAgoVal - 1) * 100, 2)",
   "return_type": "price; dividends excluded",
   "rows": [
     {
       "index": "NIFTY 50",
       "label": "NIFTY 50",
-      "return_pct": -2.22,
+      "return_pct": -1.88,
       "last": 25030.35,
-      "year_ago": 25597.65,
+      "year_ago": 25509.7,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY PHARMA",
       "label": "Pharma",
-      "return_pct": 25.1,
+      "return_pct": 25.57,
       "last": 27940.4,
-      "year_ago": 22334.45,
+      "year_ago": 22250.55,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY METAL",
       "label": "Metal",
-      "return_pct": 20.76,
+      "return_pct": 23.31,
       "last": 12678.15,
-      "year_ago": 10499.05,
+      "year_ago": 10281.9,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY AUTO",
       "label": "Auto",
-      "return_pct": 4.52,
+      "return_pct": 4.45,
       "last": 27811.8,
-      "year_ago": 26610.05,
+      "year_ago": 26626.5,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY PSU BANK",
       "label": "PSU Bank",
-      "return_pct": 3.37,
+      "return_pct": 4.02,
       "last": 8612.9,
-      "year_ago": 8332.3,
+      "year_ago": 8280.4,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
-    },
-    {
-      "index": "NIFTY BANK",
-      "label": "Bank Nifty",
-      "return_pct": 2.18,
-      "last": 59086.0,
-      "year_ago": 57827.05,
-      "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY ENERGY",
       "label": "Energy",
-      "return_pct": 1.62,
+      "return_pct": 2.87,
       "last": 36867.3,
-      "year_ago": 36278.4,
+      "year_ago": 35839.5,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
+    },
+    {
+      "index": "NIFTY BANK",
+      "label": "Bank Nifty",
+      "return_pct": 2.66,
+      "last": 59086.0,
+      "year_ago": 57554.25,
+      "observation_date": "2026-11-06",
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY INFRASTRUCTURE",
       "label": "Infra",
-      "return_pct": -1.1,
+      "return_pct": -0.44,
       "last": 9446.8,
-      "year_ago": 9551.45,
+      "year_ago": 9488.8,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
-    },
-    {
-      "index": "NIFTY IT",
-      "label": "IT",
-      "return_pct": -6.51,
-      "last": 32977.9,
-      "year_ago": 35274.55,
-      "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY REALTY",
       "label": "Realty",
-      "return_pct": -6.7,
+      "return_pct": -5.27,
       "last": 896.7,
-      "year_ago": 961.1,
+      "year_ago": 946.6,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
+    },
+    {
+      "index": "NIFTY IT",
+      "label": "IT",
+      "return_pct": -6.68,
+      "last": 32977.9,
+      "year_ago": 35337.6,
+      "observation_date": "2026-11-06",
+      "year_ago_date": "2025-11-06"
     },
     {
       "index": "NIFTY FMCG",
       "label": "FMCG",
-      "return_pct": -16.18,
+      "return_pct": -16.02,
       "last": 46785.6,
-      "year_ago": 55815.6,
+      "year_ago": 55711.75,
       "observation_date": "2026-11-06",
-      "year_ago_date": "2025-11-04"
+      "year_ago_date": "2025-11-06"
     }
   ]
 }
