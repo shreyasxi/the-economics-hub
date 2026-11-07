@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Fast Moving Consumer Goods",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-30T13:10:22.728337+00:00",
-  "window_start": "2026-04-15",
+  "collected_at": "2026-11-07T15:08:28.556150+00:00",
+  "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-15",
-  "flows_checked_through": "2026-10-15",
+  "flows_as_of": "2026-10-31",
+  "flows_checked_through": "2026-10-31",
   "universe_scope": "Fast Moving Consumer Goods members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-04-30",
-      "start": "2026-04-16",
-      "equity_flow_cr": -229.0,
-      "equity_flow_usd_m": -24.0,
-      "end_equity_auc_cr": 325861.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "opening_equity_auc_cr": 308167.0,
-      "flow_pct_opening_auc": -0.07431035769566502
-    },
     {
       "date": "2026-05-15",
       "start": "2026-05-01",
@@ -124,7 +114,7 @@
       "equity_flow_cr": -972.0,
       "equity_flow_usd_m": -101.0,
       "end_equity_auc_cr": 274596.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
       "opening_equity_auc_cr": 277635.0,
       "flow_pct_opening_auc": -0.35009995137500677
     },
@@ -134,9 +124,19 @@
       "equity_flow_cr": -8172.0,
       "equity_flow_usd_m": -860.0,
       "end_equity_auc_cr": 268394.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
       "opening_equity_auc_cr": 274596.0,
       "flow_pct_opening_auc": -2.9760083905082375
+    },
+    {
+      "date": "2026-10-31",
+      "start": "2026-10-16",
+      "equity_flow_cr": -1559.0,
+      "equity_flow_usd_m": -164.0,
+      "end_equity_auc_cr": 255495.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "opening_equity_auc_cr": 268394.0,
+      "flow_pct_opening_auc": -0.5808624633933694
     }
   ],
   "companies": [
@@ -2169,6 +2169,19 @@
         }
       ],
       "reference_price": 431.35
+    },
+    {
+      "symbol": "IGLSPIRITS",
+      "name": "IGL Spirits Ltd.",
+      "sector": "Fast Moving Consumer Goods",
+      "industry": "Fast Moving Consumer Goods",
+      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
+      "baskets": [
+        "niftymicrocap250",
+        "niftytotalmarket"
+      ],
+      "holdings": [],
+      "reference_price": null
     },
     {
       "symbol": "INDIAGLYCO",
@@ -5044,6 +5057,11 @@
       "sha256": "d098ba0111b14f6d351f88e37cc9553b3b355ec8eed4688437c1e48e6963ce33"
     },
     {
+      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IGLSPIRITS",
+      "file": "sources/filings-IGLSPIRITS.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=INDIAGLYCO",
       "file": "sources/filings-INDIAGLYCO.json",
       "sha256": "d7564e060637d7e330d3aa9c5dfd95ab7c2055c2930b05c074cee4f0839f920c"
@@ -5146,12 +5164,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "56695884f6a6482d58930d07522036af1f7b6615327a70f628b13cd7058ca3ca"
+      "sha256": "fbeed9875d0e535d100a5f76c9b8e4a4a4bc7ac830e66cf6463f3e3e0c8bbff5"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "d43b076112ebe7774db9378a5696ca9705420b9a3ffeede8b7411673caf134ed"
+      "sha256": "55a44446dca69b7bf4b7ff58bf45532c31b19c73b79a9f949bb745936c0ebd1d"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -5184,9 +5202,9 @@
       "sha256": "e5571d43029a894efdf0a9240bcdd8cfbcb3d155f56ea0ea0977a29f09be37aa"
     },
     {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
-      "file": "sources/nsdl-2026-10-15.html",
-      "sha256": "03df04abcc0b2b2344fbd25c0d1146280c1dae9ea5cbeaaa0bcfbad4f9afa0d5"
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "file": "sources/nsdl-2026-10-31.html",
+      "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -5194,5 +5212,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "ae022c3cd71545bac9f1dab3913b5147bed7c2f5dacf1198a8e84517877ccc97"
+  "digest": "45ae96f8ba2db65b2fc25810b2035d960af501777e38a82141e12926ce104e29"
 }

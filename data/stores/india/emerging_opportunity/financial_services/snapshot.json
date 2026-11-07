@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Financial Services",
   "as_of": "2026-09-30",
-  "collected_at": "2026-10-30T13:11:06.575630+00:00",
-  "window_start": "2026-04-15",
+  "collected_at": "2026-11-07T15:09:13.396166+00:00",
+  "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-15",
-  "flows_checked_through": "2026-10-15",
+  "flows_as_of": "2026-10-31",
+  "flows_checked_through": "2026-10-31",
   "universe_scope": "Financial Services members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-04-30",
-      "start": "2026-04-16",
-      "equity_flow_cr": -11704.0,
-      "equity_flow_usd_m": -1229.0,
-      "end_equity_auc_cr": 2046350.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "opening_equity_auc_cr": 2117909.0,
-      "flow_pct_opening_auc": -0.5526205327990957
-    },
     {
       "date": "2026-05-15",
       "start": "2026-05-01",
@@ -124,7 +114,7 @@
       "equity_flow_cr": -6943.0,
       "equity_flow_usd_m": -723.0,
       "end_equity_auc_cr": 2001020.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Sep302026.html",
       "opening_equity_auc_cr": 2027312.0,
       "flow_pct_opening_auc": -0.34247318616966704
     },
@@ -134,9 +124,19 @@
       "equity_flow_cr": -8634.0,
       "equity_flow_usd_m": -908.0,
       "end_equity_auc_cr": 2035663.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
       "opening_equity_auc_cr": 2001020.0,
       "flow_pct_opening_auc": -0.43147994522793376
+    },
+    {
+      "date": "2026-10-31",
+      "start": "2026-10-16",
+      "equity_flow_cr": -883.0,
+      "equity_flow_usd_m": -93.0,
+      "end_equity_auc_cr": 1962000.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "opening_equity_auc_cr": 2035663.0,
+      "flow_pct_opening_auc": -0.04337653138068531
     }
   ],
   "companies": [
@@ -2670,8 +2670,8 @@
           "mf_pct": 11.504790845060944,
           "insurance_shares": 1007570,
           "insurance_pct": 0.5052567421539506,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607395_21012026055453_WEB.xml",
-          "filed_at": "21-JAN-2026 17:55:01"
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1729441_28092026024603_WEB.xml",
+          "filed_at": "04-NOV-2026 12:55:59"
         },
         {
           "symbol": "CRAMC",
@@ -5632,8 +5632,8 @@
           "mf_pct": 4.99818749128139,
           "insurance_shares": 131054,
           "insurance_pct": 0.013705479480061875,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554510_20102025063317_WEB.xml",
-          "filed_at": "20-OCT-2025 18:33:31"
+          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1751371_02112026070417_WEB.xml",
+          "filed_at": "05-NOV-2026 12:30:39"
         },
         {
           "symbol": "JMFINANCIL",
@@ -10808,9 +10808,9 @@
       "sha256": "c3e21e0e621b33887d19065baef6c167a896248ee1197afb781f8ca598fb49af"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1607395_21012026055453_WEB.xml",
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1729441_28092026024603_WEB.xml",
       "file": "sources/CRAMC-2025-12-31.xml.gz",
-      "sha256": "fe84f69f5c102ce643e88db791a5c81cfdd65f8fb1390a8bf848f9c5be78e12f"
+      "sha256": "3af577ff186e01e66023b05285de9b7d275dc8ff2ca67e007af9214805dc45f2"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1653548_17042026064849_WEB.xml",
@@ -11688,9 +11688,9 @@
       "sha256": "43a7212cc7fd89e315a01a2e811090b093a6f0c3675bcdbd0c9ab097227ebc8c"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1554510_20102025063317_WEB.xml",
+      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1751371_02112026070417_WEB.xml",
       "file": "sources/JMFINANCIL-2025-09-30.xml.gz",
-      "sha256": "a2a163f1eb52b1c46bcf339ec8374a3e6b4de5bbf3dfecf114cd358e9c604a44"
+      "sha256": "41e837c2a1eebefa04a7d3b6656232c9ca28572f3b20445f75be4da0574d7a80"
     },
     {
       "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606897_21012026030157_WEB.xml",
@@ -13080,7 +13080,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CRAMC",
       "file": "sources/filings-CRAMC.json",
-      "sha256": "0f46414cd333a0d95a7afca77371a6a624afb8a7ab36e9ba3f8808b05ce0a5d9"
+      "sha256": "85778d8798e7397f692b2e0b8b0fb4c24c3fb5f985d4614ee83b75e64252efa5"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CREDITACC",
@@ -13220,7 +13220,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IIFLCAPS",
       "file": "sources/filings-IIFLCAPS.json",
-      "sha256": "1bd8e8a4f4ee91c45207b4acab9b2193dbf4d4cc61b39fd1b60a7ada4a7a831f"
+      "sha256": "82b279c3152204ca2ff5909dc413dcdccfe5fc69f203612c273b1c4661f5c2b8"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=INDIANB",
@@ -13255,12 +13255,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JIOFIN",
       "file": "sources/filings-JIOFIN.json",
-      "sha256": "b2642fb34edc3221e6d34d96f35802e7381e52e3570381ca86dd3c2510ce7bc9"
+      "sha256": "fa3ddaa38762a6bfb7d240208f39fa9c59dad9988e14d17d5c29d99d163a4ad7"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JMFINANCIL",
       "file": "sources/filings-JMFINANCIL.json",
-      "sha256": "68a416088a8926c536df6e5f1a919308c6434a8c62a372f4e33835a0fa5d7db0"
+      "sha256": "d696e72a4f53c7c492eda8933ccff13c90b044e7e756f3df39100b69fc85faf6"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JSFB",
@@ -13430,7 +13430,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SAMMAANCAP",
       "file": "sources/filings-SAMMAANCAP.json",
-      "sha256": "21557c415ffdd9e35d56af8e0171ee4415ff53c1a931b668cfe78547d1293be6"
+      "sha256": "3f90131a24e7cd0abbcb29a05b70fa677de3fd510e6f00399cfedaa350b52dcf"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SBFC",
@@ -13520,12 +13520,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "56695884f6a6482d58930d07522036af1f7b6615327a70f628b13cd7058ca3ca"
+      "sha256": "fbeed9875d0e535d100a5f76c9b8e4a4a4bc7ac830e66cf6463f3e3e0c8bbff5"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "d43b076112ebe7774db9378a5696ca9705420b9a3ffeede8b7411673caf134ed"
+      "sha256": "55a44446dca69b7bf4b7ff58bf45532c31b19c73b79a9f949bb745936c0ebd1d"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -13558,9 +13558,9 @@
       "sha256": "e5571d43029a894efdf0a9240bcdd8cfbcb3d155f56ea0ea0977a29f09be37aa"
     },
     {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct152026.html",
-      "file": "sources/nsdl-2026-10-15.html",
-      "sha256": "03df04abcc0b2b2344fbd25c0d1146280c1dae9ea5cbeaaa0bcfbad4f9afa0d5"
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "file": "sources/nsdl-2026-10-31.html",
+      "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -13568,5 +13568,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "c2cb1fa52468a4afeec18b358156d3ea9b302d6ff61ae45b34ac65f1fcb49f6f"
+  "digest": "b5b9bd0a3011f7bae519c4a952c98e25a3e558064dcdac9dc2549bc1bc528f70"
 }
