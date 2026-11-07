@@ -1,0 +1,160 @@
+{
+ "generated_at": "2026-11-07 12:23 UTC",
+ "reads": {
+  "count": 22,
+  "first": "2026-10-31 14:43 UTC"
+ },
+ "headlines": {
+  "from": "2026-10-31",
+  "to": "2026-11-07",
+  "world": {
+   "items": [
+    {
+     "title": "Bank of England raises interest rates to 4%, the first increase for more than three years",
+     "url": "https://www.theguardian.com/business/2026/nov/05/bank-of-england-raises-interest-rates-first-increase-for-more-than-three-years",
+     "publisher": "The Guardian",
+     "date": "2026-11-05",
+     "theme": "Central banks",
+     "also": [
+      "BBC News",
+      "CNBC",
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 5
+    },
+    {
+     "title": "US stocks recover after tech rout",
+     "url": "https://www.ft.com/content/642b32dc-e3a1-4df8-ae91-5c84bdeb89e0?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-11-06",
+     "theme": "Markets",
+     "also": [
+      "BBC News",
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 5
+    },
+    {
+     "title": "Private companies added 86,000 jobs in October, slightly higher than expected, ADP says",
+     "url": "https://www.cnbc.com/2026/11/04/private-companies-added-86000-jobs-in-october-slightly-higher-than-expected-adp-says.html",
+     "publisher": "CNBC",
+     "date": "2026-11-04",
+     "theme": "Growth & jobs",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "Crude oil prices sell off more than 7% on Iran peace talk hopes ahead of U.S. midterms",
+     "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html",
+     "publisher": "CNBC",
+     "date": "2026-11-02",
+     "theme": "Energy & commodities",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 2
+    },
+    {
+     "title": "UK Rates Are Not High Enough to Curb Inflation, Research Finds",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-04/uk-rates-are-not-high-enough-to-curb-inflation-research-finds",
+     "publisher": "Bloomberg",
+     "date": "2026-11-04",
+     "theme": "Inflation",
+     "also": [
+      "CNBC"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "From Wall Street to D-Street: What history suggests for S&P 500 returns, impact on India stock market, Sensex, Nifty",
+     "url": "https://www.livemint.com/market/stock-market-news/from-wall-street-to-d-street-what-history-suggests-for-s-p-500-returns-impact-on-india-stock-market-sensex-nifty-11793526487765.html",
+     "publisher": "Mint",
+     "date": "2026-11-01",
+     "theme": "Markets",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 5
+    },
+    {
+     "title": "US Midterm Election results impact on oil and IT shares: Reliance, Indian Oil, TCS, Infosys - 10 stocks from experts",
+     "url": "https://www.livemint.com/market/stock-market-news/us-midterm-election-results-impact-on-oil-and-it-shares-reliance-indian-oil-tcs-infosys-10-stocks-from-experts-11793852592707.html",
+     "publisher": "Mint",
+     "date": "2026-11-05",
+     "theme": "Energy & commodities",
+     "also": [
+      "Business Standard",
+      "BusinessLine"
+     ],
+     "days": 4
+    },
+    {
+     "title": "From grains to chicken and milk, India faces prolonged food inflation",
+     "url": "https://www.business-standard.com/economy/news/from-grains-to-chicken-and-milk-india-faces-prolonged-food-inflation-126110300578_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-11-03",
+     "theme": "Inflation",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 3
+    },
+    {
+     "title": "India's services PMI hits four-month high in October as demand picks up",
+     "url": "https://www.business-standard.com/economy/news/india-s-services-pmi-hits-four-month-high-in-october-as-demand-picks-up-126110401296_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-11-04",
+     "theme": "Growth & jobs",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 2
+    },
+    {
+     "title": "Edelweiss urges India to scrap foreign capital gains tax to revive markets",
+     "url": "https://www.thehindubusinessline.com/markets/edelweiss-urges-india-to-scrap-foreign-capital-gains-tax-to-revive-markets/article71677310.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-11-07",
+     "theme": "Public finances",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 2
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
