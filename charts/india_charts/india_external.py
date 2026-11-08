@@ -152,6 +152,9 @@ def generate(output_dir):
     ):
         destination = output_dir / name
         destination.unlink(missing_ok=True)
+        if os.environ.get('RBI_EXTERNAL_TESTS_FAILED') == 'true':
+            logging.warning('%s omitted because RBI external-source contract checks failed', name)
+            continue
         try:
             if os.environ.get(flag) == 'true':
                 logging.warning('%s refresh failed; using validated stored observations with original dates', name)

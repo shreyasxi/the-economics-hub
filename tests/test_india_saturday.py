@@ -210,10 +210,10 @@ class SaturdayTests(unittest.TestCase):
     def test_optional_failed_sources_remove_artifacts_and_leave_independent_chart(self):
         names=['22_india_gva_contributions','21_india_risk_appetite','23_india_sector_rotation_12m_benchmark','06_india_inflation_bar']
         for name in names: (self.root/(name+'.png')).write_bytes(b'old')
-        with patch.dict(os.environ,{'GVA_UPDATE_FAILED':'true','NSE_RISK_UPDATE_FAILED':'true',
+        with patch.dict(os.environ,{'GVA_UPDATE_FAILED':'true','NSE_OPTIONS_RISK_UPDATE_FAILED':'true',
                   'NSE_ROTATION_UPDATE_FAILED':'true','CPI_MAIN_UPDATE_FAILED':'true','CPI_MANUAL_FALLBACK':'false'}):
             self.assertIsNone(charts.chart_gva_contributions(self.root))
-            self.assertIsNone(charts.chart_risk_appetite(self.root))
+            self.assertIsNone(charts.chart_options_risk_premium(self.root))
             self.assertIsNone(charts.chart_sector_rotation_12m(self.root))
             self.assertIsNone(charts.chart_inflation_bar(None,self.root))
         for name in names: self.assertFalse((self.root/(name+'.png')).exists())
@@ -270,7 +270,7 @@ class SaturdayTests(unittest.TestCase):
         self.assertEqual(workflow.count('cron: "0 8 * * 6"'),1)
         self.assertNotIn('needs: fetch-data',workflow)
         self.assertIn('python -m data.paths --relative INDIA_DB',workflow[workflow.index('- name: Commit and push charts'):])
-        for flag in ['IIP_UPDATE_FAILED','GVA_UPDATE_FAILED','NSE_RISK_UPDATE_FAILED','NSE_ROTATION_UPDATE_FAILED','CPI_MAIN_UPDATE_FAILED','CPI_UPDATE_FAILED','NSE_VALUATIONS_UPDATE_FAILED']:
+        for flag in ['IIP_UPDATE_FAILED','GVA_UPDATE_FAILED','NSE_OPTIONS_RISK_UPDATE_FAILED','NSE_ROTATION_UPDATE_FAILED','CPI_MAIN_UPDATE_FAILED','CPI_UPDATE_FAILED','NSE_VALUATIONS_UPDATE_FAILED']:
             self.assertIn(flag,workflow)
 
 

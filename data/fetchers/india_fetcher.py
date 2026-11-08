@@ -619,7 +619,9 @@ def _existing_flags(month: str) -> dict:
         return {}
 
 
-def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
+def run_append(fred_api_key: Optional[str], dry_run: bool = False, *,
+               include_gva: bool = True, include_trade_supplement: bool = True,
+               include_wss: bool = True) -> None:
     """
     Fetch latest data from all sources and upsert into india_macro.db.
 
@@ -630,13 +632,16 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
       Source 4 (RBI WSS)   — weekly forex reserves in canonical CSV
     """
     # Quarterly production data is fetched here; chart generation stays offline.
-    from data.fetchers.mospi_gva import fetch as fetch_gva
     gva_error = None
-    try:
-        fetch_gva(dry_run=dry_run)
-    except Exception as exc:
-        gva_error = exc
-        log.error('GVA UPDATE FAILED; independent monthly/weekly updates continue: %s',exc)
+    if include_gva:
+        from data.fetchers.mospi_gva import fetch as fetch_gva
+        try:
+            fetch_gva(dry_run=dry_run)
+        except Exception as exc:
+            gva_error = exc
+            log.error('GVA UPDATE FAILED; independent monthly/weekly updates continue: %s',exc)
+    else:
+        log.warning('GVA refresh skipped because its contract checks failed')
     init_db()
 
     monthly_data: dict[str, dict] = {}
@@ -649,10 +654,13 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
     dbie_monthly, forex_weekly = fetch_dbie_all(dry_run=dry_run)
     for month, vals in dbie_monthly.items():
         monthly_data.setdefault(month, {}).update(vals)
-    for month, vals in fetch_trade_releases(dbie_monthly).items():
-        row = monthly_data.setdefault(month, {})
-        row.setdefault("_sources", {}).update(vals["_sources"])
-        row.update({key: value for key, value in vals.items() if key != "_sources"})
+    if include_trade_supplement:
+        for month, vals in fetch_trade_releases(dbie_monthly).items():
+            row = monthly_data.setdefault(month, {})
+            row.setdefault("_sources", {}).update(vals["_sources"])
+            row.update({key: value for key, value in vals.items() if key != "_sources"})
+    else:
+        log.warning('Commerce trade supplement skipped because its contract checks failed')
 
     # ── Write monthly data ────────────────────────────────────────────────────
     if not dry_run:
@@ -668,12 +676,15 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False) -> None:
         log.info("[dry-run] Would upsert %d months into india_monthly", len(monthly_data))
 
     # ── Weekly reserves: official WSS canonical CSV, independent of DBIE ─────
-    from data.fetchers.rbi_external import refresh_wss
-    try:
-        reserves = refresh_wss(dry_run=dry_run)
-        log.info("WSS reserves: %d canonical weekly observations", len(reserves))
-    except Exception as exc:
-        log.error("WSS refresh failed; canonical stored reserves preserved: %s", exc)
+    if include_wss:
+        from data.fetchers.rbi_external import refresh_wss
+        try:
+            reserves = refresh_wss(dry_run=dry_run)
+            log.info("WSS reserves: %d canonical weekly observations", len(reserves))
+        except Exception as exc:
+            log.error("WSS refresh failed; canonical stored reserves preserved: %s", exc)
+    else:
+        log.warning('RBI WSS refresh skipped because external-source contract checks failed')
 
     # ── Summary ───────────────────────────────────────────────────────────────
     if not dry_run:
@@ -710,6 +721,12 @@ def main():
                       help="Fetch data but make no DB changes (logging only)")
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV,
                         help="Path to india_manual.csv for --seed")
+    parser.add_argument("--skip-gva", action="store_true",
+                        help="Skip only the official GVA refresh; continue independent sources")
+    parser.add_argument("--skip-trade-supplement", action="store_true",
+                        help="Skip only Commerce trade supplementation; continue DBIE updates")
+    parser.add_argument("--skip-wss", action="store_true",
+                        help="Skip only the RBI WSS refresh; continue independent sources")
     args = parser.parse_args()
 
     import os
@@ -718,9 +735,27 @@ def main():
     if args.seed:
         run_seed(args.csv)
     elif args.append:
-        run_append(fred_api_key, dry_run=False)
+        run_append(
+            fred_api_key,
+            dry_run=False,
+            include_gva=not (args.skip_gva or os.environ.get("INDIA_FETCH_SKIP_GVA") == "true"),
+            include_trade_supplement=not (
+                args.skip_trade_supplement
+                or os.environ.get("INDIA_FETCH_SKIP_TRADE_SUPPLEMENT") == "true"
+            ),
+            include_wss=not (args.skip_wss or os.environ.get("INDIA_FETCH_SKIP_WSS") == "true"),
+        )
     elif args.dry_run:
-        run_append(fred_api_key, dry_run=True)
+        run_append(
+            fred_api_key,
+            dry_run=True,
+            include_gva=not (args.skip_gva or os.environ.get("INDIA_FETCH_SKIP_GVA") == "true"),
+            include_trade_supplement=not (
+                args.skip_trade_supplement
+                or os.environ.get("INDIA_FETCH_SKIP_TRADE_SUPPLEMENT") == "true"
+            ),
+            include_wss=not (args.skip_wss or os.environ.get("INDIA_FETCH_SKIP_WSS") == "true"),
+        )
 
 
 if __name__ == "__main__":

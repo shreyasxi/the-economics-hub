@@ -138,17 +138,22 @@ class SaturdaySources(unittest.TestCase):
     def test_collectors_precede_generation_and_skipped_fetches_do_not_close_gates(self):
         workflow = WORKFLOW.read_text()
         generation = workflow.index('run: python generate_india.py --mode dashboard')
-        for command, step, flag in (
-            ('python -m data.fetchers.mospi_cpi_items --update', 'mospi-cpi-items', 'CPI_ITEMS_UPDATE_FAILED'),
-            ('python -m data.fetchers.rbi_external --series reer', 'rbi-reer', 'REER_UPDATE_FAILED'),
-            ('python -m data.fetchers.rbi_external --series vulnerability', 'rbi-vulnerability', 'EXTERNAL_VULNERABILITY_UPDATE_FAILED'),
+        for command, step, flag, contract in (
+            ('python -m data.fetchers.mospi_cpi_items --update', 'mospi-cpi-items', 'CPI_ITEMS_UPDATE_FAILED', 'cpi-item-contracts'),
+            ('python -m data.fetchers.rbi_external --series reer', 'rbi-reer', 'REER_UPDATE_FAILED', 'rbi-external-contracts'),
+            ('python -m data.fetchers.rbi_external --series vulnerability', 'rbi-vulnerability', 'EXTERNAL_VULNERABILITY_UPDATE_FAILED', 'rbi-external-contracts'),
         ):
             block = workflow.split('        id: ' + step + '\n', 1)[1].split('\n      - name:', 1)[0]
-            self.assertIn("if: ${{ github.event.inputs.skip_fetch != 'true' }}", block)
+            self.assertIn(
+                "if: ${{ github.event.inputs.skip_fetch != 'true' && steps." + contract + ".outcome == 'success' }}",
+                block,
+            )
             self.assertIn('continue-on-error: true', block)
             self.assertIn('timeout-minutes:', block)
-            self.assertLess(workflow.index('run: ' + command), generation)
-            self.assertIn(flag + ": ${{ steps." + step + ".outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}", workflow)
+            self.assertLess(workflow.index(command), generation)
+            self.assertIn(flag + ':', workflow)
+            self.assertIn("steps." + step + ".outcome != 'success' && github.event.inputs.skip_fetch != 'true'", workflow)
+            self.assertIn("steps." + contract + ".outcome == 'failure'", workflow)
         publication = workflow.split('      - name: Commit and push charts', 1)[1]
         for name in ('CPI_ITEMS_DIR', 'RBI_REER_CSV', 'INDIA_EXTERNAL_CSV', 'RBI_WSS_CSV'):
             self.assertIn(name, publication)

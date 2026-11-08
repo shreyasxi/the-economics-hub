@@ -33,6 +33,7 @@ Usage:
 """
 
 import argparse
+import os
 import re
 import sys
 import io
@@ -1780,6 +1781,12 @@ def chart_fpi_flows(df, output_dir, today=None):
     An optional current-month MTD observation is shown as a grey bar and is
     excluded from the completed-month cumulative calculation.
     """
+    fp = output_dir / "03_india_fpi_monthly.png"
+    if os.environ.get("NSDL_FPI_UPDATE_FAILED") == "true":
+        fp.unlink(missing_ok=True)
+        print("   ⚠ Skipping FPI Flows — NSDL contract checks or refresh failed")
+        return None
+
     series = fpi_series(df)
     col = series["col"]
     from zoneinfo import ZoneInfo
@@ -1803,6 +1810,7 @@ def chart_fpi_flows(df, output_dir, today=None):
     )
 
     if not has_completed and not has_any_mtd:
+        fp.unlink(missing_ok=True)
         print("   ⚠ Skipping FPI Flows — no NSDL data found")
         return None
 
@@ -1854,6 +1862,7 @@ def chart_fpi_flows(df, output_dir, today=None):
                 mtd_row = candidate
 
     if df_completed.empty and mtd_row is None:
+        fp.unlink(missing_ok=True)
         print("   ⚠ Skipping FPI Flows — no eligible NSDL observations")
         return None
 
@@ -1999,7 +2008,6 @@ def chart_fpi_flows(df, output_dir, today=None):
 
     EconStyle.add_source(fig, source_text)
 
-    fp = output_dir / "03_india_fpi_monthly.png"
     EconStyle.save_chart(fig, fp)
 
     print("   ✓ FPI Flows (Monthly, NSDL)")
@@ -3109,10 +3117,15 @@ def transmission_monthly_detail(path, latest):
 
 def chart_rate_transmission(output_dir, path=TRANSMISSION_CSV):
     """An optional transmission chart must never block the later SOE briefing."""
+    destination = output_dir / "18_india_rate_transmission.png"
+    if os.environ.get("RBI_SOE_TESTS_FAILED") == "true":
+        destination.unlink(missing_ok=True)
+        print("   Skipping Monetary Transmission — RBI source checks failed")
+        return None
     try:
         return _render_rate_transmission(output_dir, path)
     except Exception as exc:
-        (output_dir / "18_india_rate_transmission.png").unlink(missing_ok=True)
+        destination.unlink(missing_ok=True)
         print(f"   Skipping Monetary Transmission: {exc}")
         return None
 
@@ -3195,12 +3208,20 @@ def chart_forex_reserves(df_weekly, output_dir):
     """
     Forex Reserves: dual-panel — bounded area chart for level + bar chart for WoW change.
     """
+    fp = output_dir / "16_india_forex_reserves.png"
+    if os.environ.get("RBI_EXTERNAL_TESTS_FAILED") == "true":
+        fp.unlink(missing_ok=True)
+        print("   ⚠ Skipping Forex Reserves — RBI external-source contract checks failed")
+        return None
     if df_weekly is None or df_weekly.empty:
+        fp.unlink(missing_ok=True)
         print("   ⚠ Skipping Forex Reserves — canonical WSS data unavailable")
         return None
     if "forex_reserves_usd_bn" not in df_weekly.columns:
+        fp.unlink(missing_ok=True)
         return None
     if not df_weekly["forex_reserves_usd_bn"].notna().any():
+        fp.unlink(missing_ok=True)
         return None
 
     fig, (ax_level, ax_chg) = EconStyle.create_figure(
@@ -3269,7 +3290,6 @@ def chart_forex_reserves(df_weekly, output_dir):
     EconStyle.add_source(fig, df_weekly.attrs.get("source", "RBI WSS"),
                          df_weekly.attrs.get("latest_observation"))
 
-    fp = output_dir / "16_india_forex_reserves.png"
     EconStyle.save_chart(fig, fp)
     print(f"   ✓ Forex Reserves")
     return fp
@@ -3283,16 +3303,24 @@ def chart_trade_balance(df, output_dir):
     """
     Monthly Exports and Imports as faded grouped bars; Trade Deficit as a bold, distinct line.
     """
+    fp = output_dir / "17_india_trade.png"
+    if os.environ.get("TRADE_CONTRACTS_FAILED") == "true":
+        fp.unlink(missing_ok=True)
+        print("   ⚠ Skipping Trade Balance — trade contract checks failed")
+        return None
+
     needed = ["india_exports_usd_bn", "india_imports_usd_bn"]
     has_data = all(
         col in df.columns and df[col].notna().any() for col in needed
     )
     if not has_data:
+        fp.unlink(missing_ok=True)
         print("   ⚠ Skipping Trade Balance — data pending DBIE configuration")
         return None
 
     df_trade = df.dropna(subset=needed).copy()
     if df_trade.empty:
+        fp.unlink(missing_ok=True)
         return None
 
     fig, ax = EconStyle.create_figure(size="wide")
@@ -3731,6 +3759,10 @@ def main():
     # ── Load data ──────────────────────────────────────────────────────────────
     df = load_india_data(args.csv, args.months)
     df_weekly = load_forex_weekly()
+    if os.environ.get("RBI_EXTERNAL_TESTS_FAILED") == "true":
+        # Keep a failed WSS contract from leaking an old reserve value into the
+        # shared snapshot table as well as the standalone chart.
+        df_weekly = None
     try:
         cag_data, df_monthly, df_prev_monthly = load_cag_data(args.cag)
     except CagManualError as e:
@@ -3757,10 +3789,18 @@ def main():
     chart_cpi_items(output_dir)
 
     # RBI manual bi-monthly surveys use the normal dated India edition.
-    from charts.india_charts.india_inflation_surveys import generate as chart_inflation_surveys
-    from charts.india_charts.india_consumer_surveys import generate as chart_consumer_surveys
-    chart_inflation_surveys(output_dir)
-    chart_consumer_surveys(output_dir)
+    from charts.india_charts import india_inflation_surveys as inflation_surveys
+    from charts.india_charts import india_consumer_surveys as consumer_surveys
+    if os.environ.get("RBI_SURVEYS_TESTS_FAILED") == "true":
+        survey_names = (*inflation_surveys.NAMES, *consumer_surveys.NAMES,
+                        consumer_surveys.RETIRED_NAME)
+        for name in survey_names:
+            for extension in (".png", ".json"):
+                (output_dir / (name + extension)).unlink(missing_ok=True)
+        print("   ⚠ RBI survey charts omitted — survey contract checks failed")
+    else:
+        inflation_surveys.generate(output_dir)
+        consumer_surveys.generate(output_dir)
 
     # ── Summary table (integrates CAG fiscal + weekly forex) ───────────────────
     chart_table(df, output_dir, cag_data, df_weekly)

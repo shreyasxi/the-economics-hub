@@ -30,6 +30,14 @@ class IipTests(unittest.TestCase):
         with patch('requests.Session.get',return_value=Response(payload or PAYLOAD)):
             return iip.fetch(dry_run=dry_run,db=self.db)
 
+    def database_snapshot(self):
+        """Compare logical SQLite contents, independent of WAL checkpoints."""
+        conn=sqlite3.connect(self.db)
+        try:
+            return tuple(conn.iterdump())
+        finally:
+            conn.close()
+
     def test_full_backfill_uses_published_growth_and_preserves_unrelated_fields(self):
         with patch.object(dbm,'DB_PATH',self.db):
             dbm.upsert_monthly('2022-01',dict(india_iip_yoy=2,india_mfg_pmi=50,source_flags=json.dumps({'pmi':'manual','india_iip_yoy':'legacy'})))
@@ -49,14 +57,14 @@ class IipTests(unittest.TestCase):
             self.assertIn('base=2022-23',flags['india_iip_yoy'])
 
     def test_invalid_base_concept_month_schema_and_bounds_rejected_atomically(self):
-        self.fetch();before=self.db.read_bytes()
+        self.fetch();before=self.database_snapshot()
         for field,value in [('base_year','2011-12'),('type','Sectoral'),('category','Manufacturing'),
                             ('sub_category','Total'),('month','Aug'),('year',True),('year',2027),
                             ('growth_rate','123.3'),('growth_rate','NaN'),('index','0'),('index',123.3),('new_field',1)]:
             bad=copy.deepcopy(PAYLOAD);bad['data'][0][field]=value
             with self.subTest(field=field,value=value),self.assertRaises((ValueError,TypeError)):
                 self.fetch(bad)
-            self.assertEqual(self.db.read_bytes(),before)
+            self.assertEqual(self.database_snapshot(),before)
             with self.assertRaisesRegex(ValueError,'not accepted'):iip.load(self.db)
         self.fetch();self.assertEqual(len(iip.load(self.db)),41)
 
@@ -79,11 +87,11 @@ class IipTests(unittest.TestCase):
         self.assertTrue((self.root/'IIP'/first['sources'][0]['raw']).exists())
 
     def test_update_cannot_drop_previously_stored_official_months(self):
-        self.fetch();before=self.db.read_bytes()
+        self.fetch();before=self.database_snapshot()
         reduced=copy.deepcopy(PAYLOAD);reduced['data']=reduced['data'][:-1]
         reduced['meta_data']['totalRecords']-=1
         with self.assertRaisesRegex(ValueError,'drops stored official months'):self.fetch(reduced)
-        self.assertEqual(before,self.db.read_bytes())
+        self.assertEqual(before,self.database_snapshot())
 
     def test_generic_source_flags_cannot_replace_official_iip_provenance(self):
         self.fetch()
@@ -138,14 +146,14 @@ class IipTests(unittest.TestCase):
         self.assertEqual(len(connections), 1)
         with self.assertRaises(sqlite3.ProgrammingError):
             connections[0].execute('SELECT 1')
-        before = self.db.read_bytes()
+        before = self.database_snapshot()
         self.fetch(dry_run=True)
-        self.assertEqual(before, self.db.read_bytes())
+        self.assertEqual(before, self.database_snapshot())
         self.assertFalse((self.root / 'IIP').exists())
 
     def test_dry_run_leaves_database_and_archive_untouched(self):
-        before=self.db.read_bytes();self.fetch(dry_run=True)
-        self.assertEqual(before,self.db.read_bytes());self.assertFalse((self.root/'IIP').exists())
+        before=self.database_snapshot();self.fetch(dry_run=True)
+        self.assertEqual(before,self.database_snapshot());self.assertFalse((self.root/'IIP').exists())
 
     def test_workflow_integration_and_optional_artifact_cleanup(self):
         workflow=Path('.github/workflows/india.yml').read_text()

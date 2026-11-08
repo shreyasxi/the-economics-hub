@@ -96,14 +96,40 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify official GVA and IIP contracts
-        id: india-contracts
+      - name: Verify official MoSPI GVA contracts
+        id: gva-contracts
+        continue-on-error: true
         env:
           PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_mospi_gva.py'
+
+      - name: Verify official MoSPI General IIP contracts
+        id: iip-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_mospi_iip.py'
+
+      - name: Verify India trade contracts
+        id: trade-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: python -m unittest discover -s tests -p 'test_india_trade.py'
+
+      - name: Verify RBI external source contracts
+        id: rbi-external-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
         run: |
-          python -m unittest discover -s tests -p 'test_mospi_gva.py'
-          python -m unittest discover -s tests -p 'test_mospi_iip.py'
-          MPLBACKEND=Agg python -m unittest discover -s tests -p 'test_india_trade.py'
+          python -m unittest discover -s tests -p 'test_rbi_external.py'
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_failed_reer_renders_validated_store_and_does_not_block_vulnerability
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_failed_vulnerability_renders_validated_store_and_does_not_block_reer
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_failed_external_refresh_with_invalid_store_omits_only_affected_chart
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_invalid_external_store_cannot_abort_independent_charts
 
       - name: Fetch latest India data including official GVA
         id: india-fetch
@@ -112,9 +138,14 @@ jobs:
         timeout-minutes: 15
         env:
           PYTHONPATH: "."
+          INDIA_FETCH_SKIP_GVA: ${{ steps.gva-contracts.outcome == 'failure' }}
+          INDIA_FETCH_SKIP_TRADE_SUPPLEMENT: ${{ steps.trade-contracts.outcome == 'failure' }}
+          INDIA_FETCH_SKIP_WSS: ${{ steps.rbi-external-contracts.outcome == 'failure' }}
         run: python data/fetchers/india_fetcher.py --append
 
       - name: Verify official IIP industry and monthly PLFS contracts
+        id: india-activity-contracts
+        continue-on-error: true
         env:
           PYTHONPATH: "."
           MPLBACKEND: Agg
@@ -122,7 +153,7 @@ jobs:
 
       - name: Refresh official MoSPI IIP manufacturing industries
         id: mospi-iip-industries
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.india-activity-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 15
         env:
@@ -131,7 +162,7 @@ jobs:
 
       - name: Refresh official MoSPI monthly urban youth unemployment
         id: mospi-plfs
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.india-activity-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 15
         env:
@@ -140,43 +171,85 @@ jobs:
 
       - name: Refresh official MoSPI General IIP current-base history
         id: mospi-iip
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.iip-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 15
         env:
           PYTHONPATH: "."
         run: python -m data.fetchers.mospi_iip
 
-      - name: Verify RBI HTML and PDF parsers
+      - name: Verify RBI State of the Economy parser contracts
+        id: soe-contracts
+        continue-on-error: true
         run: |
           python tests/test_soe.py
           python tests/test_soe_pdf.py
           python tests/test_soe_independence.py
 
-      - name: Verify RBI bi-monthly survey charts
+      - name: Verify RBI survey chart contracts
+        id: rbi-survey-contracts
+        continue-on-error: true
         env:
           PYTHONPATH: "."
           MPLBACKEND: Agg
-        run: python -m unittest discover -s tests -p 'test_rbi*.py'
+        run: |
+          python -m unittest discover -s tests -p 'test_rbi_categories.py'
+          python -m unittest discover -s tests -p 'test_rbi_consumer.py'
+          python -m unittest discover -s tests -p 'test_rbi_consumer_drivers.py'
+          python -m unittest discover -s tests -p 'test_rbi_discretionary.py'
+          python -m unittest discover -s tests -p 'test_rbi_inflation_expectations.py'
+          python -m unittest discover -s tests -p 'test_rbi_replacement.py'
 
       # RBI's State of the Economy, part 1 of 2: the transmission history the
       # pass-through chart is drawn from. continue-on-error — rbi.org.in being
       # slow or reshaping its table must not stop the charts; the chart is then
       # drawn from the last committed history, or skipped if there is none.
       - name: Read RBI transmission table (State of the Economy)
+        if: ${{ steps.soe-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 10
         env:
           PYTHONPATH: "."
         run: python generate_soe.py --history
 
-      - name: Verify NSE risk-appetite pipeline
+      - name: Verify NSE risk-appetite contracts
+        id: nse-indices-contracts
+        continue-on-error: true
         env:
           PYTHONPATH: "."
-        run: python -m unittest discover -s tests -p 'test_nse*.py'
+        run: python -m unittest discover -s tests -p 'test_nse_indices.py'
+
+      - name: Verify NSE gross TRI contracts
+        id: nse-tri-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_nse_tri.py'
+
+      - name: Verify NSE sector rotation contracts
+        id: nse-rotation-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_nse_sector_rotation.py'
+
+      - name: Verify NSE sector valuation contracts
+        id: nse-valuation-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_nse_valuations.py'
+
+      - name: Verify India equity matrix contracts
+        id: india-equity-matrix-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_india_equity_matrix.py'
 
       - name: Refresh official NSE risk-appetite indices
         id: nse-risk
+        if: ${{ steps.nse-indices-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 10
         env:
@@ -207,14 +280,9 @@ jobs:
           PYTHONPATH: "."
         run: python -m data.fetchers.nse_institutional_flows
 
-      - name: Verify India equity matrix
-        env:
-          PYTHONPATH: "."
-        run: python -m unittest discover -s tests -p 'test_india_equity_matrix.py'
-
       - name: Refresh official NSE gross TRI equity matrix
         id: nse-equity
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.nse-tri-contracts.outcome == 'success' && steps.india-equity-matrix-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 15
         env:
@@ -223,6 +291,7 @@ jobs:
 
       - name: Refresh official NSE sector rotation snapshot
         id: nse-rotation
+        if: ${{ steps.nse-rotation-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 10
         env:
@@ -232,24 +301,30 @@ jobs:
       # Optional chart: fail this update on bad source data, then omit valuations.
       - name: Refresh official NSE sector valuations
         id: nse-valuations
+        if: ${{ steps.nse-valuation-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 10
         env:
           PYTHONPATH: "."
         run: python -m data.fetchers.nse_valuations.collector --update
 
-      - name: Verify CPI source and contribution pipeline
-        id: cpi-tests
+      - name: Verify official CPI contribution contracts
+        id: cpi-contracts
         continue-on-error: true
         env:
           PYTHONPATH: "."
-        run: |
-          python -m unittest discover -s tests -p 'test_cpi_contributions.py'
-          python -m unittest discover -s tests -p 'test_india_saturday.py'
+        run: python -m unittest discover -s tests -p 'test_cpi_contributions.py'
+
+      - name: Verify India dashboard wiring
+        id: india-wiring-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+        run: python -m unittest discover -s tests -p 'test_india_saturday.py'
 
       - name: Refresh official MoSPI CPI 2024 contributions
         id: mospi-cpi
-        if: ${{ steps.cpi-tests.outcome == 'success' }}
+        if: ${{ steps.cpi-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 15
         env:
@@ -265,19 +340,43 @@ jobs:
           PYTHONPATH: "."
         run: python -m data.fetchers.mospi_inflation
 
-      - name: Verify CPI item and RBI external source contracts
+      - name: Verify official CPI item contracts
+        id: cpi-item-contracts
+        continue-on-error: true
         env:
           PYTHONPATH: "."
           MPLBACKEND: Agg
         run: |
           python -m unittest discover -s tests -p 'test_cpi_items.py'
-          python -m unittest discover -s tests -p 'test_india_display.py'
-          python -m unittest discover -s tests -p 'test_rbi_external.py'
-          python -m unittest discover -s tests -p 'test_india_source_workflow.py'
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_cpi_timeout_clears_both_panels_and_audit_without_reading_old_store
+
+      - name: Verify India display contracts
+        id: india-display-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: python -m unittest discover -s tests -p 'test_india_display.py'
+
+      - name: Verify shared India artifact publication contract
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: |
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_publication_replaces_panels_and_audit_then_removes_omitted_artifacts
+          python -m unittest tests.test_india_source_workflow.SaturdaySources.test_incomplete_cpi_panels_are_not_published
+
+      - name: Verify source-scoped India workflow wiring
+        id: india-source-wiring-contracts
+        continue-on-error: true
+        env:
+          PYTHONPATH: "."
+          MPLBACKEND: Agg
+        run: python -m unittest tests.test_india_source_workflow.SaturdaySources.test_collectors_precede_generation_and_skipped_fetches_do_not_close_gates
 
       - name: Refresh official MoSPI CPI items
         id: mospi-cpi-items
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.cpi-item-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 20
         env:
@@ -286,7 +385,7 @@ jobs:
 
       - name: Refresh official RBI REER
         id: rbi-reer
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.rbi-external-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 15
         env:
@@ -295,7 +394,7 @@ jobs:
 
       - name: Refresh official RBI DEA external vulnerability
         id: rbi-vulnerability
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.rbi-external-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 20
         env:
@@ -307,6 +406,8 @@ jobs:
         run: echo "::warning title=External vulnerability refresh failed::Publishing validated stored observations with their original dates when available. See the failed refresh step for details."
 
       - name: Test official NSDL FPI contracts
+        id: nsdl-fpi-contracts
+        continue-on-error: true
         env:
           MPLBACKEND: Agg
           PYTHONPATH: "."
@@ -314,7 +415,7 @@ jobs:
 
       - name: Refresh official NSDL monthly and MTD FPI flows
         id: nsdl-fpi
-        if: ${{ github.event.inputs.skip_fetch != 'true' }}
+        if: ${{ github.event.inputs.skip_fetch != 'true' && steps.nsdl-fpi-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 8
         env:
@@ -325,28 +426,69 @@ jobs:
         if: ${{ steps.nsdl-fpi.outcome == 'failure' }}
         run: echo "::warning title=NSDL FPI refresh failed::Keeping validated FPI observations with their original dates. See the failed refresh step for details."
 
+      - name: Report isolated India contract failures
+        if: always()
+        env:
+          GVA_TEST: ${{ steps.gva-contracts.outcome }}
+          IIP_TEST: ${{ steps.iip-contracts.outcome }}
+          TRADE_TEST: ${{ steps.trade-contracts.outcome }}
+          ACTIVITY_TEST: ${{ steps.india-activity-contracts.outcome }}
+          SOE_TEST: ${{ steps.soe-contracts.outcome }}
+          SURVEY_TEST: ${{ steps.rbi-survey-contracts.outcome }}
+          NSE_INDEX_TEST: ${{ steps.nse-indices-contracts.outcome }}
+          NSE_TRI_TEST: ${{ steps.nse-tri-contracts.outcome }}
+          NSE_ROTATION_TEST: ${{ steps.nse-rotation-contracts.outcome }}
+          NSE_VALUATION_TEST: ${{ steps.nse-valuation-contracts.outcome }}
+          EQUITY_MATRIX_TEST: ${{ steps.india-equity-matrix-contracts.outcome }}
+          CPI_TEST: ${{ steps.cpi-contracts.outcome }}
+          CPI_ITEM_TEST: ${{ steps.cpi-item-contracts.outcome }}
+          EXTERNAL_TEST: ${{ steps.rbi-external-contracts.outcome }}
+          NSDL_TEST: ${{ steps.nsdl-fpi-contracts.outcome }}
+          DISPLAY_TEST: ${{ steps.india-display-contracts.outcome }}
+          WIRING_TEST: ${{ steps.india-wiring-contracts.outcome }}
+          SOURCE_WIRING_TEST: ${{ steps.india-source-wiring-contracts.outcome }}
+        run: |
+          for result in \
+            "MoSPI GVA:$GVA_TEST" "MoSPI General IIP:$IIP_TEST" "India trade:$TRADE_TEST" \
+            "MoSPI activity:$ACTIVITY_TEST" "RBI State of the Economy:$SOE_TEST" \
+            "RBI surveys:$SURVEY_TEST" "NSE indices:$NSE_INDEX_TEST" "NSE TRI:$NSE_TRI_TEST" \
+            "NSE rotation:$NSE_ROTATION_TEST" "NSE valuations:$NSE_VALUATION_TEST" \
+            "India equity matrix:$EQUITY_MATRIX_TEST" "CPI:$CPI_TEST" "CPI items:$CPI_ITEM_TEST" \
+            "RBI external:$EXTERNAL_TEST" "NSDL FPI:$NSDL_TEST" \
+            "India display:$DISPLAY_TEST" "India wiring:$WIRING_TEST" \
+            "India source wiring:$SOURCE_WIRING_TEST"; do
+            if [[ "${result#*:}" == "failure" ]]; then
+              echo "::warning title=India ${result%%:*} checks failed::See the matching contract step. Its source/chart group is omitted while independent groups continue."
+            fi
+          done
+
       - name: Generate India charts
         # CPI is optional, but failed refreshes must omit its chart.
         env:
           PYTHONPATH: "."
-          GVA_UPDATE_FAILED: ${{ steps.india-fetch.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
-          IIP_UPDATE_FAILED: ${{ steps.mospi-iip.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          GVA_UPDATE_FAILED: ${{ (steps.india-fetch.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.gva-contracts.outcome == 'failure' }}
+          IIP_UPDATE_FAILED: ${{ (steps.mospi-iip.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.iip-contracts.outcome == 'failure' }}
           IIP_MANUAL_FALLBACK: ${{ github.event.inputs.manual_iip_fallback == 'true' }}
-          IIP_INDUSTRIES_UPDATE_FAILED: ${{ steps.mospi-iip-industries.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
-          PLFS_UPDATE_FAILED: ${{ steps.mospi-plfs.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          IIP_INDUSTRIES_UPDATE_FAILED: ${{ (steps.mospi-iip-industries.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.india-activity-contracts.outcome == 'failure' }}
+          PLFS_UPDATE_FAILED: ${{ (steps.mospi-plfs.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.india-activity-contracts.outcome == 'failure' }}
           NSE_RISK_UPDATE_FAILED: ${{ steps.nse-risk.outcome != 'success' }}
           NSE_OPTIONS_RISK_UPDATE_FAILED: ${{ steps.nse-options-risk.outcome != 'success' }}
           NSE_DOWNSIDE_SKEW_UPDATE_FAILED: ${{ steps.nse-downside-skew.outcome != 'success' }}
           NSE_INSTITUTIONAL_FLOWS_UPDATE_FAILED: ${{ steps.nse-institutional-flows.outcome != 'success' }}
           NSE_ROTATION_UPDATE_FAILED: ${{ steps.nse-rotation.outcome != 'success' }}
-          NSE_EQUITY_UPDATE_FAILED: ${{ steps.nse-equity.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          NSE_EQUITY_UPDATE_FAILED: ${{ (steps.nse-equity.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.nse-tri-contracts.outcome == 'failure' || steps.india-equity-matrix-contracts.outcome == 'failure' }}
           CPI_MAIN_UPDATE_FAILED: ${{ steps.cpi-main.outcome != 'success' }}
           CPI_MANUAL_FALLBACK: ${{ github.event.inputs.manual_cpi_fallback == 'true' }}
           NSE_VALUATIONS_UPDATE_FAILED: ${{ steps.nse-valuations.outcome != 'success' }}
-          CPI_UPDATE_FAILED: ${{ steps.mospi-cpi.outcome != 'success' }}
-          CPI_ITEMS_UPDATE_FAILED: ${{ steps.mospi-cpi-items.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
-          REER_UPDATE_FAILED: ${{ steps.rbi-reer.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
-          EXTERNAL_VULNERABILITY_UPDATE_FAILED: ${{ steps.rbi-vulnerability.outcome != 'success' && github.event.inputs.skip_fetch != 'true' }}
+          CPI_UPDATE_FAILED: ${{ steps.mospi-cpi.outcome != 'success' || steps.cpi-contracts.outcome == 'failure' }}
+          CPI_ITEMS_UPDATE_FAILED: ${{ (steps.mospi-cpi-items.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.cpi-item-contracts.outcome == 'failure' }}
+          REER_UPDATE_FAILED: ${{ (steps.rbi-reer.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.rbi-external-contracts.outcome == 'failure' }}
+          EXTERNAL_VULNERABILITY_UPDATE_FAILED: ${{ (steps.rbi-vulnerability.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.rbi-external-contracts.outcome == 'failure' }}
+          RBI_EXTERNAL_TESTS_FAILED: ${{ steps.rbi-external-contracts.outcome == 'failure' }}
+          TRADE_CONTRACTS_FAILED: ${{ steps.trade-contracts.outcome == 'failure' }}
+          RBI_SOE_TESTS_FAILED: ${{ steps.soe-contracts.outcome == 'failure' }}
+          RBI_SURVEYS_TESTS_FAILED: ${{ steps.rbi-survey-contracts.outcome == 'failure' }}
+          NSDL_FPI_UPDATE_FAILED: ${{ (steps.nsdl-fpi.outcome != 'success' && github.event.inputs.skip_fetch != 'true') || steps.nsdl-fpi-contracts.outcome == 'failure' }}
         run: python generate_india.py --mode dashboard
 
       # Part 2 of 2: the briefing shown at the top of the tab, written into the
@@ -354,6 +496,7 @@ jobs:
       # and are pruned together. The article page is already in this job's cache
       # from the step above. Prose is processed independently of transmission tables.
       - name: Read RBI briefing (State of the Economy)
+        if: ${{ steps.soe-contracts.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 8
         env:
@@ -361,6 +504,12 @@ jobs:
         run: |
           MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
           python generate_soe.py --briefing-only --out "output/india/$MONTH_FOLDER"
+
+      - name: Clear RBI briefing after failed parser checks
+        if: ${{ steps.soe-contracts.outcome == 'failure' }}
+        run: |
+          MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
+          rm -f "output/india/$MONTH_FOLDER/soe.json"
 
       - name: Copy charts to assets/
         run: |
@@ -372,7 +521,7 @@ jobs:
           echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
           mkdir -p "assets/india/$MONTH_FOLDER"
           # Remove omitted optional artifacts before copying this run's output.
-          for NAME in 18_india_rate_transmission 08_india_interest_revenue 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
+          for NAME in 03_india_fpi_monthly 08_india_interest_revenue 16_india_forex_reserves 17_india_trade 18_india_rate_transmission 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
             if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
               rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
             fi
@@ -383,15 +532,18 @@ jobs:
           fi
           # A failed official rotation snapshot must not leave a prior chart published.
           rm -f "assets/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png" "assets/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.json"
-          if [ -f "output/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark.png" ]; then
-            cp "output/india/$MONTH_FOLDER/23_india_sector_rotation_12m_benchmark."{png,json} "assets/india/$MONTH_FOLDER/"
-          fi
           # Never carry a previous CPI chart into an edition after a failed update.
           rm -f "assets/india/$MONTH_FOLDER/24_india_cpi_contributions.png" "assets/india/$MONTH_FOLDER/24_india_cpi_contributions.json"
-          if [ -f "output/india/$MONTH_FOLDER/24_india_cpi_contributions.png" ]; then
-            cp "output/india/$MONTH_FOLDER/24_india_cpi_contributions."{png,json} "assets/india/$MONTH_FOLDER/"
-          fi
           cp output/india/"$MONTH_FOLDER"/*.png "assets/india/$MONTH_FOLDER/"
+          # A sidecar-backed chart is published only as a complete pair.
+          for NAME in 23_india_sector_rotation_12m_benchmark 24_india_cpi_contributions; do
+            if [ -f "output/india/$MONTH_FOLDER/$NAME.png" ] && [ -f "output/india/$MONTH_FOLDER/$NAME.json" ]; then
+              cp "output/india/$MONTH_FOLDER/$NAME.png" "output/india/$MONTH_FOLDER/$NAME.json" "assets/india/$MONTH_FOLDER/"
+            else
+              rm -f "assets/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.json"
+              echo "::warning title=India chart omitted::$NAME did not produce both its image and audit file."
+            fi
+          done
           # Fiscal deficit remains in the snapshot; its standalone chart is retired.
           rm -f "assets/india/$MONTH_FOLDER/11_india_fiscal_deficit_gdp.png"
           # Clear omitted external charts; publish CPI item panels with their audit.
@@ -403,6 +555,8 @@ jobs:
           rm -f "assets/india/$MONTH_FOLDER/06b_india_cpi_items.json" "assets/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "assets/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png"
           if [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" ] && [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" ]; then
             cp "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" "output/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" "assets/india/$MONTH_FOLDER/"
+          elif [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.json" ] || [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items.display.json" ] || [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_increases.png" ] || [ -f "output/india/$MONTH_FOLDER/06b_india_cpi_items_declines.png" ]; then
+            echo "::warning title=India CPI item panels omitted::The data, display audit and both images must be present together."
           fi
           # Publish the heatmap and leader metrics together; clear an omitted edition.
           rm -f "assets/india/$MONTH_FOLDER/india_equity_matrix.json"
@@ -418,10 +572,13 @@ jobs:
           # Publish survey PNGs with their audits; remove omitted/retired artifacts.
           for NAME in 25_india_inflation_expectations 26_india_household_price_categories 27_india_consumer_confidence_urban_rural 27b_india_discretionary_spending_sentiment 28_india_consumer_confidence_urban_components 29_india_consumer_confidence_rural_components 28_india_consumer_confidence_drivers; do
             rm -f "assets/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.json"
-            if [ -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
+            if [ -f "output/india/$MONTH_FOLDER/$NAME.png" ] && [ -f "output/india/$MONTH_FOLDER/$NAME.json" ]; then
               cp "output/india/$MONTH_FOLDER/$NAME."{png,json} "assets/india/$MONTH_FOLDER/"
+            elif [ -f "output/india/$MONTH_FOLDER/$NAME.png" ] || [ -f "output/india/$MONTH_FOLDER/$NAME.json" ]; then
+              echo "::warning title=India survey chart omitted::$NAME did not produce both its image and audit file."
             fi
           done
+          rm -f "assets/india/$MONTH_FOLDER/soe.json"
           if [ -f "output/india/$MONTH_FOLDER/soe.json" ]; then
             cp "output/india/$MONTH_FOLDER/soe.json" "assets/india/$MONTH_FOLDER/"
           else

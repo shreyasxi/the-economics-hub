@@ -82,7 +82,7 @@ class ActivityWorkflowTests(unittest.TestCase):
         text = WORKFLOW.read_text()
         for step, module in [('mospi-iip-industries', 'mospi_iip_industries'), ('mospi-plfs', 'mospi_plfs_monthly')]:
             block = text.split(f'        id: {step}\n', 1)[1].split('\n      - name:', 1)[0]
-            self.assertIn("github.event.inputs.skip_fetch != 'true'", block)
+            self.assertIn("github.event.inputs.skip_fetch != 'true' && steps.india-activity-contracts.outcome == 'success'", block)
             self.assertIn('continue-on-error: true', block)
             self.assertIn(f'python -m data.fetchers.{module}', block)
             self.assertIn(f"steps.{step}.outcome != 'success' && github.event.inputs.skip_fetch != 'true'", text)
