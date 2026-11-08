@@ -1,7 +1,7 @@
 {
   "audit_only": true,
-  "cutoff": "2026-11-06",
-  "generated_at": "2026-11-06T16:54:04.144326+00:00",
+  "cutoff": "2026-11-08",
+  "generated_at": "2026-11-08T12:20:09.455640+00:00",
   "start_month": "2016-10",
   "expected_months": 122,
   "validated_months": 122,
@@ -4020,11 +4020,11 @@
       "month": "2026-11",
       "status": "validated",
       "source": {
-        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_06112026.csv",
-        "observation_date": "2026-11-06",
-        "retrieved_at": "2026-11-06T15:54:04.431128+00:00",
-        "sha256": "c7cd19544a65b6dbe7b748ed95a4e0a7eccd5856a87db443448044b277d2cbb0",
-        "bytes": 15751,
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_08112026.csv",
+        "observation_date": "2026-11-08",
+        "retrieved_at": "2026-11-08T12:20:08.897738+00:00",
+        "sha256": "43995b8daca1c0f26e721d6a7d9e4bd06a53470b845636aef7769cb077d9122a",
+        "bytes": 17276,
         "content_type": "text/csv",
         "exact_target_names": [
           "Nifty 50",
@@ -4045,21 +4045,21 @@
       },
       "attempts": [
         {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_06112026.csv",
-          "requested_date": "2026-11-06",
-          "retrieved_at": "2026-11-06T16:54:02.461531+00:00",
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_08112026.csv",
+          "requested_date": "2026-11-08",
+          "retrieved_at": "2026-11-08T12:20:08.897738+00:00",
           "http_status": 200,
           "content_type": "text/csv",
-          "sha256": "c7cd19544a65b6dbe7b748ed95a4e0a7eccd5856a87db443448044b277d2cbb0",
+          "sha256": "43995b8daca1c0f26e721d6a7d9e4bd06a53470b845636aef7769cb077d9122a",
           "outcome": "validated_csv"
         }
       ]
     }
   ],
   "outputs": {
-    "monthly.csv": "a7c173b0cc9b8fe35e2dbb606fb49f6f009827fbe0ba0db87a747635b5972d4e",
-    "extracted.csv": "20d590725e86484549bfc564b4ef8f60da134753b7cbbca4f6cd7ef44a5bb458",
+    "monthly.csv": "9b8f577a44cf0ab548d295bef7a52e6d08fb451bf69bc11fdc84a03cdf532c69",
+    "extracted.csv": "d3bba9dd2873fdf1d6db24f54786da02aca8c515c9482fd9a095e187f1390d79",
     "coverage.csv": "762275d4828c19a2f4bf3e7c8e1fbea920c9d89550ac93fc532d02e8d169d144",
-    "metric_details.json": "545116755bd41c9384b9c48ef83f2c4598430ba0fc37ad22c2922914479255e1"
+    "metric_details.json": "d95845ee00fde8262fa78e66f0925400d48cbf771f667313ed33656b27430c8b"
   }
 }
