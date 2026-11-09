@@ -3615,7 +3615,7 @@
       },
       {
         "date": "2026-10-01",
-        "value": 2.94,
+        "value": 2.755,
         "status": "A"
       }
     ],
@@ -6320,9 +6320,13 @@
         {
           "date": "2026-11-05",
           "value": 3.67
+        },
+        {
+          "date": "2026-11-06",
+          "value": 3.65
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483081+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.907888+00:00"
     },
     "GBR": {
       "source": "GBR national official source",
@@ -6528,9 +6532,13 @@
         {
           "date": "2026-11-04",
           "value": 5.1364
+        },
+        {
+          "date": "2026-11-05",
+          "value": 5.1392
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483130+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.907932+00:00"
     },
     "DEU": {
       "source": "DEU national official source",
@@ -6748,9 +6756,13 @@
         {
           "date": "2026-11-06",
           "value": 3.27
+        },
+        {
+          "date": "2026-11-09",
+          "value": 3.3
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483158+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.907961+00:00"
     },
     "JPN": {
       "source": "JPN national official source",
@@ -6944,13 +6956,17 @@
         {
           "date": "2026-11-05",
           "value": 2.806
+        },
+        {
+          "date": "2026-11-06",
+          "value": 2.696
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483187+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.907979+00:00"
     },
     "SWE": {
       "source": "SWE national official source",
-      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-09-23",
+      "url": "https://api.riksbank.se/swea/v1/Observations/SEGVB10YC/2026-09-25",
       "yield_type": "10-year government benchmark",
       "observations": [
         {
@@ -7166,7 +7182,7 @@
           "value": 2.974
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483242+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908004+00:00"
     },
     "KOR": {
       "source": "KOR national official source",
@@ -7272,9 +7288,13 @@
         {
           "date": "2026-11-06",
           "value": 3.853
+        },
+        {
+          "date": "2026-11-09",
+          "value": 3.863
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483254+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908017+00:00"
     },
     "ESP": {
       "source": "ESP national official source",
@@ -7486,7 +7506,7 @@
           "value": 3.9
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483308+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908048+00:00"
     },
     "CHE": {
       "source": "CHE national official source",
@@ -7528,9 +7548,13 @@
         {
           "date": "2026-11-06",
           "value": 0.45
+        },
+        {
+          "date": "2026-11-09",
+          "value": 0.459
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483339+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908083+00:00"
     },
     "AUS": {
       "source": "AUS national official source",
@@ -7738,7 +7762,7 @@
           "value": 5.082
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483362+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908099+00:00"
     },
     "IND": {
       "source": "RBI DBIE workbook / FBIL",
@@ -8789,7 +8813,7 @@
       "collection_mode": "Manually refreshed DBIE workbook",
       "workbook": "50 Macroeconomic Indicators.xlsx",
       "sha256": "fb197fa524696317f588d45ec99f0800b6b3459c87cb1c67457370f21bfe8038",
-      "retrieved_at": "2026-11-07T16:09:56.483568+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908319+00:00"
     },
     "NOR": {
       "source": "NOR national official source",
@@ -9003,10 +9027,14 @@
         {
           "date": "2026-11-05",
           "value": 4.31
+        },
+        {
+          "date": "2026-11-06",
+          "value": 4.295
         }
       ],
-      "retrieved_at": "2026-11-07T16:09:56.483331+00:00"
+      "retrieved_at": "2026-11-09T22:29:38.908073+00:00"
     }
   },
-  "monthly_retrieved_at": "2026-11-07T16:09:21.391713+00:00"
+  "monthly_retrieved_at": "2026-11-09T22:29:03.741069+00:00"
 }
