@@ -35,6 +35,14 @@
       "path": "raw/339fb188c26ea2beed7eb29c0737e0128c1bd14179992c3581df7bfa687763d5.json",
       "sha256": "339fb188c26ea2beed7eb29c0737e0128c1bd14179992c3581df7bfa687763d5",
       "bytes": 217
+    },
+    {
+      "date": "2026-11-11",
+      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
+      "retrieved_at": "2026-11-11T20:16:59.045383+00:00",
+      "path": "raw/9a5987d3ea9ded78fb93e508688366656e24c6ebd92614d7009dd8d7509aea5b.json",
+      "sha256": "9a5987d3ea9ded78fb93e508688366656e24c6ebd92614d7009dd8d7509aea5b",
+      "bytes": 219
     }
   ],
   "row_sources": {
@@ -162,11 +170,12 @@
     "2026-11-04": "third_party_historical_archive",
     "2026-11-05": "archive_cross_checked_against_nse",
     "2026-11-06": "nse_official_daily_provisional",
-    "2026-11-09": "nse_official_daily_provisional"
+    "2026-11-09": "nse_official_daily_provisional",
+    "2026-11-11": "nse_official_daily_provisional"
   },
-  "refreshed_at": "2026-11-09T23:04:00.627703+00:00",
+  "refreshed_at": "2026-11-11T20:16:59.045872+00:00",
   "first_date": "2026-05-12",
-  "last_date": "2026-11-09",
+  "last_date": "2026-11-11",
   "observations": [
     {
       "date": "2026-05-12",
@@ -1292,8 +1301,17 @@
       "dii_buy_cr": 12764.97,
       "dii_sell_cr": 19937.5,
       "dii_net_cr": -7172.53
+    },
+    {
+      "date": "2026-11-11",
+      "fpi_buy_cr": 30087.21,
+      "fpi_sell_cr": 17523.88,
+      "fpi_net_cr": 12563.33,
+      "dii_buy_cr": 19704.39,
+      "dii_sell_cr": 28138.92,
+      "dii_net_cr": -8434.53
     }
   ],
-  "observations_path": "derived/824850c78636df2c9ddf433da1fee246eaef47e2270547c00fe065ddb6cb8afc.csv",
-  "observations_sha256": "824850c78636df2c9ddf433da1fee246eaef47e2270547c00fe065ddb6cb8afc"
+  "observations_path": "derived/77e7a49ebdfebad8e4c5774293b5a74d3d0a46605cc83551e2a4a321f62e61b3.csv",
+  "observations_sha256": "77e7a49ebdfebad8e4c5774293b5a74d3d0a46605cc83551e2a4a321f62e61b3"
 }
