@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "retrieved_utc": "2026-11-11T18:03:52.357432+00:00",
+  "series": {
+    "DGS10": {
+      "frequency": "daily",
+      "units": "percent yield",
+      "max_age_days": 14,
+      "first": "1986-11-12",
+      "latest": "2026-11-09",
+      "observations": 10004,
+      "missing_months": [],
+      "source_url": "https://fred.stlouisfed.org/series/DGS10",
+      "sha256": "b0a00b4a608222878df01928acc7e6bdb3895e9eb4d650921b3263bb0bc7f0c9"
+    },
+    "BAMLH0A0HYM2": {
+      "frequency": "daily",
+      "units": "percent OAS",
+      "max_age_days": 14,
+      "first": "2023-11-13",
+      "latest": "2026-11-09",
+      "observations": 784,
+      "missing_months": [],
+      "source_url": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
+      "sha256": "4ef75dde7160da22d494add93d4b491504aa9c690374c3af1d6191864b22a6f7"
+    },
+    "CPIAUCSL": {
+      "frequency": "monthly",
+      "units": "seasonally adjusted index",
+      "max_age_days": 100,
+      "first": "1986-11-01",
+      "latest": "2026-10-01",
+      "observations": 479,
+      "missing_months": [
+        "2025-10"
+      ],
+      "source_url": "https://fred.stlouisfed.org/series/CPIAUCSL",
+      "sha256": "b641627396daaffe6af5348f984c108e8b249ce8704ac0b6979c35d051469ee4"
+    },
+    "CFNAIMA3": {
+      "frequency": "monthly",
+      "units": "published three-month activity index",
+      "max_age_days": 100,
+      "first": "1986-11-01",
+      "latest": "2026-09-01",
+      "observations": 479,
+      "missing_months": [],
+      "source_url": "https://fred.stlouisfed.org/series/CFNAIMA3",
+      "sha256": "45e78e20090c2a86d041d7d52109802412c15858f2f8ea6a1dca1985a09c9046"
+    }
+  },
+  "availability": "Ex-post latest revised observations. No release vintages; never an investable signal.",
+  "credit_rights": "Public Portfolio Lab dataset; source permissions confirmed by the owner"
+}
