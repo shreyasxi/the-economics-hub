@@ -8,22 +8,10 @@
   },
   "weekly_date_calendar": "Official NSE / NIFTY Indices NIFTY 50 daily closes",
   "legacy_underlying_source": "NIFTY 50 official historical index closes",
-  "requested_end": "2026-11-06",
-  "retained_start": "2023-11-06",
-  "refreshed_at": "2026-11-08T12:16:21.756980+00:00",
+  "requested_end": "2026-11-11",
+  "retained_start": "2023-11-11",
+  "refreshed_at": "2026-11-12T12:19:58.960288+00:00",
   "sources": [
-    {
-      "date": "2023-11-10",
-      "url": "https://archives.nseindia.com/content/historical/DERIVATIVES/2023/NOV/fo10NOV2023bhav.csv.zip",
-      "archive_format": "legacy",
-      "archive_sha256": "8b6078006136bfbba9b87226f5dc7e2f1b38c444a650c5b876447a29247db986",
-      "archive_bytes": 697210,
-      "rows": 771,
-      "retrieved_at": "2026-11-06T12:13:12.090790+00:00",
-      "subset_path": "raw/cdea1f659154ce185ee0d22865a1aa65dddf804184c71e133cc90623b2079dfa.csv",
-      "subset_sha256": "cdea1f659154ce185ee0d22865a1aa65dddf804184c71e133cc90623b2079dfa",
-      "subset_bytes": 46256
-    },
     {
       "date": "2023-11-17",
       "url": "https://archives.nseindia.com/content/historical/DERIVATIVES/2023/NOV/fo17NOV2023bhav.csv.zip",
@@ -1829,7 +1817,7 @@
       "archive_sha256": "99da5162c5e18aa4f79183a0c546780d07d5c1dedfbbcb5f1a0fbf55af28158b",
       "archive_bytes": 1066684,
       "rows": 1030,
-      "retrieved_at": "2026-11-08T12:15:32.010886+00:00",
+      "retrieved_at": "2026-11-12T12:19:20.672678+00:00",
       "subset_path": "raw/4d24235e8dd79b4286f1dc166610aa629c81bfdcf65f8c014e7f284cf386fc0c.csv",
       "subset_sha256": "4d24235e8dd79b4286f1dc166610aa629c81bfdcf65f8c014e7f284cf386fc0c",
       "subset_bytes": 61851
@@ -1841,14 +1829,25 @@
       "archive_sha256": "9021b35dccd79f13d642bee45dc0fc8660122fadcb673158c6969c43c1fbf8d5",
       "archive_bytes": 1282557,
       "rows": 1358,
-      "retrieved_at": "2026-11-08T12:15:33.197131+00:00",
+      "retrieved_at": "2026-11-12T12:19:22.685452+00:00",
       "subset_path": "raw/5857a614358e8ac3412c04f8197510cbf9d5dd4bee203eef127403abc20491ca.csv",
       "subset_sha256": "5857a614358e8ac3412c04f8197510cbf9d5dd4bee203eef127403abc20491ca",
       "subset_bytes": 82758
+    },
+    {
+      "date": "2026-11-11",
+      "url": "https://archives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261111_F_0000.csv.zip",
+      "archive_format": "udiff",
+      "archive_sha256": "e7ab0ec53ac7b3bb7bcf36b575ca06ca290b8a0c699deab9231c22b34bd296c2",
+      "archive_bytes": 1359173,
+      "rows": 1370,
+      "retrieved_at": "2026-11-12T12:19:24.811614+00:00",
+      "subset_path": "raw/af8a4abfd812f9e6d8e19e8480dc0111694ead4b42e9f2226c15484426cbf4a9.csv",
+      "subset_sha256": "af8a4abfd812f9e6d8e19e8480dc0111694ead4b42e9f2226c15484426cbf4a9",
+      "subset_bytes": 82701
     }
   ],
   "source_dates": [
-    "2023-11-10",
     "2023-11-17",
     "2023-11-24",
     "2023-12-01",
@@ -2004,10 +2003,11 @@
     "2026-10-16",
     "2026-10-23",
     "2026-10-30",
-    "2026-11-06"
+    "2026-11-06",
+    "2026-11-11"
   ],
-  "last_option_date": "2026-11-06",
-  "option_contract_rows": 144770,
-  "observations_path": "derived/98024724e2e69137ce3f443b24f04806711ecbbcb5251d973f25e2af4f0e8e6d.csv",
-  "observations_sha256": "98024724e2e69137ce3f443b24f04806711ecbbcb5251d973f25e2af4f0e8e6d"
+  "last_option_date": "2026-11-11",
+  "option_contract_rows": 145369,
+  "observations_path": "derived/866904f2689901e2e7c66ef7d833eb3f48967f8a1e08a163955c5a10803d3991.csv",
+  "observations_sha256": "866904f2689901e2e7c66ef7d833eb3f48967f8a1e08a163955c5a10803d3991"
 }
