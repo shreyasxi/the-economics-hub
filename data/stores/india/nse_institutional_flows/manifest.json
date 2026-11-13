@@ -51,10 +51,17 @@
       "path": "raw/878f59bf3be0452a4fa1774da1f5e9d3e88d2b028ff1985a189694e0a16f6870.json",
       "sha256": "878f59bf3be0452a4fa1774da1f5e9d3e88d2b028ff1985a189694e0a16f6870",
       "bytes": 216
+    },
+    {
+      "date": "2026-11-13",
+      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
+      "retrieved_at": "2026-11-13T20:34:03.711993+00:00",
+      "path": "raw/d2b53ffc75009ccccc1f174fd6d89984e470f86906a94255bcda82d034b22ce4.json",
+      "sha256": "d2b53ffc75009ccccc1f174fd6d89984e470f86906a94255bcda82d034b22ce4",
+      "bytes": 218
     }
   ],
   "row_sources": {
-    "2026-05-12": "third_party_historical_archive",
     "2026-05-13": "third_party_historical_archive",
     "2026-05-14": "third_party_historical_archive",
     "2026-05-15": "third_party_historical_archive",
@@ -180,21 +187,13 @@
     "2026-11-06": "nse_official_daily_provisional",
     "2026-11-09": "nse_official_daily_provisional",
     "2026-11-11": "nse_official_daily_provisional",
-    "2026-11-12": "nse_official_daily_provisional"
+    "2026-11-12": "nse_official_daily_provisional",
+    "2026-11-13": "nse_official_daily_provisional"
   },
-  "refreshed_at": "2026-11-12T20:59:06.806960+00:00",
-  "first_date": "2026-05-12",
-  "last_date": "2026-11-12",
+  "refreshed_at": "2026-11-13T20:34:03.712528+00:00",
+  "first_date": "2026-05-13",
+  "last_date": "2026-11-13",
   "observations": [
-    {
-      "date": "2026-05-12",
-      "fpi_buy_cr": 16555.27,
-      "fpi_sell_cr": 18514.66,
-      "fpi_net_cr": -1959.39,
-      "dii_buy_cr": 20684.82,
-      "dii_sell_cr": 12694.5,
-      "dii_net_cr": 7990.32
-    },
     {
       "date": "2026-05-13",
       "fpi_buy_cr": 14373.99,
@@ -1328,8 +1327,17 @@
       "dii_buy_cr": 15855.13,
       "dii_sell_cr": 22186.3,
       "dii_net_cr": -6331.17
+    },
+    {
+      "date": "2026-11-13",
+      "fpi_buy_cr": 18339.57,
+      "fpi_sell_cr": 12603.02,
+      "fpi_net_cr": 5736.55,
+      "dii_buy_cr": 11745.95,
+      "dii_sell_cr": 13999.53,
+      "dii_net_cr": -2253.58
     }
   ],
-  "observations_path": "derived/8310bcdd873775d50e5b67f03defe3d1cc21cb7d0c921cb430c0b11fe1798cf6.csv",
-  "observations_sha256": "8310bcdd873775d50e5b67f03defe3d1cc21cb7d0c921cb430c0b11fe1798cf6"
+  "observations_path": "derived/41fe7935d72bf6b94d9a6819abea8fd50fb89c5d11ff80b5c0d29d30a6b9b398.csv",
+  "observations_sha256": "41fe7935d72bf6b94d9a6819abea8fd50fb89c5d11ff80b5c0d29d30a6b9b398"
 }
