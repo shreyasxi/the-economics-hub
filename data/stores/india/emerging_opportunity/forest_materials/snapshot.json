@@ -2,7 +2,7 @@
   "schema_version": 1,
   "sector": "Forest Materials",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-07T15:10:50.361937+00:00",
+  "collected_at": "2026-11-14T15:26:21.151730+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
@@ -163,7 +163,7 @@
           "mf_pct": 4.819036034117686,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548416_15102025114307_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1548416_15102025114307_WEB.xml",
           "filed_at": "15-OCT-2025 11:43:12"
         },
         {
@@ -178,7 +178,7 @@
           "mf_pct": 5.093453134273042,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600417_14012026114004_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1600417_14012026114004_WEB.xml",
           "filed_at": "14-JAN-2026 11:40:10"
         },
         {
@@ -193,7 +193,7 @@
           "mf_pct": 5.437139213788296,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1650010_13042026053419_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1650010_13042026053419_WEB.xml",
           "filed_at": "13-APR-2026 17:34:26"
         },
         {
@@ -208,7 +208,7 @@
           "mf_pct": 5.754333620538383,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696718_20072026030453_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1696718_20072026030453_WEB.xml",
           "filed_at": "20-JUL-2026 15:04:59"
         },
         {
@@ -223,7 +223,7 @@
           "mf_pct": 4.830138629165979,
           "insurance_shares": 187000,
           "insurance_pct": 0.10313328232298685,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741774_19102026054325_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1741774_19102026054325_WEB.xml",
           "filed_at": "19-OCT-2026 17:43:33"
         }
       ],
@@ -234,44 +234,44 @@
   "failures": [],
   "sources": [
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1548416_15102025114307_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1548416_15102025114307_WEB.xml",
       "file": "sources/JKPAPER-2025-09-30.xml.gz",
       "sha256": "1ffd34847fd429ec09c2edcd725d53fd97d8e1efbbfffd8254c80f9496b58663"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1600417_14012026114004_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1600417_14012026114004_WEB.xml",
       "file": "sources/JKPAPER-2025-12-31.xml.gz",
       "sha256": "e0ca443cf4f2a157165782b71b15cb73c6e227560efb44acfb96b6afd029ff57"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1650010_13042026053419_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1650010_13042026053419_WEB.xml",
       "file": "sources/JKPAPER-2026-03-31.xml.gz",
       "sha256": "63c0bc97dd9ce1a304ce89f3729f7b056361aad5c7dddc4310d7a0c4ef8b3ae3"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696718_20072026030453_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1696718_20072026030453_WEB.xml",
       "file": "sources/JKPAPER-2026-06-30.xml.gz",
       "sha256": "f7d1511faa1aaf3c2f6dc5a60321368a3648843552ca232bdd41ad89cdbfc7b6"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741774_19102026054325_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1741774_19102026054325_WEB.xml",
       "file": "sources/JKPAPER-2026-09-30.xml.gz",
       "sha256": "ce914d84de4c3cf7f547f27d5beeff6c2178f7f17df935c2c8388dfe077626d6"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JKPAPER",
       "file": "sources/filings-JKPAPER.json",
-      "sha256": "790a2f491144422ad26c047964c631adb6f45bc12fb8f14db53d4f6b1ef8eb4c"
+      "sha256": "7211e3f3bdc3c1e3732c46df579010eb94f8187dc37e696c82ba70167d64ff0a"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "fbeed9875d0e535d100a5f76c9b8e4a4a4bc7ac830e66cf6463f3e3e0c8bbff5"
+      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "55a44446dca69b7bf4b7ff58bf45532c31b19c73b79a9f949bb745936c0ebd1d"
+      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -314,5 +314,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "cc59d37c7e1b8bdfbe7b032342a882dfd5bbbb43f0c95199853147b411412fcb"
+  "digest": "69a357ab8a17b96d7736dba18575c72c8130ff03fe1d2b0eab32069de85df8bc"
 }

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "sector": "Diversified",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-07T15:08:25.631488+00:00",
+  "collected_at": "2026-11-14T15:23:51.477745+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
@@ -162,7 +162,7 @@
           "mf_pct": 2.086932759180328,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552831_17102025074500_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1552831_17102025074500_WEB.xml",
           "filed_at": "17-OCT-2025 19:45:08"
         },
         {
@@ -177,7 +177,7 @@
           "mf_pct": 2.632582995941608,
           "insurance_shares": 0,
           "insurance_pct": 0.0,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606220_20012026070943_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1606220_20012026070943_WEB.xml",
           "filed_at": "20-JAN-2026 19:09:51"
         },
         {
@@ -192,7 +192,7 @@
           "mf_pct": 2.8136561053359204,
           "insurance_shares": 0,
           "insurance_pct": 0.0,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655690_21042026101135_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1655690_21042026101135_WEB.xml",
           "filed_at": "21-APR-2026 10:11:43"
         },
         {
@@ -207,7 +207,7 @@
           "mf_pct": 2.7810437475836527,
           "insurance_shares": 0,
           "insurance_pct": 0.0,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696878_20072026041613_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1696878_20072026041613_WEB.xml",
           "filed_at": "20-JUL-2026 16:16:21"
         },
         {
@@ -222,7 +222,7 @@
           "mf_pct": 3.0524125863283995,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741484_19102026034723_WEB.xml",
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1741484_19102026034723_WEB.xml",
           "filed_at": "19-OCT-2026 15:47:30"
         }
       ],
@@ -233,44 +233,44 @@
   "failures": [],
   "sources": [
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1552831_17102025074500_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1552831_17102025074500_WEB.xml",
       "file": "sources/GODREJIND-2025-09-30.xml.gz",
       "sha256": "2cc0bd5103c6b0883ce66ffb9ca997d53c6fa001b6b6a53457d169877436047d"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1606220_20012026070943_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1606220_20012026070943_WEB.xml",
       "file": "sources/GODREJIND-2025-12-31.xml.gz",
       "sha256": "b9f0879213a88f865f58b28c93f2d8c3f76bfee35643699f21ab32f5dec453ca"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1655690_21042026101135_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1655690_21042026101135_WEB.xml",
       "file": "sources/GODREJIND-2026-03-31.xml.gz",
       "sha256": "4b6c0e8feab8030a61a18165e317c55e10ef0067cfa566d8cdab9b9e90539689"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1696878_20072026041613_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1696878_20072026041613_WEB.xml",
       "file": "sources/GODREJIND-2026-06-30.xml.gz",
       "sha256": "17c1c8b6ea026907d78d0fa5041be6c2adfb70ca75fa203d108ab632bdcea429"
     },
     {
-      "url": "https://nsearchives.nseindia.com/corporate/xbrl/SHP_1741484_19102026034723_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1741484_19102026034723_WEB.xml",
       "file": "sources/GODREJIND-2026-09-30.xml.gz",
       "sha256": "ce3d7df129f882d7f92f0f8d6adc415b3f6d4f4974c205f1ce951238be7812c4"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GODREJIND",
       "file": "sources/filings-GODREJIND.json",
-      "sha256": "a7ecd91189bce15348e0bd828708f1d672ceb834c98ed1dc3c57b71c2d6ad347"
+      "sha256": "26426c825efbf20f96fa6a88af99b2e0b958fa4fa4f8e431f24fd723d848d59d"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "fbeed9875d0e535d100a5f76c9b8e4a4a4bc7ac830e66cf6463f3e3e0c8bbff5"
+      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "55a44446dca69b7bf4b7ff58bf45532c31b19c73b79a9f949bb745936c0ebd1d"
+      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
@@ -313,5 +313,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "8ab22b8a43a055bacc591fed9ca51937d9af9919643e6c4b6e431588a83916cc"
+  "digest": "388dc086b3671b8cf71c1fd6e2be1c4ffb1d34f3abb94b5f1e7c4c68d64da505"
 }
