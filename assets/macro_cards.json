@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-12T12:22:58.289984+00:00",
+  "generated_at": "2026-11-14T12:57:03.228079+00:00",
   "editions": {
-    "weekly": "assets/weekly/2026-11-07",
+    "weekly": "assets/weekly/2026-11-14",
     "macro": "assets/macro/2026-11",
     "india": "assets/india/2026-11"
   },
   "cards": {
     "risk": {
-      "state": "Mixed",
-      "evidence": "Three-month gains currently exceed 1% in 1/8 equity markets; 3/3 credit spreads have widened by over 5 bp. VIX\u2019s 20-session median is 18.0 (mid-range versus its past year). One-month signals are mixed.",
+      "state": "Risk-off",
+      "evidence": "Three-month gains currently exceed 1% in 2/9 equity markets; 3/3 credit spreads have widened by over 5 bp. VIX\u2019s 20-session median is 18.9 (elevated versus its past year). One-month signals are defensive.",
       "metrics": [
         {
           "pillar": "equities",
@@ -21,12 +21,12 @@
         },
         {
           "pillar": "volatility",
-          "state": "Mixed"
+          "state": "Risk-off"
         }
       ],
       "context": "",
-      "conclusion": "Equities, credit and volatility do not agree.",
-      "observation_date": "2026-11-06"
+      "conclusion": "Equities, credit and volatility favour caution.",
+      "observation_date": "2026-11-13"
     },
     "global_inflation": {
       "state": "Mixed",
@@ -109,11 +109,11 @@
     },
     "commodities": {
       "state": "Mixed",
-      "evidence": "4/13 futures are currently above their 200-day averages (8/13 a month earlier). Three-month prices: Brent +19.2%, copper -7.0%, gold -5.2%. WTI near\u2013six-month spread +8.88 $/bbl (+6.80 a month earlier). Backwardation widened, suggesting greater prompt tightness.",
+      "evidence": "6/13 futures are currently above their 200-day averages (9/13 a month earlier). Three-month prices: Brent +10.1%, copper -7.8%, gold -12.1%. WTI near\u2013six-month spread +8.17 $/bbl (+6.57 a month earlier). Backwardation widened, suggesting greater prompt tightness.",
       "metrics": [
         {
           "pillar": "breadth",
-          "state": "Narrow"
+          "state": "Mixed"
         },
         {
           "pillar": "prices",
@@ -129,138 +129,144 @@
         }
       ],
       "context": "",
-      "conclusion": "Commodity uptrends are concentrated; oil\u2019s prompt premium has widened.",
-      "observation_date": "2026-11-06"
+      "conclusion": "Commodity trend participation is uneven; oil\u2019s prompt premium has widened.",
+      "observation_date": "2026-11-13"
     }
   },
   "methodology": "Three-month market environment; one-month momentum; sustained VIX. Commodity futures: matched 200-session trend breadth (12/13 minimum); Brent price pressure; WTI near\u2013six-month curve tightness. Two-thirds agreement within breadth pillars; 80% matched inflation coverage; \u00b10.05 pp = little changed. Unweighted counts; no GDP/GVA.",
   "market_methodology": "Calendar three-month/one-month observed closes, anchors within four days; equity/commodity price changes in percent, spread changes in basis points. VIX: 20-session median versus preceding 252 rolling medians. No interpolation or supply/demand causal attribution.",
   "market_inputs": {
-    "as_of": "2026-11-06",
+    "as_of": "2026-11-13",
     "rows": {
       "sp500": {
-        "latest": 7376.85986328125,
-        "observation": "2026-11-06",
-        "quarter": -4.320386867686743,
-        "quarter_anchor": "2026-08-06",
-        "month": -5.653846530939632,
-        "month_anchor": "2026-10-06"
+        "latest": 7561.669921875,
+        "observation": "2026-11-13",
+        "quarter": -3.042962042111319,
+        "quarter_anchor": "2026-08-13",
+        "month": -3.1232058028363374,
+        "month_anchor": "2026-10-13"
       },
       "stoxx50": {
-        "latest": 6170.490234375,
-        "observation": "2026-11-06",
-        "quarter": -5.106755204511925,
-        "quarter_anchor": "2026-08-06",
-        "month": -1.622066576170833,
-        "month_anchor": "2026-10-06"
+        "latest": 6386.85986328125,
+        "observation": "2026-11-13",
+        "quarter": -2.423207903426172,
+        "quarter_anchor": "2026-08-13",
+        "month": 3.564938373889026,
+        "month_anchor": "2026-10-13"
       },
       "ftse100": {
-        "latest": 10673.900390625,
-        "observation": "2026-11-06",
-        "quarter": -1.7850734090951947,
-        "quarter_anchor": "2026-08-06",
-        "month": 1.2540690103412855,
-        "month_anchor": "2026-10-06"
+        "latest": 10902.599609375,
+        "observation": "2026-11-13",
+        "quarter": 1.2058203765758169,
+        "quarter_anchor": "2026-08-13",
+        "month": 2.368945563170488,
+        "month_anchor": "2026-10-13"
       },
       "nikkei": {
-        "latest": 57434.76953125,
-        "observation": "2026-11-06",
-        "quarter": -12.557976805590565,
-        "quarter_anchor": "2026-08-06",
-        "month": -18.744286436028148,
-        "month_anchor": "2026-10-06"
+        "latest": 61142.3515625,
+        "observation": "2026-11-13",
+        "quarter": -10.49098187224795,
+        "quarter_anchor": "2026-08-13",
+        "month": -9.789634584566254,
+        "month_anchor": "2026-10-13"
       },
       "hangseng": {
-        "latest": 24481.859375,
-        "observation": "2026-11-06",
-        "quarter": -4.1065744314177195,
-        "quarter_anchor": "2026-08-06",
-        "month": 0.8290534633102142,
-        "month_anchor": "2026-10-06"
+        "latest": 23637.599609375,
+        "observation": "2026-11-13",
+        "quarter": -6.925794813863528,
+        "quarter_anchor": "2026-08-13",
+        "month": -2.9066119481067965,
+        "month_anchor": "2026-10-13"
+      },
+      "shanghai": {
+        "latest": 3634.35302734375,
+        "observation": "2026-11-13",
+        "quarter": -7.451353755325895,
+        "quarter_anchor": "2026-08-13",
+        "month": -4.38089654114121,
+        "month_anchor": "2026-10-13"
       },
       "nifty50": {
-        "latest": 25030.349609375,
-        "observation": "2026-11-06",
-        "quarter": 1.600704697901456,
-        "quarter_anchor": "2026-08-06",
-        "month": 9.897436517497994,
-        "month_anchor": "2026-10-06"
+        "latest": 25144.30078125,
+        "observation": "2026-11-13",
+        "quarter": 3.0679446867363014,
+        "quarter_anchor": "2026-08-13",
+        "month": 10.660844011133918,
+        "month_anchor": "2026-10-13"
       },
       "korea": {
-        "latest": 137.00999450683594,
-        "observation": "2026-11-06",
-        "quarter": -16.51840203321604,
-        "quarter_anchor": "2026-08-06",
-        "month": -26.496781656053457,
-        "month_anchor": "2026-10-06"
+        "latest": 142.77999877929688,
+        "observation": "2026-11-13",
+        "quarter": -20.06494083396264,
+        "quarter_anchor": "2026-08-13",
+        "month": -14.277136844296223,
+        "month_anchor": "2026-10-13"
       },
       "taiwan": {
-        "latest": 89.23999786376953,
-        "observation": "2026-11-06",
-        "quarter": -12.492650592071076,
-        "quarter_anchor": "2026-08-06",
-        "month": -24.12210067116096,
-        "month_anchor": "2026-10-06"
+        "latest": 97.37999725341797,
+        "observation": "2026-11-13",
+        "quarter": -9.413956043332117,
+        "quarter_anchor": "2026-08-13",
+        "month": -14.17239728609806,
+        "month_anchor": "2026-10-13"
       },
       "us_ig": {
-        "latest": 0.93,
-        "observation": "2026-11-05",
-        "quarter": 15.000000000000002,
-        "quarter_anchor": "2026-08-06",
-        "month": 10.000000000000009,
-        "month_anchor": "2026-10-06"
+        "latest": 0.89,
+        "observation": "2026-11-12",
+        "quarter": 9.999999999999998,
+        "quarter_anchor": "2026-08-13",
+        "month": 6.000000000000005,
+        "month_anchor": "2026-10-13"
       },
       "us_hy": {
-        "latest": 3.48,
-        "observation": "2026-11-05",
-        "quarter": 77.0,
-        "quarter_anchor": "2026-08-06",
-        "month": 45.000000000000014,
-        "month_anchor": "2026-10-06"
+        "latest": 3.2,
+        "observation": "2026-11-12",
+        "quarter": 49.00000000000002,
+        "quarter_anchor": "2026-08-13",
+        "month": 4.0000000000000036,
+        "month_anchor": "2026-10-13"
       },
       "em_corp": {
-        "latest": 1.84,
-        "observation": "2026-11-05",
-        "quarter": 45.000000000000014,
-        "quarter_anchor": "2026-08-06",
-        "month": 30.000000000000004,
-        "month_anchor": "2026-10-06"
+        "latest": 1.67,
+        "observation": "2026-11-12",
+        "quarter": 28.000000000000004,
+        "quarter_anchor": "2026-08-13",
+        "month": 12.99999999999999,
+        "month_anchor": "2026-10-13"
       },
       "vix": {
-        "latest": 25.639999389648438,
-        "observation": "2026-11-06",
-        "median_20d": 17.954999923706055,
-        "percentile": 69.84126984126983,
-        "month_change_pct": 13.963819697142576
+        "latest": 19.299999237060547,
+        "observation": "2026-11-13",
+        "median_20d": 18.86500072479248,
+        "percentile": 80.15873015873017,
+        "month_change_pct": 23.38129616436131
       },
       "copper": {
-        "latest": 6.2179999351501465,
-        "observation": "2026-11-06",
-        "quarter": -7.01360665247398,
-        "quarter_anchor": "2026-08-06",
-        "month": -5.709305117859287,
-        "month_anchor": "2026-10-06"
+        "latest": 6.079500198364258,
+        "observation": "2026-11-13",
+        "quarter": -7.781569891812035,
+        "quarter_anchor": "2026-08-13",
+        "month": -8.962260816502587,
+        "month_anchor": "2026-10-13"
       },
       "brent": {
-        "latest": 98.31999969482422,
-        "observation": "2026-11-06",
-        "quarter": 19.19020759001302,
-        "quarter_anchor": "2026-08-06",
-        "month": -2.2469696709954468,
-        "month_anchor": "2026-10-06"
+        "latest": 95.83999633789062,
+        "observation": "2026-11-13",
+        "quarter": 10.072351755834141,
+        "quarter_anchor": "2026-08-13",
+        "month": -9.31971414134123,
+        "month_anchor": "2026-10-13"
       },
       "gold": {
-        "latest": 4074.89990234375,
-        "observation": "2026-11-06",
-        "quarter": -5.226071965041257,
-        "quarter_anchor": "2026-08-06",
-        "month": -2.6796635546235126,
-        "month_anchor": "2026-10-06"
+        "latest": 3886.300048828125,
+        "observation": "2026-11-13",
+        "quarter": -12.082613910846362,
+        "quarter_anchor": "2026-08-13",
+        "month": -6.9662166821934495,
+        "month_anchor": "2026-10-13"
       }
     },
-    "missing": {
-      "shanghai": "No observation within four days of 2026-10-06"
-    },
+    "missing": {},
     "methodology": "Calendar three-month/one-month observed closes, anchors within four days; equity/commodity price changes in percent, spread changes in basis points. VIX: 20-session median versus preceding 252 rolling medians. No interpolation or supply/demand causal attribution.",
     "sources": {
       "sp500": {
@@ -331,137 +337,137 @@
   },
   "refresh_errors": {},
   "commodity_inputs": {
-    "as_of": "2026-11-06",
+    "as_of": "2026-11-13",
     "rows": {
       "brent": {
-        "latest": 98.31999969482422,
-        "observation": "2026-11-06",
-        "quarter": 19.19020759001302,
-        "quarter_anchor": "2026-08-06",
-        "month": -2.2469696709954468,
-        "month_anchor": "2026-10-06"
+        "latest": 95.83999633789062,
+        "observation": "2026-11-13",
+        "quarter": 10.072351755834141,
+        "quarter_anchor": "2026-08-13",
+        "month": -9.31971414134123,
+        "month_anchor": "2026-10-13"
       },
       "copper": {
-        "latest": 6.2179999351501465,
-        "observation": "2026-11-06",
-        "quarter": -7.01360665247398,
-        "quarter_anchor": "2026-08-06",
-        "month": -5.709305117859287,
-        "month_anchor": "2026-10-06"
+        "latest": 6.079500198364258,
+        "observation": "2026-11-13",
+        "quarter": -7.781569891812035,
+        "quarter_anchor": "2026-08-13",
+        "month": -8.962260816502587,
+        "month_anchor": "2026-10-13"
       },
       "gold": {
-        "latest": 4074.89990234375,
-        "observation": "2026-11-06",
-        "quarter": -5.226071965041257,
-        "quarter_anchor": "2026-08-06",
-        "month": -2.6796635546235126,
-        "month_anchor": "2026-10-06"
+        "latest": 3886.300048828125,
+        "observation": "2026-11-13",
+        "quarter": -12.082613910846362,
+        "quarter_anchor": "2026-08-13",
+        "month": -6.9662166821934495,
+        "month_anchor": "2026-10-13"
       }
     },
     "members": [
       {
         "ticker": "BZ=F",
         "label": "Brent",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": true,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "CL=F",
         "label": "WTI",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": true,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "NG=F",
         "label": "Natural gas",
-        "observation": "2026-11-06",
-        "above_200d": false,
-        "previous_above_200d": false,
-        "previous_observation": "2026-10-06"
+        "observation": "2026-11-13",
+        "above_200d": true,
+        "previous_above_200d": true,
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "GC=F",
         "label": "Gold",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": false,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "SI=F",
         "label": "Silver",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": false,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "PL=F",
         "label": "Platinum",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": false,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "HG=F",
         "label": "Copper",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "ZW=F",
         "label": "Wheat",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "ZC=F",
         "label": "Corn",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "ZS=F",
         "label": "Soybeans",
-        "observation": "2026-11-06",
-        "above_200d": false,
+        "observation": "2026-11-13",
+        "above_200d": true,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "KC=F",
         "label": "Coffee",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": false,
         "previous_above_200d": false,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "SB=F",
         "label": "Sugar",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": true,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       },
       {
         "ticker": "CC=F",
         "label": "Cocoa",
-        "observation": "2026-11-06",
+        "observation": "2026-11-13",
         "above_200d": true,
         "previous_above_200d": true,
-        "previous_observation": "2026-10-06"
+        "previous_observation": "2026-10-13"
       }
     ],
     "missing": {},
@@ -521,7 +527,7 @@
       }
     },
     "oil_curve": {
-      "as_of": "2026-11-06",
+      "as_of": "2026-11-13",
       "benchmark": "WTI",
       "contracts": [
         {
@@ -533,13 +539,13 @@
           "ticker": "CLM27.NYM"
         }
       ],
-      "observation": "2026-11-06",
-      "comparison_date": "2026-10-06",
-      "near_price": 90.83000183105469,
-      "far_price": 81.94999694824219,
-      "spread": 8.8800048828125,
-      "previous_spread": 6.8000030517578125,
-      "change": 2.0800018310546875,
+      "observation": "2026-11-13",
+      "comparison_date": "2026-10-13",
+      "near_price": 88.55999755859375,
+      "far_price": 80.38999938964844,
+      "spread": 8.169998168945312,
+      "previous_spread": 6.569999694824219,
+      "change": 1.5999984741210938,
       "state": "Backwardation",
       "source": "Yahoo Finance / NYMEX monthly contracts",
       "methodology": "Near-month minus six-month-deferred WTI; same contracts and common observed dates at current/prior-month cutoffs, within four calendar days; \u00b1$0.25/bbl = flat. A prompt premium is consistent with near-term tightness, not proof of its cause."
