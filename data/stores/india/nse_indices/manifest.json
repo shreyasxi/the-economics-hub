@@ -3,12 +3,12 @@
   "source_url": "https://www.niftyindices.com/reports/historical-data",
   "index_variant": "price return; excludes dividends",
   "requested_start": "2016-10-04",
-  "requested_end": "2026-11-13",
+  "requested_end": "2026-11-15",
   "base_date": "2016-10-04",
   "last_date": "2026-11-13",
   "matched_dates": 2507,
   "unmatched_dates": [],
-  "imported_at": "2026-11-14T14:42:00.023735+00:00",
+  "imported_at": "2026-11-16T16:22:20.707719+00:00",
   "sources": [
     {
       "role": "smallcap",
@@ -1152,12 +1152,10 @@
     }
   ],
   "refresh": {
-    "started_at": "2026-11-14T14:41:55.756378+00:00",
-    "requested_start": "2026-10-28",
-    "requested_end": "2026-11-13",
+    "started_at": "2026-11-16T16:22:15.015133+00:00",
+    "requested_start": "2026-10-30",
+    "requested_end": "2026-11-15",
     "received_dates": [
-      "2026-10-28",
-      "2026-10-29",
       "2026-10-30",
       "2026-11-02",
       "2026-11-03",
@@ -1174,7 +1172,9 @@
       "2026-10-31",
       "2026-11-01",
       "2026-11-07",
-      "2026-11-10"
+      "2026-11-10",
+      "2026-11-14",
+      "2026-11-15"
     ],
     "status": "validated_with_unavailable_reports",
     "unresolved_report_dates": [
@@ -1195,7 +1195,9 @@
       "2026-10-31",
       "2026-11-01",
       "2026-11-07",
-      "2026-11-10"
+      "2026-11-10",
+      "2026-11-14",
+      "2026-11-15"
     ]
   },
   "signal_path": "signals/cd4f918e9f810146529b03d0914065d900034fe2dcf32f8661e95c9cc0d00000.csv",

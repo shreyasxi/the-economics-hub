@@ -85,7 +85,7 @@
       "missing_months": [],
       "missing_while_present": [],
       "min": 15.49,
-      "median": 30.93,
+      "median": 30.8,
       "max": 737.27,
       "nonpositive_months": [],
       "largest_changes": [
@@ -334,6 +334,11 @@
           "ratio": 1.1171818835370237
         },
         {
+          "month": "2026-11",
+          "previous_month": "2026-10",
+          "ratio": 1.1164109406270846
+        },
+        {
           "month": "2026-04",
           "previous_month": "2026-03",
           "ratio": 1.1157862407862407
@@ -342,11 +347,6 @@
           "month": "2022-07",
           "previous_month": "2022-06",
           "ratio": 1.1153544336908188
-        },
-        {
-          "month": "2020-11",
-          "previous_month": "2020-10",
-          "ratio": 1.1119627703257595
         }
       ]
     },
@@ -1166,7 +1166,7 @@
       "missing_while_present": [],
       "min": 31.02,
       "median": 37.62,
-      "max": 46.44,
+      "max": 46.37,
       "nonpositive_months": [],
       "largest_changes": [
         {

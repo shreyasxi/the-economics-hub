@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-11-16",
+  "retrieved_at": "2026-11-16T22:01:09.011929+05:30",
+  "units": "INR crore",
+  "scope": "all segments",
+  "completed": {
+    "2026-08": "25492",
+    "2026-09": "-58443",
+    "2026-10": "-24475"
+  },
+  "mtd": {
+    "month": "2026-11",
+    "asof": "2026-11-16",
+    "value": "97395.10"
+  },
+  "sources": [
+    {
+      "url": "https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx?RptType=6",
+      "sha256": "ad5643b68c2b891d27a4dcb60686170a44505c0e8334787ac4d855c51edef4f4"
+    },
+    {
+      "url": "https://www.fpi.nsdl.co.in/web/Reports/Monthly.aspx",
+      "sha256": "d5f5151b1b0596f6b23e3446f53e63f4514d0ef29cff70d5cddb37552dc6205d"
+    }
+  ]
+}

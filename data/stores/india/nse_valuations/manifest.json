@@ -1,7 +1,7 @@
 {
   "audit_only": true,
-  "cutoff": "2026-11-14",
-  "generated_at": "2026-11-14T14:43:46.512878+00:00",
+  "cutoff": "2026-11-16",
+  "generated_at": "2026-11-16T16:29:50.883691+00:00",
   "start_month": "2016-10",
   "expected_months": 122,
   "validated_months": 122,
@@ -4020,11 +4020,11 @@
       "month": "2026-11",
       "status": "validated",
       "source": {
-        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_13112026.csv",
-        "observation_date": "2026-11-13",
-        "retrieved_at": "2026-11-14T14:43:45.849461+00:00",
-        "sha256": "5aa75542683abc5c13c7906bc14f81639cb80a9eff31a1cf78b9af4028485dbf",
-        "bytes": 17736,
+        "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_16112026.csv",
+        "observation_date": "2026-11-16",
+        "retrieved_at": "2026-11-16T16:29:50.256928+00:00",
+        "sha256": "05074ff8684709342594745969d079a5c30090f2bd53b8c49d996abbf6033162",
+        "bytes": 15762,
         "content_type": "text/csv",
         "exact_target_names": [
           "Nifty 50",
@@ -4045,30 +4045,21 @@
       },
       "attempts": [
         {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_14112026.csv",
-          "requested_date": "2026-11-14",
-          "retrieved_at": "2026-11-14T14:43:44.220256+00:00",
-          "http_status": 404,
-          "content_type": "text/html;charset=UTF-8",
-          "sha256": "79b1437e62b91e4b90a72041e693bb2ef80e937543ae58bf4e05cf0d5d29bec2",
-          "outcome": "archive_not_found"
-        },
-        {
-          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_13112026.csv",
-          "requested_date": "2026-11-13",
-          "retrieved_at": "2026-11-14T14:43:45.849461+00:00",
+          "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_16112026.csv",
+          "requested_date": "2026-11-16",
+          "retrieved_at": "2026-11-16T16:29:50.256928+00:00",
           "http_status": 200,
           "content_type": "text/csv",
-          "sha256": "5aa75542683abc5c13c7906bc14f81639cb80a9eff31a1cf78b9af4028485dbf",
+          "sha256": "05074ff8684709342594745969d079a5c30090f2bd53b8c49d996abbf6033162",
           "outcome": "validated_csv"
         }
       ]
     }
   ],
   "outputs": {
-    "monthly.csv": "72c5055080c073aaa2e13fb55fdde14baf4fe7e13a90a6ab28547e94fe1f7911",
-    "extracted.csv": "0347ae2098531171adcb3e57c71acb723792f75c3cd221556aaeebae1782167d",
+    "monthly.csv": "bf85ccfb8d9107434bb18719fb0fd45a112b36a4b3a9b9dd163f740cf9992b24",
+    "extracted.csv": "c96f21faeb0bec86e84a043ae2d9c420bcfcf5d79777f274e3d07b80a8f7b733",
     "coverage.csv": "762275d4828c19a2f4bf3e7c8e1fbea920c9d89550ac93fc532d02e8d169d144",
-    "metric_details.json": "c84f11bea3b99c46ee1eb4ab66c1d4a4dd52caef053d82be1257dd1a2df0f143"
+    "metric_details.json": "c2cc1607603944b978b8800728380830d2e05ff546e34496c987cfbee07e3836"
   }
 }
