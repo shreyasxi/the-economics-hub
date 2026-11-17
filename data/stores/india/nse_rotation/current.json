@@ -1,113 +1,113 @@
 {
   "metadata": {
     "methodology": "round((last / oneYearAgoVal - 1) * 100, 2)",
-    "observation_date": "2026-11-16",
+    "observation_date": "2026-11-17",
     "previous_close_date": "2026-11-16",
     "return_type": "price; dividends excluded",
     "source_url": "https://www.nseindia.com/api/allIndices",
-    "timestamp": "16-Nov-2026 15:30",
+    "timestamp": "17-Nov-2026 15:30",
     "year_ago_date": "2025-11-14"
   },
   "rows": [
     {
       "index": "NIFTY 50",
       "label": "NIFTY 50",
-      "last": 25291.1,
-      "observation_date": "2026-11-16",
-      "return_pct": -2.39,
+      "last": 25387.4,
+      "observation_date": "2026-11-17",
+      "return_pct": -2.02,
       "year_ago": 25910.05,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY PHARMA",
       "label": "Pharma",
-      "last": 28098.4,
-      "observation_date": "2026-11-16",
-      "return_pct": 23.12,
+      "last": 28157.1,
+      "observation_date": "2026-11-17",
+      "return_pct": 23.38,
       "year_ago": 22821.05,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY METAL",
       "label": "Metal",
-      "last": 12458.35,
-      "observation_date": "2026-11-16",
-      "return_pct": 18.71,
+      "last": 12530.3,
+      "observation_date": "2026-11-17",
+      "return_pct": 19.4,
       "year_ago": 10494.75,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY PSU BANK",
       "label": "PSU Bank",
-      "last": 9305.3,
-      "observation_date": "2026-11-16",
-      "return_pct": 10.78,
+      "last": 9486.6,
+      "observation_date": "2026-11-17",
+      "return_pct": 12.94,
       "year_ago": 8399.9,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY BANK",
       "label": "Bank Nifty",
-      "last": 61575.9,
-      "observation_date": "2026-11-16",
-      "return_pct": 5.23,
+      "last": 62273.25,
+      "observation_date": "2026-11-17",
+      "return_pct": 6.42,
       "year_ago": 58517.55,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY ENERGY",
       "label": "Energy",
-      "last": 37276.65,
-      "observation_date": "2026-11-16",
-      "return_pct": 2.8,
+      "last": 37176.7,
+      "observation_date": "2026-11-17",
+      "return_pct": 2.53,
       "year_ago": 36261.1,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY AUTO",
       "label": "Auto",
-      "last": 27570.25,
-      "observation_date": "2026-11-16",
-      "return_pct": 1.21,
+      "last": 27769.15,
+      "observation_date": "2026-11-17",
+      "return_pct": 1.94,
       "year_ago": 27239.8,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY INFRASTRUCTURE",
       "label": "Infra",
-      "last": 9540.2,
-      "observation_date": "2026-11-16",
-      "return_pct": -0.82,
+      "last": 9565.1,
+      "observation_date": "2026-11-17",
+      "return_pct": -0.56,
       "year_ago": 9619.0,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY REALTY",
       "label": "Realty",
-      "last": 908.9,
-      "observation_date": "2026-11-16",
-      "return_pct": -3.43,
+      "last": 926.5,
+      "observation_date": "2026-11-17",
+      "return_pct": -1.56,
       "year_ago": 941.15,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY IT",
       "label": "IT",
-      "last": 31941.05,
-      "observation_date": "2026-11-16",
-      "return_pct": -12.01,
+      "last": 31654.1,
+      "observation_date": "2026-11-17",
+      "return_pct": -12.8,
       "year_ago": 36301.25,
       "year_ago_date": "2025-11-14"
     },
     {
       "index": "NIFTY FMCG",
       "label": "FMCG",
-      "last": 47708.1,
-      "observation_date": "2026-11-16",
-      "return_pct": -14.13,
+      "last": 47611.6,
+      "observation_date": "2026-11-17",
+      "return_pct": -14.31,
       "year_ago": 55560.8,
       "year_ago_date": "2025-11-14"
     }
   ],
-  "sha256": "df7485f9c18b0aca0ce179a10d0f1890ff3350c27f38454a5823d26848b19de0"
+  "sha256": "42f584385682b9ffb67c31b6e7e74f11aea29d084029820cf25c72043dadf95c"
 }

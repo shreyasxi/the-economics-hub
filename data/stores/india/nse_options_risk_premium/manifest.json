@@ -4,9 +4,9 @@
   "source_url_template": "https://archives.nseindia.com/content/indices/ind_close_all_{date}.csv",
   "chart_window_calendar_days": 365,
   "retained_start": "2024-11-18",
-  "last_date": "2026-11-13",
-  "matched_dates": 494,
-  "refreshed_at": "2026-11-16T16:22:24.065591+00:00",
+  "last_date": "2026-11-16",
+  "matched_dates": 495,
+  "refreshed_at": "2026-11-17T10:58:03.217237+00:00",
   "unavailable_report_dates_this_refresh": [
     "2026-10-31",
     "2026-11-01",
@@ -3473,8 +3473,15 @@
       "path": "raw/5aa75542683abc5c13c7906bc14f81639cb80a9eff31a1cf78b9af4028485dbf.csv",
       "sha256": "5aa75542683abc5c13c7906bc14f81639cb80a9eff31a1cf78b9af4028485dbf",
       "bytes": 17736
+    },
+    {
+      "date": "2026-11-16",
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_16112026.csv",
+      "path": "raw/6a95c6693c2aac7499df5c59876c3ffa09536b17fae0f54bc9d71eab9fa726a7.csv",
+      "sha256": "6a95c6693c2aac7499df5c59876c3ffa09536b17fae0f54bc9d71eab9fa726a7",
+      "bytes": 17845
     }
   ],
-  "observations_path": "derived/e28cc52c4a16497a8a87eb8b6b350c1b7139cfca3990e4eaf1b24a51202b1b75.csv",
-  "observations_sha256": "e28cc52c4a16497a8a87eb8b6b350c1b7139cfca3990e4eaf1b24a51202b1b75"
+  "observations_path": "derived/1ee12ef55872f692c817c5a768060a94bc806b978af65f5a2d9fb51ae860e6b9.csv",
+  "observations_sha256": "1ee12ef55872f692c817c5a768060a94bc806b978af65f5a2d9fb51ae860e6b9"
 }
