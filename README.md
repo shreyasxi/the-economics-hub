@@ -202,7 +202,12 @@ NSDL equity sectors. A ranked horizontal chart compares net equity investment ov
 fortnight, latest complete calendar month, or six/twelve fortnights (three/six months), with exact
 dates shown. An optional comparison divides investment by opening FPI equity holdings; this is
 not an investment return. A selected-sector chart shows the saved fortnightly history.
-Company ownership rankings and the AI theme are no longer displayed in this section.
+The local sector-directory prototype adds a searchable list of verified NSE index members for
+the selected sector, with index coverage noted and a link to NSE's industry classification
+drilldown. Its Market Lens handoff includes direct sector browsing, a custom-screen builder,
+and copyable starter queries. The published list carries only broad sector labels, so
+company-level sub-industry mapping is not inferred. Company ownership rankings and the AI
+theme remain out of this section.
 
 The existing weekly collector and audited publication command remain available:
 `python -m data.fetchers.emerging_opportunity --refresh --latest-flows --sector all`, then
@@ -313,4 +318,5 @@ for refresh and validation commands. No snapshot URL or data-storage secrets are
 
 Foreign Investment by Sector compares official NSDL equity net investment across 22 sectors.
 It shows sector rankings and fortnightly history, with common comparison dates and explicit
-missing-data handling. See [collection and coverage notes](docs/emerging_opportunity.md).
+missing-data handling. A local prototype adds a searchable, index-scoped company directory and
+links to NSE's interactive industry classification. See [collection and coverage notes](docs/emerging_opportunity.md).

@@ -1,6 +1,6 @@
 # Foreign Investment by Sector
 
-## Current dashboard — 30 October 2026
+## Current dashboard — local sector directory prototype, 18 November 2026
 
 The India Equity Markets subsection displays only the 22 named NSDL equity sectors. It has:
 
@@ -12,6 +12,15 @@ The India Equity Markets subsection displays only the 22 named NSDL equity secto
   unavailable. This is neither investment return nor a change in portfolio weight.
 - A selected-sector history chart covering the full saved fortnightly window, independently
   of the ranking period. Comparison and history CSV downloads are available.
+- A searchable company directory for the selected sector, from the checksum-verified published
+  NSE index-member subset. It currently contains 748 unique companies across the 22 sectors;
+  BSE-only listings and NSE names outside those indices are not represented.
+- A link to the official NSE Indices classification drilldown. The selected directory's
+  published constituent file carries only its broad sector, so company-level sub-industry
+  labels are not inferred locally.
+- A Market Lens research path: sector/sub-sector browsing, a custom-screen builder, and example
+  quality/growth and value/capital-efficiency queries. Market Lens uses its own sector labels;
+  these may not map one-for-one to NSDL flow sectors.
 
 `data/processors/sector_flows.py` selects exact common periods. Missing periods never become zero,
 partial calendar months cannot become full months, and inconsistent sector cutoffs block display.
@@ -19,10 +28,11 @@ The UI reads checksum-verified published files only. It does not fetch live sour
 ownership data in calculations. Sovereign and Others are excluded; the sectors need not sum to the
 NSDL all-sector total. AI Catalysts has no separate sector-flow series and is absent from this view.
 
-Company explorer, quarterly ownership rankings and the AI basket have been removed from the UI.
-Historical stores and collectors are preserved for reproducibility; the existing all-sector weekly
-job still collects and audits its legacy datasets before publication. Decoupling or retiring that
-collector is separate maintenance, not a deletion of historical data in this change.
+Quarterly ownership rankings and the AI basket remain out of the UI. The company directory is
+reference-only: it does not attribute sector-level FPI flows to individual companies or show
+quarterly ownership. Historical ownership stores and collectors are preserved for reproducibility;
+the existing all-sector weekly job still collects and audits those legacy datasets before
+publication. Decoupling or retiring that collector is separate maintenance.
 
 Publish an audited existing source store with `python -m data.processors.emerging_publication`.
 The 30 October rebuild advances the displayed flow cutoff from 30 September to 15 October using

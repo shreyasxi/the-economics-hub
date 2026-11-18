@@ -8,6 +8,10 @@ from data.processors.emerging_publication import read_manifest, load_sector
 from data.processors.sector_flows import PERIODS, rank_sectors
 
 INK = '#0A1F3D'
+NIFTY_TOTAL_MARKET_PAGE = 'https://www.niftyindices.com/indices/equity/broad-based-indices/nifty-total-market'
+NSE_MARKET_LENS_SCREENER = 'https://marketlens.nseindia.in/screener'
+NSE_MARKET_LENS_CREATE = 'https://marketlens.nseindia.in/create-screen'
+NSE_MARKET_LENS_GUIDE = 'https://marketlens.nseindia.in/screener-guidelines'
 
 
 def finish(chart):
@@ -39,7 +43,18 @@ def _published_flows(folder, manifest):
     result = {}
     for sector in EQUITY_SECTORS:
         data = load_sector(sector, folder, manifest)
-        result[sector] = {key: data[key] for key in ('as_of', 'flows_as_of', 'flows')}
+        # Keep the directory lean: this view needs the verified company identity
+        # and classification only, not the much larger quarterly ownership history.
+        result[sector] = {
+            **{key: data[key] for key in ('as_of', 'flows_as_of', 'flows')},
+            'companies': [
+                {'name': company['name'], 'symbol': company['symbol'],
+                 'baskets': company.get('baskets', [])}
+                for company in data.get('companies', [])
+            ],
+            'universe_scope': data.get('universe_scope', 'Verified company subset'),
+            'collected_at': data.get('collected_at'),
+        }
     return result
 
 
@@ -60,7 +75,8 @@ def render():
     if st.session_state.get('eo-active-sector') not in options:
         st.session_state['eo-active-sector'] = options[0]
     st.markdown('<style>'
-                '.st-key-eo-history{max-width:680px;width:100%;margin:1.5rem auto 1rem;}'
+                '.st-key-eo-history-selector{max-width:680px;width:100%;margin:1.5rem auto 0;}'
+                '.st-key-eo-history{max-width:680px;width:100%;margin:0 auto 1rem;}'
                 '.st-key-eo-history [data-testid="stMarkdownContainer"] h4{text-align:center;}'
                 '.st-key-eo-history [data-testid="stCaptionContainer"]{text-align:center;}'
                 '</style>', unsafe_allow_html=True)
@@ -154,12 +170,13 @@ def _history_chart(history):
 
 @st.fragment
 def _render_history(datasets, options):
-    with st.container(key='eo-history'):
+    with st.container(key='eo-history-selector'):
         sector = st.selectbox('Sector history', options, key='eo-active-sector')
-        data = datasets[sector]
-        history = pd.DataFrame(data['flows']).sort_values('date')
-        history['period_label'] = pd.to_datetime(history.date).dt.strftime('%d %b')
-        history['direction'] = history.equity_flow_cr.map(_direction)
+    data = datasets[sector]
+    history = pd.DataFrame(data['flows']).sort_values('date')
+    history['period_label'] = pd.to_datetime(history.date).dt.strftime('%d %b')
+    history['direction'] = history.equity_flow_cr.map(_direction)
+    with st.container(key='eo-history'):
         st.markdown('#### ' + sector)
         st.caption('Fortnightly net equity investment · ₹ crore · '
                    + _day(history.iloc[0]['start']) + '–' + _day(history.iloc[-1]['date']))
@@ -168,3 +185,65 @@ def _render_history(datasets, options):
         st.caption('Teal: net investment · Ochre: net withdrawal. Full saved history; independent of the comparison period above.')
         st.download_button('Download selected sector history · CSV', history.drop(columns=['period_label', 'direction']).to_csv(index=False),
                            file_name=SECTORS[sector] + '_foreign_flows.csv', mime='text/csv')
+    _render_directory(data, sector)
+
+
+def _render_directory(data, sector):
+    """Show a dated, auditable directory without implying complete market coverage."""
+    companies = pd.DataFrame(data['companies'])
+    if companies.empty:
+        return
+
+    with st.expander('Company directory and industry map', expanded=False):
+        collected = _day(data['collected_at'][:10]) if data.get('collected_at') else 'date unavailable'
+        st.markdown('#### Companies in ' + sector)
+        st.caption(f"{len(companies):,} verified NSE index members · constituent snapshot collected {collected}.")
+        st.caption('Coverage basis: ' + data['universe_scope'])
+
+        st.markdown('**Sub-industry map**')
+        st.caption('NSE Indices provides an official drilldown from sector to industry, basic industry and '
+                   'constituent stocks. Its classification is separate from the NSDL flow sectors.')
+        st.link_button('Open official NSE Indices industry map', NIFTY_TOTAL_MARKET_PAGE,
+                       width='stretch')
+        st.caption('On the NIFTY Total Market page, open “Sectoral Distribution” and drill into a sector.')
+
+        st.markdown('**Continue your research in NSE Market Lens**')
+        st.caption('Browse NSE stocks by Market Lens sector and sub-sector, then refine the list with financial '
+                   'filters or a custom screen. Its sector labels are independent of NSDL, so choose the closest '
+                   'Market Lens category for comparison.')
+        browse_col, screen_col = st.columns(2)
+        with browse_col:
+            st.link_button('Browse NSE stocks by sector', NSE_MARKET_LENS_SCREENER,
+                           width='stretch')
+        with screen_col:
+            st.link_button('Build a custom screen', NSE_MARKET_LENS_CREATE,
+                           width='stretch')
+        st.caption('Copy a starter query below into the custom-screen builder, adjust the thresholds, and review '
+                   'the metric definitions before using the results.')
+        query_col1, query_col2 = st.columns(2)
+        with query_col1:
+            st.markdown('**Quality and growth**')
+            st.code('ROE > 20 AND Rev Growth > 15 AND Debt / Eq < 1', language='text')
+        with query_col2:
+            st.markdown('**Value and capital efficiency**')
+            st.code('Market Cap > 500 AND PE Ratio < 15 AND ROCE > 22', language='text')
+        st.markdown(f'[Market Lens screen-building guide]({NSE_MARKET_LENS_GUIDE}) · '
+                    'Filtered results can be refined and exported as CSV.')
+
+        st.markdown('**Search the verified directory**')
+        query = st.text_input('Company name or NSE symbol', key='eo-directory-search-' + SECTORS[sector],
+                              placeholder='For example, TCS or Tata Consultancy Services')
+        view = companies[['name', 'symbol']].copy()
+        if query.strip():
+            needle = query.strip().casefold()
+            mask = (view['name'].str.casefold().str.contains(needle, regex=False) |
+                    view['symbol'].str.casefold().str.contains(needle, regex=False))
+            view = view.loc[mask]
+        view = view.rename(columns={'name': 'Company', 'symbol': 'NSE symbol'}).sort_values('Company')
+        st.caption(f"Showing {len(view):,} of {len(companies):,} companies in the verified subset.")
+        st.dataframe(view, hide_index=True, width='stretch',
+                     height=420,
+                     column_config={'Company': st.column_config.TextColumn('Company', width='large'),
+                                    'NSE symbol': st.column_config.TextColumn('NSE symbol', width='small')})
+        st.download_button('Download visible directory · CSV', view.to_csv(index=False),
+                           file_name=SECTORS[sector] + '_company_directory.csv', mime='text/csv')

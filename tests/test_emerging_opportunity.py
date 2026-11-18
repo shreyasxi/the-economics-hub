@@ -68,7 +68,11 @@ class OpportunityTests(unittest.TestCase):
         self.assertEqual(len(app.selectbox(key='eo-active-sector').options), 22)
         self.assertNotIn('AI Catalysts', app.selectbox(key='eo-active-sector').options)
         self.assertFalse(app.tabs)
-        self.assertFalse(app.text_input)
+        self.assertFalse(any('verified NSE index-member subset' in item.value for item in app.info))
+        search_key = 'eo-directory-search-consumer_services'
+        self.assertEqual(app.text_input(key=search_key).label, 'Company name or NSE symbol')
+        app.text_input(key=search_key).set_value('DMART').run(timeout=60)
+        self.assertTrue(any('Showing 1 of 43 companies' in c.value for c in app.caption))
         app.selectbox(key='eo-active-sector').set_value('Textiles').run(timeout=60)
         history_options = app.selectbox(key='eo-active-sector').options
         for relative in [False, True]:
