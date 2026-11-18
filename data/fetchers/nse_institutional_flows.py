@@ -21,6 +21,8 @@ from data.processors.nse_institutional_flows import (
     digest, load, parse_archive, parse_nse_daily, publish,
 )
 
+ARCHIVE_REFRESH_DAYS = 7
+
 
 def session() -> requests.Session:
     client = requests.Session()
@@ -50,11 +52,12 @@ def _fetch_nse(client: requests.Session) -> tuple[pd.DataFrame, bytes]:
     return parse_nse_daily(response.content), response.content
 
 
-def bootstrap(root: Path = ROOT, client: requests.Session | None = None) -> tuple[pd.DataFrame, dict]:
+def bootstrap(root: Path = ROOT, client: requests.Session | None = None,
+              latest_snapshot: tuple[pd.DataFrame, bytes] | None = None) -> tuple[pd.DataFrame, dict]:
     """Import archive history, then require an exact latest-date NSE cross-check."""
     root = Path(root)
     client = client or session()
-    nse_frame, nse_payload = _fetch_nse(client)
+    nse_frame, nse_payload = latest_snapshot or _fetch_nse(client)
     last = nse_frame.index[-1]
     cutoff = str((last - pd.DateOffset(months=HISTORY_MONTHS)).date())
     response = client.get(ARCHIVE_URL, timeout=(10, 45))
@@ -91,7 +94,7 @@ def bootstrap(root: Path = ROOT, client: requests.Session | None = None) -> tupl
 
 
 def refresh(root: Path = ROOT, client: requests.Session | None = None) -> tuple[pd.DataFrame, dict]:
-    """Append today's NSE observation, rebuilding history when a gap is too large."""
+    """Refresh today's NSE observation and periodically reconcile archive history."""
     root = Path(root)
     frame, previous = load(root)
     client = client or session()
@@ -104,18 +107,32 @@ def refresh(root: Path = ROOT, client: requests.Session | None = None) -> tuple[
 
     if day < last:
         raise ValueError(f"NSE daily endpoint regressed from {last.date()} to {day.date()}")
+    archive = previous.get("sources", {}).get("historical_archive", {})
+    retrieved_at = archive.get("retrieved_at")
+    try:
+        archive_time = datetime.fromisoformat(str(retrieved_at).replace("Z", "+00:00")) if retrieved_at else None
+    except (TypeError, ValueError):
+        archive_time = None
+    if archive_time is not None and archive_time.tzinfo is None:
+        archive_time = archive_time.replace(tzinfo=timezone.utc)
+    archive_stale = (
+        archive_time is None
+        or datetime.now(timezone.utc) - archive_time >= timedelta(days=ARCHIVE_REFRESH_DAYS)
+    )
+    gap = (day - last).days
+    if archive_stale or gap > 1:
+        if archive_stale:
+            reason = "historical archive is due for reconciliation"
+        else:
+            reason = f"collector missed {gap} calendar days"
+        print(f"NSE institutional-flow {reason}; rebuilding the rolling archive")
+        return bootstrap(root, client=client, latest_snapshot=(daily, payload))
+
     if day == last:
         if not (frame.loc[day, DAILY_COLUMNS].astype(float).sub(daily.loc[day, DAILY_COLUMNS].astype(float)).abs() <= 0.03).all():
             raise ValueError("NSE latest observation differs from the stored same-date archive value")
         return frame, previous
     else:
-        gap = (day - last).days
-        if gap > 5:
-            print(
-                f"NSE institutional-flow collector missed {gap} calendar days; "
-                "rebuilding the rolling history from the validated archive"
-            )
-            return bootstrap(root, client=client)
         frame = pd.concat([frame, daily]).sort_index()
         row_sources[str(day.date())] = "nse_official_daily_provisional"
     raw = _save_raw(root, payload, "json")
