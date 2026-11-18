@@ -10,10 +10,11 @@ Sources:
   2. jugaad-data       — RBI repo rate (diagnostic); weekly FPI flows from NSE
   3. RBI DBIE Excel    — "50 Macroeconomic Indicators.xlsx" (manual drop required)
                          Parsed from: Monthly and Fortnightly sheets
-                         Covers: Trade, Bank Credit, Deposits, M3
-     Trade supplement:  verified Ministry of Commerce quick estimates in
-                         data/stores/india/india_trade_releases.json fill missing DBIE months.
-                         Add new monthly releases there; DBIE revisions take precedence.
+                         Covers: historical trade, Bank Credit, Deposits, M3
+     Commerce trade:   newest monthly merchandise exports/imports are discovered
+                         from the Ministry's official release page and PDF. The
+                         checked-in release archive fills DBIE gaps and remains
+                         the fallback if live discovery is unavailable.
   4. RBI WSS           — automated weekly Total Reserves, US$ million
                          Stored in data/stores/india/rbi_wss_reserves.csv; preserves DBIE history
                          only after verifying at least five WSS overlaps.
@@ -24,7 +25,7 @@ Usage:
   python data/fetchers/india_fetcher.py --seed      # one-time CSV → SQLite migration
   python data/fetchers/india_fetcher.py --dry-run   # print what would be fetched
 
-DBIE EXCEL — MANUAL DROP REQUIRED:
+DBIE EXCEL — MANUAL DROP REQUIRED FOR ITS SERIES:
   The RBI DBIE portal (https://data.rbi.org.in/DBIE/#/dbie/ind1) uses a stateful
   WAF that blocks automated downloads.  Download the file manually (clicking the
   link above), place it at:
@@ -36,8 +37,10 @@ DBIE EXCEL — MANUAL DROP REQUIRED:
 """
 
 import argparse
+import calendar
 import json
 import logging
+import re
 import sqlite3
 import sys
 from datetime import date, datetime, timedelta
@@ -496,6 +499,140 @@ def fetch_trade_releases(dbie_monthly: dict[str, dict],
     return results
 
 
+def fetch_latest_commerce_trade_release(today: Optional[date] = None,
+                                       lookback_months: int = 6) -> Optional[dict]:
+    """Discover and parse the newest monthly merchandise trade release on Commerce.
+
+    Drupal's official search page is queried by reference month, newest first.
+    The matched node must link to an official PDF with explicit merchandise
+    exports/imports and a publication date. Any site, PDF, or format issue is
+    returned as ``None`` so the DBIE workbook and checked-in archive remain usable.
+    """
+    today = today or date.today()
+    search_url = "https://www.commerce.gov.in/ministryofcommerce/search/node"
+    headers = {"User-Agent": "EconomicsHub/1.0 (India trade data refresh)"}
+
+    # Commerce typically releases the prior month's estimates around the 15th.
+    # Continue backwards so early-month workflow runs can still use the latest
+    # published observation while retaining its actual reference month.
+    candidates = []
+    for offset in range(1, max(1, lookback_months) + 1):
+        index = today.year * 12 + today.month - 1 - offset
+        year, month_index = divmod(index, 12)
+        candidates.append((year, month_index + 1))
+
+    try:
+        import fitz
+        import requests
+        from bs4 import BeautifulSoup
+        from urllib.parse import urljoin, urlparse
+
+        with requests.Session() as session:
+            session.headers.update(headers)
+            for year, month_number in candidates:
+                month_name = calendar.month_name[month_number]
+                period = f"{year:04d}-{month_number:02d}"
+                query = f"Monthly Press Release on India's Foreign Trade {month_name} {year}"
+                response = session.get(search_url, params={"keys": query}, timeout=(15, 45))
+                response.raise_for_status()
+                search_soup = BeautifulSoup(response.content, "html.parser")
+
+                title_pattern = re.compile(
+                    r"Monthly\s+Press\s+Release\s+on\s+India(?:['’])?s\s+Foreign\s+Trade"
+                    r"(?:\s+for)?\s+(?:the\s+month\s+of\s+)?([A-Za-z]+),?\s+(20\d{2})",
+                    re.IGNORECASE,
+                )
+                node_url = None
+                for anchor in search_soup.find_all("a", href=True):
+                    title = " ".join(anchor.get_text(" ", strip=True).split())
+                    match = title_pattern.search(title)
+                    if not match:
+                        continue
+                    try:
+                        title_period = (int(match.group(2)),
+                                        list(calendar.month_name).index(match.group(1).title()))
+                    except (ValueError, IndexError):
+                        continue
+                    if title_period != (year, month_number):
+                        continue
+                    candidate_url = urljoin(search_url, anchor["href"])
+                    if (urlparse(candidate_url).hostname or "").lower() in {
+                            "commerce.gov.in", "www.commerce.gov.in"}:
+                        node_url = candidate_url
+                        break
+                if not node_url:
+                    continue
+
+                node_response = session.get(node_url, timeout=(15, 45))
+                node_response.raise_for_status()
+                node_soup = BeautifulSoup(node_response.content, "html.parser")
+                node_text = " ".join(node_soup.get_text(" ", strip=True).split())
+                published_match = re.search(
+                    r"Date\s+of\s+Press\s+Release\s*(20\d{2}-\d{2}-\d{2})",
+                    node_text,
+                    re.IGNORECASE,
+                )
+                if not published_match:
+                    raise ValueError(f"publication date missing on {node_url}")
+                published_on = date.fromisoformat(published_match.group(1))
+                if published_on > today or published_on.strftime("%Y-%m") <= period:
+                    raise ValueError(f"invalid Commerce publication date {published_on} for {period}")
+
+                pdf_url = None
+                for anchor in node_soup.find_all("a", href=True):
+                    candidate_url = urljoin(node_url, anchor["href"])
+                    parsed = urlparse(candidate_url)
+                    if ((parsed.hostname or "").lower() in {
+                            "commerce.gov.in", "www.commerce.gov.in"}
+                            and ".pdf" in parsed.path.lower()):
+                        pdf_url = candidate_url
+                        break
+                if not pdf_url:
+                    raise ValueError(f"official PDF link missing on {node_url}")
+
+                pdf_response = session.get(pdf_url, timeout=(15, 60))
+                pdf_response.raise_for_status()
+                with fitz.open(stream=pdf_response.content, filetype="pdf") as document:
+                    release_text = "\n".join(page.get_text() for page in document)
+
+                def parse_value(kind: str) -> float:
+                    pattern = re.compile(
+                        rf"Merchandise\s+{kind}\s+during\s+{re.escape(month_name)}"
+                        rf"\s+{year}\s+were\s+US\s*\$\s*([\d,]+(?:\.\d+)?)"
+                        rf"\s*(?:Billion|Bn)\b",
+                        re.IGNORECASE,
+                    )
+                    matches = pattern.findall(release_text)
+                    if len(matches) != 1:
+                        raise ValueError(
+                            f"expected one explicit merchandise {kind} figure for {period}, "
+                            f"found {len(matches)}"
+                        )
+                    return float(matches[0].replace(",", ""))
+
+                exports = parse_value("exports")
+                imports = parse_value("imports")
+                if not (5 <= exports <= 120 and 5 <= imports <= 160):
+                    raise ValueError(f"implausible Commerce merchandise values for {period}")
+
+                log.info("Commerce release discovered: %s exports=$%.2fbn imports=$%.2fbn",
+                         period, exports, imports)
+                return {
+                    "month": period,
+                    "exports_usd_bn": exports,
+                    "imports_usd_bn": imports,
+                    "published_on": published_on.isoformat(),
+                    "source_url": node_url,
+                }
+    except Exception as exc:
+        log.warning("Automatic Commerce trade discovery failed; using workbook/archive fallback: %s",
+                    exc)
+        return None
+
+    log.info("No monthly Commerce trade release found in the last %d months", len(candidates))
+    return None
+
+
 def fetch_dbie_fortnightly(source: Path) -> dict[str, dict]:
     """
     Parse Fortnightly sheet: Bank Credit YoY, Deposit Growth YoY, M3 YoY.
@@ -625,6 +762,7 @@ def _existing_flags(month: str) -> dict:
 
 def run_append(fred_api_key: Optional[str], dry_run: bool = False, *,
                include_gva: bool = True, include_trade_supplement: bool = True,
+               include_commerce_discovery: bool = False,
                include_wss: bool = True) -> None:
     """
     Fetch latest data from all sources and upsert into india_macro.db.
@@ -632,7 +770,8 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False, *,
       Source 1 (MoSPI)     — quarterly GVA (official catalogue + workbook)
       Source 2a (jugaad)   — repo rate diagnostic (not written to DB)
       Source 2b (jugaad)   — weekly FPI net flows → india_weekly.fpi_net_flows_usd_bn
-      Source 3 (DBIE Excel)— monthly trade, FPI (net portfolio), credit, M3
+      Source 3 (DBIE Excel)— historical monthly trade, FPI (net portfolio), credit, M3
+      Source 3a (Commerce)— newest official monthly merchandise exports/imports
       Source 4 (RBI WSS)   — weekly forex reserves in canonical CSV
     """
     # Quarterly production data is fetched here; chart generation stays offline.
@@ -665,6 +804,41 @@ def run_append(fred_api_key: Optional[str], dry_run: bool = False, *,
             row.update({key: value for key, value in vals.items() if key != "_sources"})
     else:
         log.warning('Commerce trade supplement skipped because its contract checks failed')
+
+    if include_commerce_discovery:
+        release = fetch_latest_commerce_trade_release()
+        if release:
+            period = release["month"]
+            latest_complete = max(
+                (month for month, row in monthly_data.items()
+                 if row.get("india_exports_usd_bn") is not None
+                 and row.get("india_imports_usd_bn") is not None),
+                default=None,
+            )
+            if latest_complete and period < latest_complete:
+                log.warning("Commerce release %s is older than the latest complete trade data %s; "
+                            "keeping the newer workbook/archive observation",
+                            period, latest_complete)
+            else:
+                exports = release["exports_usd_bn"]
+                imports = release["imports_usd_bn"]
+                provenance = (
+                    f"commerce:ministry:monthly_press_release:published={release['published_on']}:"
+                    f"{release['source_url']}"
+                )
+                row = monthly_data.setdefault(period, {})
+                row.update({
+                    "india_exports_usd_bn": exports,
+                    "india_imports_usd_bn": imports,
+                    "india_trade_deficit_usd_bn": round(imports - exports, 4),
+                })
+                row.setdefault("_sources", {}).update({
+                    key: provenance for key in (
+                        "india_exports_usd_bn", "india_imports_usd_bn",
+                        "india_trade_deficit_usd_bn",
+                    )
+                })
+                log.info("Commerce monthly release applied to %s", period)
 
     # ── Write monthly data ────────────────────────────────────────────────────
     if not dry_run:
@@ -728,7 +902,9 @@ def main():
     parser.add_argument("--skip-gva", action="store_true",
                         help="Skip only the official GVA refresh; continue independent sources")
     parser.add_argument("--skip-trade-supplement", action="store_true",
-                        help="Skip only Commerce trade supplementation; continue DBIE updates")
+                        help="Skip the checked-in Commerce release archive; continue DBIE updates")
+    parser.add_argument("--skip-commerce-discovery", action="store_true",
+                        help="Skip live Commerce release discovery; continue DBIE/archive updates")
     parser.add_argument("--skip-wss", action="store_true",
                         help="Skip only the RBI WSS refresh; continue independent sources")
     args = parser.parse_args()
@@ -747,6 +923,10 @@ def main():
                 args.skip_trade_supplement
                 or os.environ.get("INDIA_FETCH_SKIP_TRADE_SUPPLEMENT") == "true"
             ),
+            include_commerce_discovery=not (
+                args.skip_commerce_discovery
+                or os.environ.get("INDIA_FETCH_SKIP_COMMERCE_DISCOVERY") == "true"
+            ),
             include_wss=not (args.skip_wss or os.environ.get("INDIA_FETCH_SKIP_WSS") == "true"),
         )
     elif args.dry_run:
@@ -757,6 +937,10 @@ def main():
             include_trade_supplement=not (
                 args.skip_trade_supplement
                 or os.environ.get("INDIA_FETCH_SKIP_TRADE_SUPPLEMENT") == "true"
+            ),
+            include_commerce_discovery=not (
+                args.skip_commerce_discovery
+                or os.environ.get("INDIA_FETCH_SKIP_COMMERCE_DISCOVERY") == "true"
             ),
             include_wss=not (args.skip_wss or os.environ.get("INDIA_FETCH_SKIP_WSS") == "true"),
         )
