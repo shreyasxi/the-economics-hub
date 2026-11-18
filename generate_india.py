@@ -113,6 +113,62 @@ C_IIP_NEG      = "#DC2626"    # Red — negative IIP
 SECTION_BG = "#F1F5F9"  # Slate 100
 
 
+def _india_today():
+    """Return today's date in the timezone used by NSE trading sessions."""
+    return pd.Timestamp.now(tz="Asia/Kolkata").date()
+
+
+def _market_series_cutoff(primary, reference, primary_name, reference_name):
+    """Align daily observations to the latest shared date, allowing only a trailing lag.
+
+    A newer source can publish before the reference source has corresponding
+    coverage. Unmatched primary dates beyond the reference's final date are safe
+    to omit. A mismatch on a date already covered by the reference points to a
+    data/calendar problem and remains an error.
+    """
+    for name, series in ((primary_name, primary), (reference_name, reference)):
+        index = series.index
+        if (not isinstance(index, pd.DatetimeIndex) or index.empty
+                or index.has_duplicates or not index.is_monotonic_increasing
+                or index.isna().any() or index.tz is not None
+                or not index.equals(index.normalize())):
+            raise ValueError(
+                f"{name} dates must be a unique, sorted, timezone-naive daily index"
+            )
+
+    common_dates = primary.index.intersection(reference.index)
+    if common_dates.empty:
+        raise ValueError(f"{primary_name} and {reference_name} have no shared dates")
+    cutoff = common_dates[-1]
+    unmatched = primary.index.difference(reference.index)
+    historical_mismatches = unmatched[unmatched <= reference.index[-1]]
+    if len(historical_mismatches):
+        examples = ", ".join(str(day.date()) for day in historical_mismatches[:4])
+        raise ValueError(
+            f"{primary_name} has dates not found in {reference_name} through "
+            f"{reference.index[-1]:%d %b %Y}; unmatched [{examples}]"
+        )
+
+    trailing = unmatched[unmatched > reference.index[-1]]
+    return (
+        primary.loc[primary.index <= cutoff],
+        reference.loc[reference.index <= cutoff],
+        cutoff,
+        trailing,
+    )
+
+
+def _log_trailing_market_lag(primary_name, reference_name, cutoff, dropped):
+    if len(dropped):
+        dates = ", ".join(str(day.date()) for day in dropped[:4])
+        suffix = " …" if len(dropped) > 4 else ""
+        print(
+            f"   WARNING: {primary_name} includes date(s) beyond {reference_name} "
+            f"through {cutoff:%d %b %Y}; excluding {dates}{suffix} and using the "
+            "latest shared date."
+        )
+
+
 # ═══════════════════════════════════════════
 # DATA LOADING
 # ═══════════════════════════════════════════
@@ -1299,12 +1355,16 @@ def chart_options_risk_premium(output_dir):
     try:
         if os.environ.get("NSE_OPTIONS_RISK_UPDATE_FAILED") == "true":
             raise ValueError("NSE daily VIX refresh failed")
-        panel, meta = load_risk_premium()
-        if (pd.Timestamp.now().normalize() - pd.Timestamp(meta["last_date"])).days > 10:
-            raise ValueError("Latest NSE India VIX close is more than ten days old")
-        last = panel.index[-1]
-        panel = panel.loc[panel.index >= last - pd.Timedelta(days=CHART_DAYS)]
+        panel, _ = load_risk_premium()
+        if panel.empty:
+            raise ValueError("No matched NIFTY 50 and India VIX observations are available")
         panel = panel.dropna(subset=["realized_vol_pct", "implied_minus_realized_pp", "drawdown_pct"])
+        if panel.empty:
+            raise ValueError("No complete matched NIFTY 50 and India VIX observations are available")
+        last = panel.index[-1]
+        if (_india_today() - last.date()).days > 10:
+            raise ValueError("Latest matched NSE India VIX and NIFTY close is more than ten days old")
+        panel = panel.loc[panel.index >= last - pd.Timedelta(days=CHART_DAYS)]
         if len(panel) < 100:
             raise ValueError("Fewer than 100 matched daily observations in the chart window")
     except (ValueError, OSError, KeyError) as exc:
@@ -2028,16 +2088,22 @@ def chart_nifty_downside_skew(output_dir):
         if os.environ.get("NSE_DOWNSIDE_SKEW_UPDATE_FAILED") == "true":
             raise ValueError("NSE NIFTY options refresh failed")
         daily, metadata = load_skew()
-        last = daily.index[-1]
-        if (pd.Timestamp.now().normalize() - last).days > 10:
-            raise ValueError("Latest NIFTY downside-skew observation is more than ten days old")
+        nifty = load_nifty_close_history()
+        daily, nifty, aligned_through, dropped = _market_series_cutoff(
+            daily, nifty, "NIFTY downside-skew", "NIFTY 50 close history",
+        )
+        _log_trailing_market_lag(
+            "NIFTY downside-skew", "NIFTY 50 close history", aligned_through, dropped,
+        )
+        last = aligned_through
+        if (_india_today() - last.date()).days > 10:
+            raise ValueError("Latest matched NIFTY downside-skew and close date is more than ten days old")
         daily = daily.loc[daily.index >= last - pd.DateOffset(months=HISTORY_MONTHS)]
         weekly = daily.groupby(daily.index.to_period("W-FRI"), sort=True).tail(1).copy()
         if len(weekly) < 140:
             raise ValueError(f"Only {len(weekly)} complete weeks are available; at least 140 are required")
         if not np.isfinite(weekly["downside_skew_pp"].to_numpy(dtype=float)).all():
             raise ValueError("NIFTY downside-skew series contains non-finite values")
-        nifty = load_nifty_close_history()
         nifty_drawdown = (
             nifty / nifty.rolling(252, min_periods=252).max() - 1
         ) * 100
@@ -2141,11 +2207,17 @@ def chart_institutional_flows_weekly(output_dir):
         if os.environ.get("NSE_INSTITUTIONAL_FLOWS_UPDATE_FAILED") == "true":
             raise ValueError("NSE institutional-flow refresh failed")
         daily, metadata = load()
-        last = daily.index[-1]
-        if (pd.Timestamp.now().normalize() - last).days > 7:
-            raise ValueError("Latest daily institutional-flow observation is more than seven days old")
         nifty_reports, _ = load_nse_daily_indices()
         nifty = nifty_reports["nifty50_close"]
+        daily, nifty, aligned_through, dropped = _market_series_cutoff(
+            daily, nifty, "Institutional flows", "NIFTY 50 close history",
+        )
+        _log_trailing_market_lag(
+            "Institutional flows", "NIFTY 50 close history", aligned_through, dropped,
+        )
+        last = aligned_through
+        if (_india_today() - last.date()).days > 7:
+            raise ValueError("Latest matched institutional-flow and NIFTY close date is more than seven days old")
         start = last - pd.DateOffset(months=6)
         daily = daily.loc[daily.index >= start]
         expected_sessions = nifty.index[(nifty.index >= daily.index[0]) & (nifty.index <= last)]

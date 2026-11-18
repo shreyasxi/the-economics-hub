@@ -656,8 +656,14 @@ jobs:
           done
           MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
           for NAME in 04_india_institutional_flows_weekly 05_india_nifty_downside_skew 21_india_risk_appetite; do
-            if [ -z "$MONTH_FOLDER" ] || [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ] || [ ! -f "assets/india/$MONTH_FOLDER/$NAME.png" ] || ! cmp -s "output/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.png"; then
-              echo "::error title=India chart missing::$NAME was not generated from current source data."
+            if [ -z "$MONTH_FOLDER" ] || [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
+              echo "::error title=India chart missing::output/india/$MONTH_FOLDER/$NAME.png was not generated. Check the chart-generation log for stale or unaligned source dates."
+              FAILED=1
+            elif [ ! -f "assets/india/$MONTH_FOLDER/$NAME.png" ]; then
+              echo "::error title=India chart missing::assets/india/$MONTH_FOLDER/$NAME.png was not copied from the generated chart."
+              FAILED=1
+            elif ! cmp -s "output/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.png"; then
+              echo "::error title=India chart mismatch::output and assets copies differ for $NAME in $MONTH_FOLDER."
               FAILED=1
             fi
           done
