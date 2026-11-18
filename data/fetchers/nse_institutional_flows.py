@@ -54,7 +54,7 @@ def _fetch_nse(client: requests.Session) -> tuple[pd.DataFrame, bytes]:
 
 def bootstrap(root: Path = ROOT, client: requests.Session | None = None,
               latest_snapshot: tuple[pd.DataFrame, bytes] | None = None) -> tuple[pd.DataFrame, dict]:
-    """Import archive history, then require an exact latest-date NSE cross-check."""
+    """Import archive history and reconcile its latest session to official NSE data."""
     root = Path(root)
     client = client or session()
     nse_frame, nse_payload = latest_snapshot or _fetch_nse(client)
@@ -64,10 +64,20 @@ def bootstrap(root: Path = ROOT, client: requests.Session | None = None,
     response.raise_for_status()
     archive_frame = parse_archive(response.content, cutoff)
     nse_values = nse_frame.loc[last, DAILY_COLUMNS].astype(float)
-    if last not in archive_frame.index:
-        raise ValueError("Historical archive does not include the latest NSE observation")
-    if not (archive_frame.loc[last, DAILY_COLUMNS].astype(float).sub(nse_values).abs() <= 0.03).all():
-        raise ValueError("Latest archive values disagree with NSE's official daily endpoint")
+
+    # The third-party archive can lag NSE's current daily endpoint or publish a
+    # revised value. Keep its historical backfill, but make the latest official
+    # observation authoritative so a routine archive lag cannot fail the run.
+    # Ignore archive rows beyond NSE's latest session to keep the store's end
+    # date aligned with the endpoint used by the daily refresh.
+    archive_frame = archive_frame.loc[archive_frame.index <= last].copy()
+    archive_has_latest = last in archive_frame.index
+    archive_matches_latest = (
+        archive_has_latest
+        and (archive_frame.loc[last, DAILY_COLUMNS].astype(float).sub(nse_values).abs() <= 0.03).all()
+    )
+    if not archive_matches_latest:
+        archive_frame.loc[last, DAILY_COLUMNS] = nse_values
 
     root.mkdir(parents=True, exist_ok=True)
     archive_raw = _save_raw(root, response.content, "html")
@@ -78,11 +88,14 @@ def bootstrap(root: Path = ROOT, client: requests.Session | None = None,
     nse_snapshots = [{"date": str(last.date()), "url": NSE_DAILY_URL,
                       "retrieved_at": datetime.now(timezone.utc).isoformat(), **nse_raw}]
     row_sources = {str(day.date()): "third_party_historical_archive" for day in archive_frame.index}
-    row_sources[str(last.date())] = "archive_cross_checked_against_nse"
+    row_sources[str(last.date())] = (
+        "archive_cross_checked_against_nse" if archive_matches_latest
+        else "nse_official_daily_provisional"
+    )
     manifest = {
         "version": VERSION,
         "history_months": HISTORY_MONTHS,
-        "source_note": "NSE/BSE cash market daily figures; archive backfill cross-checked against NSE daily API at latest date. NSE daily figures are provisional.",
+        "source_note": "Historical rows from the public archive; latest session uses the official NSE daily endpoint and is cross-checked when the archive has matching values.",
         "sources": sources,
         "nse_daily_snapshots": nse_snapshots,
         "row_sources": row_sources,
