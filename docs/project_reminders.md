@@ -16,22 +16,21 @@ subtests. The remaining sector-selector test fails identically under 3.9: publis
 values differ. Investigate that publication/test mismatch separately; no economic data were changed.
 See project context §0.3 for setup, rollback and verification details.
 
-## Manual-update audit — 30 Oct 2026
+## Manual-update audit — 18 Nov 2026
 
-This is an inventory of the local stores, not confirmation that newer official releases are available.
-Use the reference month the figure describes; October blanks are not automatically overdue. Check final
-releases before entering values. No economic observations were changed during this audit.
+This is an inventory of the local stores as of 18 Nov. Use the reference month the figure describes;
+check final releases before entering values.
 
 | Manual task | Stored position / next action |
 |---|---|
-| World manufacturing PMI: US, euro area, UK, Japan, China | All five populated through Sep 2026. Enter October final releases when published; avoid flash/services/composite figures. |
+| World manufacturing PMI: US, euro area, UK, Japan, China | All five final October releases are entered; avoid flash/services/composite figures. |
 | China surveyed urban unemployment | September entered at 5.2% from owner-supplied figure on 30 Oct. |
 | China 10-year yield | September stored at 1.68%; October entered at 1.66% from owner-supplied month-end figure. |
-| India manufacturing/services PMI | Both through September; enter October final releases when available. Composite is calculated. |
-| India GST | Detailed gross/net/refunds CSV through September; summary gross level also present. Add October official monthly figures when released, including year-earlier revisions and source PDF; keep ₹ crore CSV versus ₹ lakh crore summary units straight. |
-| India core CPI | September entered at 4.3% from owner-supplied figure. Keep the same core definition. |
-| India legacy headline unemployment | Missing from August onward. This field still feeds the World scoreboard; decide whether to maintain the same series. It is separate from automated urban youth PLFS. |
-| RBI DBIE workbook | Owner-supplied `data/50 Macroeconomic Indicators.xlsx`; check for a newer release, dry-run then append. Updated workbook parsed/imported on 30 Oct: 109 combined months, with fortnightly-derived credit/deposit/M3 figures through October. |
+| India manufacturing/services PMI and GST | October releases are entered; composite PMI is calculated. |
+| India core CPI | October entered at 4.63% from owner-supplied figure. Keep the same core definition. |
+| India headline unemployment | Automated from the latest MoSPI PLFS monthly bulletin (all-India, persons age 15+); October 2026 is 4.9%. This field is separate from the urban-only PLFS chart. |
+| India merchandise trade | September: exports $44.40B, imports $74.61B; October: exports $49.47B, imports $89.35B. Verified Commerce release inputs are in `data/stores/india/india_trade_releases.json`; the fetcher supplements DBIE blanks. |
+| RBI DBIE workbook | The workflow parses the committed `data/50 Macroeconomic Indicators.xlsx`; local edits are invisible to GitHub until pushed. Monthly trade fields in the current workbook are blank after August, even though other monthly fields extend into October. |
 | CGA fiscal accounts | Manual YTD CSV through Sep 2026, plus FY2026–27 BE. September official source pages and full financing breakdown are archived in `data/inputs/cag/sources/2026-09/`. Replace the workbook if available, otherwise enter verified YTD rows including interest, net tax/non-tax revenue and financing components. |
 | Fiscal annuals and Budget assumptions | Annual interest/revenue file through FY2025–26 provisional. Update when actuals/revisions arrive; replace rounded FY2026–27 ₹393 lakh crore GDP with the exact official Budget figure after verification. |
 | RBI surveys | October-release workbooks present: IESH07102026, UCCSH07102026 and RCCSH07102026. Replace on new bi-monthly releases; workbook contents establish survey dates. |
@@ -41,12 +40,11 @@ releases before entering values. No economic observations were changed during th
 | Research editorial content | Maintain `WATCHING`, pinned essays, captions and saved chart images in `config/analysis.py` / `assets/analysis/` when the research changes. |
 | RBI Sentinel yield closes | Recovery only if automatic decision-day collection fails and an issue requests closes. Never rescore the history as routine maintenance. |
 
-**No routine manual entry:** NSDL FPI, headline/food CPI, IIP, urban youth PLFS, WSS reserves,
+**No routine manual entry:** NSDL FPI, headline/food CPI, IIP, all-India headline and urban PLFS unemployment, WSS reserves,
 REER, external vulnerability, State of the Economy, Portfolio Lab and normal market feeds. Their source
 failures need investigation; emergency manual flags do not turn them into monthly typing tasks.
 
-Next: collect October final PMI/GST releases as available. September China unemployment/core CPI,
-September fiscal accounts and the updated DBIE workbook were entered/imported on 30 Oct.
+Next: commit the latest DBIE workbook when ready; future Commerce trade releases must be added to the verified supplement if the workbook still has blanks. China's stored unemployment observation is unchanged.
 The older `india_manual_entry status` grid includes automatic series, so its missing count is not a manual to-do count.
 
 ---
@@ -216,8 +214,8 @@ Full command: `python -m data.processors.india_manual_entry set 2026-09 --gst 2.
 | 1st business day | Manufacturing PMI | `set YYYY-MM --mfg-pmi 53.1` |
 | ~3rd business day | Services PMI | `set YYYY-MM --svc-pmi 54.6` |
 | ~5th | DBIE workbook (credit/deposits, trade; M3 retained without a chart) | replace file, run fetcher (below) |
-| when officially released | Headline/food CPI, General/industry IIP, monthly urban youth PLFS | automated collectors; no routine manual entry |
-| monthly, if sourced consistently | Core CPI; legacy unemployment field if still maintained | `set YYYY-MM --core-cpi 3.8`; `--unemployment` is not the new youth series |
+| when officially released | Headline/food CPI, General/industry IIP, all-India headline UR, monthly urban PLFS | automated collectors; no routine manual entry |
+| monthly, if sourced consistently | Core CPI | `set YYYY-MM --core-cpi 3.8`; unemployment is collected from the official PLFS bulletin |
 | bi-monthly RBI release | Inflation expectations + Urban/Rural confidence | replace official workbooks (below) |
 | when published | CAG monthly accounts | replace workbook, or type figures (below) |
 | ~22nd–25th | RBI Bulletin, State of the Economy | nothing — the Saturday run reads it (below) |

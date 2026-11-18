@@ -1,17 +1,20 @@
-"""Redesigned PLFS monthly Urban/Persons unemployment, officially published only.
+"""Redesigned PLFS monthly unemployment, officially published only.
+
+The urban age-band history feeds the dedicated India labour chart. The
+all-India, persons-15+ rate from the same bulletin feeds the overview database.
 
 python -m data.fetchers.mospi_plfs_monthly [--dry-run] [--csv PATH]
 
-Monthly API frequency_code=3 is CWS by the bulletin's explicit methodology.
-Each refresh verifies the latest five months against Statement 3 of the latest
-bulletin. release_date identifies that corroborating release vintage; the API
-does not expose per-record publication dates or revisions. Reference month is
-stored separately. Only a newer official bulletin permits a changed vintage.
+The official monthly bulletin's Statement 3 is the canonical source for the
+latest five months. It supplies both the urban age bands and the all-India
+persons-15+ rate, avoiding a lag between the PDF release and the separate API.
 """
 import argparse
 from contextlib import nullcontext
 import calendar
 from datetime import date, datetime, timezone
+import hashlib
+import json
 from pathlib import Path
 import re
 
@@ -24,6 +27,7 @@ from data.fetchers.mospi_dashboard import (
 )
 
 from data.paths import MOSPI_PLFS_CSV, mospi_sources_for
+from data.processors.india_db_manager import init_db, upsert_monthly
 
 CSV = MOSPI_PLFS_CSV
 URL = 'https://api.mospi.gov.in/api/plfs/getData'
@@ -38,7 +42,7 @@ FIELDS = ('month', 'geography', 'sector', 'age_group', 'gender', 'indicator',
           'frequency', 'activity_status', 'methodology', 'bulletin_url', 'raw_sha256')
 
 
-def validate(rows):
+def validate(rows, require_start=True):
     require(bool(rows), 'empty PLFS history')
     seen, periods = set(), {}
     for r in rows:
@@ -63,7 +67,8 @@ def validate(rows):
         official_url(r['bulletin_url'])
         require(re.fullmatch('[0-9a-f]{64}', r['raw_sha256']) is not None, 'missing PLFS raw hash')
     require(all(ages == set(AGES.values()) for ages in periods.values()), 'incomplete PLFS month')
-    require(min(periods) == START, 'first published PLFS month missing')
+    if require_start:
+        require(min(periods) == START, 'first published PLFS month missing')
     return rows
 
 
@@ -121,6 +126,101 @@ def parse_statement(text):
     return result
 
 
+def parse_all_india_ur_statement(text):
+    """Read the official all-India, age-15+, person UR from Statement 3."""
+    match = re.search(re.escape(TABLE), text)
+    require(match is not None, 'exact monthly Statement 3 missing')
+    lines = [s.strip() for s in text[match.end():].splitlines() if s.strip()]
+    require([s.casefold() for s in lines[:5]] ==
+            ['sector', 'survey month', 'male', 'female', 'person'],
+            'Statement 3 gender column order changed')
+
+    result = {}
+    sector = age = None
+    month_re = re.compile(r'(' + '|'.join(calendar.month_name[1:]) + r'),\s*(20\d{2})', re.I)
+    for i, line in enumerate(lines):
+        normalized = line.casefold()
+        if normalized in ('rural', 'urban', 'rural + urban'):
+            sector, age = normalized, None
+            continue
+        if normalized.startswith('age group:'):
+            age = normalized.split(':', 1)[1].strip()
+            continue
+        m = month_re.fullmatch(line)
+        if m and sector == 'rural + urban' and age == '15 years and above':
+            require(i + 3 < len(lines), 'truncated all-India unemployment row')
+            values = [number(v) for v in lines[i + 1:i + 4]]
+            period = month(m[2], m[1].capitalize())
+            require(period not in result, 'duplicate all-India unemployment month')
+            result[period] = values[2]  # male / female / person
+
+    require(len(result) >= 5, 'five months of all-India 15+ unemployment required')
+    require(all(0 <= value <= 30 for value in result.values()),
+            'all-India unemployment outside plausible range')
+    return result
+
+
+def persist_all_india_ur(values, release_date, bulletin_url, bulletin_hash, archive,
+                         dry_run=False, persist_database=True):
+    """Update the India overview series independently of the urban-only API feed."""
+    if dry_run or not persist_database:
+        return
+    init_db()
+    for period, value in sorted(values.items()):
+        upsert_monthly(period, {
+            'india_unemployment': value,
+            'source_flags': json.dumps({
+                'india_unemployment': f'mospi_plfs_bulletin:published={release_date}'
+            }),
+        })
+    atomic_json(archive / 'headline_unemployment_latest.json', {
+        'reference_month': max(values),
+        'release_date': release_date,
+        'source_url': bulletin_url,
+        'table_id': TABLE,
+        'age_group': '15 years and above',
+        'sector': 'rural + urban',
+        'gender': 'Persons',
+        'value_pct': values[max(values)],
+        'bulletin_sha256': bulletin_hash,
+    })
+
+
+def rows_from_bulletin(urban_values, release_date, bulletin_url, fetched_at, checksum):
+    """Convert the latest official Statement 3 rows into the urban chart schema."""
+    return validate([
+        dict(month=period, geography='All India', sector='Urban',
+             age_group=age_group, gender='Persons', indicator='UR', value_pct=value,
+             source_url=bulletin_url, table_id=TABLE, release_date=release_date,
+             fetched_at=fetched_at, frequency='Monthly', activity_status='CWS',
+             methodology='Redesigned January 2025', bulletin_url=bulletin_url,
+             raw_sha256=checksum)
+        for (period, age_group), value in sorted(urban_values.items())
+    ], require_start=False)
+
+
+def merge_bulletin_rows(previous, incoming, reference):
+    """Replace only periods verified by the newest bulletin; retain older history."""
+    if previous:
+        validate(previous)
+    validate(incoming, require_start=False)
+    require(max(r['month'] for r in incoming) == reference,
+            'bulletin urban UR reference month mismatch')
+
+    merged = {(r['month'], r['age_group']): r for r in previous}
+    for row in incoming:
+        key = (row['month'], row['age_group'])
+        old = merged.get(key)
+        if old and row['release_date'] < old['release_date']:
+            continue
+        if old and row['release_date'] == old['release_date']:
+            require(float(old['value_pct']) == float(row['value_pct']),
+                    'conflicting PLFS value within the same official bulletin vintage')
+        merged[key] = row
+
+    return validate([merged[key] for key in sorted(merged)])
+
+
 def verify_bulletin(text, rows, reference):
     require(re.search(r'January,?\s*2025', text) and re.search(r'April,?\s*2025', text)
             and 'Current Weekly Status' in text and 'Monthly Bulletin' in text,
@@ -152,31 +252,28 @@ def fetch(path=CSV, dry_run=False, session=None):
         bulletin = download(client, url)
         with fitz.open(stream=bulletin, filetype='pdf') as document:
             text = '\n'.join(p.get_text() for p in document)
-        raw, pages = api_rows(client, URL, PARAMS)
-        import hashlib
-        # Hash the exact bytes of every returned page in deterministic order.
-        checksum = hashlib.sha256(b'\n'.join(pages)).hexdigest()
+        urban_values = parse_statement(text)
+        require(max(period for period, _ in urban_values) == reference,
+                'urban PLFS reference month differs from bulletin')
+        headline_ur = parse_all_india_ur_statement(text)
+        require(max(headline_ur) == reference, 'all-India UR reference month differs from bulletin')
+        archive = mospi_sources_for(path, 'plfs')
+        bulletin_hash = (hashlib.sha256(bulletin).hexdigest() if dry_run
+                         else retain(archive, bulletin))
         fetched = datetime.now(timezone.utc).isoformat()
-        incoming = parse_api(raw, release['published_year'], url, fetched, checksum)
-        verified = verify_bulletin(text, incoming, reference)
+        incoming = rows_from_bulletin(urban_values, release['published_year'],
+                                      url, fetched, bulletin_hash)
         previous = read_csv(path)
-        # The latest bulletin supplies revision evidence only for its own table.
-        # A changed older API observation needs an explicit historical bulletin.
-        old = {(r['month'], r['age_group']): r for r in previous}
-        for r in incoming:
-            key = (r['month'], r['age_group'])
-            if key in old and float(old[key]['value_pct']) != r['value_pct']:
-                require(key in verified, 'historical PLFS change lacks bulletin evidence')
-        combined = reconcile(previous, incoming, ('month', 'age_group'), validate)
+        combined = merge_bulletin_rows(previous, incoming, reference)
+        persist_all_india_ur(headline_ur, release['published_year'], url,
+                             bulletin_hash, archive, dry_run=dry_run,
+                             persist_database=path.resolve() == Path(CSV).resolve())
         if not dry_run:
-            archive = mospi_sources_for(path, 'plfs')
-            retain(archive, b'\n'.join(pages))
-            bulletin_hash = retain(archive, bulletin)
-            atomic_json(archive / 'latest.json', dict(release=release, source_url=URL,
-                        request=PARAMS, table_id=TABLE, raw_sha256=checksum,
+            atomic_json(archive / 'latest.json', dict(release=release, source_url=url,
+                        table_id=TABLE, raw_sha256=bulletin_hash,
                         bulletin_sha256=bulletin_hash, fetched_at=fetched,
-                        start_month=START, spot_checks=len(verified),
-                        release_date_semantics='Corroborating bulletin vintage; API record dates not exposed'))
+                        start_month=START, spot_checks=len(urban_values),
+                        source_method='Official monthly bulletin Statement 3'))
             write_csv(path, combined, FIELDS)
         return combined
 

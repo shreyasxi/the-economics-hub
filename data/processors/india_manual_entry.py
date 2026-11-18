@@ -1,9 +1,9 @@
 """
-India manual data entry.
+India manual data entry and correction utility.
 
-Four India series have no free API and must be keyed in each month: the two
-PMIs, GST collections, CPI, and the PLFS unemployment rate. This replaces the
-old workflow of editing a constant at the top of a script and running it.
+The regular workflow collects headline/food CPI and the official monthly PLFS
+unemployment rate. This utility remains available for manual series, core CPI,
+and emergency corrections when an official collector cannot refresh.
 
     python -m data.processors.india_manual_entry status
     python -m data.processors.india_manual_entry set 2026-05 --mfg-pmi 57.2 --svc-pmi 60.1 --gst 2.01
@@ -73,7 +73,7 @@ FIELDS = [
     Field("--food-cpi", "india_food_cpi_yoy", "% YoY", -10, 30, "mospi",
           "CPI food & beverages %% YoY (MoSPI, ~12th)"),
     Field("--unemployment", "india_unemployment", "%", 0, 30, "plfs",
-          "PLFS unemployment rate %% (MoSPI)"),
+          "All-India PLFS unemployment rate %% (MoSPI; manual recovery only)"),
     # Current-base MoSPI automation is canonical; this flag is emergency-only.
     Field("--iip", "india_iip_yoy", "% YoY", -30, 30, "mospi",
           "Emergency General IIP %% YoY, 2022-23 base; stored separately, explicit chart opt-in required"),

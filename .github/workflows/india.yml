@@ -160,7 +160,7 @@ jobs:
           PYTHONPATH: "."
         run: python -m data.fetchers.mospi_iip_industries
 
-      - name: Refresh official MoSPI monthly urban youth unemployment
+      - name: Refresh official MoSPI monthly PLFS unemployment
         id: mospi-plfs
         if: ${{ github.event.inputs.skip_fetch != 'true' && steps.india-activity-contracts.outcome == 'success' }}
         continue-on-error: true

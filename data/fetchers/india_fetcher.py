@@ -30,7 +30,9 @@ DBIE EXCEL — MANUAL DROP REQUIRED:
   link above), place it at:
       data/50 Macroeconomic Indicators.xlsx
   then run --append to parse and upsert.  If the file is missing, DBIE parsing
-  is skipped gracefully — existing DB data is preserved.
+  is skipped gracefully — existing DB data is preserved. GitHub Actions reads
+  only the workbook version committed to the workflow branch; a local edit is
+  not available to the hosted run until it is committed and pushed.
 """
 
 import argparse
@@ -473,8 +475,10 @@ def fetch_trade_releases(dbie_monthly: dict[str, dict],
         imports = float(release["imports_usd_bn"])
         if not (5 <= exports <= 120 and 5 <= imports <= 160):
             raise ValueError(f"Invalid merchandise trade values for {month}")
-        if not release["source_url"].startswith("https://www.pib.gov.in/"):
-            raise ValueError(f"Expected official PIB source for {month}")
+        source_url = release["source_url"]
+        if not (source_url.startswith("https://www.pib.gov.in/")
+                or source_url.startswith("https://www.commerce.gov.in/")):
+            raise ValueError(f"Expected official PIB or Commerce Ministry source for {month}")
         existing = dbie_monthly.get(month, {})
         if all(existing.get(k) is not None for k in
                ("india_exports_usd_bn", "india_imports_usd_bn")):
