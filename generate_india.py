@@ -2193,25 +2193,33 @@ def chart_institutional_flows_weekly(output_dir):
     width = 2.4
     fpi = panel["fpi_net_cr"].to_numpy() / 1000
     dii = panel["dii_net_cr"].to_numpy() / 1000
+    latest_week = panel.index[-1].to_period("W-FRI")
+    recent_start = (latest_week - 7).start_time
+    recent_end = panel.index[-1] + pd.Timedelta(days=8)
+    ax.axvspan(recent_start, recent_end, color="#F4F4F4", zorder=0)
     # Use fixed series colors regardless of sign, so the bars identify investor
     # groups without implying that buying is good or selling is bad.
     fpi_color = "#D97706"  # Food Inflation bar in India's Inflation Dynamics
     dii_color = "#A070E0"  # IIP monthly series color
     ax.bar(x - width / 2, fpi, width=width, color=fpi_color,
-           alpha=0.86, edgecolor="#333333", linewidth=1.0, zorder=2)
+           edgecolor="#333333", linewidth=1.0, zorder=3)
     ax.bar(x + width / 2, dii, width=width, color=dii_color,
-           alpha=0.86, edgecolor="#333333", linewidth=1.0, zorder=2)
-    ax.axhline(0, color=EconStyle.INK, linewidth=0.95, zorder=2)
+           edgecolor="#333333", linewidth=1.0, zorder=3)
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=0.7,
+            alpha=0.65, zorder=0)
+    ax.grid(axis="x", visible=False)
+    ax.axhline(0, color=EconStyle.INK, linewidth=0.95, zorder=4)
     ax.set_ylabel("Net cash flows (₹ thousand crore)", fontsize=EconStyle.FONT_SIZE_AXIS,
                   fontweight="bold", color=EconStyle.INK)
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda value, _: f"{value:+.0f}" if value else "0"))
-    ax.set_axisbelow(True)
-    ax.grid(axis="y", color=EconStyle.GRID_COLOR, linewidth=0.7, alpha=0.65, zorder=0)
-
     ax_ret = ax.twinx()
+    ax_ret.grid(False)
     ax_ret.plot(panel.index, panel["nifty_return_pct"], color=EconStyle.LINE_BLUE,
                 linewidth=1.65, marker="o", markersize=3.2, label="NIFTY 50 weekly return", zorder=5)
-    ax_ret.axhline(0, color=EconStyle.LINE_BLUE, linewidth=0.65, alpha=0.28, zorder=1)
+    ax.add_artist(Line2D([0, 1], [0, 0], transform=ax_ret.get_yaxis_transform(),
+                          color=EconStyle.LINE_BLUE, linewidth=0.65,
+                          alpha=0.28, zorder=1))
     ax_ret.set_ylabel("NIFTY 50 weekly return (%)", fontsize=EconStyle.FONT_SIZE_AXIS,
                       fontweight="bold", color=EconStyle.LINE_BLUE)
     ax_ret.yaxis.set_major_formatter(mticker.FuncFormatter(lambda value, _: f"{value:+.0f}%" if value else "0%"))
