@@ -1,77 +1,21 @@
 {
   "version": "nse_fpi_dii_cash_weekly_v1",
   "history_months": 6,
-  "source_note": "Six-month daily cash-market flow history; historical rows from the public archive, new rows from the provisional NSE daily endpoint.",
+  "source_note": "Historical rows from the public archive; latest session uses the official NSE daily endpoint and is cross-checked when the archive has matching values.",
   "sources": {
     "historical_archive": {
       "url": "https://indmarket.in/fii-dii-activity",
-      "retrieved_at": "2026-11-06T06:15:09.719895+00:00",
-      "path": "raw/12d576418ca075b7776eac22660b77762450b7c4fc612c9f3d5ab29996c590b5.html",
-      "sha256": "12d576418ca075b7776eac22660b77762450b7c4fc612c9f3d5ab29996c590b5",
-      "bytes": 634097
+      "retrieved_at": "2026-11-18T08:37:41.043436+00:00",
+      "path": "raw/d115ef8e1904f6b4ece3d3a689792b0ca99de18c8d7a4db52a3cca93bc074b08.html",
+      "sha256": "d115ef8e1904f6b4ece3d3a689792b0ca99de18c8d7a4db52a3cca93bc074b08",
+      "bytes": 638843
     }
   },
   "nse_daily_snapshots": [
     {
-      "date": "2026-11-05",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-06T06:15:09.719907+00:00",
-      "path": "raw/861c19014ce4aa4847c366df3f1a1116de58e2f883489faff2be5b011b0409f2.json",
-      "sha256": "861c19014ce4aa4847c366df3f1a1116de58e2f883489faff2be5b011b0409f2",
-      "bytes": 220
-    },
-    {
-      "date": "2026-11-06",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-06T15:50:58.276587+00:00",
-      "path": "raw/b5851617af7a361ae5f8bc8de545b2148e26b1dd67d1697d4b19fe4d888c6417.json",
-      "sha256": "b5851617af7a361ae5f8bc8de545b2148e26b1dd67d1697d4b19fe4d888c6417",
-      "bytes": 218
-    },
-    {
-      "date": "2026-11-09",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-09T23:04:00.627060+00:00",
-      "path": "raw/339fb188c26ea2beed7eb29c0737e0128c1bd14179992c3581df7bfa687763d5.json",
-      "sha256": "339fb188c26ea2beed7eb29c0737e0128c1bd14179992c3581df7bfa687763d5",
-      "bytes": 217
-    },
-    {
-      "date": "2026-11-11",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-11T20:16:59.045383+00:00",
-      "path": "raw/9a5987d3ea9ded78fb93e508688366656e24c6ebd92614d7009dd8d7509aea5b.json",
-      "sha256": "9a5987d3ea9ded78fb93e508688366656e24c6ebd92614d7009dd8d7509aea5b",
-      "bytes": 219
-    },
-    {
-      "date": "2026-11-12",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-12T20:59:06.806443+00:00",
-      "path": "raw/878f59bf3be0452a4fa1774da1f5e9d3e88d2b028ff1985a189694e0a16f6870.json",
-      "sha256": "878f59bf3be0452a4fa1774da1f5e9d3e88d2b028ff1985a189694e0a16f6870",
-      "bytes": 216
-    },
-    {
-      "date": "2026-11-13",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-13T20:34:03.711993+00:00",
-      "path": "raw/d2b53ffc75009ccccc1f174fd6d89984e470f86906a94255bcda82d034b22ce4.json",
-      "sha256": "d2b53ffc75009ccccc1f174fd6d89984e470f86906a94255bcda82d034b22ce4",
-      "bytes": 218
-    },
-    {
-      "date": "2026-11-16",
-      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-16T16:26:23.302392+00:00",
-      "path": "raw/72e1621b2cfdbb35e474e9443bcef0b68fe36bca9107895da66484f90729fb9f.json",
-      "sha256": "72e1621b2cfdbb35e474e9443bcef0b68fe36bca9107895da66484f90729fb9f",
-      "bytes": 217
-    },
-    {
       "date": "2026-11-17",
       "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-17T21:50:30.425818+00:00",
+      "retrieved_at": "2026-11-18T08:37:41.043454+00:00",
       "path": "raw/105e7ae591e47e6902aeff75499e358bd9f67660fca000a81a4e80ea188d9c03.json",
       "sha256": "105e7ae591e47e6902aeff75499e358bd9f67660fca000a81a4e80ea188d9c03",
       "bytes": 214
@@ -196,16 +140,17 @@
     "2026-11-02": "third_party_historical_archive",
     "2026-11-03": "third_party_historical_archive",
     "2026-11-04": "third_party_historical_archive",
-    "2026-11-05": "archive_cross_checked_against_nse",
-    "2026-11-06": "nse_official_daily_provisional",
-    "2026-11-09": "nse_official_daily_provisional",
-    "2026-11-11": "nse_official_daily_provisional",
-    "2026-11-12": "nse_official_daily_provisional",
-    "2026-11-13": "nse_official_daily_provisional",
-    "2026-11-16": "nse_official_daily_provisional",
-    "2026-11-17": "nse_official_daily_provisional"
+    "2026-11-05": "third_party_historical_archive",
+    "2026-11-06": "third_party_historical_archive",
+    "2026-11-08": "third_party_historical_archive",
+    "2026-11-09": "third_party_historical_archive",
+    "2026-11-11": "third_party_historical_archive",
+    "2026-11-12": "third_party_historical_archive",
+    "2026-11-13": "third_party_historical_archive",
+    "2026-11-16": "third_party_historical_archive",
+    "2026-11-17": "archive_cross_checked_against_nse"
   },
-  "refreshed_at": "2026-11-17T21:50:30.426392+00:00",
+  "refreshed_at": "2026-11-18T08:37:41.043776+00:00",
   "first_date": "2026-05-18",
   "last_date": "2026-11-17",
   "observations": [
@@ -1290,6 +1235,15 @@
       "dii_net_cr": -5968.7
     },
     {
+      "date": "2026-11-08",
+      "fpi_buy_cr": 52.39,
+      "fpi_sell_cr": 52.64,
+      "fpi_net_cr": -0.25,
+      "dii_buy_cr": 331.11,
+      "dii_sell_cr": 1031.42,
+      "dii_net_cr": -700.31
+    },
+    {
       "date": "2026-11-09",
       "fpi_buy_cr": 20310.99,
       "fpi_sell_cr": 13098.77,
@@ -1327,12 +1281,12 @@
     },
     {
       "date": "2026-11-16",
-      "fpi_buy_cr": 15636.88,
+      "fpi_buy_cr": 15636.9,
       "fpi_sell_cr": 10772.2,
-      "fpi_net_cr": 4864.68,
-      "dii_buy_cr": 11752.03,
-      "dii_sell_cr": 15271.08,
-      "dii_net_cr": -3519.05
+      "fpi_net_cr": 4864.7,
+      "dii_buy_cr": 11752.0,
+      "dii_sell_cr": 15271.1,
+      "dii_net_cr": -3519.0
     },
     {
       "date": "2026-11-17",
@@ -1344,6 +1298,6 @@
       "dii_net_cr": 196.93
     }
   ],
-  "observations_path": "derived/214a9618564e3be18336b59887a6cc2ee620428b17e95e02120f9f5518cc67a2.csv",
-  "observations_sha256": "214a9618564e3be18336b59887a6cc2ee620428b17e95e02120f9f5518cc67a2"
+  "observations_path": "derived/8524c7185a199d8649329d889f3808243a2614d32343628e110efeecb431a516.csv",
+  "observations_sha256": "8524c7185a199d8649329d889f3808243a2614d32343628e110efeecb431a516"
 }
