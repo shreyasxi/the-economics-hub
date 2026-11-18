@@ -521,7 +521,7 @@ jobs:
           echo "Copying output/india/$MONTH_FOLDER/ → assets/india/$MONTH_FOLDER/"
           mkdir -p "assets/india/$MONTH_FOLDER"
           # Remove omitted optional artifacts before copying this run's output.
-          for NAME in 03_india_fpi_monthly 08_india_interest_revenue 16_india_forex_reserves 17_india_trade 18_india_rate_transmission 22_india_gva_contributions 21_india_risk_appetite 06_india_inflation_bar 15_india_iip; do
+          for NAME in 03_india_fpi_monthly 04_india_institutional_flows_weekly 05_india_nifty_downside_skew 08_india_interest_revenue 16_india_forex_reserves 17_india_trade 18_india_rate_transmission 21_india_risk_appetite 22_india_gva_contributions 06_india_inflation_bar 15_india_iip; do
             if [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ]; then
               rm -f "assets/india/$MONTH_FOLDER/$NAME.png"
             fi
@@ -638,3 +638,27 @@ jobs:
             sleep 10
           done
           exit 1
+
+
+      - name: Require current NSE flow and volatility charts
+        if: always()
+        env:
+          OPTIONS_REFRESH: ${{ steps.nse-options-risk.outcome }}
+          SKEW_REFRESH: ${{ steps.nse-downside-skew.outcome }}
+          FLOW_REFRESH: ${{ steps.nse-institutional-flows.outcome }}
+        run: |
+          FAILED=0
+          for RESULT in "India VIX:$OPTIONS_REFRESH" "NIFTY downside skew:$SKEW_REFRESH" "FPI/DII flows:$FLOW_REFRESH"; do
+            if [[ "${RESULT#*:}" != "success" ]]; then
+              echo "::error title=India chart refresh failed::${RESULT%%:*} source refresh ended with ${RESULT#*:}."
+              FAILED=1
+            fi
+          done
+          MONTH_FOLDER=$(ls output/india/ | sort | tail -1)
+          for NAME in 04_india_institutional_flows_weekly 05_india_nifty_downside_skew 21_india_risk_appetite; do
+            if [ -z "$MONTH_FOLDER" ] || [ ! -f "output/india/$MONTH_FOLDER/$NAME.png" ] || [ ! -f "assets/india/$MONTH_FOLDER/$NAME.png" ] || ! cmp -s "output/india/$MONTH_FOLDER/$NAME.png" "assets/india/$MONTH_FOLDER/$NAME.png"; then
+              echo "::error title=India chart missing::$NAME was not generated from current source data."
+              FAILED=1
+            fi
+          done
+          exit "$FAILED"

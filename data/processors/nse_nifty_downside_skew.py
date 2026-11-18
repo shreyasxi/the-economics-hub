@@ -145,29 +145,45 @@ def extract_snapshot(archive: bytes, expected_date: str | date,
 def parse_snapshot(payload: bytes, expected_date: str | date) -> pd.DataFrame:
     expected = pd.Timestamp(expected_date).normalize()
     try:
-        reader = csv.DictReader(io.StringIO(payload.decode("utf-8-sig")))
-    except UnicodeDecodeError as exc:
-        raise ValueError("Stored NIFTY option snapshot is not UTF-8") from exc
-    if reader.fieldnames != OPTION_COLUMNS:
+        frame = pd.read_csv(
+            io.BytesIO(payload), encoding="utf-8-sig",
+            dtype={
+                "date": "string", "expiry_date": "string", "option_type": "string",
+                "strike": "float64", "close_price": "float64", "volume": "float64",
+                "open_interest": "float64", "underlying": "float64",
+            },
+        )
+    except (UnicodeDecodeError, pd.errors.ParserError, TypeError, ValueError) as exc:
+        raise ValueError("Stored NIFTY option snapshot is not valid UTF-8 CSV") from exc
+    if frame.columns.tolist() != OPTION_COLUMNS:
         raise ValueError("Stored NIFTY option snapshot has an unexpected schema")
-    rows = []
-    for row in reader:
-        day = pd.to_datetime(row["date"], errors="raise").normalize()
-        expiry = pd.to_datetime(row["expiry_date"], errors="raise").normalize()
-        option_type = row["option_type"]
-        if day != expected or option_type not in {"CE", "PE"}:
-            raise ValueError("Stored NIFTY option snapshot has an unexpected date or option side")
-        dte = (expiry - day).days
-        if not MIN_EXPIRY_DAYS <= dte <= MAX_EXPIRY_DAYS:
-            raise ValueError("Stored NIFTY option snapshot includes an out-of-window expiry")
-        values = {key: float(row[key]) for key in ("strike", "close_price", "volume", "open_interest", "underlying")}
-        if not all(math.isfinite(value) for value in values.values()):
-            raise ValueError("Stored NIFTY option snapshot contains a non-finite value")
-        if (values["strike"] <= 0 or values["close_price"] < 0 or values["volume"] < 0
-                or values["open_interest"] < 0 or values["underlying"] <= 0):
-            raise ValueError("Stored NIFTY option snapshot contains an invalid value")
-        rows.append({"date": day, "expiry_date": expiry, "option_type": option_type, **values})
-    frame = pd.DataFrame(rows, columns=OPTION_COLUMNS)
+    if frame.empty:
+        raise ValueError("Stored NIFTY option snapshot is empty")
+    expected_text = expected.strftime("%Y-%m-%d")
+    if (not frame["date"].eq(expected_text).all()
+            or not frame["option_type"].isin({"CE", "PE"}).all()):
+        raise ValueError("Stored NIFTY option snapshot has an unexpected date or option side")
+    frame["date"] = expected
+    frame["date"] = frame["date"].astype("datetime64[ns]")
+    frame["option_type"] = frame["option_type"].astype(object)
+    try:
+        frame["expiry_date"] = pd.to_datetime(
+            frame["expiry_date"], format="%Y-%m-%d", errors="raise",
+        )
+        frame["expiry_date"] = frame["expiry_date"].astype("datetime64[ns]")
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Stored NIFTY option snapshot has an invalid expiry date") from exc
+    dte = (frame["expiry_date"] - expected).dt.days
+    if ((dte < MIN_EXPIRY_DAYS) | (dte > MAX_EXPIRY_DAYS)).any():
+        raise ValueError("Stored NIFTY option snapshot includes an out-of-window expiry")
+    numeric = frame[["strike", "close_price", "volume", "open_interest", "underlying"]].to_numpy(float)
+    if not np.isfinite(numeric).all():
+        raise ValueError("Stored NIFTY option snapshot contains a non-finite value")
+    if ((frame["strike"] <= 0).any() or (frame["close_price"] < 0).any()
+            or (frame["volume"] < 0).any() or (frame["open_interest"] < 0).any()
+            or (frame["underlying"] <= 0).any()):
+        raise ValueError("Stored NIFTY option snapshot contains an invalid value")
+    frame = frame[OPTION_COLUMNS]
     if frame.duplicated(["date", "expiry_date", "option_type", "strike"]).any():
         raise ValueError("Stored NIFTY option snapshot contains duplicate contracts")
     return frame

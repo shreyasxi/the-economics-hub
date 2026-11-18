@@ -91,7 +91,7 @@ def bootstrap(root: Path = ROOT, client: requests.Session | None = None) -> tupl
 
 
 def refresh(root: Path = ROOT, client: requests.Session | None = None) -> tuple[pd.DataFrame, dict]:
-    """Append the latest NSE observation; refuse gaps that cannot be recovered."""
+    """Append today's NSE observation, rebuilding history when a gap is too large."""
     root = Path(root)
     frame, previous = load(root)
     client = client or session()
@@ -111,7 +111,11 @@ def refresh(root: Path = ROOT, client: requests.Session | None = None) -> tuple[
     else:
         gap = (day - last).days
         if gap > 5:
-            raise ValueError(f"NSE collector missed {gap} calendar days; daily endpoint cannot backfill the gap")
+            print(
+                f"NSE institutional-flow collector missed {gap} calendar days; "
+                "rebuilding the rolling history from the validated archive"
+            )
+            return bootstrap(root, client=client)
         frame = pd.concat([frame, daily]).sort_index()
         row_sources[str(day.date())] = "nse_official_daily_provisional"
     raw = _save_raw(root, payload, "json")
@@ -144,10 +148,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         if args.bootstrap:
-            if (args.root / "manifest.json").exists():
-                refresh(args.root)
-            else:
-                bootstrap(args.root)
+            bootstrap(args.root)
         else:
             refresh(args.root)
     except Exception as exc:
