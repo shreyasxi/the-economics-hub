@@ -8,9 +8,9 @@
   },
   "weekly_date_calendar": "Official NSE / NIFTY Indices NIFTY 50 daily closes",
   "legacy_underlying_source": "NIFTY 50 official historical index closes",
-  "requested_end": "2026-11-16",
-  "retained_start": "2023-11-16",
-  "refreshed_at": "2026-11-17T11:00:42.937214+00:00",
+  "requested_end": "2026-11-17",
+  "retained_start": "2023-11-17",
+  "refreshed_at": "2026-11-18T05:46:32.757703+00:00",
   "sources": [
     {
       "date": "2023-11-17",
@@ -1829,7 +1829,7 @@
       "archive_sha256": "9021b35dccd79f13d642bee45dc0fc8660122fadcb673158c6969c43c1fbf8d5",
       "archive_bytes": 1282557,
       "rows": 1358,
-      "retrieved_at": "2026-11-17T10:59:22.754147+00:00",
+      "retrieved_at": "2026-11-18T05:46:27.445719+00:00",
       "subset_path": "raw/5857a614358e8ac3412c04f8197510cbf9d5dd4bee203eef127403abc20491ca.csv",
       "subset_sha256": "5857a614358e8ac3412c04f8197510cbf9d5dd4bee203eef127403abc20491ca",
       "subset_bytes": 82758
@@ -1841,22 +1841,22 @@
       "archive_sha256": "7455447c19eb138dd6799d701aab4fed7d94f0bf0dbac3a3f14ebe257bdeab2c",
       "archive_bytes": 1385672,
       "rows": 1370,
-      "retrieved_at": "2026-11-17T10:59:23.938136+00:00",
+      "retrieved_at": "2026-11-18T05:46:29.929488+00:00",
       "subset_path": "raw/eba3985efec83fcf530c3de9d417a258c4f02e14f83f2d3018ab1032452cec67.csv",
       "subset_sha256": "eba3985efec83fcf530c3de9d417a258c4f02e14f83f2d3018ab1032452cec67",
       "subset_bytes": 81377
     },
     {
-      "date": "2026-11-16",
-      "url": "https://archives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261116_F_0000.csv.zip",
+      "date": "2026-11-17",
+      "url": "https://archives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261117_F_0000.csv.zip",
       "archive_format": "udiff",
-      "archive_sha256": "8d05f146bb8d2d03fb47c5bcba0c8e9ede5cd1e3485fef33843f445a8e6f1d0e",
-      "archive_bytes": 1412691,
-      "rows": 1370,
-      "retrieved_at": "2026-11-17T10:59:25.383927+00:00",
-      "subset_path": "raw/c11409fdb8fe29f97b27a39e88f1c944ab71962361e292200a935c7ba915ae52.csv",
-      "subset_sha256": "c11409fdb8fe29f97b27a39e88f1c944ab71962361e292200a935c7ba915ae52",
-      "subset_bytes": 81619
+      "archive_sha256": "056b8567e71017a5e9b586e20ea0c7c98c4b63ae1a59f82cb6d3cca466dad7da",
+      "archive_bytes": 1442580,
+      "rows": 1054,
+      "retrieved_at": "2026-11-18T05:46:31.878149+00:00",
+      "subset_path": "raw/db8f3f7ba8d3e5fe8d6a971b5e264dcbd4efd56a989fe3d2bfecbe920d8beb27.csv",
+      "subset_sha256": "db8f3f7ba8d3e5fe8d6a971b5e264dcbd4efd56a989fe3d2bfecbe920d8beb27",
+      "subset_bytes": 62717
     }
   ],
   "source_dates": [
@@ -2017,10 +2017,10 @@
     "2026-10-30",
     "2026-11-06",
     "2026-11-13",
-    "2026-11-16"
+    "2026-11-17"
   ],
-  "last_option_date": "2026-11-16",
-  "option_contract_rows": 146739,
-  "observations_path": "derived/bbc7e431d440dd31d8a2792cef1bcc0044ba0c1e09ac7a22c687489c36156058.csv",
-  "observations_sha256": "bbc7e431d440dd31d8a2792cef1bcc0044ba0c1e09ac7a22c687489c36156058"
+  "last_option_date": "2026-11-17",
+  "option_contract_rows": 146423,
+  "observations_path": "derived/5cd04dc8bb2c87413f6a834ea3cfa7dda69de13490b7913be62b11ea0ae4727a.csv",
+  "observations_sha256": "5cd04dc8bb2c87413f6a834ea3cfa7dda69de13490b7913be62b11ea0ae4727a"
 }
