@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Information Technology",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:27:28.172015+00:00",
+  "collected_at": "2026-11-18T06:43:02.732113+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Information Technology members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -3483,6 +3483,11 @@
   "price_date": "2026-09-30",
   "failures": [
     {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    },
+    {
       "stage": "holding",
       "identity": "INFY:2025-09-30",
       "error": "Total shares do not reconcile to reported category percentages"
@@ -4517,7 +4522,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BSOFT",
       "file": "sources/filings-BSOFT.json",
-      "sha256": "6c2c891c34fe5a245153d1cd89ca1f5b27d240b6f446ef4c86bce1a5e3c2b2d7"
+      "sha256": "05ff58e3153d41b38d579a19c13bd651f7e1b39dc8f951a3717b3a55428bee55"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CAPILLARY",
@@ -4527,7 +4532,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=COFORGE",
       "file": "sources/filings-COFORGE.json",
-      "sha256": "f55489cc12b5d12f618a197f6781a8b16ab58d52b438e33678ea507504bdb394"
+      "sha256": "38fbda7cfb924d1e0e47030f69990afebeba678d1f9d93b42aa7963ec0cde562"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CYIENT",
@@ -4542,7 +4547,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=E2E",
       "file": "sources/filings-E2E.json",
-      "sha256": "f84fd16bfa0594845c2beeece6f2b3fc4619e4a88844f2dd7ade402a53d4f653"
+      "sha256": "f10b7de25041e1ff9908762e22f6175627c55a1ea3c741650a96fd8036b20308"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=EBGNG",
@@ -4577,7 +4582,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=INFY",
       "file": "sources/filings-INFY.json",
-      "sha256": "4df3418d6922832ad3ef340ba2d2084bb014a00e09295f44a1a13b829347b81e"
+      "sha256": "0b902e6fcec1d04c9f71a83f7733af8e6824a32b14316ede02226bc49d9d02a2"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=INTELLECT",
@@ -4697,17 +4702,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -4740,10 +4740,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "1721fa0893b06f8a181d45f531dc281d3abc5d486962a78b041dad6fc8bde241"
+  "digest": "fb1977f68c93fecf06333d30342f06c01ad8eae753e970b520a59f9e54f42727"
 }

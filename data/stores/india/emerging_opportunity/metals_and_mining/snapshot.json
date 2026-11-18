@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Metals & Mining",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:28:19.866549+00:00",
+  "collected_at": "2026-11-18T06:43:39.031497+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Metals & Mining members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -2422,6 +2422,11 @@
   "price_date": "2026-09-30",
   "failures": [
     {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    },
+    {
       "stage": "holding",
       "identity": "JAINREC:2025-09-30",
       "error": "Total shares context not found"
@@ -3096,7 +3101,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HINDALCO",
       "file": "sources/filings-HINDALCO.json",
-      "sha256": "92a70798684004a344b49dbc8ac88f67bcad62215bbc25feb243038ff16dd16d"
+      "sha256": "001dfc1dda4279f73a5912ddc74c81d139b8c674b19519c01e1028df18e89487"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HINDCOPPER",
@@ -3106,7 +3111,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HINDZINC",
       "file": "sources/filings-HINDZINC.json",
-      "sha256": "d3268618784783ab03784bd14c7da8823f9223dda6259b80bfefeb84228be44f"
+      "sha256": "214ad5a2f0427d3fed8904c40b2a3446c02170c472772e71ad6085c154b9c8a8"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IMFA",
@@ -3136,7 +3141,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JSWSTEEL",
       "file": "sources/filings-JSWSTEEL.json",
-      "sha256": "970e957296f97c110054e14d538fbd54494487463679747328186ca9bdfa6938"
+      "sha256": "ed53224c7c8e8207f9ad7bf1b8c3e60b9f0bf7c527b29643e5f9ff979afe6d51"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=LLOYDSENT",
@@ -3156,7 +3161,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NATIONALUM",
       "file": "sources/filings-NATIONALUM.json",
-      "sha256": "3cc42585a84e784b9e6bf74e2ed147fdbb9dd7f22620b4e7715e2ce9ecec8c72"
+      "sha256": "843e90d16ac5ad9d7517fab6998d003fbf6030c81e95945a8c14e3232ddb4093"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NMDC",
@@ -3201,7 +3206,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VEDL",
       "file": "sources/filings-VEDL.json",
-      "sha256": "4bf856a976367005b1a6fd042140c7278e45dfdba09f5d2df3da20ffa443b7d5"
+      "sha256": "8e8f3f06ac5fd1f4853eed21a80a277e48590a50c58481486f97c932313289b9"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VISL",
@@ -3211,17 +3216,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -3254,10 +3254,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "4aa9a64210f0712bc008a5c9b0ae88a750e2d4dcd0f0d8cd7b757cf0c89a26ec"
+  "digest": "f622296d46a344521e16e677504e80a9131669882450fa700cf7de21b717d4a0"
 }

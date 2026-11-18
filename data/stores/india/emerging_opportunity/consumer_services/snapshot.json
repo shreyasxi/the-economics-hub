@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Consumer Services",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:23:11.513319+00:00",
+  "collected_at": "2026-11-18T06:39:41.579127+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Consumer Services members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -477,6 +477,21 @@
           "insurance_pct": null,
           "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1694830_17072026113506_WEB.xml",
           "filed_at": "17-JUL-2026 11:35:11"
+        },
+        {
+          "symbol": "AVL",
+          "quarter": "2026-09-30",
+          "fpi_shares": 20794212,
+          "total_shares": 129138050,
+          "fpi_pct": 16.10231221549342,
+          "dii_shares": 27120830,
+          "dii_pct": 21.001424444615665,
+          "mf_shares": 25819483,
+          "mf_pct": 19.993706734769496,
+          "insurance_shares": null,
+          "insurance_pct": null,
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1758988_16112026023410_WEB.xml",
+          "filed_at": "16-NOV-2026 14:34:19"
         }
       ],
       "reference_price": 594.35
@@ -3886,7 +3901,13 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [],
+  "failures": [
+    {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    }
+  ],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1551314_17102025124300_WEB.xml",
@@ -3982,6 +4003,11 @@
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1694830_17072026113506_WEB.xml",
       "file": "sources/AVL-2026-06-30.xml.gz",
       "sha256": "0b78c1268c3628f46e52b3426dc7d082dbe155d9251232f7950dd7f61a519596"
+    },
+    {
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1758988_16112026023410_WEB.xml",
+      "file": "sources/AVL-2026-09-30.xml.gz",
+      "sha256": "8caa11346cd6778dfebb2b5d413fe54079795934117236462749c326da34ad69"
     },
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1655472_20042026070312_WEB.xml",
@@ -4946,7 +4972,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ABFRL",
       "file": "sources/filings-ABFRL.json",
-      "sha256": "d75b07df95575f70599e66d42b24f2248cbb7ea3db8dcc98b5d13f7036dca3f3"
+      "sha256": "bc64e01a126c8dc9e5f579b1e1cb3a771abbad71114542faaa8b24e0e9ea6033"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ABLBL",
@@ -4961,7 +4987,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AVL",
       "file": "sources/filings-AVL.json",
-      "sha256": "14429fc8043f261221117d50a415e0fcccabf1f9e27137c3347ba8827bb4e76c"
+      "sha256": "1fd5c573b426245c4fa2fd68bf1d4ddf374a4c42742281ff0b870c654d242bf4"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BLS",
@@ -5161,17 +5187,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -5204,10 +5225,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "072ddd8837be5a1f97a051047df7cd23ec6052edf3a0f57e4d94ebdaeca3353d"
+  "digest": "4663de99edc87527fef78607a82b22750bc10fd803d24f15152ce793a34e57d8"
 }

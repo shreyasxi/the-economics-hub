@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Fast Moving Consumer Goods",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:23:54.269620+00:00",
+  "collected_at": "2026-11-18T06:40:17.117001+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Fast Moving Consumer Goods members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -3837,6 +3837,11 @@
   "price_date": "2026-09-30",
   "failures": [
     {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    },
+    {
       "stage": "holding",
       "identity": "ITC:2025-09-30",
       "error": "Total shares do not reconcile to reported category percentages"
@@ -4951,7 +4956,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BALRAMCHIN",
       "file": "sources/filings-BALRAMCHIN.json",
-      "sha256": "4efe7dcfe8d4ee5df00393d6344e55ebb730dc2e227f34d6c627b4104b3749b2"
+      "sha256": "aebc79f309bdc21c4870c9b59934afe4161f8bbc77184a37211a82c57c1b86cb"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BECTORFOOD",
@@ -5026,7 +5031,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GOKULAGRO",
       "file": "sources/filings-GOKULAGRO.json",
-      "sha256": "419bfa1664338e62c8abf22202742b190c00ba1336b0686be95c3959d0a280cf"
+      "sha256": "919bfb330f1a584c522085c9a26995e675e9cb3974f1c1edff8ebd0b4f31001b"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HERITGFOOD",
@@ -5051,7 +5056,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ITC",
       "file": "sources/filings-ITC.json",
-      "sha256": "4ef054fe0b6769f5b3c7693bf605beb55e15631734c005dee30a97b5813e96c8"
+      "sha256": "39aeb13981cea14725b7bfdb397618fdff38036161cffe779341e0938f406415"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JYOTHYLAB",
@@ -5146,17 +5151,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -5189,10 +5189,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "ea796e007be633dcb9c368ed9c3419e24c934d9083c7b913c2ec3e1cce541030"
+  "digest": "36c2eb00ccbbc3308446dcc510510605e1c753da3a40db17f5501e7c817aeb98"
 }

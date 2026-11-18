@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Chemicals",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:21:22.566080+00:00",
+  "collected_at": "2026-11-18T06:38:08.203897+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Chemicals members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -3899,6 +3899,11 @@
   "price_date": "2026-09-30",
   "failures": [
     {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    },
+    {
       "stage": "holding",
       "identity": "ACI:2025-12-31",
       "error": "Missing share count"
@@ -5118,12 +5123,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GSFC",
       "file": "sources/filings-GSFC.json",
-      "sha256": "4bb6e6434ef9fbea587fb8928ab0f5340bff4825e4154f338ac4798b0f279ccc"
+      "sha256": "16f44542b38f5489d07cc37490d5af4205598469ff6b28b92032f8d6c7d6db94"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GUJALKALI",
       "file": "sources/filings-GUJALKALI.json",
-      "sha256": "ff38a28a617f0ff10c772321726ea372a5bb1ba9656ee61a01557e3b2075a76d"
+      "sha256": "e96d953a3e64b65dc3043f0f95324983f7da06ed1158b1eb09c285ceac776025"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HSCL",
@@ -5148,7 +5153,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=MBAPL",
       "file": "sources/filings-MBAPL.json",
-      "sha256": "05f60bb6e436d05b908657397e0e93ad86e8076db4601e0d01a935facf879638"
+      "sha256": "5bdec1d30d3c385e540bd020ae8dbe24398a7deed3bbb344925a6aa357a19ed7"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NAVINFLUOR",
@@ -5248,7 +5253,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TATACHEM",
       "file": "sources/filings-TATACHEM.json",
-      "sha256": "3435eeb2a3b3e08722c05edfa7d7420f010d36ec6591cf6cbcfa7fe1f24c3557"
+      "sha256": "16c08054320b6b61468354f14642c534aeb0d3ed14f9346b9705d2d2c14c8e98"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=UPL",
@@ -5258,17 +5263,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -5301,10 +5301,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "b309eb85b98a5da34712d2e1741c9a7174d9290b0fabc3da6916646571cb864e"
+  "digest": "ccb6a24d18da962ce4ccd781463a3eccba7ec329a5f7ea226452958cb681c2da"
 }

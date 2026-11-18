@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Financial Services",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:24:33.776306+00:00",
+  "collected_at": "2026-11-18T06:40:48.816287+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Financial Services members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -5809,8 +5809,8 @@
           "mf_pct": 32.16142731306948,
           "insurance_shares": 62733358,
           "insurance_pct": 6.49153049934857,
-          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1553727_18102025053450_WEB.xml",
-          "filed_at": "18-OCT-2025 17:34:55"
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1747163_27102026071259_WEB.xml",
+          "filed_at": "17-NOV-2026 16:41:08"
         },
         {
           "symbol": "KARURVYSYA",
@@ -10021,6 +10021,11 @@
   "price_date": "2026-09-30",
   "failures": [
     {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    },
+    {
       "stage": "holding",
       "identity": "CANBK:2025-09-30",
       "error": "Total shares do not reconcile to reported category percentages"
@@ -11738,9 +11743,9 @@
       "sha256": "40f8ebba42ddb14465556ea594d5fb670e82bf86eb42cf45ed2e05b0900e4e61"
     },
     {
-      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1553727_18102025053450_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1747163_27102026071259_WEB.xml",
       "file": "sources/KARURVYSYA-2025-09-30.xml.gz",
-      "sha256": "2928219640f96b9605714d6ced5c81c203369f95897d3fe54ab2c7d534549e35"
+      "sha256": "9ed7828f20a02611c10a01f7be87cef17c6818a324d8bb6c0b5831e7f44f35bc"
     },
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1600463_14012026121729_WEB.xml",
@@ -12970,7 +12975,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ANGELONE",
       "file": "sources/filings-ANGELONE.json",
-      "sha256": "6e104fcad1d5a2310fa97dc01f5902ea7109170771f62a987fb4aee109b904a2"
+      "sha256": "191bb954ccb7d64ec8e5912943dcb7655cb223a8d91bc7331625863789ae0640"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=APTUS",
@@ -12985,7 +12990,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AXISBANK",
       "file": "sources/filings-AXISBANK.json",
-      "sha256": "495616b1764350f7637da3e328e6cf8bf38d4bb08ddd8e601ce26fc52d2d2fb4"
+      "sha256": "f7fc557fdd862fd6875e52e49b6e8a14ae960b4b6c13efce36c8f30ccf6cedd7"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BAJAJFINSV",
@@ -13000,7 +13005,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BAJAJHLDNG",
       "file": "sources/filings-BAJAJHLDNG.json",
-      "sha256": "5092679ccb04ff44eac7ecd0ded39d30ba1e012b6894322ce75510f68b468546"
+      "sha256": "4df79b4b081f1b1cefc8172949b18de694f0eb47dcc37b3490ca6a403f499e74"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BAJFINANCE",
@@ -13020,7 +13025,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BANKINDIA",
       "file": "sources/filings-BANKINDIA.json",
-      "sha256": "0c218c8797a0cbff95288e1a67c4c64acca8064bf23c3ada5fc0274cbd57db9b"
+      "sha256": "519341bc2f8e6909925cc3d9d076d9bdbe13498e77620a3e810ae46fffafa06d"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BSE",
@@ -13030,7 +13035,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CAMS",
       "file": "sources/filings-CAMS.json",
-      "sha256": "183b321dee744c361026e0516f6bf7202d8e6cbc3abab071917d66e9acee9c4f"
+      "sha256": "4607dfa8a185358cd7a6f8d706a516a14e6dd03f37c7cf012db0a608025de8ab"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CANBK",
@@ -13060,7 +13065,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CGCL",
       "file": "sources/filings-CGCL.json",
-      "sha256": "0f9e748e6ebd8505bda0ce730186d0af420932d231f73d99105af110be363fd5"
+      "sha256": "9bde3ac307456422ec39ad80622b77966ead37a5100bf50df36e1e39301a7df5"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CHOICEIN",
@@ -13085,7 +13090,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CREDITACC",
       "file": "sources/filings-CREDITACC.json",
-      "sha256": "4530cde99031543a610f0cd9f8cb340b17824810120d20c5b3883f098eb11d2b"
+      "sha256": "79be220d1ac683fe4fdba9ed3ba355ee012ffbcddec6b33f87643bb6703b5996"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CRISIL",
@@ -13100,7 +13105,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CUB",
       "file": "sources/filings-CUB.json",
-      "sha256": "1a16714d94ec47d3d437cf1b84d9d8095551190e6defa8ffe9f26475df239f79"
+      "sha256": "b3fda547d148580b0b51ab45d0eb337e7792ad293312b3787f55755bfbf0c9e7"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=DCBBANK",
@@ -13120,7 +13125,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=FEDERALBNK",
       "file": "sources/filings-FEDERALBNK.json",
-      "sha256": "9da01b6f15d1b8e47ce932073f65519ede385f8558ee3d41a057cd3c7e676080"
+      "sha256": "c7db8eee8f2b2c3f8d00bc28f473e2aaf5dda4c494c81b0bdba3b2aa1d472211"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=FEDFINA",
@@ -13155,7 +13160,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HDFCBANK",
       "file": "sources/filings-HDFCBANK.json",
-      "sha256": "1106d26692b328ca3c00678a372d4155222d8d5f42e2e8356bc92013b49302f0"
+      "sha256": "b974d7ce528c676c5656f236f013d6d035f91ee0917d3654fe6324599744cc0d"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HDFCLIFE",
@@ -13195,12 +13200,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IDBI",
       "file": "sources/filings-IDBI.json",
-      "sha256": "46aefc6e9e671c67c3342a2037d1a6c81af0576971a6a18596b69a6483afc87e"
+      "sha256": "5b26fece0678eb33e690f4649fd5a786da04b924ca9708ce740e15948502fb93"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IDFCFIRSTB",
       "file": "sources/filings-IDFCFIRSTB.json",
-      "sha256": "5129b377a640d1a2d5f9b69755a51b0004ed0c28666dd067c4faaedbb776fb6f"
+      "sha256": "ce7f1408b442def7a178fee3f0669dee927c9ccf148b88d25480593a39bf4f02"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IEX",
@@ -13230,7 +13235,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=INDUSINDBK",
       "file": "sources/filings-INDUSINDBK.json",
-      "sha256": "739d3e3bd83a4dd6cb4985e29abe0e125895427628e230fcd3f96e0aac5ce1a8"
+      "sha256": "ee23db71bc8b710bdb6c92c80e82f934d389ca14fc425302758db81269d6cd79"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IOB",
@@ -13270,7 +13275,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=KARURVYSYA",
       "file": "sources/filings-KARURVYSYA.json",
-      "sha256": "91e103d9a97d3f0f53eeba7939f8dcc3838d6277c8634a1d92c33613d846fbb1"
+      "sha256": "4bf2b759c204fd535728ff0b25b20b7905633b636a1c7ffb34f9e4314d605ddf"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=KFINTECH",
@@ -13340,7 +13345,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=MUTHOOTFIN",
       "file": "sources/filings-MUTHOOTFIN.json",
-      "sha256": "62c94f490ba3c10542904869854ab109f6848600a0b3823f25ae4b065c37288e"
+      "sha256": "495e6b390e04c8e08f6f35e6322351be9401d7c85edbd1a62eb44e9bd6555d8d"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=NAM-INDIA",
@@ -13370,7 +13375,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PAISALO",
       "file": "sources/filings-PAISALO.json",
-      "sha256": "271a7616443962e4ab1b4e1ff361c3049fbab6b55cde3576fd409957562b9c97"
+      "sha256": "9b9c2a80fb44b277ddc1a66c9eec696d17aacdabaadb27b7de68b256c1ac10df"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PAYTM",
@@ -13420,7 +13425,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=RECLTD",
       "file": "sources/filings-RECLTD.json",
-      "sha256": "c9905a5862f34976f4c83590f27cbb8df57b90596a8226420f0ed10bece881c0"
+      "sha256": "4d4dc3b93ae59d5c641e13c979d0ea0462102db932b2e4a9b45a240092df3dbe"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=RELIGARE",
@@ -13455,12 +13460,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SHAREINDIA",
       "file": "sources/filings-SHAREINDIA.json",
-      "sha256": "62493dc638c34a906d1edef844e5c247b1d7fb0109e3fa9b31b9a7c0ba4b8ea1"
+      "sha256": "2d248df51855b531b86d53905e5cb73ee67343929fe20cf01c04feb8eaada90c"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SHRIRAMFIN",
       "file": "sources/filings-SHRIRAMFIN.json",
-      "sha256": "1f37bfd55bbd1e0bc11febb9347192c65ecf1e1e483549068d8e5674f6a0f321"
+      "sha256": "2a38ec500dbbe9c6ecf767eb71d467cbfa70cfcb2c85937382379047eb3ae604"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SOUTHBANK",
@@ -13485,7 +13490,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TATAINVEST",
       "file": "sources/filings-TATAINVEST.json",
-      "sha256": "1180e183bfc62523f595d4300d32c8e01a7250d61e8a144c449793785f934957"
+      "sha256": "8a6093fd7db6a1a0c5e4b8cc80d39536e3afa4c3953bc7988f0eed866d14a373"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TMB",
@@ -13515,22 +13520,17 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=YESBANK",
       "file": "sources/filings-YESBANK.json",
-      "sha256": "4182c50759911aa0ccc3c4aa29870fb8bce322f76bc9e5146a76aaeeeef1cafe"
+      "sha256": "2b454874de239ccbbba35f03243d6aa55e269f87a9cf810fb5cc1f4329223ba2"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -13563,10 +13563,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "d4a1089470dde1bf075338e643093de2dfb1ed0ee55e51d554a5cf129847ad8f"
+  "digest": "007bb67d921b219ca015f9bbeffe4ab6bc8546ff90939d1fc959bc80c764b7aa"
 }

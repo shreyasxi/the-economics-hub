@@ -2,11 +2,11 @@
   "schema_version": 1,
   "sector": "Healthcare",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-14T15:26:26.096439+00:00",
+  "collected_at": "2026-11-18T06:42:17.326720+00:00",
   "window_start": "2026-04-30",
   "ownership_as_of": "2026-09-30",
   "flows_as_of": "2026-10-31",
-  "flows_checked_through": "2026-10-31",
+  "flows_checked_through": "2026-11-15",
   "universe_scope": "Healthcare members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
   "kind": "sector",
@@ -664,6 +664,21 @@
           "insurance_pct": 4.130224564044662,
           "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1689784_09072026041014_WEB.xml",
           "filed_at": "09-JUL-2026 16:10:19"
+        },
+        {
+          "symbol": "ALKEM",
+          "quarter": "2026-09-30",
+          "fpi_shares": 12343313,
+          "total_shares": 119565000,
+          "fpi_pct": 10.323516915485301,
+          "dii_shares": 27289460,
+          "dii_pct": 22.823953498097268,
+          "mf_shares": 21267773,
+          "mf_pct": 17.787624304771462,
+          "insurance_shares": 3749210,
+          "insurance_pct": 3.1357086103792917,
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1759358_17112026014419_WEB.xml",
+          "filed_at": "17-NOV-2026 13:44:31"
         }
       ],
       "reference_price": 5163.5
@@ -1812,19 +1827,6 @@
         }
       ],
       "reference_price": 1943.0
-    },
-    {
-      "symbol": "ENNATURE",
-      "name": "Ennature Bio Pharma Ltd.",
-      "sector": "Healthcare",
-      "industry": "Healthcare",
-      "classification_url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
-      "baskets": [
-        "niftymicrocap250",
-        "niftytotalmarket"
-      ],
-      "holdings": [],
-      "reference_price": null
     },
     {
       "symbol": "ERIS",
@@ -5910,6 +5912,11 @@
   "price_date": "2026-09-30",
   "failures": [
     {
+      "stage": "sector_flows",
+      "identity": "2026-11-15",
+      "error": "NSDL report date mismatch"
+    },
+    {
       "stage": "holding",
       "identity": "VIYASH:2025-09-30",
       "error": "Filing symbol mismatch"
@@ -6065,6 +6072,11 @@
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1689784_09072026041014_WEB.xml",
       "file": "sources/ALKEM-2026-06-30.xml.gz",
       "sha256": "35b0d0653709cb7586105c4cf07ffdddcffeebed12ada7a8586c03252d6df65b"
+    },
+    {
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1759358_17112026014419_WEB.xml",
+      "file": "sources/ALKEM-2026-09-30.xml.gz",
+      "sha256": "d9b9af1f5f5d1624887bf4b2dc9e70103a1e4e778508415be751e227bc0d8914"
     },
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1718773_28082026112949_WEB.xml",
@@ -7574,7 +7586,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AJANTPHARM",
       "file": "sources/filings-AJANTPHARM.json",
-      "sha256": "c2b75ca7c02cbba36e739f95dc224ec07b2740d4488f0aac987087353668665b"
+      "sha256": "e1ade14773e4f9670184f51f56d90d83dba649fbfdbbef0041e4a755aa867dd6"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AKUMS",
@@ -7584,7 +7596,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ALKEM",
       "file": "sources/filings-ALKEM.json",
-      "sha256": "709f0a3169531a48464994ba0cb5af353e0ea1b410bf76b9c16f8145ecb506f0"
+      "sha256": "9d576a1bd6a75ba4477117542bf23486abcf0995070d4fad28d4ca08bf2f8d96"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ANTHEM",
@@ -7644,17 +7656,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=DRREDDY",
       "file": "sources/filings-DRREDDY.json",
-      "sha256": "078c67ee39c2fa9f1b5f5132bfd2d3aefb8f61a31a8d9d550358caab3273cb31"
+      "sha256": "a3d3f5b971e879a5915bc5eb657583b893f4b8c2585ddef3a8b1e19c6be94d18"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=EMCURE",
       "file": "sources/filings-EMCURE.json",
       "sha256": "6f6a7088251b7fc60889f7875c14f1de01f69b0065d0664f7ba42e7dc1fe898d"
-    },
-    {
-      "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ENNATURE",
-      "file": "sources/filings-ENNATURE.json",
-      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ERIS",
@@ -7674,12 +7681,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GLAXO",
       "file": "sources/filings-GLAXO.json",
-      "sha256": "b0daf513f3917fd40a051cb7151ebf68f78c5ef97ae3a122953c35039315c5e1"
+      "sha256": "2e999adf129ab0844acd07a29bcc1ed2ecc135d3373fef832d6761af2372ed2f"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GLENMARK",
       "file": "sources/filings-GLENMARK.json",
-      "sha256": "fcd21fcc11ac8dc58f8ce850290d686357d35a18c82ddcde25ca1e60ef5b5228"
+      "sha256": "10b8d5e521ae794e5ce51f2083de493bc989d693bc77e64c7b689d96babb3049"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GRANULES",
@@ -7699,7 +7706,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IPCALAB",
       "file": "sources/filings-IPCALAB.json",
-      "sha256": "2cdc2e709c4d622d41d4c856d509893e51f422abadf6e9edb3e1a6b88407e3ed"
+      "sha256": "78a5a55f834740d4edcbcc9f0a6d6670515b16f8f43f002b6b93634a9115d4e6"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JUBLPHARMA",
@@ -7784,7 +7791,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PFIZER",
       "file": "sources/filings-PFIZER.json",
-      "sha256": "d2c1eec5db2888fa1846191aecf317042c2627a9c4b960737af75812108337ad"
+      "sha256": "04c2e21082e97b7b6c12d2a49542b2cfd05144f59848ef5ebde133659fab55cc"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PGHL",
@@ -7894,17 +7901,12 @@
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv",
       "file": "sources/niftymicrocap250.csv",
-      "sha256": "b3e3b92aad9b788abeb014bb1668b9bb796a14fb3eb89e17c7fe51ca28f52b6b"
+      "sha256": "ad062c848e55c453490b0d51d6b96dab525c5984924980acd552c9b85fcadd78"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv",
       "file": "sources/niftytotalmarket.csv",
-      "sha256": "df60535f43e817ce2bd259d046502318a20584859f14f9f3ecc51d4440b63cb8"
-    },
-    {
-      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Apr302026.html",
-      "file": "sources/nsdl-2026-04-30.html",
-      "sha256": "7355fc88f7b81a1288775108cccb9299ccc444fdb6b4b77d2789d4a6146b4c06"
+      "sha256": "3a1bc40095103cd46900e3b40b6279898682799ec469500ec34e06de93b2c98e"
     },
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
@@ -7937,10 +7939,15 @@
       "sha256": "2f3b2ba0fb76e3a543b3a58448c7a2b7dbfc89f995b1303e299fe3ee4be88665"
     },
     {
+      "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "file": "sources/nsdl-2026-11-15.html",
+      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+    },
+    {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
       "file": "sources/prices-2026-09-30.zip",
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "1eae302315c67949860ad14871d82d4388c2365a1b40a3de301bd6f4d939d641"
+  "digest": "a105a8e8ef8cfe6a15ad0a7fa8e6001c7d8b3d5c1b1fe43ffec7106ce3ce8fe4"
 }
