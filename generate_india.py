@@ -2151,13 +2151,22 @@ def chart_institutional_flows_weekly(output_dir):
         expected_sessions = nifty.index[(nifty.index >= daily.index[0]) & (nifty.index <= last)]
         missing_sessions = expected_sessions.difference(daily.index)
         unmatched_flows = daily.index.difference(nifty.index)
-        if len(missing_sessions) or len(unmatched_flows):
-            missing_text = ", ".join(str(day.date()) for day in missing_sessions[:4])
+        if len(unmatched_flows):
             extra_text = ", ".join(str(day.date()) for day in unmatched_flows[:4])
             raise ValueError(
-                f"Institutional flow dates do not match NSE sessions; missing [{missing_text}], "
-                f"unmatched [{extra_text}]"
+                f"Institutional flow dates do not match NSE sessions; unmatched [{extra_text}]"
             )
+        # NSE can publish a special trading session without a corresponding
+        # FPI/DII row; omit that week's total rather than suppressing the chart.
+        incomplete_weeks = missing_sessions.to_period("W-FRI").unique()
+        if len(incomplete_weeks):
+            labels = ", ".join(str(period) for period in incomplete_weeks)
+            print(
+                f"   WARNING: Excluding {len(incomplete_weeks)} weekly FPI/DII total(s) "
+                f"with NSE sessions but no flow observation: {labels}"
+            )
+            flow_periods = daily.index.to_period("W-FRI")
+            daily = daily.loc[~flow_periods.isin(incomplete_weeks)]
         flows = weekly(daily)
         returns = {}
         flow_weeks = daily.index.to_period("W-FRI")
