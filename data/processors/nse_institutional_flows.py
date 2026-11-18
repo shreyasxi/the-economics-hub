@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import re
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -17,8 +18,12 @@ ARCHIVE_URL = "https://indmarket.in/fii-dii-activity"
 NSE_DAILY_URL = "https://www.nseindia.com/api/fiidiiTradeReact"
 VERSION = "nse_fpi_dii_cash_weekly_v1"
 HISTORY_MONTHS = 6
+# The historical publisher has a known 0.10 crore gross/net discrepancy on
+# one session. Allow that narrow archive-only variance; NSE daily data stays strict.
+ARCHIVE_NET_RECONCILIATION_TOLERANCE_CR = 0.11
 DAILY_COLUMNS = ["fpi_buy_cr", "fpi_sell_cr", "fpi_net_cr",
                  "dii_buy_cr", "dii_sell_cr", "dii_net_cr"]
+ARCHIVE_ROW_SOURCES = {"third_party_historical_archive", "archive_cross_checked_against_nse"}
 
 # IndMarket's server-rendered historical ledger is embedded in Next.js RSC as
 # escaped JSON objects. Keep the parser narrow so a page/schema change fails closed.
@@ -43,8 +48,18 @@ def _validate_row(row: dict, date_text: str, source: str) -> dict:
         raise ValueError(f"Non-finite institutional flow in {source} for {date_text}")
     for prefix in ("fpi", "dii"):
         buy, sell, net = (values[f"{prefix}_{part}_cr"] for part in ("buy", "sell", "net"))
-        if buy < 0 or sell < 0 or abs((buy - sell) - net) > 0.03:
+        difference = abs((buy - sell) - net)
+        tolerance = (ARCHIVE_NET_RECONCILIATION_TOLERANCE_CR
+                     if source == "historical archive" else 0.03)
+        if buy < 0 or sell < 0 or difference > tolerance:
             raise ValueError(f"Buy/sell/net do not reconcile in {source} for {date_text}")
+        if source == "historical archive" and difference > 0.03:
+            warnings.warn(
+                f"Historical archive {prefix.upper()} gross/net differ by {difference:.2f} crore "
+                f"for {date_text}; retaining the archive's published net figure.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
     return values
 
 
@@ -126,18 +141,23 @@ def load(root: Path = ROOT) -> tuple[pd.DataFrame, dict]:
     values = frame[DAILY_COLUMNS].to_numpy(dtype=float)
     if not np.isfinite(values).all():
         raise ValueError("Institutional-flow store contains non-finite values")
-    for prefix in ("fpi", "dii"):
-        if not np.allclose(frame[f"{prefix}_buy_cr"] - frame[f"{prefix}_sell_cr"],
-                           frame[f"{prefix}_net_cr"], rtol=0, atol=0.03):
-            raise ValueError(f"Stored {prefix.upper()} flows do not reconcile")
+    row_sources = manifest.get("row_sources", {})
+    for day, row in frame.iterrows():
+        source = row_sources.get(str(day.date()))
+        tolerance = (ARCHIVE_NET_RECONCILIATION_TOLERANCE_CR
+                     if source in ARCHIVE_ROW_SOURCES else 0.03)
+        for prefix in ("fpi", "dii"):
+            difference = abs((row[f"{prefix}_buy_cr"] - row[f"{prefix}_sell_cr"])
+                             - row[f"{prefix}_net_cr"])
+            if difference > tolerance:
+                raise ValueError(f"Stored {prefix.upper()} flows do not reconcile for {day.date()}")
     for item in manifest.get("sources", {}).values():
         payload = (root / item["path"]).read_bytes()
         if digest(payload) != item.get("sha256"):
             raise ValueError("Institutional-flow historical source checksum mismatch")
     archive = manifest.get("sources", {}).get("historical_archive")
     row_sources = manifest.get("row_sources", {})
-    archive_days = [day for day, source in row_sources.items()
-                    if source in {"third_party_historical_archive", "archive_cross_checked_against_nse"}]
+    archive_days = [day for day, source in row_sources.items() if source in ARCHIVE_ROW_SOURCES]
     if archive and archive_days:
         original = parse_archive((root / archive["path"]).read_bytes(), min(archive_days))
         for day in archive_days:
