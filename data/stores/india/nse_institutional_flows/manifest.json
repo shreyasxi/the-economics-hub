@@ -27,10 +27,17 @@
       "path": "raw/24737eaa7d9a5a7e69b3f9a75a46bc292095bd7b695bb42f5d7589810681560e.json",
       "sha256": "24737eaa7d9a5a7e69b3f9a75a46bc292095bd7b695bb42f5d7589810681560e",
       "bytes": 217
+    },
+    {
+      "date": "2026-11-19",
+      "url": "https://www.nseindia.com/api/fiidiiTradeReact",
+      "retrieved_at": "2026-11-19T21:42:04.392970+00:00",
+      "path": "raw/9c27e9983f53b91513becf029e460930a963a81042bc9ba412b49abd5dfe495d.json",
+      "sha256": "9c27e9983f53b91513becf029e460930a963a81042bc9ba412b49abd5dfe495d",
+      "bytes": 217
     }
   ],
   "row_sources": {
-    "2026-05-18": "third_party_historical_archive",
     "2026-05-19": "third_party_historical_archive",
     "2026-05-20": "third_party_historical_archive",
     "2026-05-21": "third_party_historical_archive",
@@ -157,21 +164,13 @@
     "2026-11-13": "third_party_historical_archive",
     "2026-11-16": "third_party_historical_archive",
     "2026-11-17": "archive_cross_checked_against_nse",
-    "2026-11-18": "nse_official_daily_provisional"
+    "2026-11-18": "nse_official_daily_provisional",
+    "2026-11-19": "nse_official_daily_provisional"
   },
-  "refreshed_at": "2026-11-18T13:29:17.593163+00:00",
-  "first_date": "2026-05-18",
-  "last_date": "2026-11-18",
+  "refreshed_at": "2026-11-19T21:42:04.393603+00:00",
+  "first_date": "2026-05-19",
+  "last_date": "2026-11-19",
   "observations": [
-    {
-      "date": "2026-05-18",
-      "fpi_buy_cr": 17222.18,
-      "fpi_sell_cr": 14408.49,
-      "fpi_net_cr": 2813.69,
-      "dii_buy_cr": 16844.94,
-      "dii_sell_cr": 14162.82,
-      "dii_net_cr": 2682.12
-    },
     {
       "date": "2026-05-19",
       "fpi_buy_cr": 17907.55,
@@ -1314,8 +1313,17 @@
       "dii_buy_cr": 14602.25,
       "dii_sell_cr": 17762.15,
       "dii_net_cr": -3159.9
+    },
+    {
+      "date": "2026-11-19",
+      "fpi_buy_cr": 20706.95,
+      "fpi_sell_cr": 13295.54,
+      "fpi_net_cr": 7411.41,
+      "dii_buy_cr": 17651.5,
+      "dii_sell_cr": 19008.07,
+      "dii_net_cr": -1356.57
     }
   ],
-  "observations_path": "derived/8fc75a96d799434f0806fcab97cf1b095e32cc3a01203b30dfb4261f71323f01.csv",
-  "observations_sha256": "8fc75a96d799434f0806fcab97cf1b095e32cc3a01203b30dfb4261f71323f01"
+  "observations_path": "derived/087e5a4472813eb1f113e2e460d11d56fb2e635c790f1342d4c436bbf42768ac.csv",
+  "observations_sha256": "087e5a4472813eb1f113e2e460d11d56fb2e635c790f1342d4c436bbf42768ac"
 }
