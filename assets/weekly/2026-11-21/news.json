@@ -1,0 +1,156 @@
+{
+ "generated_at": "2026-11-21 10:53 UTC",
+ "reads": {
+  "count": 20,
+  "first": "2026-11-14 11:44 UTC"
+ },
+ "headlines": {
+  "from": "2026-11-14",
+  "to": "2026-11-21",
+  "world": {
+   "items": [
+    {
+     "title": "Central banks ❤️ US dollars",
+     "url": "https://www.ft.com/content/cb01773d-32ae-424c-a5be-a0b960d353ce",
+     "publisher": "Financial Times",
+     "date": "2026-11-19",
+     "theme": "Central banks",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 6
+    },
+    {
+     "title": "Japan’s economy contracts for the first time in a year",
+     "url": "https://www.ft.com/content/4eb7ff18-1ba3-4944-ad48-bdc9e5ddc84e?syn-25a6b1a6=1",
+     "publisher": "Financial Times",
+     "date": "2026-11-16",
+     "theme": "Growth & jobs",
+     "also": [
+      "CNBC",
+      "Bloomberg"
+     ],
+     "days": 3
+    },
+    {
+     "title": "UK inflation rises to 3.6% after petrol and diesel prices hit record high",
+     "url": "https://www.theguardian.com/business/2026/nov/18/uk-inflation-rises-energy-prices-iran-war-oil",
+     "publisher": "The Guardian",
+     "date": "2026-11-18",
+     "theme": "Inflation",
+     "also": [
+      "CNBC",
+      "Financial Times"
+     ],
+     "days": 1
+    },
+    {
+     "title": "SoftBank suffers worst day in over two years as AI sell-off hits Asian tech stocks",
+     "url": "https://www.cnbc.com/2026/11/20/softbank-ai-tech-stocks-slide-anthropic-debut.html",
+     "publisher": "CNBC",
+     "date": "2026-11-20",
+     "theme": "Markets",
+     "also": [
+      "Financial Times",
+      "Bloomberg"
+     ],
+     "days": 1
+    },
+    {
+     "title": "More support for households reliant on heating oil",
+     "url": "https://www.bbc.co.uk/news/articles/cwm2mj7vezr3o?at_medium=RSS&at_campaign=rss",
+     "publisher": "BBC News",
+     "date": "2026-11-19",
+     "theme": "Energy & commodities",
+     "also": [
+      "CNBC"
+     ],
+     "days": 3
+    }
+   ],
+   "publishers": [
+    "BBC News",
+    "The Guardian",
+    "CNBC",
+    "Financial Times",
+    "Bloomberg"
+   ],
+   "unavailable": []
+  },
+  "india": {
+   "items": [
+    {
+     "title": "Oil prices fall as supply surplus outlook outweighs tanker attack concerns",
+     "url": "https://www.business-standard.com/markets/commodities/oil-prices-fall-as-supply-surplus-outlook-outweighs-tanker-attack-concerns-126111700067_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-11-17",
+     "theme": "Energy & commodities",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 7
+    },
+    {
+     "title": "Nifty Bank extends gains to 11.5% in a month, hits fresh record high",
+     "url": "https://www.business-standard.com/markets/news/nifty-bank-extends-gains-to-11-5-in-a-month-hits-fresh-record-high-126111701213_1.html",
+     "publisher": "Business Standard",
+     "date": "2026-11-17",
+     "theme": "Markets",
+     "also": [
+      "Mint",
+      "BusinessLine"
+     ],
+     "days": 3
+    },
+    {
+     "title": "WPI inflation, crude oil prices and FII activity to steer stock markets this week",
+     "url": "https://www.thehindubusinessline.com/markets/wpi-inflation-crude-oil-prices-and-fii-activity-to-steer-stock-markets-this-week/article71704397.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-11-15",
+     "theme": "Inflation",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 2
+    },
+    {
+     "title": "India raises export duty on diesel and aviation turbine fuel",
+     "url": "https://www.thehindubusinessline.com/markets/commodities/india-raises-export-duty-on-diesel-and-aviation-turbine-fuel/article71709576.ece",
+     "publisher": "BusinessLine",
+     "date": "2026-11-17",
+     "theme": "Trade & tariffs",
+     "also": [
+      "Mint",
+      "Business Standard"
+     ],
+     "days": 1
+    },
+    {
+     "title": "Budget 2027-28: Govt to invite Gen Z for pre-Budget consultations; Sitharaman meets economists",
+     "url": "https://www.livemint.com/economy/budget-2027-28-govt-to-invite-gen-z-for-pre-budget-consultations-sitharaman-meets-economists-11794901153565.html",
+     "publisher": "Mint",
+     "date": "2026-11-17",
+     "theme": "Public finances",
+     "also": [
+      "BusinessLine"
+     ],
+     "days": 3
+    }
+   ],
+   "publishers": [
+    "Mint",
+    "Business Standard",
+    "BusinessLine"
+   ],
+   "unavailable": [
+    "The Indian Express"
+   ]
+  }
+ },
+ "problems": [
+  "The Indian Express feed (https://indianexpress.com/section/business/economy/feed/): HTTPError: 403 Client Error: Forbidden for url: https://indianexpress.com/section/business/economy/feed/"
+ ]
+}
