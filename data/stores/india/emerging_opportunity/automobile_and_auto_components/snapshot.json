@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Automobile and Auto Components",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:36:07.140007+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:21:48.880234+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Automobile and Auto Components members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -357.0,
-      "equity_flow_usd_m": -37.0,
-      "end_equity_auc_cr": 505010.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 503316.0,
-      "flow_pct_opening_auc": -0.07092959492644779
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -1098.0,
       "equity_flow_usd_m": -115.0,
       "end_equity_auc_cr": 474488.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 477593.0,
       "flow_pct_opening_auc": -0.22990286708557287
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 7551.0,
+      "equity_flow_usd_m": 802.0,
+      "end_equity_auc_cr": 529709.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 474488.0,
+      "flow_pct_opening_auc": 1.5913995717489167
     }
   ],
   "companies": [
@@ -4390,19 +4390,14 @@
   "price_date": "2026-09-30",
   "failures": [
     {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
+      "stage": "holding",
+      "identity": "TIINDIA:2026-06-30",
+      "error": "404 Client Error: Not Found for url: https://nsearchives.nseindia.in/corporate/xbrl/-"
     },
     {
       "stage": "holding",
       "identity": "TMPV:2025-09-30",
       "error": "Filing symbol mismatch"
-    },
-    {
-      "stage": "holding",
-      "identity": "TIINDIA:2026-06-30",
-      "error": "404 Client Error: Not Found for url: https://nsearchives.nseindia.in/corporate/xbrl/-"
     }
   ],
   "sources": [
@@ -5709,7 +5704,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HEROMOTOCO",
       "file": "sources/filings-HEROMOTOCO.json",
-      "sha256": "f55178039a598d8d3c24c36a80c6d2b08aedca11f4b3b608168cca6d7c5d3144"
+      "sha256": "dcb24d24f47a363ba642b119402ed2e4636c69eded13dfdfd5a42c9a1e0f666a"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HYUNDAI",
@@ -5764,7 +5759,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=MRF",
       "file": "sources/filings-MRF.json",
-      "sha256": "839af2227846acc51372dbc14b289c3b48bf75420df3aaedde271866740b26c9"
+      "sha256": "b9db6fa3dba251c57c70bd420c1b76cad0108b349d7d3f2ece7750ff2744d465"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=MSUMI",
@@ -5899,7 +5894,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -5907,5 +5902,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "a2f6b0dda11795fc49b787a6d08b867a660c19ab2ddb669320dea3c44f994a3e"
+  "digest": "e6d1f40bdc0df999961ff39a4c891255f070e160868088a0dd329c1c65e87d1d"
 }

@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Healthcare",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:42:17.326720+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:29:32.544113+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Healthcare members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -418.0,
-      "equity_flow_usd_m": -44.0,
-      "end_equity_auc_cr": 489272.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 463301.0,
-      "flow_pct_opening_auc": -0.09022212341436776
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -57.0,
       "equity_flow_usd_m": -6.0,
       "end_equity_auc_cr": 528015.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 504679.0,
       "flow_pct_opening_auc": -0.011294307866980794
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 998.0,
+      "equity_flow_usd_m": 106.0,
+      "end_equity_auc_cr": 557842.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 528015.0,
+      "flow_pct_opening_auc": 0.18900978191907428
     }
   ],
   "companies": [
@@ -5912,11 +5912,6 @@
   "price_date": "2026-09-30",
   "failures": [
     {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    },
-    {
       "stage": "holding",
       "identity": "VIYASH:2025-09-30",
       "error": "Filing symbol mismatch"
@@ -7586,7 +7581,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AJANTPHARM",
       "file": "sources/filings-AJANTPHARM.json",
-      "sha256": "e1ade14773e4f9670184f51f56d90d83dba649fbfdbbef0041e4a755aa867dd6"
+      "sha256": "c2b75ca7c02cbba36e739f95dc224ec07b2740d4488f0aac987087353668665b"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AKUMS",
@@ -7656,7 +7651,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=DRREDDY",
       "file": "sources/filings-DRREDDY.json",
-      "sha256": "a3d3f5b971e879a5915bc5eb657583b893f4b8c2585ddef3a8b1e19c6be94d18"
+      "sha256": "078c67ee39c2fa9f1b5f5132bfd2d3aefb8f61a31a8d9d550358caab3273cb31"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=EMCURE",
@@ -7681,12 +7676,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GLAXO",
       "file": "sources/filings-GLAXO.json",
-      "sha256": "2e999adf129ab0844acd07a29bcc1ed2ecc135d3373fef832d6761af2372ed2f"
+      "sha256": "b0daf513f3917fd40a051cb7151ebf68f78c5ef97ae3a122953c35039315c5e1"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GLENMARK",
       "file": "sources/filings-GLENMARK.json",
-      "sha256": "10b8d5e521ae794e5ce51f2083de493bc989d693bc77e64c7b689d96babb3049"
+      "sha256": "fcd21fcc11ac8dc58f8ce850290d686357d35a18c82ddcde25ca1e60ef5b5228"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GRANULES",
@@ -7706,7 +7701,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=IPCALAB",
       "file": "sources/filings-IPCALAB.json",
-      "sha256": "78a5a55f834740d4edcbcc9f0a6d6670515b16f8f43f002b6b93634a9115d4e6"
+      "sha256": "2cdc2e709c4d622d41d4c856d509893e51f422abadf6e9edb3e1a6b88407e3ed"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JUBLPHARMA",
@@ -7791,7 +7786,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PFIZER",
       "file": "sources/filings-PFIZER.json",
-      "sha256": "04c2e21082e97b7b6c12d2a49542b2cfd05144f59848ef5ebde133659fab55cc"
+      "sha256": "d2c1eec5db2888fa1846191aecf317042c2627a9c4b960737af75812108337ad"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PGHL",
@@ -7941,7 +7936,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -7949,5 +7944,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "a105a8e8ef8cfe6a15ad0a7fa8e6001c7d8b3d5c1b1fe43ffec7106ce3ce8fe4"
+  "digest": "2a537a427e78186cac6eea7c0a07c1764d8edce3c11206d78cced8551113e6ef"
 }

@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Capital Goods",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:36:44.489931+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:22:30.200674+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Capital Goods members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": 2645.0,
-      "equity_flow_usd_m": 276.0,
-      "end_equity_auc_cr": 490576.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 490799.0,
-      "flow_pct_opening_auc": 0.5389171534579329
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -825.0,
       "equity_flow_usd_m": -87.0,
       "end_equity_auc_cr": 449447.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 476822.0,
       "flow_pct_opening_auc": -0.17302054015964027
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": -3781.0,
+      "equity_flow_usd_m": -401.0,
+      "end_equity_auc_cr": 470287.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 449447.0,
+      "flow_pct_opening_auc": -0.8412560324131655
     }
   ],
   "companies": [
@@ -10544,11 +10544,6 @@
   "price_date": "2026-09-30",
   "failures": [
     {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    },
-    {
       "stage": "holding",
       "identity": "HEGAM:2025-09-30",
       "error": "Filing symbol mismatch"
@@ -13578,7 +13573,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=APLAPOLLO",
       "file": "sources/filings-APLAPOLLO.json",
-      "sha256": "110615842c7a0b579aeee02e9706e09e1bd45c57363352db2e0459cf7c616499"
+      "sha256": "7b3cb3746c1e92d7e1386a49be3a081152fd8ec43363bce7ab0a23c563600325"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=APOLLO",
@@ -13673,7 +13668,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=COCHINSHIP",
       "file": "sources/filings-COCHINSHIP.json",
-      "sha256": "a0c262613832d46f20757cfff67e806f7adb605260d5acb57bbabbff233cb84a"
+      "sha256": "65efca7c2bd04a45095f25470cb7a1f9c46bb469df700a0a3ac5db5b6e6b60c2"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CPPLUS",
@@ -13713,7 +13708,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ELGIEQUIP",
       "file": "sources/filings-ELGIEQUIP.json",
-      "sha256": "879ac24561e7d7e422fb4ec8efddefa30f16514103aa294f5225bdf45e33af5a"
+      "sha256": "07eb0f455569aa219d924a5b5f16434ea3444ba48d0cec759cc938c6691b9fc3"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=EMMVEE",
@@ -13768,7 +13763,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GREAVESCOT",
       "file": "sources/filings-GREAVESCOT.json",
-      "sha256": "8cdbc1bac4d60ff20f8efa4351596909ebc2893e4d670142267806f9a6bc44a3"
+      "sha256": "2e9ea3debb9cf6cb81c0accc4ebafc0ebcdd6de36b737d4ee2dacab409c094df"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GRINDWELL",
@@ -13788,7 +13783,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GVT%26D",
       "file": "sources/filings-GVT&D.json",
-      "sha256": "3d8a15d8ac09936ccc3fc9f780e79ba54aa34ffee7711fa26320fe94194abcef"
+      "sha256": "6c94713051c20a2020fc45ddaa1c31b2822dd6b2eb4d6a935c3d091f4fe27687"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HAL",
@@ -13833,7 +13828,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JINDALSAW",
       "file": "sources/filings-JINDALSAW.json",
-      "sha256": "80db6f5edbf2df44cde43abd7a08ca13646793031df4dd65d0557da84ae21fbe"
+      "sha256": "652a1d8911e39371d7945d1643ddc4992113e8e37ba0f80b4df904c04decb0ff"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JWL",
@@ -13933,7 +13928,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PRAJIND",
       "file": "sources/filings-PRAJIND.json",
-      "sha256": "0f07a2c64b0072d24a1fc739b54787934596803239c3e64d5eb865e0b4caaf3b"
+      "sha256": "3b63311d1d127cb0e7c82c912dbaa6c69bda9a8aaf577edf745cde864ddfc2d8"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PRECWIRE",
@@ -14063,7 +14058,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=THERMAX",
       "file": "sources/filings-THERMAX.json",
-      "sha256": "9c579795f02d0d8a9ff5dcafe88b23e4a0cb8b7ada9b4f9a39c188b7c3ad6370"
+      "sha256": "25715dc763d3a4ddf8fccea39c2793f4acb026b6a325049d2c0a4342b10a421c"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=TIMETECHNO",
@@ -14193,7 +14188,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -14201,5 +14196,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "abf9defd35e159229df5149e44eefef3fac35911d513cf025241a9ccc89d622a"
+  "digest": "81fdf500286391907943313ec8417d3d15f4f1e4f6f8c31b6c94d03fbe6b9629"
 }

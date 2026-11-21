@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Consumer Durables",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:39:11.148082+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:25:34.600633+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Consumer Durables members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -1162.0,
-      "equity_flow_usd_m": -121.0,
-      "end_equity_auc_cr": 169119.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 173880.0,
-      "flow_pct_opening_auc": -0.6682769726247987
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -402.0,
       "equity_flow_usd_m": -42.0,
       "end_equity_auc_cr": 172174.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 179333.0,
       "flow_pct_opening_auc": -0.22416398543491717
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 1091.0,
+      "equity_flow_usd_m": 116.0,
+      "end_equity_auc_cr": 191724.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 172174.0,
+      "flow_pct_opening_auc": 0.6336612961306585
     }
   ],
   "companies": [
@@ -3580,13 +3580,7 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1547730_14102025050536_WEB.xml",
@@ -4641,7 +4635,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=KANSAINER",
       "file": "sources/filings-KANSAINER.json",
-      "sha256": "64ca4f2a44b1fb93af33b6b82d984190fe80a1594d785df14f22f4410b149a3a"
+      "sha256": "103f9e4085f00d84756874ea112505a52f3365a22fe80e58fffb083eee90d9a2"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=LGEINDIA",
@@ -4651,12 +4645,12 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PCJEWELLER",
       "file": "sources/filings-PCJEWELLER.json",
-      "sha256": "8915452cda457613b2396f94efa7bfbb1a83f58859af1135a4112a301700614b"
+      "sha256": "315bf3b46b0c42f852798437bdb365c49b6713c39f4949e650d7a60ae99d98cd"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PGEL",
       "file": "sources/filings-PGEL.json",
-      "sha256": "79a77a832e0051e6aaf5ea33d232e965b0c4ff9f0926c0893a4ee5a8d6aa1896"
+      "sha256": "728ea7607567c63c0bb73e3b948c1eb0e059dbca2f68549a217a58f3659c61c5"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PNGJL",
@@ -4691,7 +4685,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SHAILY",
       "file": "sources/filings-SHAILY.json",
-      "sha256": "07b18833f86468820d7803abb2aed4be3a62da87df98aac8f8e734c64489e682"
+      "sha256": "a06eb65ed6b08f4aaf984d083de00eb4ab0665316586d52ed61162c3fe6a8904"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=SKYGOLD",
@@ -4736,7 +4730,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VIPIND",
       "file": "sources/filings-VIPIND.json",
-      "sha256": "95c8208a6f4e188ce20e1f6ee3aa6a2a58cc77a57f60a80361f29c204532ff30"
+      "sha256": "03461f723781a943ddec1d5b22919df3ae66da128a5ee50fa0dac41f27f913c8"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=VOLTAS",
@@ -4796,7 +4790,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -4804,5 +4798,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "a0c7179c257418fb3123479019cc36b00a6897ff2902d9eb2a63c691e85cab81"
+  "digest": "dd4e575e8d6909c0a7ed4ab232935030ce5cf1e9810f28b9a70c56f4c852bf57"
 }

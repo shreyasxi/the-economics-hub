@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Services",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:44:37.609777+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:32:45.540809+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Services members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": 7019.0,
-      "equity_flow_usd_m": 732.0,
-      "end_equity_auc_cr": 167368.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 154811.0,
-      "flow_pct_opening_auc": 4.533915548636725
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": 658.0,
       "equity_flow_usd_m": 69.0,
       "end_equity_auc_cr": 186538.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 186896.0,
       "flow_pct_opening_auc": 0.35206745997774164
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 2633.0,
+      "equity_flow_usd_m": 280.0,
+      "end_equity_auc_cr": 203796.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 186538.0,
+      "flow_pct_opening_auc": 1.411508647031704
     }
   ],
   "companies": [
@@ -2189,13 +2189,7 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1544115_10102025011529_WEB.xml",
@@ -2795,7 +2789,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=CONCOR",
       "file": "sources/filings-CONCOR.json",
-      "sha256": "1740c8d35e653c91ec6a16a12aeaf4b99d3b344d390aee9cbb8780bb7fd26fa8"
+      "sha256": "28df1f689fd325720cd4e664b8ba13b74295ed6be5cd4c4a5009a7d9317e6629"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=DELHIVERY",
@@ -2935,7 +2929,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -2943,5 +2937,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "cd76f1450653c55ade2f32e8870ec9b7378ffcea684bbd85248a92f401c6dd6b"
+  "digest": "1da08ce3e1eb03d66d9957cdb7a48278c4bbcafc619f44f394250e5f8859d7fa"
 }

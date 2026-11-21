@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Consumer Services",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:39:41.579127+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:26:14.421196+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Consumer Services members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -365.0,
-      "equity_flow_usd_m": -38.0,
-      "end_equity_auc_cr": 236223.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 241133.0,
-      "flow_pct_opening_auc": -0.15136874670824815
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -662.0,
       "equity_flow_usd_m": -70.0,
       "end_equity_auc_cr": 289957.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 287273.0,
       "flow_pct_opening_auc": -0.23044281919985518
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 6519.0,
+      "equity_flow_usd_m": 692.0,
+      "end_equity_auc_cr": 316296.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 289957.0,
+      "flow_pct_opening_auc": 2.248264397824505
     }
   ],
   "companies": [
@@ -1843,8 +1843,8 @@
           "mf_pct": 0.0,
           "insurance_shares": 0,
           "insurance_pct": 0.0,
-          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1546024_13102025032531_WEB.xml",
-          "filed_at": "13-OCT-2025 15:25:35"
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1571427_11112025063456_WEB.xml",
+          "filed_at": "18-NOV-2026 14:57:58"
         },
         {
           "symbol": "JSLL",
@@ -1858,8 +1858,8 @@
           "mf_pct": 0.0,
           "insurance_shares": null,
           "insurance_pct": null,
-          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1603252_17012026040436_WEB.xml",
-          "filed_at": "17-JAN-2026 16:04:40"
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1607986_22012026123929_WEB.xml",
+          "filed_at": "18-NOV-2026 15:18:23"
         },
         {
           "symbol": "JSLL",
@@ -3901,13 +3901,7 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1551314_17102025124300_WEB.xml",
@@ -4385,14 +4379,14 @@
       "sha256": "c4178d7c260212b51c2cc8fe5442aeb212d2cee6f60e39a31a3de832fb605dcf"
     },
     {
-      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1546024_13102025032531_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1571427_11112025063456_WEB.xml",
       "file": "sources/JSLL-2025-09-30.xml.gz",
-      "sha256": "d283edae456e903e50b5e444888d0a6af4b6100fe5b185c4f6d1d0013da411f2"
+      "sha256": "4a3a06d7a2279607d34133c06c192ad544cbf651dfe62e611be06e31d69c75b4"
     },
     {
-      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1603252_17012026040436_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1607986_22012026123929_WEB.xml",
       "file": "sources/JSLL-2025-12-31.xml.gz",
-      "sha256": "35b6854cc526757d69225e498404fccf69392dfdb63f807031c4455a89b3e9e5"
+      "sha256": "39f489dfeb10a86c665f0cee08e3e60972f7520e45c2e329839d90be046ff737"
     },
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1652795_17042026103206_WEB.xml",
@@ -4972,7 +4966,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ABFRL",
       "file": "sources/filings-ABFRL.json",
-      "sha256": "bc64e01a126c8dc9e5f579b1e1cb3a771abbad71114542faaa8b24e0e9ea6033"
+      "sha256": "d75b07df95575f70599e66d42b24f2248cbb7ea3db8dcc98b5d13f7036dca3f3"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ABLBL",
@@ -5067,7 +5061,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JSLL",
       "file": "sources/filings-JSLL.json",
-      "sha256": "bde60984a7fca6d9f393d96e082be225456b2317dc08bd2efaeb3bc5849e3bbd"
+      "sha256": "4ac20079013f7f6d6bf494e4e895a97e705adb8e0ce30c694fd8fa2f76bb1b1b"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JUBLFOOD",
@@ -5227,7 +5221,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -5235,5 +5229,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "4663de99edc87527fef78607a82b22750bc10fd803d24f15152ce793a34e57d8"
+  "digest": "562eaabce11f67bca3d4a098b3c0267001c751077ab40d555d5f79782ef7901f"
 }

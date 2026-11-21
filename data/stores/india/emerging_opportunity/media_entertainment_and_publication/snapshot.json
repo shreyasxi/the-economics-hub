@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Media, Entertainment & Publication",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:43:31.759340+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:31:11.994115+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Media, Entertainment & Publication members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -12.0,
-      "equity_flow_usd_m": -1.0,
-      "end_equity_auc_cr": 10404.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 10619.0,
-      "flow_pct_opening_auc": -0.11300499105377154
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": 140.0,
       "equity_flow_usd_m": 15.0,
       "end_equity_auc_cr": 11409.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 11084.0,
       "flow_pct_opening_auc": 1.2630819198845182
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 612.0,
+      "equity_flow_usd_m": 65.0,
+      "end_equity_auc_cr": 13136.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 11409.0,
+      "flow_pct_opening_auc": 5.364186168814094
     }
   ],
   "companies": [
@@ -850,13 +850,7 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1554338_20102025024243_WEB.xml",
@@ -1141,7 +1135,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -1149,5 +1143,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "b59b4eab4afbc7bc39abb2a4d0d72c5ca5dfbca40f5bd4fb4a4ef081737dfdc0"
+  "digest": "31bcc899921949249b28d3888503f77479bd7be6ace054f95ba3c88d47b0f39f"
 }

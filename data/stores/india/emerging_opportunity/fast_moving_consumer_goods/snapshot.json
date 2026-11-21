@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Fast Moving Consumer Goods",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:40:17.117001+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:26:57.657843+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Fast Moving Consumer Goods members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -1625.0,
-      "equity_flow_usd_m": -169.0,
-      "end_equity_auc_cr": 324652.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 325861.0,
-      "flow_pct_opening_auc": -0.49867888455507103
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -1559.0,
       "equity_flow_usd_m": -164.0,
       "end_equity_auc_cr": 255495.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 268394.0,
       "flow_pct_opening_auc": -0.5808624633933694
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": 3042.0,
+      "equity_flow_usd_m": 323.0,
+      "end_equity_auc_cr": 278452.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 255495.0,
+      "flow_pct_opening_auc": 1.1906299536194447
     }
   ],
   "companies": [
@@ -368,8 +368,8 @@
           "mf_pct": 8.166081644469326,
           "insurance_shares": 2139427,
           "insurance_pct": 0.16461200421161046,
-          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1648510_10042026122209_WEB.xml",
-          "filed_at": "10-APR-2026 12:22:15"
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1760026_19112026125031_WEB.xml",
+          "filed_at": "19-NOV-2026 14:56:05"
         },
         {
           "symbol": "AWL",
@@ -383,8 +383,8 @@
           "mf_pct": 8.247243709917038,
           "insurance_shares": 2505638,
           "insurance_pct": 0.19278904725834123,
-          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1692368_14072026050220_WEB.xml",
-          "filed_at": "14-JUL-2026 17:02:24"
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1760025_19112026124935_WEB.xml",
+          "filed_at": "19-NOV-2026 14:55:32"
         },
         {
           "symbol": "AWL",
@@ -398,8 +398,8 @@
           "mf_pct": 10.032490840302785,
           "insurance_shares": 2446481,
           "insurance_pct": 0.18823738350297764,
-          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1734273_08102026033216_WEB.xml",
-          "filed_at": "08-OCT-2026 15:32:22"
+          "source_url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1760024_19112026124823_WEB.xml",
+          "filed_at": "19-NOV-2026 14:55:00"
         }
       ],
       "reference_price": 177.68
@@ -3837,11 +3837,6 @@
   "price_date": "2026-09-30",
   "failures": [
     {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    },
-    {
       "stage": "holding",
       "identity": "ITC:2025-09-30",
       "error": "Total shares do not reconcile to reported category percentages"
@@ -3929,19 +3924,19 @@
       "sha256": "5cc1e6ac1d6d348a4c2eff05935417a65f2184cc2587a85994e9f425fc18d310"
     },
     {
-      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1648510_10042026122209_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1760026_19112026125031_WEB.xml",
       "file": "sources/AWL-2026-03-31.xml.gz",
-      "sha256": "887d5200f6de220517c4f68c086305bc9f5da29f3bed603b7f96b6c49befe356"
+      "sha256": "5f4ac684f9dd5f82c0fd8b0e96eb80fa02dc484271747473a1511c251971f6a2"
     },
     {
-      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1692368_14072026050220_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1760025_19112026124935_WEB.xml",
       "file": "sources/AWL-2026-06-30.xml.gz",
-      "sha256": "d595afdf628e244394aeee012861131a9950291dfcaa24cdb2a0a65c302ac6f7"
+      "sha256": "dcef291a8b3d567517d4f020f1d1be2649f55460e01d6662dbb17a2c5b95f32d"
     },
     {
-      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1734273_08102026033216_WEB.xml",
+      "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1760024_19112026124823_WEB.xml",
       "file": "sources/AWL-2026-09-30.xml.gz",
-      "sha256": "1dbb696c64c5660e88a52c8ca0a1710333249110c7721b0ec92baed68b6ebd7c"
+      "sha256": "528d31e87f37ff4a47f0bfd63e46c8ba1ed29c3828b60486cad34000c1ceb408"
     },
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1555155_22102025111637_WEB.xml",
@@ -4946,7 +4941,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=AWL",
       "file": "sources/filings-AWL.json",
-      "sha256": "dc9f898dccf87310df145934b9893c3c91a6ce0c1533ecb7b5c0dc23155b56a9"
+      "sha256": "c4385f5fd17ce6ed35df459de23316b0593dde5e9fc387b6532af7c30ef809fc"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BAJAJCON",
@@ -4956,7 +4951,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BALRAMCHIN",
       "file": "sources/filings-BALRAMCHIN.json",
-      "sha256": "aebc79f309bdc21c4870c9b59934afe4161f8bbc77184a37211a82c57c1b86cb"
+      "sha256": "4efe7dcfe8d4ee5df00393d6344e55ebb730dc2e227f34d6c627b4104b3749b2"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=BECTORFOOD",
@@ -5031,7 +5026,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GOKULAGRO",
       "file": "sources/filings-GOKULAGRO.json",
-      "sha256": "919bfb330f1a584c522085c9a26995e675e9cb3974f1c1edff8ebd0b4f31001b"
+      "sha256": "419bfa1664338e62c8abf22202742b190c00ba1336b0686be95c3959d0a280cf"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=HERITGFOOD",
@@ -5056,7 +5051,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ITC",
       "file": "sources/filings-ITC.json",
-      "sha256": "39aeb13981cea14725b7bfdb397618fdff38036161cffe779341e0938f406415"
+      "sha256": "4ef054fe0b6769f5b3c7693bf605beb55e15631734c005dee30a97b5813e96c8"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=JYOTHYLAB",
@@ -5191,7 +5186,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -5199,5 +5194,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "36c2eb00ccbbc3308446dcc510510605e1c753da3a40db17f5501e7c817aeb98"
+  "digest": "d2bff4f1529839326d94399f9de647647966dc282bfc3c25eb582944ece0e8db"
 }

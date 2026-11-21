@@ -2,10 +2,10 @@
   "schema_version": 1,
   "sector": "Textiles",
   "as_of": "2026-09-30",
-  "collected_at": "2026-11-18T06:45:02.926511+00:00",
-  "window_start": "2026-04-30",
+  "collected_at": "2026-11-21T16:33:24.590569+00:00",
+  "window_start": "2026-05-15",
   "ownership_as_of": "2026-09-30",
-  "flows_as_of": "2026-10-31",
+  "flows_as_of": "2026-11-15",
   "flows_checked_through": "2026-11-15",
   "universe_scope": "Textiles members of NIFTY Total Market and NIFTY Microcap 250; verified subset of NSE listings. BSE-only and other non-members are excluded.",
   "universe_complete": false,
@@ -18,16 +18,6 @@
     "2026-09-30"
   ],
   "flows": [
-    {
-      "date": "2026-05-15",
-      "start": "2026-05-01",
-      "equity_flow_cr": -112.0,
-      "equity_flow_usd_m": -12.0,
-      "end_equity_auc_cr": 18920.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_May312026.html",
-      "opening_equity_auc_cr": 18746.0,
-      "flow_pct_opening_auc": -0.5974607916355489
-    },
     {
       "date": "2026-05-31",
       "start": "2026-05-16",
@@ -134,9 +124,19 @@
       "equity_flow_cr": -21.0,
       "equity_flow_usd_m": -2.0,
       "end_equity_auc_cr": 20480.0,
-      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Oct312026.html",
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "opening_equity_auc_cr": 21265.0,
       "flow_pct_opening_auc": -0.09875382083235364
+    },
+    {
+      "date": "2026-11-15",
+      "start": "2026-11-01",
+      "equity_flow_cr": -98.0,
+      "equity_flow_usd_m": -10.0,
+      "end_equity_auc_cr": 20728.0,
+      "source_url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
+      "opening_equity_auc_cr": 20480.0,
+      "flow_pct_opening_auc": -0.478515625
     }
   ],
   "companies": [
@@ -1205,13 +1205,7 @@
     }
   ],
   "price_date": "2026-09-30",
-  "failures": [
-    {
-      "stage": "sector_flows",
-      "identity": "2026-11-15",
-      "error": "NSDL report date mismatch"
-    }
-  ],
+  "failures": [],
   "sources": [
     {
       "url": "https://nsearchives.nseindia.in/corporate/xbrl/SHP_1551835_17102025035053_WEB.xml",
@@ -1516,7 +1510,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=ARVIND",
       "file": "sources/filings-ARVIND.json",
-      "sha256": "c0162ff7cfb5b06be56553349ecec5639719e76a000d4cd309a9cfba814703b6"
+      "sha256": "ab0b502193f03c63d7701b33304c20bcef369e118fc755986d40592d2521859e"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=GOKEX",
@@ -1551,7 +1545,7 @@
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=PGIL",
       "file": "sources/filings-PGIL.json",
-      "sha256": "dcfb3a6c952a9ddadf82bbeedcde03b4d806db72da00ff175711e1c10e8061bb"
+      "sha256": "69ee9c6cbd7b4e90fc04506a6203708deaba19048e0b6f0df5b7979f60dd99c5"
     },
     {
       "url": "https://www.nseindia.com/api/corporate-share-holdings-master?index=equities&symbol=RAYMONDLSL",
@@ -1616,7 +1610,7 @@
     {
       "url": "https://pilot.fpi.nsdl.co.in/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/FIIInvestSector_Nov152026.html",
       "file": "sources/nsdl-2026-11-15.html",
-      "sha256": "c0233337ebd8e5cb5548dd033f4870e7fb8ff2d0464c0a3d2aeac43a8d20f204"
+      "sha256": "145936c49660920f1c7bd5553ebbb9601c951eebb17c4cffc2242b7cb07c7094"
     },
     {
       "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
@@ -1624,5 +1618,5 @@
       "sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59"
     }
   ],
-  "digest": "e44cf19e9a859f5c0ecd29b72f5a850bc2e9154d4567d5f0705ee16b8d8e571a"
+  "digest": "4be783f6b55b1eb519721e4c304e132b4bdbc8ce0b8b1ffb10b890274991a2fa"
 }
