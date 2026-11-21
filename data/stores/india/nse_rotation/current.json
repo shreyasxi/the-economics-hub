@@ -1,113 +1,113 @@
 {
   "metadata": {
     "methodology": "round((last / oneYearAgoVal - 1) * 100, 2)",
-    "observation_date": "2026-11-18",
-    "previous_close_date": "2026-11-18",
+    "observation_date": "2026-11-20",
+    "previous_close_date": "2026-11-20",
     "return_type": "price; dividends excluded",
     "source_url": "https://www.nseindia.com/api/allIndices",
-    "timestamp": "18-Nov-2026 15:30",
-    "year_ago_date": "2025-11-17"
+    "timestamp": "20-Nov-2026 15:30",
+    "year_ago_date": "2025-11-20"
   },
   "rows": [
     {
       "index": "NIFTY 50",
       "label": "NIFTY 50",
-      "last": 25227.95,
-      "observation_date": "2026-11-18",
-      "return_pct": -3.02,
-      "year_ago": 26013.45,
-      "year_ago_date": "2025-11-17"
+      "last": 25800.6,
+      "observation_date": "2026-11-20",
+      "return_pct": -1.49,
+      "year_ago": 26192.15,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY PHARMA",
       "label": "Pharma",
-      "last": 28200.5,
-      "observation_date": "2026-11-18",
-      "return_pct": 23.32,
-      "year_ago": 22867.6,
-      "year_ago_date": "2025-11-17"
+      "last": 28386.9,
+      "observation_date": "2026-11-20",
+      "return_pct": 25.12,
+      "year_ago": 22687.55,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY METAL",
       "label": "Metal",
-      "last": 12222.3,
-      "observation_date": "2026-11-18",
-      "return_pct": 16.45,
-      "year_ago": 10495.85,
-      "year_ago_date": "2025-11-17"
+      "last": 12271.1,
+      "observation_date": "2026-11-20",
+      "return_pct": 18.15,
+      "year_ago": 10386.05,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY PSU BANK",
       "label": "PSU Bank",
-      "last": 9542.8,
-      "observation_date": "2026-11-18",
-      "return_pct": 12.38,
-      "year_ago": 8491.65,
-      "year_ago_date": "2025-11-17"
+      "last": 9881.05,
+      "observation_date": "2026-11-20",
+      "return_pct": 16.24,
+      "year_ago": 8500.35,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY BANK",
       "label": "Bank Nifty",
-      "last": 62038.65,
-      "observation_date": "2026-11-18",
-      "return_pct": 5.22,
-      "year_ago": 58962.7,
-      "year_ago_date": "2025-11-17"
-    },
-    {
-      "index": "NIFTY ENERGY",
-      "label": "Energy",
-      "last": 36979.55,
-      "observation_date": "2026-11-18",
-      "return_pct": 1.48,
-      "year_ago": 36441.85,
-      "year_ago_date": "2025-11-17"
+      "last": 64635.2,
+      "observation_date": "2026-11-20",
+      "return_pct": 8.91,
+      "year_ago": 59347.7,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY AUTO",
       "label": "Auto",
-      "last": 27394.95,
-      "observation_date": "2026-11-18",
-      "return_pct": -0.28,
-      "year_ago": 27472.65,
-      "year_ago_date": "2025-11-17"
+      "last": 28787.65,
+      "observation_date": "2026-11-20",
+      "return_pct": 4.48,
+      "year_ago": 27554.0,
+      "year_ago_date": "2025-11-20"
     },
     {
-      "index": "NIFTY INFRASTRUCTURE",
-      "label": "Infra",
-      "last": 9523.4,
-      "observation_date": "2026-11-18",
-      "return_pct": -1.32,
-      "year_ago": 9651.1,
-      "year_ago_date": "2025-11-17"
+      "index": "NIFTY ENERGY",
+      "label": "Energy",
+      "last": 37321.25,
+      "observation_date": "2026-11-20",
+      "return_pct": 3.0,
+      "year_ago": 36232.7,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY REALTY",
       "label": "Realty",
-      "last": 918.65,
-      "observation_date": "2026-11-18",
-      "return_pct": -2.82,
-      "year_ago": 945.35,
-      "year_ago_date": "2025-11-17"
+      "last": 938.9,
+      "observation_date": "2026-11-20",
+      "return_pct": 1.74,
+      "year_ago": 922.8,
+      "year_ago_date": "2025-11-20"
     },
     {
-      "index": "NIFTY IT",
-      "label": "IT",
-      "last": 31262.3,
-      "observation_date": "2026-11-18",
-      "return_pct": -14.06,
-      "year_ago": 36375.2,
-      "year_ago_date": "2025-11-17"
+      "index": "NIFTY INFRASTRUCTURE",
+      "label": "Infra",
+      "last": 9689.4,
+      "observation_date": "2026-11-20",
+      "return_pct": -0.03,
+      "year_ago": 9692.3,
+      "year_ago_date": "2025-11-20"
     },
     {
       "index": "NIFTY FMCG",
       "label": "FMCG",
-      "last": 47569.1,
-      "observation_date": "2026-11-18",
-      "return_pct": -14.56,
-      "year_ago": 55677.15,
-      "year_ago_date": "2025-11-17"
+      "last": 48535.7,
+      "observation_date": "2026-11-20",
+      "return_pct": -12.43,
+      "year_ago": 55426.7,
+      "year_ago_date": "2025-11-20"
+    },
+    {
+      "index": "NIFTY IT",
+      "label": "IT",
+      "last": 31322.65,
+      "observation_date": "2026-11-20",
+      "return_pct": -15.44,
+      "year_ago": 37043.3,
+      "year_ago_date": "2025-11-20"
     }
   ],
-  "sha256": "270a7e39c13c37cd60da7cef74916b87200febc1a515a40cd1849db869dc6787"
+  "sha256": "dd3310f791c0e9a970218950c4bb402f69fad0370dec773422926892fe900668"
 }

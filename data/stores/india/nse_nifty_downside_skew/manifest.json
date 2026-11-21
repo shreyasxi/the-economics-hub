@@ -8,22 +8,10 @@
   },
   "weekly_date_calendar": "Official NSE / NIFTY Indices NIFTY 50 daily closes",
   "legacy_underlying_source": "NIFTY 50 official historical index closes",
-  "requested_end": "2026-11-17",
-  "retained_start": "2023-11-17",
-  "refreshed_at": "2026-11-18T14:38:11.134043+00:00",
+  "requested_end": "2026-11-20",
+  "retained_start": "2023-11-20",
+  "refreshed_at": "2026-11-21T08:49:37.217454+00:00",
   "sources": [
-    {
-      "date": "2023-11-17",
-      "url": "https://archives.nseindia.com/content/historical/DERIVATIVES/2023/NOV/fo17NOV2023bhav.csv.zip",
-      "archive_format": "legacy",
-      "archive_sha256": "1949cf771d0fa171569cd2364ee58997c737b45b87c8f00fde2bcab29ec515d6",
-      "archive_bytes": 736115,
-      "rows": 767,
-      "retrieved_at": "2026-11-06T12:13:12.532799+00:00",
-      "subset_path": "raw/d681c645a7a398ae62bae033aaff6f0d8fda82a53f6bff2a5930349aafc4292c.csv",
-      "subset_sha256": "d681c645a7a398ae62bae033aaff6f0d8fda82a53f6bff2a5930349aafc4292c",
-      "subset_bytes": 45326
-    },
     {
       "date": "2023-11-24",
       "url": "https://archives.nseindia.com/content/historical/DERIVATIVES/2023/NOV/fo24NOV2023bhav.csv.zip",
@@ -1829,7 +1817,7 @@
       "archive_sha256": "9021b35dccd79f13d642bee45dc0fc8660122fadcb673158c6969c43c1fbf8d5",
       "archive_bytes": 1282557,
       "rows": 1358,
-      "retrieved_at": "2026-11-18T14:38:08.201057+00:00",
+      "retrieved_at": "2026-11-21T08:49:34.000544+00:00",
       "subset_path": "raw/5857a614358e8ac3412c04f8197510cbf9d5dd4bee203eef127403abc20491ca.csv",
       "subset_sha256": "5857a614358e8ac3412c04f8197510cbf9d5dd4bee203eef127403abc20491ca",
       "subset_bytes": 82758
@@ -1841,26 +1829,25 @@
       "archive_sha256": "7455447c19eb138dd6799d701aab4fed7d94f0bf0dbac3a3f14ebe257bdeab2c",
       "archive_bytes": 1385672,
       "rows": 1370,
-      "retrieved_at": "2026-11-18T14:38:09.421803+00:00",
+      "retrieved_at": "2026-11-21T08:49:35.636738+00:00",
       "subset_path": "raw/eba3985efec83fcf530c3de9d417a258c4f02e14f83f2d3018ab1032452cec67.csv",
       "subset_sha256": "eba3985efec83fcf530c3de9d417a258c4f02e14f83f2d3018ab1032452cec67",
       "subset_bytes": 81377
     },
     {
-      "date": "2026-11-17",
-      "url": "https://archives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261117_F_0000.csv.zip",
+      "date": "2026-11-20",
+      "url": "https://archives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261120_F_0000.csv.zip",
       "archive_format": "udiff",
-      "archive_sha256": "056b8567e71017a5e9b586e20ea0c7c98c4b63ae1a59f82cb6d3cca466dad7da",
-      "archive_bytes": 1442580,
-      "rows": 1054,
-      "retrieved_at": "2026-11-18T14:38:10.365024+00:00",
-      "subset_path": "raw/db8f3f7ba8d3e5fe8d6a971b5e264dcbd4efd56a989fe3d2bfecbe920d8beb27.csv",
-      "subset_sha256": "db8f3f7ba8d3e5fe8d6a971b5e264dcbd4efd56a989fe3d2bfecbe920d8beb27",
-      "subset_bytes": 62717
+      "archive_sha256": "becc894692f4877071bcd9fa9dc1c91b09ea6274e830f8b299e8e4f43dfc4c6b",
+      "archive_bytes": 1528543,
+      "rows": 1206,
+      "retrieved_at": "2026-11-21T08:49:36.516565+00:00",
+      "subset_path": "raw/4dc1e5085971f6294a376b03537c105141cfdad21899d94410263e5996c835b3.csv",
+      "subset_sha256": "4dc1e5085971f6294a376b03537c105141cfdad21899d94410263e5996c835b3",
+      "subset_bytes": 72485
     }
   ],
   "source_dates": [
-    "2023-11-17",
     "2023-11-24",
     "2023-12-01",
     "2023-12-08",
@@ -2017,10 +2004,10 @@
     "2026-10-30",
     "2026-11-06",
     "2026-11-13",
-    "2026-11-17"
+    "2026-11-20"
   ],
-  "last_option_date": "2026-11-17",
-  "option_contract_rows": 146423,
-  "observations_path": "derived/5cd04dc8bb2c87413f6a834ea3cfa7dda69de13490b7913be62b11ea0ae4727a.csv",
-  "observations_sha256": "5cd04dc8bb2c87413f6a834ea3cfa7dda69de13490b7913be62b11ea0ae4727a"
+  "last_option_date": "2026-11-20",
+  "option_contract_rows": 145808,
+  "observations_path": "derived/78e2bdae520ac0da8abbecf0783668631e78667a02d01d4a143cff857c5f8509.csv",
+  "observations_sha256": "78e2bdae520ac0da8abbecf0783668631e78667a02d01d4a143cff857c5f8509"
 }

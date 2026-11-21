@@ -3,10 +3,10 @@
   "source_description": "NSE daily index closing reports; exact Nifty 50 and India VIX rows",
   "source_url_template": "https://archives.nseindia.com/content/indices/ind_close_all_{date}.csv",
   "chart_window_calendar_days": 365,
-  "retained_start": "2024-11-18",
-  "last_date": "2026-11-17",
-  "matched_dates": 496,
-  "refreshed_at": "2026-11-18T14:38:04.298375+00:00",
+  "retained_start": "2024-11-21",
+  "last_date": "2026-11-20",
+  "matched_dates": 497,
+  "refreshed_at": "2026-11-21T08:49:31.384818+00:00",
   "unavailable_report_dates_this_refresh": [
     "2026-11-07",
     "2026-11-10",
@@ -14,20 +14,6 @@
     "2026-11-15"
   ],
   "sources": [
-    {
-      "date": "2024-11-18",
-      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_18112024.csv",
-      "path": "raw/0324c996d7d414654d32bf298ac057514c3c78fa79c50b455b8ee93495bba1c2.csv",
-      "sha256": "0324c996d7d414654d32bf298ac057514c3c78fa79c50b455b8ee93495bba1c2",
-      "bytes": 12958
-    },
-    {
-      "date": "2024-11-19",
-      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_19112024.csv",
-      "path": "raw/16d1eaee9c7917f717fcd84ebdd00297ffd38a0c12e9b089950ee7c0616599a5.csv",
-      "sha256": "16d1eaee9c7917f717fcd84ebdd00297ffd38a0c12e9b089950ee7c0616599a5",
-      "bytes": 12824
-    },
     {
       "date": "2024-11-21",
       "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_21112024.csv",
@@ -3485,8 +3471,29 @@
       "path": "raw/176cde7ac54156d9d070b1bcb21d633943722f80338274b73d012be797238488.csv",
       "sha256": "176cde7ac54156d9d070b1bcb21d633943722f80338274b73d012be797238488",
       "bytes": 17680
+    },
+    {
+      "date": "2026-11-18",
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_18112026.csv",
+      "path": "raw/b23709e77ecfdff44bc2410304424efbb3a954c9c2578fb52ab36169c0a51232.csv",
+      "sha256": "b23709e77ecfdff44bc2410304424efbb3a954c9c2578fb52ab36169c0a51232",
+      "bytes": 17942
+    },
+    {
+      "date": "2026-11-19",
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_19112026.csv",
+      "path": "raw/1bf9578c4d0ebf5672db14980a83f7b661ea0c4548bb29f5cd8a466019dfdd62.csv",
+      "sha256": "1bf9578c4d0ebf5672db14980a83f7b661ea0c4548bb29f5cd8a466019dfdd62",
+      "bytes": 17775
+    },
+    {
+      "date": "2026-11-20",
+      "source_url": "https://archives.nseindia.com/content/indices/ind_close_all_20112026.csv",
+      "path": "raw/2fc89d675e654691a26f32c15a6cded2a3cd630ae400a9178b7501aeadd2bdfc.csv",
+      "sha256": "2fc89d675e654691a26f32c15a6cded2a3cd630ae400a9178b7501aeadd2bdfc",
+      "bytes": 17725
     }
   ],
-  "observations_path": "derived/ec5acc16dd33e22e4604b2f6d8eda54d190a5f08cd4accdde3ece7340b203e84.csv",
-  "observations_sha256": "ec5acc16dd33e22e4604b2f6d8eda54d190a5f08cd4accdde3ece7340b203e84"
+  "observations_path": "derived/7358dcf04fd1ec17fd0dfb384084502e2267964c7b401d171e74ec962a907ca4.csv",
+  "observations_sha256": "7358dcf04fd1ec17fd0dfb384084502e2267964c7b401d171e74ec962a907ca4"
 }
