@@ -5,20 +5,20 @@
   "sources": {
     "historical_archive": {
       "url": "https://indmarket.in/fii-dii-activity",
-      "retrieved_at": "2026-11-24T01:04:32.151041+00:00",
-      "path": "raw/007d0b3a1e92f1c1f838a8b5bd96ce592b0a23c2297a97f7db749c7263c29e18.html",
-      "sha256": "007d0b3a1e92f1c1f838a8b5bd96ce592b0a23c2297a97f7db749c7263c29e18",
-      "bytes": 641726
+      "retrieved_at": "2026-11-25T22:38:38.701545+00:00",
+      "path": "raw/538a8dd517fbdddbe73ce9a1d11cfec421ca9aa9c1bfe958a7cd7d439079eac6.html",
+      "sha256": "538a8dd517fbdddbe73ce9a1d11cfec421ca9aa9c1bfe958a7cd7d439079eac6",
+      "bytes": 642375
     }
   },
   "nse_daily_snapshots": [
     {
-      "date": "2026-11-23",
+      "date": "2026-11-25",
       "url": "https://www.nseindia.com/api/fiidiiTradeReact",
-      "retrieved_at": "2026-11-24T01:04:32.151057+00:00",
-      "path": "raw/3b75c726ed624f2f48a1fe7020f526ce17273afd08ebf620aaad5632055b2048.json",
-      "sha256": "3b75c726ed624f2f48a1fe7020f526ce17273afd08ebf620aaad5632055b2048",
-      "bytes": 218
+      "retrieved_at": "2026-11-25T22:38:38.701563+00:00",
+      "path": "raw/a04600c75117c1855de930f006c59e8dc6b5f7e85bbea882f76ab1dd6015d62f.json",
+      "sha256": "a04600c75117c1855de930f006c59e8dc6b5f7e85bbea882f76ab1dd6015d62f",
+      "bytes": 216
     }
   ],
   "row_sources": {
@@ -147,11 +147,12 @@
     "2026-11-18": "third_party_historical_archive",
     "2026-11-19": "third_party_historical_archive",
     "2026-11-20": "third_party_historical_archive",
-    "2026-11-23": "archive_cross_checked_against_nse"
+    "2026-11-23": "third_party_historical_archive",
+    "2026-11-25": "archive_cross_checked_against_nse"
   },
-  "refreshed_at": "2026-11-24T01:04:32.151277+00:00",
+  "refreshed_at": "2026-11-25T22:38:38.701786+00:00",
   "first_date": "2026-05-25",
-  "last_date": "2026-11-23",
+  "last_date": "2026-11-25",
   "observations": [
     {
       "date": "2026-05-25",
@@ -1286,8 +1287,17 @@
       "dii_buy_cr": 16505.75,
       "dii_sell_cr": 19265.87,
       "dii_net_cr": -2760.12
+    },
+    {
+      "date": "2026-11-25",
+      "fpi_buy_cr": 24309.87,
+      "fpi_sell_cr": 19830.79,
+      "fpi_net_cr": 4479.08,
+      "dii_buy_cr": 22379.82,
+      "dii_sell_cr": 18361.1,
+      "dii_net_cr": 4018.72
     }
   ],
-  "observations_path": "derived/74b0c54a563d96337e1d8117367811e95cbaa49f6e3578c5fc78c25d0d096bbc.csv",
-  "observations_sha256": "74b0c54a563d96337e1d8117367811e95cbaa49f6e3578c5fc78c25d0d096bbc"
+  "observations_path": "derived/e2f5e426e4a8020b375d32be38bd3da574548a1114280eeb1523c7434bb7ac90.csv",
+  "observations_sha256": "e2f5e426e4a8020b375d32be38bd3da574548a1114280eeb1523c7434bb7ac90"
 }
